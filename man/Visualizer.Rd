@@ -142,7 +142,7 @@ Add an optimization trace.
   npoints = NULL,
   npmax = NULL,
   name = NULL,
-  offset = c(0, 0, 0),
+  offset = NULL,
   ...
 )}\if{html}{\out{</div>}}
 }

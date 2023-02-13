@@ -178,9 +178,15 @@ Visualizer = R6::R6Class("Visualizer",
     #' @param name (`character(1)`) The name of the trace in the legend. Default is `NULL`
     #' which means that the name is pasted from `opt$id` and `objective$id`.
     #' @param offset (`numeric(3)`) Trace shift in direction (x, y, z).
+    #' @param add_marker_at (`integer()`) Vector of iterations at which a marker is added.
+    #' @param marker_shape (`character()`) Vector indicating the shape of the markers.
+    #' if `length(marker_shape) == 1`, all markers get the same shape. The other option is to
+    #' specify all markers individually by passing a vector of `length(add_marker_at)`.
+    #' For a list of all shapes see `schema(F)$traces$scatter$attributes$marker$symbol$values`.
     #' @param ... Further arguments passed to `add_trace(...)`.
     addLayerOptimizationTrace = function(opt, line_color = colSampler(), mcolor_out = "black",
-      npoints = NULL, npmax = NULL, name = NULL, offset = c(0, 0, 0), ...) {
+      npoints = NULL, npmax = NULL, name = NULL, offset = NULL, add_marker_at = 1,
+      marker_shape = "circle", ...) {
 
       checkmate::assertR6(opt, "Optimizer")
       checkmate::assertCount(npoints, null.ok = TRUE)
@@ -192,11 +198,17 @@ Visualizer = R6::R6Class("Visualizer",
 
       checkmate::assertString(line_color)
       if (private$p_layer_primary == "contour") {
-        checkmate::assertNumeric(offset, len = 2L)
+        checkmate::assertNumeric(offset, len = 2L, null.ok = TRUE)
+        if (is.null(offset)) {
+          offset = rep(0, 2)
+        }
         offset[3] = 0
       }
       if (private$p_layer_primary == "surface") {
-        checkmate::assertNumeric(offset, len = 3L)
+        checkmate::assertNumeric(offset, len = 3L, null.ok = TRUE)
+        if (is.null(offset)) {
+          offset = rep(0, 3)
+        }
       }
 
       aargs = list(...)
@@ -207,6 +219,12 @@ Visualizer = R6::R6Class("Visualizer",
 
       if (nrow(opt$archive) == 0) {
         stop("No optimization trace in `opt$archive`. Did you forget to call `opt$optimize(steps)`?")
+      }
+      checkmate::assertIntegerish(add_marker_at, lower = 1, upper = nrow(opt$archive))
+      if (! length(marker_shape) %in% c(1, length(add_marker_at))) {
+        if (length(marker_shape) == 1) marker_shape = rep(marker_shape, length(add_marker_at))
+        mvals = schema(F)$traces$scatter$attributes$marker$symbol$values
+        checkmate::assertChoice(marker_shape, choices = mvals)
       }
 
       xmat = do.call(rbind, c(opt$archive$x_in[1], opt$archive$x_out))
@@ -221,8 +239,9 @@ Visualizer = R6::R6Class("Visualizer",
           npmax = nrow(xmarkers)
         }
       }
-      xmarkers = xmarkers[unique(round(seq(1, nrow(xmarkers), length.out = npoints))), ]
-      xmarkers = xmarkers[seq_len(npmax), ]
+      xmr = xmarkers[unique(round(seq(1, nrow(xmarkers), length.out = npoints))), ]
+      xmr = xmr[seq_len(npmax), ]
+      add_marker_at = add_marker_at[add_marker_at <= npmax]
 
       ptype = NULL
       if (is.null(name)) {
@@ -233,9 +252,9 @@ Visualizer = R6::R6Class("Visualizer",
         ptype = "scatter3d"
         pargs = list(
           name = name,
-          x = xmarkers$x,
-          y = xmarkers$y,
-          z = xmarkers$z,
+          x = xmr$x,
+          y = xmr$y,
+          z = xmr$z,
           marker = list(color = line_color, line = list(color = mcolor_out, width = 6)),
           line = list(color = line_color, width = 8))
       }
@@ -243,8 +262,8 @@ Visualizer = R6::R6Class("Visualizer",
         ptype = "scatter"
         pargs = list(
           name = name,
-          x = xmarkers$x,
-          y = xmarkers$y,
+          x = xmr$x,
+          y = xmr$y,
           marker = list(color = line_color, size = 12, line = list(color = mcolor_out, width = 2)),
           line = list(color = line_color, width = 4))
       }
@@ -258,12 +277,12 @@ Visualizer = R6::R6Class("Visualizer",
         list(mode = "lines")))
 
       pargs = list(
-        x = xmarkers$x[1],
-        y = xmarkers$y[1],
-        z = xmarkers$z[1],
+        x = xmarkers$x[add_marker_at],
+        y = xmarkers$y[add_marker_at],
+        z = xmarkers$z[add_marker_at],
         mode = "markers",
         type = ptype,
-        marker = pargs$marker,
+        marker = insert_named(pargs$marker, list(symbol = marker_shape)),
         showlegend = FALSE)
       if (private$p_layer_primary == "contour") {
         pargs$z = NULL

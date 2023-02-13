@@ -43,7 +43,7 @@ Creates a new instance of this [R6][R6::R6Class] class.
   x_start,
   step_size = 0.01,
   id = "Gradient Descent",
-  verbose = TRUE
+  print_trace = TRUE
 )}\if{html}{\out{</div>}}
 }
 
@@ -60,7 +60,7 @@ optimization. Get this value with `$x`.}
 
 \item{\code{id}}{(`character(1)`) Id of the object.}
 
-\item{\code{verbose}}{(`logical(1)` Indicator whether to print the status of `$optimize()`.}
+\item{\code{print_trace}}{(`logical(1)` Indicator whether to print the status of `$optimize()`.}
 }
 \if{html}{\out{</div>}}
 }

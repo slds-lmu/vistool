@@ -269,6 +269,7 @@ for (i in seq_along(tfuns)) {
     limits_upper = tf$limits_upper)))
 }
 
+#' @export
 as.data.table.DictionaryObjective = function(x, ..., objects = FALSE) {
 
   data.table::setkeyv(mlr3misc::map_dtr(x$keys(), function(key) {

@@ -9,9 +9,9 @@ options(width = 80)
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  eval = FALSE,
   fig.path = "Readme_files/"
 )
+REBUILD = FALSE
 ```
 
 # Vistool
@@ -21,27 +21,30 @@ knitr::opts_chunk$set(
 ```{r}
 devtools::load_all()
 
+# Test functions dictionary:
+as.data.table(tfun_dict)
+
 # Get objective to define the "problem":
 obj = tfun_dict$get("TF_banana")
 
 # Define optimizers based on the objective and conduct 1000 steps:
-oo1 = OptimizerGD$new(obj, x_start = c(0.6, 0.6), step_size = 0.001, id = "GD x0=(0.6, 0.6)")
+oo1 = OptimizerGD$new(obj, x_start = c(0.6, 0.6), step_size = 0.001, id = "GD x0=(0.6, 0.6)", print_trace = FALSE)
 oo1$optimize(steps = 1000)
 
-oo2 = OptimizerGD$new(obj, x_start = c(0, 0), step_size = 0.001, id = "GD x0=(0, 0)")
+oo2 = OptimizerGD$new(obj, x_start = c(0, 0), step_size = 0.001, id = "GD x0=(0, 0)", print_trace = FALSE)
 oo2$optimize(steps = 1000)
 
-oo3 = OptimizerGD$new(obj, x_start = c(0.4, 1), step_size = 0.001, id = "GD x0=(0.4, 1)")
+oo3 = OptimizerGD$new(obj, x_start = c(0.4, 1), step_size = 0.001, id = "GD x0=(0.4, 1)", print_trace = FALSE)
 oo3$optimize(steps = 1000)
 
-oo4 = OptimizerMomentum$new(obj, x_start = c(0, 0), step_size = 0.001)
+oo4 = OptimizerMomentum$new(obj, x_start = c(0, 0), step_size = 0.001, print_trace = FALSE)
 oo4$optimize(steps = 1000)
 
-oo5 = OptimizerNAG$new(obj, x_start = c(0, 0), step_size = 0.001)
+oo5 = OptimizerNAG$new(obj, x_start = c(0, 0), step_size = 0.001, print_trace = FALSE)
 oo5$optimize(steps = 1000)
 
 # Optimization traces are stored in the archive:
-head(oo5$archive)
+oo5$archive
 
 # The Visualizer class just requires the object and sets everything such as
 # limits automatically (if not you will get a message):
@@ -50,11 +53,12 @@ viz = Visualizer$new(obj)
 # The two potential visualizations are surface and contour plots. The "base"
 # layer is defined by `$initLayerContour()` or `$initLayerSurface()`:
 viz$initLayerSurface()
-
+```
+```{r, eval=FALSE}
 # Creating the figure is done with `$plot()`:
 viz$plot()
 ```
-```{r, include=FALSE}
+```{r, include=FALSE, eval=REBUILD}
 viz$save("Readme_files/fig1.png")
 ```
 ![](Readme_files/fig1.png)
@@ -65,10 +69,11 @@ viz$addLayerOptimizationTrace(oo2, line_color = "rgb(46,139,87)")
 viz$addLayerOptimizationTrace(oo3, line_color = "rgb(220,20,60)")
 viz$addLayerOptimizationTrace(oo4)
 viz$addLayerOptimizationTrace(oo5)
-
+```
+```{r, eval=FALSE}
 viz$plot()
 ```
-```{r, include=FALSE}
+```{r, include=FALSE, eval=REBUILD}
 viz$save("Readme_files/fig2.png")
 ```
 ![](Readme_files/fig2.png)
@@ -82,10 +87,11 @@ viz$addLayerOptimizationTrace(oo2, line_color = "rgb(46,139,87)", offset = c(-0.
 viz$addLayerOptimizationTrace(oo3, line_color = "rgb(220,20,60)")
 viz$addLayerOptimizationTrace(oo4, offset = c(0.01, 0.01, -0.01))
 viz$addLayerOptimizationTrace(oo5, offset = c(0.01, 0.01, 0.01))
-
+```
+```{r, eval=FALSE}
 viz$plot()
 ```
-```{r, include=FALSE}
+```{r, include=FALSE, eval=REBUILD}
 viz$save("Readme_files/fig3.png")
 ```
 ![](Readme_files/fig3.png)
@@ -98,19 +104,20 @@ viz$setLayout(legend = list(
   orientation = "h",   # show entries horizontally
   xanchor = "center",  # use center of legend as anchor
   x = 0.5))            # legend = list()
-
+```
+```{r, eval=FALSE}
 viz$plot()
 
 # Save a plot can also easily be done with `save()`
 viz$save("myfigure.png")
 ```
-```{r, include=FALSE}
+```{r, include=FALSE, eval=REBUILD}
 viz$save("Readme_files/fig4.png")
 ```
 ![](Readme_files/fig4.png)
 
 
-```{r}
+```{r, eval=FALSE}
 # Create animations with `$animate()` (Note: Just the frames are stored,
 # you have to put them together by yourself):
 viz$animate(nframes = 24L, view_start = list(x = 1, y = -2, z = 1),
@@ -135,31 +142,40 @@ y = iris$Sepal.Width
 obj_lm = Objective$new(id = "iris LM", fun = mylm, xdim = 2,  Xmat = Xmat, y = y, minimize = TRUE)
 
 # Optimize with two different start points:
-oo1 = OptimizerGD$new(obj_lm, x_start = c(0, -0.05), step_size = 0.001)
+oo1 = OptimizerGD$new(obj_lm, x_start = c(0, -0.05), step_size = 0.001, print_trace = FALSE)
 oo1$optimize(steps = 100)
 
-oo2 = OptimizerMomentum$new(obj_lm, x_start = c(-0.05, 0), step_size = 0.001)
+tail(oo1$archive)
+
+oo2 = OptimizerMomentum$new(obj_lm, x_start = c(-0.05, 0), step_size = 0.001, print_trace = FALSE)
 oo2$optimize(steps = 100)
 
-oo3 = OptimizerNAG$new(obj_lm, x_start = c(0, 0), step_size = 0.001)
+tail(oo2$archive)
+
+oo3 = OptimizerNAG$new(obj_lm, x_start = c(0, 0), step_size = 0.001, print_trace = FALSE)
 oo3$optimize(steps = 100)
+
+tail(oo3$archive)
 
 # Visualize, this time with contour lines and custom limits:
 viz = Visualizer$new(obj_lm, x1limits = c(-0.5, 5), x2limits = c(-3.2, 2.8))
 
 viz$initLayerContour()
 
-viz$addLayerOptimizationTrace(oo1)
-viz$addLayerOptimizationTrace(oo2)
-viz$addLayerOptimizationTrace(oo3)
+viz$addLayerOptimizationTrace(oo1, add_marker_at = round(seq(1, 100, len = 10L)))
+viz$addLayerOptimizationTrace(oo2, add_marker_at = c(1, 50, 90), marker_shape = c("square", "star-triangle-down", "cross"))
+viz$addLayerOptimizationTrace(oo3, add_marker_at = 100, marker_shape = "star")
 
 viz$setLayout(legend = list(orientation = "h", xanchor = "center", x = 0.5))
+```
+
+```{r, eval=FALSE}
 viz$plot()
 
 viz$animate(nframes = 24L)
 # Use, e.g., ImageMagick: `convert -delay 10 -loop 0 animation/*.png mygif.gif`
 ```
-```{r,include=FALSE}
+```{r,include=FALSE, eval=REBUILD}
 viz$save("Readme_files/fig_lm.png")
 ```
 ![](Readme_files/fig_lm.png)
@@ -167,7 +183,7 @@ viz$save("Readme_files/fig_lm.png")
 
 ## All 2D Objectives
 
-```{r, eval=TRUE, results="asis", echo=FALSE, warning=FALSE, message=FALSE}
+```{r, results="asis", echo=FALSE, warning=FALSE, message=FALSE}
 devtools::load_all(quiet = TRUE)
 
 rerun = FALSE

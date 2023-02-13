@@ -1,6 +1,6 @@
 # question: do we enforce that x is always 2d?
 #   currently not, as we maybe want to benchmark in some d, then show at least
-#   y-traces. restriction seems to have no value, currently
+#   y-print_traces. restriction seems to have no value, currently
 
 #' Optimizer class
 #'
@@ -12,22 +12,22 @@ Optimizer = R6Class("Optimizer",
     #' @field id (`character(1)` The id of the objective.
     id = NULL,
 
-    #' @field verbose (`logical(1)` Indicator whether to print the status of `$optimize()`.
-    verbose = TRUE,
+    #' @field print_trace (`logical(1)` Indicator whether to print the status of `$optimize()`.
+    print_trace = TRUE,
 
     #' @description Creates a new instance of this [R6][R6::R6Class] class.
     #' @param objective (`Objective`) The objective to optimize.
-    #' @param x_start (`numeric()` Start value of the optimization. Note, after
+    #' @param x_start (`numeric()`) Start value of the optimization. Note, after
     #' the first call of `$optimize()` the last value is used to continue
     #' optimization. Get this value with `$x`.
     #' @param id (`character(1)`) Id of the object.
-    #' @param verbose (`logical(1)` Indicator whether to print the status of `$optimize()`.
-    initialize = function(objective, x_start, id = NULL, verbose = TRUE) {
+    #' @param print_trace (`logical(1)`) Indicator whether to print the status of `$optimize()`.
+    initialize = function(objective, x_start, id = NULL, print_trace = TRUE) {
       private$p_objective = checkmate::assertR6(objective$clone(deep = TRUE), "Objective")
       private$p_x_start = objective$assertX(x_start)
       private$p_x = private$p_x_start
       self$id = checkmate::assertString(id, null.ok = TRUE)
-      self$verbose = checkmate::assertLogical(verbose, len = 1L)
+      self$print_trace = checkmate::assertLogical(print_trace, len = 1L)
 
       return(invisible(self))
     },
@@ -41,8 +41,9 @@ Optimizer = R6Class("Optimizer",
     #' @param lr (`numeric(1)`) The learning rate used to multiply `update` with.
     #' @param objective (`Objective`) The objective used by `$optimize()`.
     #' @param step (`integer(1)`) The step or iteration.
+    #' @param ... Additional objects added to the archive (e.g. `momentum`).
     #' @return `data.table()` of the input arguments.
-    prepareUpdateForArchive = function(x_out, x_in, update, fval_out, fval_in, lr, objective, step) {
+    prepareUpdateForArchive = function(x_out, x_in, update, fval_out, fval_in, lr, objective, step, ...) {
 
       out = data.table(
         x_out = list(x_out),
@@ -51,8 +52,9 @@ Optimizer = R6Class("Optimizer",
         fval_out = fval_out,
         fval_in = fval_in,
         lr = lr,
-        objective = list(objective),
-        step = step)
+        objective = list(objective))
+      out = cbind(out, do.call(data.table, list(...)))
+      out$step = step
 
       return(out)
     },
@@ -68,7 +70,7 @@ Optimizer = R6Class("Optimizer",
       ain$batch = batch
       private$p_archive = rbind(private$p_archive, ain)
 
-      if (self$verbose) private$p_printer(ain)
+      if (self$print_trace) private$p_printer(ain)
 
     },
 
@@ -79,6 +81,14 @@ Optimizer = R6Class("Optimizer",
     }
   ),
   active = list(
+    #' @field step_size (`numeric(1`) Step size of the algorithm.
+    step_size = function(x) {
+      if (! missing(x)) {
+        private$p_step_size = checkmate::assertNumber(x, lower = 0)
+      } else {
+        return(private$p_step_size)
+      }
+    },
 
     #' @field archive (`data.table()`) Archive of all calls to `$evalStore`.
     archive = function(x) {
@@ -102,6 +112,8 @@ Optimizer = R6Class("Optimizer",
     p_x = NULL,
     p_archive = data.table(),
 
+    p_step_size = 0.01,
+
     p_objective = NULL,
     p_x_start = NULL,
 
@@ -123,15 +135,15 @@ OptimizerMomentum = R6Class("OptimizerMomentum", inherit = Optimizer,
 
     #' @description Creates a new instance of this [R6][R6::R6Class] class.
     #' @param objective (`Objective`) The objective to optimize.
-    #' @param x_start (`numeric()` Start value of the optimization. Note, after
+    #' @param x_start (`numeric()`) Start value of the optimization. Note, after
     #' the first call of `$optimize()` the last value is used to continue
     #' optimization. Get this value with `$x`.
     #' @param step_size (`numeric(1)`) Step size with which the update is multiplied.
     #' @param momentum (`numeric(1)`) Momentum value.
     #' @param id (`character(1)`) Id of the object.
-    #' @param verbose (`logical(1)` Indicator whether to print the status of `$optimize()`.
-    initialize = function(objective, x_start, step_size = 0.01, momentum = 0.9, id = "Momentum", verbose = TRUE) {
-      super$initialize(objective$clone(deep = TRUE), x_start, id, verbose) # assert in super
+    #' @param print_trace (`logical(1)`) Indicator whether to print the status of `$optimize()`.
+    initialize = function(objective, x_start, step_size = 0.01, momentum = 0.9, id = "Momentum", print_trace = TRUE) {
+      super$initialize(objective$clone(deep = TRUE), x_start, id, print_trace) # assert in super
 
       private$p_step_size = checkmate::assertNumber(step_size, lower = 0)
       private$p_momentum = checkmate::assertNumber(momentum, lower = 0)
@@ -147,8 +159,7 @@ OptimizerMomentum = R6Class("OptimizerMomentum", inherit = Optimizer,
     #' `u` (the upate generated by `$update()`), and `obj` (the objective object).
     #' @param minimize (`logical(1)`) Indicator to whether minimize or optimize the objective. The default (`NULL`)
     #' uses the option defined in `objective$minimize`.
-    #' @param ... Further arguments passed to `objective$evalStore(x, ...)`.
-    optimize = function(steps = 1L, stepSizeControl = function(x, u, obj) return(private$p_step_size), minimize = NULL, ...) {
+    optimize = function(steps = 1L, stepSizeControl = function(x, u, obj) return(private$p_step_size), minimize = NULL) {
       #checkmate::assertR6(objective, "Objective")
       checkmate::assertCount(steps, positive = TRUE)
       checkmate::assertFunction(stepSizeControl, args = c("x", "u", "obj"))
@@ -168,8 +179,8 @@ OptimizerMomentum = R6Class("OptimizerMomentum", inherit = Optimizer,
         x_new = super$x + u
 
         lldt = c(lldt, list(super$prepareUpdateForArchive(x_new, super$x, u,
-          super$objective$eval(x_new, ...), super$objective$eval(super$x, ...), lr,
-          super$objective, step)))
+          super$objective$eval(x_new), super$objective$eval(super$x), lr,
+          super$objective, step, momentum = private$p_momentum)))
         super$setX(x_new)
 
       }
@@ -193,9 +204,19 @@ OptimizerMomentum = R6Class("OptimizerMomentum", inherit = Optimizer,
       return(u)
     }
   ),
+  active = list(
+    #' @field momentum (`numeric(1)`) Momentum of the algorithm.
+    momentum = function(x) {
+      if (! missing(x)) {
+        private$p_momentum = checkmate::assertNumber(x, lower = 0)
+      } else {
+        return(private$p_momentum)
+      }
+    }
+  ),
   private = list(
     # @field p_step_size, p_momentum (`numeric(1)`) The step size / learning rate and momentum of the optimization.
-    p_step_size = 0.01,
+    #p_step_size = 0.01,
     p_momentum = 0.9,
     p_grad_old = 0
   )
@@ -210,17 +231,23 @@ OptimizerGD = R6Class("OptimizerGD", inherit = OptimizerMomentum,
 
     #' @description Creates a new instance of this [R6][R6::R6Class] class.
     #' @param objective (`Objective`) The objective to optimize.
-    #' @param x_start (`numeric()` Start value of the optimization. Note, after
+    #' @param x_start (`numeric()`) Start value of the optimization. Note, after
     #' the first call of `$optimize()` the last value is used to continue
     #' optimization. Get this value with `$x`.
     #' @param step_size (`numeric(1)`) Step size with which the update is multiplied.
     #' @param id (`character(1)`) Id of the object.
-    #' @param verbose (`logical(1)` Indicator whether to print the status of `$optimize()`.
-    initialize = function(objective, x_start, step_size = 0.01, id = "Gradient Descent", verbose = TRUE) {
-      super$initialize(objective, x_start, step_size, 0, id, verbose) # assert in super
+    #' @param print_trace (`logical(1)`) Indicator whether to print the status of `$optimize()`.
+    initialize = function(objective, x_start, step_size = 0.01, id = "Gradient Descent", print_trace = TRUE) {
+      super$initialize(objective, x_start, step_size, 0, id, print_trace) # assert in super
       private$p_step_size = checkmate::assertNumber(step_size, lower = 0)
 
       return(invisible(self))
+    }
+  ),
+  active = list(
+    #' @field momentum (`numeric(1)`) Momentum of the algorithm.
+    momentum = function(x) {
+      stop("Momentum has no effect for `OptimizerGD`.")
     }
   )
 )
@@ -234,15 +261,15 @@ OptimizerNAG = R6Class("OptimizerNAG", inherit = Optimizer,
 
     #' @description Creates a new instance of this [R6][R6::R6Class] class.
     #' @param objective (`Objective`) The objective to optimize.
-    #' @param x_start (`numeric()` Start value of the optimization. Note, after
+    #' @param x_start (`numeric()`) Start value of the optimization. Note, after
     #' the first call of `$optimize()` the last value is used to continue
     #' optimization. Get this value with `$x`.
     #' @param step_size (`numeric(1)`) Step size with which the update is multiplied.
     #' @param momentum (`numeric(1)`) Momentum value.
     #' @param id (`character(1)`) Id of the object.
-    #' @param verbose (`logical(1)` Indicator whether to print the status of `$optimize()`.
-    initialize = function(objective, x_start, step_size = 0.01, momentum = 0.9, id = "NAG", verbose = TRUE) {
-      super$initialize(objective$clone(deep = TRUE), x_start, id, verbose) # assert in super
+    #' @param print_trace (`logical(1)`) Indicator whether to print the status of `$optimize()`.
+    initialize = function(objective, x_start, step_size = 0.01, momentum = 0.9, id = "NAG", print_trace = TRUE) {
+      super$initialize(objective$clone(deep = TRUE), x_start, id, print_trace) # assert in super
 
       private$p_step_size = checkmate::assertNumber(step_size, lower = 0)
       private$p_momentum = checkmate::assertNumber(momentum, lower = 0)
@@ -258,8 +285,7 @@ OptimizerNAG = R6Class("OptimizerNAG", inherit = Optimizer,
     #' `u` (the upate generated by `$update()`), and `obj` (the objective object).
     #' @param minimize (`logical(1)`) Indicator to whether minimize or optimize the objective. The default (`NULL`)
     #' uses the option defined in `objective$minimize`.
-    #' @param ... Further arguments passed to `objective$evalStore(x, ...)`.
-    optimize = function(steps = 1L, stepSizeControl = function(x, u, obj) return(private$p_step_size), minimize = NULL, ...) {
+    optimize = function(steps = 1L, stepSizeControl = function(x, u, obj) return(private$p_step_size), minimize = NULL) {
       #checkmate::assertR6(objective, "Objective")
       checkmate::assertCount(steps, positive = TRUE)
       checkmate::assertFunction(stepSizeControl, args = c("x", "u", "obj"))
@@ -279,8 +305,8 @@ OptimizerNAG = R6Class("OptimizerNAG", inherit = Optimizer,
         x_new = super$x + u
 
         lldt = c(lldt, list(super$prepareUpdateForArchive(x_new, super$x, u,
-          super$objective$eval(x_new, ...), super$objective$eval(super$x, ...), lr,
-          super$objective, step)))
+          super$objective$eval(x_new), super$objective$eval(super$x), lr,
+          super$objective, step, momentum = private$p_momentum)))
         super$setX(x_new)
 
       }
@@ -310,57 +336,18 @@ OptimizerNAG = R6Class("OptimizerNAG", inherit = Optimizer,
       return(u)
     }
   ),
+  active = list(
+    #' @field momentum (`numeric(1)`) Momentum of the algorithm.
+    momentum = function(x) {
+      if (! missing(x)) {
+        private$p_momentum = checkmate::assertNumber(x, lower = 0)
+      } else {
+        return(private$p_momentum)
+      }
+    }
+  ),
   private = list(
-    # @field p_step_size, p_momentum (`numeric(1)`) The step size / learning rate and momentum of the optimization.
-    p_step_size = 0.01,
     p_momentum = 0.9,
     p_grad_old = 0
   )
 )
-
-
-
-
-if (FALSE) {
-
-OptimizerNR = R6Class("OptimizerNR", inherit = Optimizer,
-  public = list(
-    gamma = NULL,
-    tau = NULL,
-    initialize = function(steps, step_size, x0, gamma, tau) {
-      super$initialize(steps, step_size, x0)  # assert in super
-      self$gamma = gamma
-      self$tau = tau
-    },
-
-    optimize = function(obj) {
-      assert_r6(obj, "Objective")
-      x_old = self$x0
-
-      for (step in 1:self$steps) {
-        # FIXM: all bad here
-        ee = obj$eval_store(x_old)
-        hess = obj$hess(x_old)
-        grad = obj$grad(x_old)
-        # FIXME: transpose seems uneccassary? H symmetric?
-        # FIXME: we can take hessian from eval_store
-        d = t(solve(hess, grad))
-        # d = d / l2norm(d)
-
-        # Step size through Armijo rule
-        alpha = self$step_size
-
-        # while (obj$eval(x_old + alpha * d) > obj$eval(x_old) + self$gamma * alpha * (grad %*% t(d))[1]) {
-        #   alpha = alpha * self$tau
-        # }
-
-        # print(alpha)
-
-        # dn = l2norm(d)
-        x_new = x_old - d #/ dn
-        x_old = x_new
-      }
-    }
-  )
-)
-}

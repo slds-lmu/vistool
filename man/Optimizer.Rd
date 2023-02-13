@@ -16,13 +16,15 @@ This class defines the optimization technique.
 \describe{
 \item{\code{id}}{(`character(1)` The id of the objective.}
 
-\item{\code{verbose}}{(`logical(1)` Indicator whether to print the status of `$optimize()`.}
+\item{\code{print_trace}}{(`logical(1)` Indicator whether to print the status of `$optimize()`.}
 }
 \if{html}{\out{</div>}}
 }
 \section{Active bindings}{
 \if{html}{\out{<div class="r6-active-bindings">}}
 \describe{
+\item{\code{step_size}}{(`numeric(1`) Step size of the algorithm.}
+
 \item{\code{archive}}{(`data.table()`) Archive of all calls to `$evalStore`.}
 
 \item{\code{objective}}{(`Objective`) The objective function.}
@@ -47,7 +49,7 @@ This class defines the optimization technique.
 \subsection{Method \code{new()}}{
 Creates a new instance of this [R6][R6::R6Class] class.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Optimizer$new(objective, x_start, id = NULL, verbose = TRUE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Optimizer$new(objective, x_start, id = NULL, print_trace = TRUE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -61,7 +63,7 @@ optimization. Get this value with `$x`.}
 
 \item{\code{id}}{(`character(1)`) Id of the object.}
 
-\item{\code{verbose}}{(`logical(1)` Indicator whether to print the status of `$optimize()`.}
+\item{\code{print_trace}}{(`logical(1)` Indicator whether to print the status of `$optimize()`.}
 }
 \if{html}{\out{</div>}}
 }
