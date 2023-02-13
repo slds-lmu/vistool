@@ -1,0 +1,24 @@
+Package: vistool
+Type: Package
+Title: Visualize optimization methods
+Authors@R:
+    c(person(given = "Daniel",
+        family = "Schalk",
+        role = c("aut", "cre"),
+        email = "daniel.schalk@stat.uni-muenchen.de",
+        comment = c(ORCID = "0000-0003-0950-1947")))
+Version: 0.0.1
+License: LGPL-3
+Description: Visualize the optimization path of several methods.
+Depends:
+    R,
+    R6,
+    rootSolve,
+    checkmate,
+    data.table,
+    colorspace,
+    mlr3misc,
+    TestFunctions,
+    plotly,
+    stringr
+RoxygenNote: 7.1.1
