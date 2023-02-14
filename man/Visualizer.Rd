@@ -143,6 +143,8 @@ Add an optimization trace.
   npmax = NULL,
   name = NULL,
   offset = NULL,
+  add_marker_at = 1,
+  marker_shape = "circle",
   ...
 )}\if{html}{\out{</div>}}
 }
@@ -167,6 +169,13 @@ created.}
 which means that the name is pasted from `opt$id` and `objective$id`.}
 
 \item{\code{offset}}{(`numeric(3)`) Trace shift in direction (x, y, z).}
+
+\item{\code{add_marker_at}}{(`integer()`) Vector of iterations at which a marker is added.}
+
+\item{\code{marker_shape}}{(`character()`) Vector indicating the shape of the markers.
+if `length(marker_shape) == 1`, all markers get the same shape. The other option is to
+specify all markers individually by passing a vector of `length(add_marker_at)`.
+For a list of all shapes see `schema(F)$traces$scatter$attributes$marker$symbol$values`.}
 
 \item{\code{...}}{Further arguments passed to `add_trace(...)`.}
 }

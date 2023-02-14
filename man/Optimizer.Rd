@@ -57,13 +57,13 @@ Creates a new instance of this [R6][R6::R6Class] class.
 \describe{
 \item{\code{objective}}{(`Objective`) The objective to optimize.}
 
-\item{\code{x_start}}{(`numeric()` Start value of the optimization. Note, after
+\item{\code{x_start}}{(`numeric()`) Start value of the optimization. Note, after
 the first call of `$optimize()` the last value is used to continue
 optimization. Get this value with `$x`.}
 
 \item{\code{id}}{(`character(1)`) Id of the object.}
 
-\item{\code{print_trace}}{(`logical(1)` Indicator whether to print the status of `$optimize()`.}
+\item{\code{print_trace}}{(`logical(1)`) Indicator whether to print the status of `$optimize()`.}
 }
 \if{html}{\out{</div>}}
 }
@@ -82,7 +82,8 @@ Prepare updates for adding them to the archive.
   fval_in,
   lr,
   objective,
-  step
+  step,
+  ...
 )}\if{html}{\out{</div>}}
 }
 
@@ -104,6 +105,8 @@ Prepare updates for adding them to the archive.
 \item{\code{objective}}{(`Objective`) The objective used by `$optimize()`.}
 
 \item{\code{step}}{(`integer(1)`) The step or iteration.}
+
+\item{\code{...}}{Additional objects added to the archive (e.g. `momentum`).}
 }
 \if{html}{\out{</div>}}
 }

@@ -126,6 +126,24 @@ viz$animate(nframes = 24L, view_start = list(x = 1, y = -2, z = 1),
 ```
 ![](Readme_files/gif1.gif)
 
+```{r}
+library(patchwork)
+
+# Plot info from multiple optimizers:
+arx = mergeOptimArchives(oo1, oo2, oo3, oo4, oo5)
+
+gg1 = ggplot(arx, aes(x = log(iteration), y = fval_in, color = optim_id)) +
+  geom_line()
+
+gg2 = ggplot(arx, aes(x = log(iteration), y = gnorm, color = optim_id)) +
+  geom_line()
+
+(gg1 | gg2) +
+  plot_layout(guides = "collect") &
+  theme_minimal() &
+  scale_color_brewer(palette = "Set1")
+```
+
 ## Example: Linear Model loss and optimization
 
 ```{r}

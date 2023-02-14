@@ -14,6 +14,13 @@ This class defines gradient descent
 \section{Super classes}{
 \code{\link[vistool:Optimizer]{vistool::Optimizer}} -> \code{\link[vistool:OptimizerMomentum]{vistool::OptimizerMomentum}} -> \code{OptimizerGD}
 }
+\section{Active bindings}{
+\if{html}{\out{<div class="r6-active-bindings">}}
+\describe{
+\item{\code{momentum}}{(`numeric(1)`) Momentum of the algorithm.}
+}
+\if{html}{\out{</div>}}
+}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
@@ -52,7 +59,7 @@ Creates a new instance of this [R6][R6::R6Class] class.
 \describe{
 \item{\code{objective}}{(`Objective`) The objective to optimize.}
 
-\item{\code{x_start}}{(`numeric()` Start value of the optimization. Note, after
+\item{\code{x_start}}{(`numeric()`) Start value of the optimization. Note, after
 the first call of `$optimize()` the last value is used to continue
 optimization. Get this value with `$x`.}
 
@@ -60,7 +67,7 @@ optimization. Get this value with `$x`.}
 
 \item{\code{id}}{(`character(1)`) Id of the object.}
 
-\item{\code{print_trace}}{(`logical(1)` Indicator whether to print the status of `$optimize()`.}
+\item{\code{print_trace}}{(`logical(1)`) Indicator whether to print the status of `$optimize()`.}
 }
 \if{html}{\out{</div>}}
 }

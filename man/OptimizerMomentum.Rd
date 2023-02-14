@@ -14,6 +14,13 @@ This class defines momentum.
 \section{Super class}{
 \code{\link[vistool:Optimizer]{vistool::Optimizer}} -> \code{OptimizerMomentum}
 }
+\section{Active bindings}{
+\if{html}{\out{<div class="r6-active-bindings">}}
+\describe{
+\item{\code{momentum}}{(`numeric(1)`) Momentum of the algorithm.}
+}
+\if{html}{\out{</div>}}
+}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
@@ -53,7 +60,7 @@ Creates a new instance of this [R6][R6::R6Class] class.
 \describe{
 \item{\code{objective}}{(`Objective`) The objective to optimize.}
 
-\item{\code{x_start}}{(`numeric()` Start value of the optimization. Note, after
+\item{\code{x_start}}{(`numeric()`) Start value of the optimization. Note, after
 the first call of `$optimize()` the last value is used to continue
 optimization. Get this value with `$x`.}
 
@@ -63,7 +70,7 @@ optimization. Get this value with `$x`.}
 
 \item{\code{id}}{(`character(1)`) Id of the object.}
 
-\item{\code{print_trace}}{(`logical(1)` Indicator whether to print the status of `$optimize()`.}
+\item{\code{print_trace}}{(`logical(1)`) Indicator whether to print the status of `$optimize()`.}
 }
 \if{html}{\out{</div>}}
 }
@@ -77,8 +84,7 @@ Optimize `steps` iteration.
 \if{html}{\out{<div class="r">}}\preformatted{OptimizerMomentum$optimize(
   steps = 1L,
   stepSizeControl = function(x, u, obj) return(private$p_step_size),
-  minimize = NULL,
-  ...
+  minimize = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -92,8 +98,6 @@ Optimize `steps` iteration.
 
 \item{\code{minimize}}{(`logical(1)`) Indicator to whether minimize or optimize the objective. The default (`NULL`)
 uses the option defined in `objective$minimize`.}
-
-\item{\code{...}}{Further arguments passed to `objective$evalStore(x, ...)`.}
 }
 \if{html}{\out{</div>}}
 }

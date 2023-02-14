@@ -8,54 +8,6 @@
 ``` r
 devtools::load_all()
 #> ℹ Loading vistool
-#> Loading required package: R6
-#> 
-#> Loading required package: rootSolve
-#> 
-#> Loading required package: checkmate
-#> 
-#> Loading required package: data.table
-#> 
-#> data.table 1.14.6 using 4 threads (see ?getDTthreads).  Latest news: r-datatable.com
-#> 
-#> Loading required package: colorspace
-#> 
-#> Loading required package: mlr3misc
-#> 
-#> Loading required package: TestFunctions
-#> 
-#> Loading required package: plotly
-#> 
-#> Loading required package: ggplot2
-#> 
-#> 
-#> Attaching package: 'plotly'
-#> 
-#> 
-#> The following object is masked from 'package:ggplot2':
-#> 
-#>     last_plot
-#> 
-#> 
-#> The following object is masked from 'package:stats':
-#> 
-#>     filter
-#> 
-#> 
-#> The following object is masked from 'package:graphics':
-#> 
-#>     layout
-#> 
-#> 
-#> Loading required package: stringr
-#> 
-#> 
-#> Attaching package: 'stringr'
-#> 
-#> 
-#> The following object is masked from 'package:mlr3misc':
-#> 
-#>     str_trunc
 
 # Test functions dictionary:
 as.data.table(tfun_dict)
@@ -215,6 +167,26 @@ viz$animate(nframes = 24L, view_start = list(x = 1, y = -2, z = 1),
 ```
 
 ![](Readme_files/gif1.gif)
+
+``` r
+library(patchwork)
+
+# Plot info from multiple optimizers:
+arx = mergeOptimArchives(oo1, oo2, oo3, oo4, oo5)
+
+gg1 = ggplot(arx, aes(x = log(iteration), y = fval_in, color = optim_id)) +
+  geom_line()
+
+gg2 = ggplot(arx, aes(x = log(iteration), y = gnorm, color = optim_id)) +
+  geom_line()
+
+(gg1 | gg2) +
+  plot_layout(guides = "collect") &
+  theme_minimal() &
+  scale_color_brewer(palette = "Set1")
+```
+
+![](Readme_files/unnamed-chunk-15-1.png)<!-- -->
 
 ## Example: Linear Model loss and optimization
 

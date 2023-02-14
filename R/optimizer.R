@@ -305,7 +305,7 @@ OptimizerNAG = R6Class("OptimizerNAG", inherit = Optimizer,
         x_new = super$x + u
 
         lldt = c(lldt, list(super$prepareUpdateForArchive(x_new, super$x, u,
-          super$objective$eval(x_new), super$objective$eval(super$x), lr,
+          super$objective$evalStore(x_new)$fval, super$objective$eval(super$x), lr,
           super$objective, step, momentum = private$p_momentum)))
         super$setX(x_new)
 
@@ -351,3 +351,27 @@ OptimizerNAG = R6Class("OptimizerNAG", inherit = Optimizer,
     p_grad_old = 0
   )
 )
+
+#' Merge optimization archives
+#' @param ... Optimization objects.
+#' @export
+mergeOptimArchives = function(...) {
+  opts = list(...)
+  lapply(opts, checkmate::assertR6, classes = "Optimizer")
+
+  common_opt = c("x_out", "x_in", "update", "fval_out", "fval_in", "lr")
+  common_obj = c("gnorm")
+  arxs = do.call(rbind, lapply(opts, function(o) {
+    out = try({
+      ax = o$archive[, ..common_opt]
+      ax$optim_id = o$id
+      ax$iteration = seq_len(nrow(ax))
+      cbind(ax, o$objective$archive[, ..common_obj, drop = FALSE])
+    }, silent = TRUE)
+    if (inherits(out, "try-error")) {
+      stop(sprintf("Error for optimizer '%s'\n%s", o$id, attr(out, "condition")$message))
+    }
+    return(out)
+  }))
+  return(arxs)
+}

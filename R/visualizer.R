@@ -130,6 +130,7 @@ Visualizer = R6::R6Class("Visualizer",
       )
       if (! private$p_freeze_plot) { # Used in animate to not overwrite the plot over and over again.
         private$p_opts = list()
+        private$p_layer_arrow = list()
       }
 
       return(invisible(self))
@@ -161,6 +162,7 @@ Visualizer = R6::R6Class("Visualizer",
       )
       if (! private$p_freeze_plot) { # Used in animate to not overwrite the plot over and over again.
         private$p_opts = list()
+        private$p_layer_arrow = list()
       }
 
       return(invisible(self))
@@ -292,6 +294,28 @@ Visualizer = R6::R6Class("Visualizer",
       return(invisible(self))
     },
 
+    #addLayerArrow = function(c1, c2, iter_connect = NULL, ...) {
+      #if (private$p_layer_primary == "surface") {
+        #checkmate::assertNumeric(c1, len = 3)
+        #checkmate::assertNumeric(c2, len = 3)
+      #} else {
+        #checkmate::assertNumeric(c1, len = 2)
+        #checkmate::assertNumeric(c2, len = 2)
+
+      #}
+
+      #private$p_layer_arrow = c(private$p_layer_arrow, list(c(list(c1 = c1, c2 = c2, iter_connect = iter_connect, list(...))))
+
+      #if (is.null(private$p_plot)) {
+        #stop("Initialize plot with `initLayer*`")
+      #}
+      #x = c(c1[1], c2[1])
+      #y = c(c1[2], c2[2])
+
+      #private$p_layer_plot = add_trace(x = aaa, y = bbb, z = ccc, type = "scatter3d", mode = "lines",
+            #name = "lines", showlegend = FALSE)
+    #},
+
     #' @description Set the layout of the plotly plot.
     #' @param ... Layout options directly passed to `layout(...)`.
     setLayout = function(...) {
@@ -407,6 +431,9 @@ Visualizer = R6::R6Class("Visualizer",
     # @field p_layer_primary (`character(1)`) The id of the primary layer. Used to determine
     # the trace setup.
     p_layer_primary = NULL,
+
+    # @field p_layer_arrow (`list()`) Arguments passed to `$addLayerArrow()` to reconstruct the plot for animations.
+    p_layer_arrow = list(),
 
     # @field p_plot (`plot_ly()`) The plot.
     p_plot = NULL,
