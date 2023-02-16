@@ -114,6 +114,37 @@ obj_lm$evalStore(coef(lm(Sepal.Width ~ Petal.Width, data = iris)))
 obj_lm$archive
 ```
 
+Visualize lm `Objective`:
+
+```{r, eval=FALSE}
+viz_lm = Visualizer$new(obj_lm, x1limits = c(-0.5, 5), x2limits = c(-3.2, 2.8))
+viz_lm$initLayerSurface()
+viz_lm$plot()
+```
+```{r, eval=REBUILD, include=FALSE}
+viz_lm = Visualizer$new(obj_lm, x1limits = c(-0.5, 5), x2limits = c(-3.2, 2.8))
+viz_lm$initLayerSurface()
+viz_lm$save("README_files/viz_lm.png")
+```
+![](README_files/viz_lm.png)
+
+More advanced (see [More advanced](#more-advanced)) is to add points to the `plotly` object:
+
+```{r, eval=FALSE}
+x = sapply(obj_lm$archive$x, function(x) x[1])
+y = sapply(obj_lm$archive$x, function(x) x[2])
+
+viz_lm$plot() %>% add_trace(x = x, y = y, z = obj_lm$archive$fval, type = "scatter3d", mode = "markers")
+```
+```{r, eval=REBUILD, include=FALSE}
+x = sapply(obj_lm$archive$x, function(x) x[1])
+y = sapply(obj_lm$archive$x, function(x) x[2])
+
+p = viz_lm$plot() %>% add_trace(x = x, y = y, z = obj_lm$archive$fval, type = "scatter3d", mode = "markers")
+orca(p, "README_files/viz_lm_scatter.png")
+```
+![](README_files/viz_lm_scatter.png)
+
 # Optimizer
 
 ## Optimizer class

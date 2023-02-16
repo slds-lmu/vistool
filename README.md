@@ -231,6 +231,28 @@ obj_lm$archive
 #> 3:  3.3084,-0.2094  4.951 4.564e-07,2.665e-07 5.285e-07
 ```
 
+Visualize lm `Objective`:
+
+``` r
+viz_lm = Visualizer$new(obj_lm, x1limits = c(-0.5, 5), x2limits = c(-3.2, 2.8))
+viz_lm$initLayerSurface()
+viz_lm$plot()
+```
+
+![](README_files/viz_lm.png)
+
+More advanced (see [More advanced](#more-advanced)) is to add points to
+the `plotly` object:
+
+``` r
+x = sapply(obj_lm$archive$x, function(x) x[1])
+y = sapply(obj_lm$archive$x, function(x) x[2])
+
+viz_lm$plot() %>% add_trace(x = x, y = y, z = obj_lm$archive$fval, type = "scatter3d", mode = "markers")
+```
+
+![](README_files/viz_lm_scatter.png)
+
 # Optimizer
 
 ## Optimizer class
@@ -380,7 +402,7 @@ stepSizeControlDecayTime()
 #>     epoch = nrow(obj$archive)
 #>     return(1 / (1 + decay * epoch))
 #>   }
-#> <environment: 0x55db2be863a0>
+#> <environment: 0x55efa2b34670>
 ```
 
 Let’s define multiple gradient descent optimizers and optimize 100 steps
@@ -427,7 +449,7 @@ gg2 = ggplot(arx, aes(x = iteration, y = fval_out, color = optim_id))
   ggsci::scale_color_simpsons()
 ```
 
-![](README_files/unnamed-chunk-20-1.png)<!-- -->
+![](README_files/unnamed-chunk-24-1.png)<!-- -->
 
 Visualizing the traces is done as before by adding optimization trace
 layer. We can do this for all optimizers to add multiple traces to the
@@ -627,10 +649,10 @@ orca(p, "README_files/viz_scatter.png")
 #> Use 'kaleido' instead.
 #> See help("Deprecated")
 #> -
-#> (orca:112398): Gtk-WARNING **: 23:45:11.012: Theme parsing error: gtk-contained.css:2871:228: Missing closing bracket for :not()
+#> (orca:115807): Gtk-WARNING **: 23:58:05.328: Theme parsing error: gtk-contained.css:2871:228: Missing closing bracket for :not()
 #> \|/Fontconfig warning: "/usr/share/fontconfig/conf.avail/05-reset-dirs-sample.conf", line 6: unknown element "reset-dirs"
-#> -\|/[112436:0216/234512.080193:ERROR:buffer_manager.cc(488)] [.DisplayCompositor]GL ERROR :GL_INVALID_OPERATION : glBufferData: <- error from previous GL command
-#> -\|/-\|/-\|/- 
+#> -\|/[115846:0216/235806.529362:ERROR:buffer_manager.cc(488)] [.DisplayCompositor]GL ERROR :GL_INVALID_OPERATION : glBufferData: <- error from previous GL command
+#> -\|/-\|/-\|/-\ 
 
 # List of marker symbols:
 head(schema(F)$traces$scatter3d$attributes$marker$symbol$values)
