@@ -42,56 +42,7 @@ Just load the package with `devtools::load_all()`. Or install with
 permanent installation.
 
 ``` r
-devtools::load_all()
-#> ℹ Loading vistool
-#> Loading required package: R6
-#> 
-#> Loading required package: rootSolve
-#> 
-#> Loading required package: checkmate
-#> 
-#> Loading required package: data.table
-#> 
-#> data.table 1.14.6 using 4 threads (see ?getDTthreads).  Latest news: r-datatable.com
-#> 
-#> Loading required package: colorspace
-#> 
-#> Loading required package: mlr3misc
-#> 
-#> Loading required package: TestFunctions
-#> 
-#> Loading required package: plotly
-#> 
-#> Loading required package: ggplot2
-#> 
-#> 
-#> Attaching package: 'plotly'
-#> 
-#> 
-#> The following object is masked from 'package:ggplot2':
-#> 
-#>     last_plot
-#> 
-#> 
-#> The following object is masked from 'package:stats':
-#> 
-#>     filter
-#> 
-#> 
-#> The following object is masked from 'package:graphics':
-#> 
-#>     layout
-#> 
-#> 
-#> Loading required package: stringr
-#> 
-#> 
-#> Attaching package: 'stringr'
-#> 
-#> 
-#> The following object is masked from 'package:mlr3misc':
-#> 
-#>     str_trunc
+devtools::load_all(quiet = TRUE)
 ```
 
 # Objective
@@ -402,7 +353,7 @@ stepSizeControlDecayTime()
 #>     epoch = nrow(obj$archive)
 #>     return(1 / (1 + decay * epoch))
 #>   }
-#> <environment: 0x55efa2b34670>
+#> <environment: 0x56342cab3f98>
 ```
 
 Let’s define multiple gradient descent optimizers and optimize 100 steps
@@ -649,10 +600,10 @@ orca(p, "README_files/viz_scatter.png")
 #> Use 'kaleido' instead.
 #> See help("Deprecated")
 #> -
-#> (orca:115807): Gtk-WARNING **: 23:58:05.328: Theme parsing error: gtk-contained.css:2871:228: Missing closing bracket for :not()
-#> \|/Fontconfig warning: "/usr/share/fontconfig/conf.avail/05-reset-dirs-sample.conf", line 6: unknown element "reset-dirs"
-#> -\|/[115846:0216/235806.529362:ERROR:buffer_manager.cc(488)] [.DisplayCompositor]GL ERROR :GL_INVALID_OPERATION : glBufferData: <- error from previous GL command
-#> -\|/-\|/-\|/-\ 
+#> (orca:119704): Gtk-WARNING **: 00:12:50.637: Theme parsing error: gtk-contained.css:2871:228: Missing closing bracket for :not()
+#> \|Fontconfig warning: "/usr/share/fontconfig/conf.avail/05-reset-dirs-sample.conf", line 6: unknown element "reset-dirs"
+#> /-\|[119743:0217/001251.650881:ERROR:buffer_manager.cc(488)] [.DisplayCompositor]GL ERROR :GL_INVALID_OPERATION : glBufferData: <- error from previous GL command
+#> /-\|/-\|/-\|/ 
 
 # List of marker symbols:
 head(schema(F)$traces$scatter3d$attributes$marker$symbol$values)

@@ -23,7 +23,7 @@ RECREATE_ALL_2DFIGS = FALSE
 Just load the package with `devtools::load_all()`. Or install with `remotes::install_github("slds-lmu/vistool", ref = "main")` for a permanent installation.
 
 ```{r, messages=FALSE, warnings=FALSE}
-devtools::load_all()
+devtools::load_all(quiet = TRUE)
 ```
 
 # Objective
