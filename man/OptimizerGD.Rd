@@ -48,7 +48,7 @@ Creates a new instance of this [R6][R6::R6Class] class.
 \if{html}{\out{<div class="r">}}\preformatted{OptimizerGD$new(
   objective,
   x_start,
-  step_size = 0.01,
+  lr = 0.01,
   id = "Gradient Descent",
   print_trace = TRUE
 )}\if{html}{\out{</div>}}
@@ -63,7 +63,7 @@ Creates a new instance of this [R6][R6::R6Class] class.
 the first call of `$optimize()` the last value is used to continue
 optimization. Get this value with `$x`.}
 
-\item{\code{step_size}}{(`numeric(1)`) Step size with which the update is multiplied.}
+\item{\code{lr}}{(`numeric(1)`) Step size with which the update is multiplied.}
 
 \item{\code{id}}{(`character(1)`) Id of the object.}
 

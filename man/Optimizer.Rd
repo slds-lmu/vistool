@@ -23,7 +23,7 @@ This class defines the optimization technique.
 \section{Active bindings}{
 \if{html}{\out{<div class="r6-active-bindings">}}
 \describe{
-\item{\code{step_size}}{(`numeric(1`) Step size of the algorithm.}
+\item{\code{lr}}{(`numeric(1`) Step size of the algorithm.}
 
 \item{\code{archive}}{(`data.table()`) Archive of all calls to `$evalStore`.}
 
@@ -81,6 +81,7 @@ Prepare updates for adding them to the archive.
   fval_out,
   fval_in,
   lr,
+  step_size,
   objective,
   step,
   ...

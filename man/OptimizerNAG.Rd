@@ -48,7 +48,7 @@ Creates a new instance of this [R6][R6::R6Class] class.
 \if{html}{\out{<div class="r">}}\preformatted{OptimizerNAG$new(
   objective,
   x_start,
-  step_size = 0.01,
+  lr = 0.01,
   momentum = 0.9,
   id = "NAG",
   print_trace = TRUE
@@ -64,7 +64,7 @@ Creates a new instance of this [R6][R6::R6Class] class.
 the first call of `$optimize()` the last value is used to continue
 optimization. Get this value with `$x`.}
 
-\item{\code{step_size}}{(`numeric(1)`) Step size with which the update is multiplied.}
+\item{\code{lr}}{(`numeric(1)`) Step size with which the update is multiplied.}
 
 \item{\code{momentum}}{(`numeric(1)`) Momentum value.}
 
@@ -83,7 +83,7 @@ Optimize `steps` iteration.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{OptimizerNAG$optimize(
   steps = 1L,
-  stepSizeControl = function(x, u, obj) return(private$p_step_size),
+  stepSizeControl = function(x, u, obj, opt) return(1),
   minimize = NULL
 )}\if{html}{\out{</div>}}
 }

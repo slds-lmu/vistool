@@ -32,6 +32,8 @@ the cross product of `grid$x1` and `grid$x2`.}
 \item \href{#method-initLayerContour}{\code{Visualizer$initLayerContour()}}
 \item \href{#method-initLayerSurface}{\code{Visualizer$initLayerSurface()}}
 \item \href{#method-addLayerOptimizationTrace}{\code{Visualizer$addLayerOptimizationTrace()}}
+\item \href{#method-addLayerTaylor}{\code{Visualizer$addLayerTaylor()}}
+\item \href{#method-addLayerHessian}{\code{Visualizer$addLayerHessian()}}
 \item \href{#method-setLayout}{\code{Visualizer$setLayout()}}
 \item \href{#method-setScene}{\code{Visualizer$setScene()}}
 \item \href{#method-plot}{\code{Visualizer$plot()}}
@@ -181,6 +183,32 @@ For a list of all shapes see `schema(F)$traces$scatter$attributes$marker$symbol$
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-addLayerTaylor"></a>}}
+\if{latex}{\out{\hypertarget{method-addLayerTaylor}{}}}
+\subsection{Method \code{addLayerTaylor()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer$addLayerTaylor(
+  x0,
+  degree = 2,
+  x1margin = 0.1,
+  x2margin = 0.1,
+  x3margin = 0.3,
+  npoints_per_dim = 20L,
+  ...
+)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-addLayerHessian"></a>}}
+\if{latex}{\out{\hypertarget{method-addLayerHessian}{}}}
+\subsection{Method \code{addLayerHessian()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer$addLayerHessian(x0, x1length = 0.1, x2length = 0.1, ...)}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-setLayout"></a>}}

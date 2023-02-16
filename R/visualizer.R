@@ -48,7 +48,7 @@ Visualizer = R6::R6Class("Visualizer",
     #' `x2limits` must be set.
     #' @param npoints (`integer(1)`) The number of generated point per dimension. Note that
     #' a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.
-    initialize = function(objective, x1limits = NULL, x2limits = NULL, padding = 0.1, auto_box = TRUE, npoints = 100L) {
+    initialize = function(objective, x1limits = NULL, x2limits = NULL, padding = 0, auto_box = TRUE, npoints = 100L) {
       self$objective = checkmate::assertR6(objective, "Objective")
       checkmate::assertLogical(auto_box, len = 1L)
       checkmate::assertNumber(padding, lower = 0)
@@ -125,12 +125,12 @@ Visualizer = R6::R6Class("Visualizer",
         z = t(llp$z),
         type = "contour",
         opacity = opacity,
-        colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")),
+        colorscale = colorscale,
         ...
       )
-      if (! private$p_freeze_plot) { # Used in animate to not overwrite the plot over and over again.
-        private$p_opts = list()
-        private$p_layer_arrow = list()
+      if (! private$p_freeze_plot) {    # Used in animate to not overwrite the
+        private$p_opts = list()         # plot over and over again when calling
+        private$p_layer_arrow = list()  # `$initLayerXXX`.
       }
 
       return(invisible(self))
@@ -267,7 +267,7 @@ Visualizer = R6::R6Class("Visualizer",
           x = xmr$x,
           y = xmr$y,
           marker = list(color = line_color, size = 12, line = list(color = mcolor_out, width = 2)),
-          line = list(color = line_color, width = 4))
+          line = list(color = line_color, width = 2))
       }
       if (is.null(ptype)) {
         stop("No known plot mode")
@@ -316,6 +316,100 @@ Visualizer = R6::R6Class("Visualizer",
             #name = "lines", showlegend = FALSE)
     #},
 
+    addLayerTaylor = function(x0, degree = 2, x1margin = 0, x2margin = 0, npoints_per_dim = 20L, zlim = NULL, ...) {
+      private$checkInit()
+      if (private$p_layer_primary != "surface") stop("Atm just available for `surface`")
+      checkmate::assertNumeric(x0, len = 2L)
+      checkmate::assertIntegerish(degree, len = 1, lower = 1, upper = 2)
+      checkmate::assertNumber(x1margin)
+      checkmate::assertNumber(x2margin)
+
+      #checkmate::assertNumeric(x1limits, len = 2L, null.ok = TRUE)
+      #checkmate::assertNumeric(x2limits, len = 2L, null.ok = TRUE)
+
+      #if (is.null(x1limits)) x1limits = x0[1] + c(-0.05, 0.05)
+      #if (is.null(x2limits)) x2limits = x0[2] + c(-0.05, 0.05)
+
+      f0 = self$objective$eval(x0)
+      g = self$objective$grad(x0)
+      h = self$objective$hess(x0)
+
+      # Create box based on the gradient at x0:
+      # - Normalize vector to length x1margin / 2
+      # - Calculate perpendicular vector
+      # - These vectors define the rotation
+      gn = g / l2norm(g)
+      gp = rbind(c(0, -1), c(1, 0)) %*% gn
+
+      gn = gn * x1margin / 2
+      gp = gp * x2margin / 2
+
+      # - Create grid in (0,0) x (1,1) and rotate w.r.t. to gn and gp:
+      rotation = cbind(gn, gp)
+      square = as.matrix(expand.grid(x = seq(0, 1, len = npoints_per_dim), y = seq(0, 1, len = npoints_per_dim)))
+      grid = square %*% rotation
+      grid[, 1] = grid[, 1] - max(grid[, 1]) + (max(grid[, 1]) - min(grid[, 1])) / 2 + x0[1]
+      grid[, 2] = grid[, 2] - max(grid[, 2]) + (max(grid[, 2]) - min(grid[, 2])) / 2 + x0[2]
+
+      fapp = function(x) {
+        out = f0 + crossprod(g, x - x0) * f0
+        if (degree == 2) {
+          out = out + 0.5 * f0 * t(x - x0) %*% h %*% (x - x0)
+        }
+        return(as.numeric(out))
+      }
+      fappV = function(x, y) {
+        X = cbind(x = x, y = y)
+        apply(X, 1, fapp)
+      }
+      z = outer(X = grid[,1], Y = grid[,2], FUN = function(x, y) fappV(x, y))
+      if (! is.null(zlim)) {
+        checkmate::assertNumeric(zlim, len = 2L)
+        z[! between(z, zlim[1], zlim[2])] = NA
+      }
+
+      private$p_plot = private$p_plot %>% add_surface(x = grid[, 1], y = grid[, 2], z = t(z), showscale = FALSE, ...)
+    },
+
+    addLayerHessian = function(x0, x1length = 0.1, x2length = 0.1, ...) {
+      private$checkInit()
+      checkmate::assertNumeric(x0, len = 2L)
+      checkmate::assertNumber(x1length)
+      checkmate::assertNumber(x2length)
+      #if (private$p_layer_primary != "surface") stop("Atm just available for `surface`")
+
+      f0 = self$objective$eval(x0)
+      h = self$objective$hess(x0)
+      ev = eigen(h)$vectors
+
+      v1 = ev[, 1]
+      v2 = ev[, 2]
+
+      if (private$p_layer_primary == "contour") {
+        # Transpose x and y to macht contour:
+        v1 = v1 * x1length + x0
+        v2 = v2 * x2length + x0
+
+        mx = c(v1[1], x0[1], v2[1])
+        my = c(v1[2], x0[2], v2[2])
+
+        private$p_plot = private$p_plot %>% add_trace(x = mx, y = my, mode = "lines", type = "scatter", showlegend = FALSE, ...)
+      }
+      if (private$p_layer_primary == "surface") {
+        v1 = v1 * x1length + x0
+        v2 = v2 * x2length + x0
+
+        v0 = c(x0, f0)
+        v1 = c(v1, f0)
+        v2 = c(v2, f0)
+
+        # Order is important to have the angle:
+        marker = cbind(v1, v0, v2)
+
+        private$p_plot = private$p_plot %>% add_trace(x = marker[1, ], y = marker[2, ], z = marker[3, ], mode = "lines", type = "scatter3d", showlegend = FALSE, ...)
+      }
+    },
+
     #' @description Set the layout of the plotly plot.
     #' @param ... Layout options directly passed to `layout(...)`.
     setLayout = function(...) {
@@ -333,9 +427,9 @@ Visualizer = R6::R6Class("Visualizer",
       checkmate::assertNumber(x)
       checkmate::assertNumber(y)
       checkmate::assertNumber(z)
-      if (is.null(private$p_plot)) {
-        stop("Initialize plot with `initLayer*`")
-      }
+
+      private$checkInit()
+
       if (private$p_layer_primary != "surface") {
         stop("Scene can only be set for `surface` plots")
       }
@@ -424,6 +518,7 @@ Visualizer = R6::R6Class("Visualizer",
     #' @description Save the plot by using plotlys `orca()` function.
     #' @param ... Further arguments passed to `orca()`.
     save = function(...) {
+      private$checkInit()
       orca(private$p_plot, ...)
     }
   ),
@@ -448,7 +543,23 @@ Visualizer = R6::R6Class("Visualizer",
     p_layout = list(),
 
     # @field p_freeze_plot (`logical(1)`) Indicator whether to freeze saving the plot elements.
-    p_freeze_plot = FALSE
+    p_freeze_plot = FALSE,
+
+    checkInit = function() {
+      if (is.null(private$p_plot)) {
+        stop("Initialize plot with `initLayer*`")
+      }
+      return(invisible(TRUE))
+    },
+    checkInput = function(x) {
+      if (private$p_layer_primary == "surface") {
+        return(checkmate::assertNumeric(x, len = 3L))
+      }
+      if (private$p_layer_primary == "contour") {
+        return(checkmate::assertNumeric(x, len = 3L))
+      }
+      stop("Error in `$checkInput()`")
+    }
   )
 )
 

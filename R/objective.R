@@ -165,6 +165,11 @@ Objective = R6::R6Class("Objective",
       il = list(l)
       names(il) = label
       private$p_log_funs = c(private$p_log_funs, il)
+    },
+
+    #' @description Delete the archive.
+    clearArchive = function() {
+      private$p_archive = data.table()
     }
   ),
   active = list(
