@@ -186,7 +186,7 @@ A layer of the `Visualizer` class is `$addLayerOptimizationTrace()` that gets th
 
 ```{r, eval=FALSE}
 viz = Visualizer$new(obj)
-viz$initLayerContour()
+viz$initLayerSurface()
 viz$addLayerOptimizationTrace(opt)
 viz$plot()
 ```

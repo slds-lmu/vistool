@@ -50,6 +50,7 @@ ob = Objective$new()
 \item \href{#method-grad}{\code{Objective$grad()}}
 \item \href{#method-hess}{\code{Objective$hess()}}
 \item \href{#method-addLogFun}{\code{Objective$addLogFun()}}
+\item \href{#method-clearArchive}{\code{Objective$clearArchive()}}
 \item \href{#method-clone}{\code{Objective$clone()}}
 }
 }
@@ -216,6 +217,16 @@ The arguments of `l` must be `x`, `fval` and `grad`.}
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-clearArchive"></a>}}
+\if{latex}{\out{\hypertarget{method-clearArchive}{}}}
+\subsection{Method \code{clearArchive()}}{
+Delete the archive.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Objective$clearArchive()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

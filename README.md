@@ -309,7 +309,7 @@ plot:
 
 ``` r
 viz = Visualizer$new(obj)
-viz$initLayerContour()
+viz$initLayerSurface()
 viz$addLayerOptimizationTrace(opt)
 viz$plot()
 ```
@@ -353,7 +353,7 @@ stepSizeControlDecayTime()
 #>     epoch = nrow(obj$archive)
 #>     return(1 / (1 + decay * epoch))
 #>   }
-#> <environment: 0x56342cab3f98>
+#> <environment: 0x5648f3983170>
 ```
 
 Let’s define multiple gradient descent optimizers and optimize 100 steps
@@ -600,9 +600,9 @@ orca(p, "README_files/viz_scatter.png")
 #> Use 'kaleido' instead.
 #> See help("Deprecated")
 #> -
-#> (orca:119704): Gtk-WARNING **: 00:12:50.637: Theme parsing error: gtk-contained.css:2871:228: Missing closing bracket for :not()
+#> (orca:8408): Gtk-WARNING **: 09:50:33.601: Theme parsing error: gtk-contained.css:2871:228: Missing closing bracket for :not()
 #> \|Fontconfig warning: "/usr/share/fontconfig/conf.avail/05-reset-dirs-sample.conf", line 6: unknown element "reset-dirs"
-#> /-\|[119743:0217/001251.650881:ERROR:buffer_manager.cc(488)] [.DisplayCompositor]GL ERROR :GL_INVALID_OPERATION : glBufferData: <- error from previous GL command
+#> /-\|[8447:0217/095034.600866:ERROR:buffer_manager.cc(488)] [.DisplayCompositor]GL ERROR :GL_INVALID_OPERATION : glBufferData: <- error from previous GL command
 #> /-\|/-\|/-\|/ 
 
 # List of marker symbols:

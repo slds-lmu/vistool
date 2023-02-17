@@ -184,18 +184,23 @@ Visualizer = R6::R6Class("Visualizer",
     #' @param marker_shape (`character()`) Vector indicating the shape of the markers.
     #' if `length(marker_shape) == 1`, all markers get the same shape. The other option is to
     #' specify all markers individually by passing a vector of `length(add_marker_at)`.
-    #' For a list of all shapes see `schema(F)$traces$scatter$attributes$marker$symbol$values`.
+    #' For a list of all shapes see `schema(F)$traces$XXX$attributes$marker$symbol$values` with `XXX` one of `scatter` or `scatter3d`. If `marker_shape = NA`, no marker
+    #' are added.
+    #' @param marker_color (`character()`) The colors for the markers.
     #' @param ... Further arguments passed to `add_trace(...)`.
     addLayerOptimizationTrace = function(opt, line_color = colSampler(), mcolor_out = "black",
       npoints = NULL, npmax = NULL, name = NULL, offset = NULL, add_marker_at = 1,
-      marker_shape = "circle", ...) {
+      marker_shape = "circle", marker_color = NULL, ...) {
+
+      ## Basic asserts:
+      private$checkInit()
 
       checkmate::assertR6(opt, "Optimizer")
       checkmate::assertCount(npoints, null.ok = TRUE)
       checkmate::assertCount(npmax, null.ok = TRUE)
 
-      if (is.null(private$p_plot)) {
-        stop("Initialize plot with `initLayer*`")
+      if (nrow(opt$archive) == 0) {
+        stop("No optimization trace in `opt$archive`. Did you forget to call `opt$optimize(steps)`?")
       }
 
       checkmate::assertString(line_color)
@@ -213,22 +218,33 @@ Visualizer = R6::R6Class("Visualizer",
         }
       }
 
+      # Catch additional arguments:
       aargs = list(...)
 
       if (! private$p_freeze_plot) { # Just set by animate to not save the optimizer over and over again for each frame.
         private$p_opts = c(private$p_opts, list(c(as.list(environment()), aargs)))
       }
 
-      if (nrow(opt$archive) == 0) {
-        stop("No optimization trace in `opt$archive`. Did you forget to call `opt$optimize(steps)`?")
-      }
+      # Assert marker styling:
       checkmate::assertIntegerish(add_marker_at, lower = 1, upper = nrow(opt$archive))
-      if (! length(marker_shape) %in% c(1, length(add_marker_at))) {
-        if (length(marker_shape) == 1) marker_shape = rep(marker_shape, length(add_marker_at))
+      if (is.null(marker_shape)) marker_shape = NA
+      if (length(marker_shape) == 1) marker_shape = rep(marker_shape, length(add_marker_at))
+      mvals = NULL
+      if (private$p_layer_primary == "contour") {
         mvals = schema(F)$traces$scatter$attributes$marker$symbol$values
-        checkmate::assertChoice(marker_shape, choices = mvals)
       }
+      if (private$p_layer_primary == "surface") {
+        mvals = schema(F)$traces$scatter3d$attributes$marker$symbol$values
+      }
+      invisible(lapply(marker_shape, function(marker_shape) checkmate::assertChoice(marker_shape, choices = c(mvals, NA))))
 
+      if (is.null(marker_color)) marker_color = line_color
+      if (length(marker_color) == 1) {
+        marker_color = rep(marker_color, length(marker_shape))
+      }
+      checkmate::assertCharacter(marker_color, len = length(marker_shape), null.ok = TRUE)
+
+      # Define marker coordinates for plotting:
       xmat = do.call(rbind, c(opt$archive$x_in[1], opt$archive$x_out))
       xmarkers = data.frame(x = xmat[, 1] + offset[1], y = xmat[, 2] + offset[2],
         z = c(opt$archive$fval_in[1], opt$archive$fval_out) + offset[3])
@@ -241,6 +257,7 @@ Visualizer = R6::R6Class("Visualizer",
           npmax = nrow(xmarkers)
         }
       }
+      # Cut marker after npmax iterations (if specified):
       xmr = xmarkers[unique(round(seq(1, nrow(xmarkers), length.out = npoints))), ]
       xmr = xmr[seq_len(npmax), ]
       add_marker_at = add_marker_at[add_marker_at <= npmax]
@@ -250,6 +267,9 @@ Visualizer = R6::R6Class("Visualizer",
         name = paste0(opt$id, " on ", opt$objective$id)
       }
 
+      # Define the plotting arguments as list, so we can call `do.call` with these arguments. This is
+      # more comfortable due to just one call to `add_trace`. Additionally, it is easier to control
+      # different default stylings (such as line width) and to recreate the layer with the stored arguments:
       if (private$p_layer_primary == "surface") {
         ptype = "scatter3d"
         pargs = list(
@@ -274,17 +294,20 @@ Visualizer = R6::R6Class("Visualizer",
       }
       pargs$type = ptype
 
+      # Add optimization traces as lines to the plot:
       private$p_plot = do.call(add_trace, c(list(private$p_plot),
         mlr3misc::insert_named(mlr3misc::remove_named(pargs, "marker"), aargs),
         list(mode = "lines")))
 
+      # Now add marker to the lines. Marker are added at `add_marker_at` iterations
+      # and with the specified shape and color:
       pargs = list(
         x = xmarkers$x[add_marker_at],
         y = xmarkers$y[add_marker_at],
         z = xmarkers$z[add_marker_at],
         mode = "markers",
         type = ptype,
-        marker = insert_named(pargs$marker, list(symbol = marker_shape)),
+        marker = insert_named(pargs$marker, list(symbol = marker_shape, color = marker_color)),
         showlegend = FALSE)
       if (private$p_layer_primary == "contour") {
         pargs$z = NULL
@@ -294,28 +317,15 @@ Visualizer = R6::R6Class("Visualizer",
       return(invisible(self))
     },
 
-    #addLayerArrow = function(c1, c2, iter_connect = NULL, ...) {
-      #if (private$p_layer_primary == "surface") {
-        #checkmate::assertNumeric(c1, len = 3)
-        #checkmate::assertNumeric(c2, len = 3)
-      #} else {
-        #checkmate::assertNumeric(c1, len = 2)
-        #checkmate::assertNumeric(c2, len = 2)
-
-      #}
-
-      #private$p_layer_arrow = c(private$p_layer_arrow, list(c(list(c1 = c1, c2 = c2, iter_connect = iter_connect, list(...))))
-
-      #if (is.null(private$p_plot)) {
-        #stop("Initialize plot with `initLayer*`")
-      #}
-      #x = c(c1[1], c2[1])
-      #y = c(c1[2], c2[2])
-
-      #private$p_layer_plot = add_trace(x = aaa, y = bbb, z = ccc, type = "scatter3d", mode = "lines",
-            #name = "lines", showlegend = FALSE)
-    #},
-
+    #' @description Add a Taylor approximation (for 1 and 2 degrees).
+    #' @param x0 (`numeric()) ` The point around which the approximation is done.
+    #' @param degree (`integer(1)`) The degree of the approximation (only 1 and 2 is implemented).
+    #' @param x1margin (`numeric(1)`) The "length" of the hyperplane in direction x1.
+    #' @param x2margin (`numeric(1)`) The "length" of the hyperplane in direction x2.
+    #' @param npoints_per_dim (`integer(1)`) Number of points per dimension for the plotting grid.
+    #' @param zlim (`numeric(2)`) The limits for z. Can be helpful if the hyperplane
+    #' has a huge z range and therefore the plot looks ugly.
+    #' @param ... Additional parameter passed to `add_surface()`.
     addLayerTaylor = function(x0, degree = 2, x1margin = 0, x2margin = 0, npoints_per_dim = 20L, zlim = NULL, ...) {
       private$checkInit()
       if (private$p_layer_primary != "surface") stop("Atm just available for `surface`")
@@ -371,12 +381,16 @@ Visualizer = R6::R6Class("Visualizer",
       private$p_plot = private$p_plot %>% add_surface(x = grid[, 1], y = grid[, 2], z = t(z), showscale = FALSE, ...)
     },
 
+    #' @description Add two "arrows" as eigenvectors of the Hessian.
+    #' @param x0 (`numeric(2)`) The point at which the Hessian is calculated.
+    #' @param x1length (`numeric(1)`) The length of the first eigenvector.
+    #' @param x2length (`numeric(1)`) The length of the second eigenvector.
+    #' @param ... Additional arguments passed to `add_trace`.
     addLayerHessian = function(x0, x1length = 0.1, x2length = 0.1, ...) {
       private$checkInit()
       checkmate::assertNumeric(x0, len = 2L)
       checkmate::assertNumber(x1length)
       checkmate::assertNumber(x2length)
-      #if (private$p_layer_primary != "surface") stop("Atm just available for `surface`")
 
       f0 = self$objective$eval(x0)
       h = self$objective$hess(x0)

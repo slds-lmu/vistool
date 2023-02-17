@@ -39,6 +39,7 @@ Optimizer = R6Class("Optimizer",
     #' @param fval_out (`numeric(1)`) The objective value `objetive$eval(x_out)`.
     #' @param fval_in (`numeric(1)`) The objective value `objetive$eval(x_in)`.
     #' @param lr (`numeric(1)`) The learning rate used to multiply `update` with.
+    #' @param step_size (`numeric(1)`) The step_size used to multiply `lr * update` with.
     #' @param objective (`Objective`) The objective used by `$optimize()`.
     #' @param step (`integer(1)`) The step or iteration.
     #' @param ... Additional objects added to the archive (e.g. `momentum`).

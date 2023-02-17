@@ -103,6 +103,8 @@ Prepare updates for adding them to the archive.
 
 \item{\code{lr}}{(`numeric(1)`) The learning rate used to multiply `update` with.}
 
+\item{\code{step_size}}{(`numeric(1)`) The step_size used to multiply `lr * update` with.}
+
 \item{\code{objective}}{(`Objective`) The objective used by `$optimize()`.}
 
 \item{\code{step}}{(`integer(1)`) The step or iteration.}

@@ -1,3 +1,9 @@
+#' Assertion for the main signature of a `stepSizeControlXX` function.
+#' @param x (`numeric()`) The "old" point.
+#' @param u (`numeric()`) The update added to `x` without a step size control.
+#' @param obj (`Objective`) The usd objective object.
+#' @param opt (`Optimizer`) The optimizer object from which the function is called.
+#' @export
 assertStepSizeControl = function(x, u, obj, opt) {
   checkmate::assertR6(obj, "Objective")
   checkmate::assertR6(opt, "Optimizer")
@@ -5,9 +11,14 @@ assertStepSizeControl = function(x, u, obj, opt) {
   obj$assertX(checkmate::assertNumeric(u))
 }
 
+#' Conduct line search in each iteration to adjust the update.
+#' @param lower (`numeric(1)`) The lower bound for the step_size.
+#' @param upper (`numeric(1)`) The upper bound for the step_size.
+#' @return The step size as number.
+#' @export
 stepSizeControlLineSearch = function(lower = 0, upper = 10) {
-  checkmate::assertIntegerish(lower, len = 1L)
-  checkmate::assertIntegerish(upper, len = 1L, lower = lower)
+  checkmate::assertNumber(lower, len = 1L)
+  checkmate::asserNumber(upper, len = 1L, lower = lower)
   function(x, u, obj, opt) {
     assertStepSizeControl(x, u, obj, opt)
     f = function(a) {
@@ -19,7 +30,11 @@ stepSizeControlLineSearch = function(lower = 0, upper = 10) {
   }
 }
 
-# See https://neptune.ai/blog/how-to-choose-a-learning-rate-scheduler
+#' Conduct time decay to adjust the update.
+#' See https://neptune.ai/blog/how-to-choose-a-learning-rate-scheduler
+#' @param decay (`numeric(1)`) The decay parameter indicating how fast the step size is reduced.
+#' @return The step size as number.
+#' @export
 stepSizeControlDecayTime = function(decay = 0.01) {
   checkmate::assertNumber(decay, lower = 0, upper = 1)
 
@@ -31,6 +46,11 @@ stepSizeControlDecayTime = function(decay = 0.01) {
   }
 }
 
+#' Conduct exponential decay to adjust the update.
+#' See https://neptune.ai/blog/how-to-choose-a-learning-rate-scheduler
+#' @param decay (`numeric(1)`) The decay parameter indicating how fast the step size is reduced.
+#' @return The step size as number.
+#' @export
 stepSizeControlDecayExp = function(decay = 0.01) {
   checkmate::assertNumber(decay, lower = 0, upper = 1)
 
@@ -42,8 +62,13 @@ stepSizeControlDecayExp = function(decay = 0.01) {
   }
 }
 
+#' Conduct linear decay to adjust the update.
+#' See https://neptune.ai/blog/how-to-choose-a-learning-rate-scheduler
+#' @param iter_zero (`integer(1)`) The iteration at which the update is shrinked to zero.
+#' @return The step size as number.
+#' @export
 stepSizeControlDecayLinear = function(iter_zero = 100L) {
-  checkmate::assertNumber(iter_zero, lower = 0)
+  checkmate::assertIntegerish(iter_zero, lower = 0, len = 1)
 
   function(x, u, obj, opt) {
     assertStepSizeControl(x, u, obj, opt)
@@ -57,6 +82,14 @@ stepSizeControlDecayLinear = function(iter_zero = 100L) {
   }
 }
 
+#' Conduct a step-wise decay to adjust the update.
+#' See https://neptune.ai/blog/how-to-choose-a-learning-rate-scheduler
+#' @param drop_rate (`numeric(1)`) The rate indicating how much the learning rate is reduced
+#' after each `every_iter`.
+#' @param every_iter (`integer(1)`) Number indicates after how many iterations the
+#' learning rate is reduced by `drop_rate`.
+#' @return The step size as number.
+#' @export
 stepSizeControlDecaySteps = function(drop_rate = 0.1, every_iter = 10) {
   checkmate::assertNumber(drop_rate, lower = 0, upper = 1)
   checkmate::assertIntegerish(every_iter, lower = 1, len = 1L)
@@ -68,17 +101,3 @@ stepSizeControlDecaySteps = function(drop_rate = 0.1, every_iter = 10) {
     return((1 - drop_rate)^(floor(epoch / every_iter)))
   }
 }
-
-
-
-if (FALSE) {
-devtools::load_all()
-
-obj = tfun_dict$get("TF_banana")
-opt = OptimizerGD$new(obj, x_start = c(0.6, 0.6), step_size = 0.001, id = "GD x0=(0.6, 0.6)", print_trace = FALSE)
-opt$optimize(steps = 10)
-
-opt2 = OptimizerGD$new(obj, x_start = c(0.6, 0.6), step_size = 0.001, id = "GD x0=(0.6, 0.6) line search", print_trace = FALSE)
-opt2$optimize(steps = 10, stepSizeControl = stepSizeControlLineSearch)
-}
-

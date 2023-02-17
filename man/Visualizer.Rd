@@ -52,7 +52,7 @@ Creates a new instance of this [R6][R6::R6Class] class.
   objective,
   x1limits = NULL,
   x2limits = NULL,
-  padding = 0.1,
+  padding = 0,
   auto_box = TRUE,
   npoints = 100L
 )}\if{html}{\out{</div>}}
@@ -147,6 +147,7 @@ Add an optimization trace.
   offset = NULL,
   add_marker_at = 1,
   marker_shape = "circle",
+  marker_color = NULL,
   ...
 )}\if{html}{\out{</div>}}
 }
@@ -177,7 +178,10 @@ which means that the name is pasted from `opt$id` and `objective$id`.}
 \item{\code{marker_shape}}{(`character()`) Vector indicating the shape of the markers.
 if `length(marker_shape) == 1`, all markers get the same shape. The other option is to
 specify all markers individually by passing a vector of `length(add_marker_at)`.
-For a list of all shapes see `schema(F)$traces$scatter$attributes$marker$symbol$values`.}
+For a list of all shapes see `schema(F)$traces$XXX$attributes$marker$symbol$values` with `XXX` one of `scatter` or `scatter3d`. If `marker_shape = NA`, no marker
+are added.}
+
+\item{\code{marker_color}}{(`character()`) The colors for the markers.}
 
 \item{\code{...}}{Further arguments passed to `add_trace(...)`.}
 }
@@ -188,27 +192,62 @@ For a list of all shapes see `schema(F)$traces$scatter$attributes$marker$symbol$
 \if{html}{\out{<a id="method-addLayerTaylor"></a>}}
 \if{latex}{\out{\hypertarget{method-addLayerTaylor}{}}}
 \subsection{Method \code{addLayerTaylor()}}{
+Add a Taylor approximation (for 1 and 2 degrees).
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Visualizer$addLayerTaylor(
   x0,
   degree = 2,
-  x1margin = 0.1,
-  x2margin = 0.1,
-  x3margin = 0.3,
+  x1margin = 0,
+  x2margin = 0,
   npoints_per_dim = 20L,
+  zlim = NULL,
   ...
 )}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{x0}}{(`numeric()) ` The point around which the approximation is done.}
+
+\item{\code{degree}}{(`integer(1)`) The degree of the approximation (only 1 and 2 is implemented).}
+
+\item{\code{x1margin}}{(`numeric(1)`) The "length" of the hyperplane in direction x1.}
+
+\item{\code{x2margin}}{(`numeric(1)`) The "length" of the hyperplane in direction x2.}
+
+\item{\code{npoints_per_dim}}{(`integer(1)`) Number of points per dimension for the plotting grid.}
+
+\item{\code{zlim}}{(`numeric(2)`) The limits for z. Can be helpful if the hyperplane
+has a huge z range and therefore the plot looks ugly.}
+
+\item{\code{...}}{Additional parameter passed to `add_surface()`.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-addLayerHessian"></a>}}
 \if{latex}{\out{\hypertarget{method-addLayerHessian}{}}}
 \subsection{Method \code{addLayerHessian()}}{
+Add two "arrows" as eigenvectors of the Hessian.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Visualizer$addLayerHessian(x0, x1length = 0.1, x2length = 0.1, ...)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{x0}}{(`numeric(2)`) The point at which the Hessian is calculated.}
+
+\item{\code{x1length}}{(`numeric(1)`) The length of the first eigenvector.}
+
+\item{\code{x2length}}{(`numeric(1)`) The length of the second eigenvector.}
+
+\item{\code{...}}{Additional arguments passed to `add_trace`.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-setLayout"></a>}}
