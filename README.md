@@ -353,7 +353,7 @@ stepSizeControlDecayTime()
 #>     epoch = nrow(obj$archive)
 #>     return(1 / (1 + decay * epoch))
 #>   }
-#> <environment: 0x5648f3983170>
+#> <environment: 0x563c3a5cca68>
 ```
 
 Let’s define multiple gradient descent optimizers and optimize 100 steps
@@ -600,9 +600,9 @@ orca(p, "README_files/viz_scatter.png")
 #> Use 'kaleido' instead.
 #> See help("Deprecated")
 #> -
-#> (orca:8408): Gtk-WARNING **: 09:50:33.601: Theme parsing error: gtk-contained.css:2871:228: Missing closing bracket for :not()
+#> (orca:13935): Gtk-WARNING **: 10:22:41.904: Theme parsing error: gtk-contained.css:2871:228: Missing closing bracket for :not()
 #> \|Fontconfig warning: "/usr/share/fontconfig/conf.avail/05-reset-dirs-sample.conf", line 6: unknown element "reset-dirs"
-#> /-\|[8447:0217/095034.600866:ERROR:buffer_manager.cc(488)] [.DisplayCompositor]GL ERROR :GL_INVALID_OPERATION : glBufferData: <- error from previous GL command
+#> /-\|[13974:0217/102242.894889:ERROR:buffer_manager.cc(488)] [.DisplayCompositor]GL ERROR :GL_INVALID_OPERATION : glBufferData: <- error from previous GL command
 #> /-\|/-\|/-\|/ 
 
 # List of marker symbols:
