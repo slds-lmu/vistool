@@ -17,8 +17,8 @@ assertStepSizeControl = function(x, u, obj, opt) {
 #' @return The step size as number.
 #' @export
 stepSizeControlLineSearch = function(lower = 0, upper = 10) {
-  checkmate::assertNumber(lower, len = 1L)
-  checkmate::asserNumber(upper, len = 1L, lower = lower)
+  checkmate::assertNumber(lower)
+  checkmate::assertNumber(upper, lower = lower)
   function(x, u, obj, opt) {
     assertStepSizeControl(x, u, obj, opt)
     f = function(a) {
