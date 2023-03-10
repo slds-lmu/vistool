@@ -125,7 +125,7 @@ Visualizer = R6::R6Class("Visualizer",
         z = t(llp$z),
         type = "contour",
         opacity = opacity,
-        colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")),
+        colorscale = colorscale,
         ...
       )
       if (! private$p_freeze_plot) { # Used in animate to not overwrite the plot over and over again.
