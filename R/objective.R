@@ -65,6 +65,14 @@ Objective = R6::R6Class("Objective",
 
       return(invisible(self))
     },
+    
+    #' @description Reset additional arguments of objective function.
+    # #' @param ... Additional arguments passed to `fun`.
+    reset_fargs = function(...) {
+        private$p_fargs = mlr3misc::insert_named(private$p_fargs, list(...))
+        xtest = rep(0, ifelse(is.na(private$p_xdim), 2, private$p_xdim))
+        checkmate::assertNumber(self$eval(xtest)) # check that fun works as expected
+    },
 
     #' @description Evaluate the objective function.
     #' @param x (`numeric`) The numerical input of `fun`.
@@ -223,10 +231,19 @@ Objective = R6::R6Class("Objective",
   )
 )
 
+# ADD PRE-DEFINED OBJECTIVES ---------------------------------------------------
+
 l2norm = function(x) sqrt(sum(crossprod(x)))
+
+# Instantiate dicts
 
 tfun_dict = R6::R6Class("DictionaryObjective", inherit = mlr3misc::Dictionary,
   cloneable = FALSE)$new()
+rloss_dict = R6::R6Class(
+  "DictionaryObjective", inherit = mlr3misc::Dictionary, cloneable = FALSE
+)$new()
+
+# Define custom objective functions
 
 tfuns = c(list(list(minimize = TRUE, name = "branin", desc = "A function. 2 dimensional function.", xdim = 2, limits_lower = c(-2, -2), limits_upper = c(3, 3))),
   list(list(minimize = TRUE, name = "borehole", desc = "A function estimating water flow through a borehole. 8 dimensional function.", xdim = 2, limits_lower = c(0, 0), limits_upper = c(1.5, 1))),
@@ -265,6 +282,78 @@ tfuns = c(list(list(minimize = TRUE, name = "branin", desc = "A function. 2 dime
   #list(list(minimize = FALSE, name = "detpep8d", desc = "detpep8d function 8 dimensional function.", xdim = 8, limits_lower = NA, limits_upper = NA)),
   list(list(minimize = FALSE, name = "hartmann", desc = "hartmann function 6 dimensional function.", xdim = 6, limits_lower = NA, limits_upper = NA)))
 
+rlosses = c(
+  list(list(minimize = TRUE, name = "l2", desc = "Quadratic regression loss.", xdim = NA, limits_lower = NA, limits_upper = NA)),
+  list(list(minimize = TRUE, name = "l1", desc = "Absolute regression loss.", xdim = NA, limits_lower = NA, limits_upper = NA)),
+  list(list(minimize = TRUE, name = "huber", desc = "Huber regression loss.", xdim = NA, limits_lower = NA, limits_upper = NA)),
+  list(list(minimize = TRUE, name = "logcosh", desc = "Log-cosh regression loss.", xdim = NA, limits_lower = NA, limits_upper = NA)),
+  list(list(minimize = TRUE, name = "logbarrier", desc = "Log-barrier regression loss.", xdim = NA, limits_lower = NA, limits_upper = NA)),
+  list(list(minimize = TRUE, name = "epsinsensitive", desc = "Epsilon-insensitive regression loss.", xdim = NA, limits_lower = NA, limits_upper = NA)),
+  list(list(minimize = TRUE, name = "pinball", desc = "Pinball aka quantile regression loss.", xdim = NA, limits_lower = NA, limits_upper = NA)),
+  list(list(minimize = TRUE, name = "cauchy", desc = "Cauchy regression loss.", xdim = NA, limits_lower = NA, limits_upper = NA))
+)
+rlossfuns = list(
+  l2 = list(
+    fun = function(x, Xmat, y) sum((y - Xmat %*% x)**2),
+    args = list(Xmat = matrix(), y = c())
+  ),
+  l1 = list(
+    fun = function(x, Xmat, y) sum(abs(y - Xmat %*% x)),
+    args = list(Xmat = matrix(), y = c())
+  ),
+  huber = list(
+    fun = function(x, Xmat, y, epsilon) {
+      res <- y - Xmat %*% x
+      sum(
+        ifelse(
+          abs(res) <= epsilon, 
+          0.5 * res**2, 
+          epsilon * abs(res) - 0.5 * epsilon**2
+        )
+      )
+    },
+    args = list(Xmat = matrix(), y = c(), epsilon = 0.5)
+  ),
+  logcosh = list(
+    fun = function(x, Xmat, y) sum(log(cosh(abs(y - Xmat %*% x)))),
+    args = list(Xmat = matrix(), y = c())
+  ),
+  logbarrier = list(
+    fun = function(x, Xmat, y, epsilon) {
+      abs_res <- abs(y - Xmat %*% x)
+      abs_res[abs_res > epsilon] <- Inf
+      abs_res[abs_res <= epsilon] <- -epsilon**2 * log(
+        1 - (abs_res[abs_res <= epsilon] / epsilon)**2
+      )
+      sum(abs_res)
+    },
+    args = list(Xmat = matrix(), y = c(), epsilon = 1)
+  ),
+  epsinsensitive = list(
+    fun = function(x, Xmat, y, epsilon) {
+      res <- y - Xmat %*% x
+      sum(ifelse(abs(res) > epsilon, abs(res) - epsilon, 0L))
+    },
+    args = list(Xmat = matrix(), y = c(), epsilon = 1)
+  ),
+  pinball = list(
+    fun = function(x, Xmat, y, quantile) {
+      res <- y - Xmat %*% x
+      sum(ifelse(res < 0, ((1 - quantile) * (-res)), quantile * res))
+    },
+    args = list(Xmat = matrix(), y = c(), quantile = 0.5)
+  ),
+  cauchy = list(
+    fun = function(x, Xmat, y, epsilon) {
+      res <- y - Xmat %*% x
+      sum(0.5 * epsilon**2 * log(1 + ((y - Xmat %*% x) / epsilon)**2))
+    },
+    args = list(Xmat = matrix(), y = c(), epsilon = 1)
+  )
+)
+
+# Add custom objectives to dicts
+
 for (i in seq_along(tfuns)) {
   tf = tfuns[[i]]
   id = sprintf("TF_%s", tf$name)
@@ -273,6 +362,24 @@ for (i in seq_along(tfuns)) {
     id = id, label = tf$name, xdim = tf$xdim, limits_lower = tf$limits_lower,
     limits_upper = tf$limits_upper)))
 }
+for (i in seq_along(rlosses)) {
+    rl = rlosses[[i]]
+    id = sprintf("RL_%s", rl$name)
+    args_list = append(
+        list(
+            fun = rlossfuns[[rl$name]]$fun,
+            id = id, 
+            label = rl$name, 
+            xdim = rl$xdim, 
+            limits_lower = rl$limits_lower,
+            limits_upper = rl$limits_upper
+        ),
+        rlossfuns[[rl$name]]$args
+    )
+    rloss_dict$add(id, do.call(Objective$new, args_list))
+}
+
+# Export dicts
 
 #' @export
 as.data.table.DictionaryObjective = function(x, ..., objects = FALSE) {
