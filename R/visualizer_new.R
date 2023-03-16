@@ -3,7 +3,8 @@
 #' Visualizer base class
 #'
 #' This class is used to create visualizations/animations.
-#' The used plotting backend is plotly (https://plotly.com/).
+#' The used plotting backends are plotly (https://plotly.com/) and ggplot2
+#' (https://ggplot2.tidyverse.org//).
 #' @export
 Visualizer = R6::R6Class(
   "Visualizer",
@@ -11,6 +12,10 @@ Visualizer = R6::R6Class(
     
     grid = list(),
     zmat = NULL,
+    
+    initialize = function() {
+      stop("Abstract Visualizer class not implemented")
+    },
 
     initLayerUnivariate = function(theme = theme_bw(), ...) {
       private$p_layer_primary = "line"
@@ -242,5 +247,5 @@ Tester = R6::R6Class(
 
 foo = Tester$new(data.frame(x = rnorm(10), y = rnorm(10)))
 foo$initLayerUnivariate()
-# foo$setLayout(list())
+foo$plot()
 foo$save("foo.png", width = 3)

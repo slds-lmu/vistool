@@ -40,18 +40,17 @@ LMPredictor = R6::R6Class(
       if (dim_diff == 0) {
         private$p_with_intercept = TRUE
         private$p_xmat = xmat
-      }
-      else if (dim_diff == 1) {
+      } else if (dim_diff == 1) {
         private$p_with_intercept = FALSE
         private$p_xmat = xmat[, -1]
-      }
-      else stop("Number of coefficients does not match number of predictors.")
+      } else stop("Number of coefficients does not match number of predictors.")
     },
     #' @description Makes LM predictions according to formula and coefficients.
     #' @param data (`data.table()`) Optional new data.
     predict = function(data = NULL) {
-      if (is.null(data)) dt = private$p_xmat
-      else {
+      if (is.null(data)) {
+        dt = private$p_xmat
+      } else {
         dt_in = checkmate::assertDataTable(dt)
         dt = model.matrix(self$formula, dt_in)
         if (!private$p_with_intercept) dt = dt[, -1]
