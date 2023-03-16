@@ -73,6 +73,13 @@ Objective = R6::R6Class("Objective",
         xtest = rep(0, ifelse(is.na(private$p_xdim), 2, private$p_xdim))
         checkmate::assertNumber(self$eval(xtest)) # check that fun works as expected
     },
+    
+    #' @description Reset dimension of x (in regression, depending on task).
+    #' @param dim (`numeric(1)`) Dimension of parameter (incl. intercept).
+    reset_xdim = function(dim) {
+      checkmate::assertCount(dim, positive = TRUE)
+      private$p_xdim = dim
+    },
 
     #' @description Evaluate the objective function.
     #' @param x (`numeric`) The numerical input of `fun`.
@@ -235,14 +242,6 @@ Objective = R6::R6Class("Objective",
 
 l2norm = function(x) sqrt(sum(crossprod(x)))
 
-# Instantiate dicts
-
-tfun_dict = R6::R6Class("DictionaryObjective", inherit = mlr3misc::Dictionary,
-  cloneable = FALSE)$new()
-rloss_dict = R6::R6Class(
-  "DictionaryObjective", inherit = mlr3misc::Dictionary, cloneable = FALSE
-)$new()
-
 # Define custom objective functions
 
 tfuns = c(list(list(minimize = TRUE, name = "branin", desc = "A function. 2 dimensional function.", xdim = 2, limits_lower = c(-2, -2), limits_upper = c(3, 3))),
@@ -352,6 +351,15 @@ rlossfuns = list(
   )
 )
 
+
+# Instantiate dicts
+
+tfun_dict = R6::R6Class("DictionaryObjective", inherit = mlr3misc::Dictionary,
+                        cloneable = FALSE)$new()
+rloss_dict = R6::R6Class(
+  "DictionaryObjective", inherit = mlr3misc::Dictionary, cloneable = FALSE
+)$new()
+
 # Add custom objectives to dicts
 
 for (i in seq_along(tfuns)) {
@@ -372,7 +380,8 @@ for (i in seq_along(rlosses)) {
             label = rl$name, 
             xdim = rl$xdim, 
             limits_lower = rl$limits_lower,
-            limits_upper = rl$limits_upper
+            limits_upper = rl$limits_upper,
+            minimize = rl$minimize
         ),
         rlossfuns[[rl$name]]$args
     )
