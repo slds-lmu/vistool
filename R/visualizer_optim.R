@@ -359,6 +359,7 @@ VisualizerOptim = R6::R6Class(
             inherit = FALSE,
             ...
           )
+        
       }
       if (private$p_layer_primary == "surface") {
         v1 = v1 * x1length + x0
@@ -408,30 +409,3 @@ VisualizerOptim = R6::R6Class(
     }
   )
 )
-
-n_points <- 1000L
-set.seed(123)
-x_1 <- rnorm(n_points, mean = 1, sd = 1)
-x_2 <- rnorm(n_points, mean = 1, sd = 1)
-set.seed(456)
-y_univ <- 1 + 0.5 * x_1 + rnorm(n_points, sd = 0.5)
-y_biv <- 1 + 0.5 * x_1 + 0.5 * x_2 + rnorm(n_points, sd = 0.5)
-dt_univ <- data.table(x_1, y = y_univ)
-dt_biv <- data.table(x_1, x_2, y = y_biv)
-
-Xmat_univ = model.matrix(~ x_1, dt_univ)
-Xmat_biv = model.matrix(~ x_1 + x_2, dt_biv)
-
-obj = rloss_dict$get("RL_l2")
-obj$reset_xdim(2L)
-obj$reset_fargs(Xmat = Xmat_univ, y = y_univ)
-
-opt = OptimizerGD$new(
-  obj, x_start = c(2, 1.6), print_trace = FALSE, lr = 0.0001
-)
-opt$optimize(steps = 1000)
-
-foo = VisualizerOptim$new(obj, x1limits = c(-10, 10), x2limits = c(-10, 10))
-foo$initLayerBivariate()
-foo$addLayerOptimizationTrace(opt)
-foo$plot()

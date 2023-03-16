@@ -222,30 +222,3 @@ Visualizer = R6::R6Class(
     }
   )
 )
-
-
-Tester = R6::R6Class(
-  "Tester",
-  inherit = Visualizer,
-  public = list(
-    grid = NULL,
-    zmat = NULL,
-    initialize = function(data) {
-      self$grid = list(
-        x1 = seq_len(nrow(data))
-        # , x2 = seq_len(nrow(data))
-      )
-      self$zmat = data$y
-      # self$zmat = outer(self$grid$x1, self$grid$x2, function(x, y) {
-      #   xin = cbind(x, y)
-      #   apply(xin, 1, function(x) sum(x))
-      # })
-      return(invisible(self))
-    }
-  )
-)
-
-foo = Tester$new(data.frame(x = rnorm(10), y = rnorm(10)))
-foo$initLayerUnivariate()
-foo$plot()
-foo$save("foo.png", width = 3)

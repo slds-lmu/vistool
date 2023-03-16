@@ -9,6 +9,12 @@ LMPredictor = R6::R6Class(
     id = NULL,
     #' @field data Data to predict on.
     data = NULL,
+    #' @field xmat Model matrix.
+    xmat = NULL,
+    #' @field target Regression target.
+    target = NULL,
+    #' @field with_intercept Whether to use intercept term.
+    with_intercept = TRUE,
     #' @field prediction Result of LM prediction.
     prediction = NULL,
     #' @field id ID of regression computation.
@@ -32,53 +38,47 @@ LMPredictor = R6::R6Class(
       # )
       if (!is.null(coeffs)) self$coeffs = checkmate::assertNumeric(coeffs)
       else {
-        self$coeffs = coefficientss(lm(self$formla, self$data))
+        self$coeffs = coefficients(lm(self$formla, self$data))
       }
-      private$p_target = paste0(formula)[2]
+      if (length(paste0(formula)) != 3L) {
+        stop("Could not determine target, please state explicitly in formula.")
+      } else  self$target = paste0(formula)[2]
       xmat = model.matrix(formula, data = data)
       dim_diff = ncol(xmat) - length(self$coeffs)
       if (dim_diff == 0) {
-        private$p_with_intercept = TRUE
-        private$p_xmat = xmat
+        self$with_intercept = TRUE
+        self$xmat = xmat
       } else if (dim_diff == 1) {
-        private$p_with_intercept = FALSE
-        private$p_xmat = xmat[, -1]
+        self$with_intercept = FALSE
+        self$xmat = xmat[, -1]
       } else stop("Number of coefficients does not match number of predictors.")
     },
     #' @description Makes LM predictions according to formula and coefficients.
     #' @param data (`data.table()`) Optional new data.
     predict = function(data = NULL) {
       if (is.null(data)) {
-        dt = private$p_xmat
+        dt = self$xmat
       } else {
         dt_in = checkmate::assertDataTable(dt)
         dt = model.matrix(self$formula, dt_in)
-        if (!private$p_with_intercept) dt = dt[, -1]
+        if (!self$with_intercept) dt = dt[, -1]
         if (ncol(dt) != length(self$coeffs)) {
           stop(
             sprintf(
               "Data has %i cols %s but there are (%i) coefficients",
               ncol(dt),
-              ifelse(private$p_with_intercept, "with intercept", ""),
+              ifelse(self$with_intercept, "with intercept", ""),
               length(self$coefficients)
             )
           )
         }
       }
       pred = dt %*% self$coeffs
-      self$prediction = data.table::data.table(dt)[
-        , `:=`(target = self$data[[private$p_target]], pred = pred)
+      dt = data.table::data.table(dt)[
+        , `:=`(target = self$data[[self$target]], pred = pred)
         ][, residual := target - pred]
-      return(self$prediction)
+      self$prediction = dt
     }
-  ),
-  private = list(
-    # @field p_target (`character(1)`) Regression target.
-    p_target = NULL,
-    # @field p_xmat (`matrix()`) Model matrix.
-    p_xmat = NULL,
-    # @field p_with_intercept (`logical()`) Whether to include intercept term.
-    p_with_intercept = NULL
   )
 )
 
