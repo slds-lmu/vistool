@@ -17,13 +17,17 @@ Visualizer = R6::R6Class(
       stop("Abstract Visualizer class not implemented")
     },
 
-    initLayerUnivariate = function(theme = theme_bw(), ...) {
+    initLayerUnivariate = function(
+      theme = theme_bw(), col = "black", ...
+    ) {
       private$p_layer_primary = "line"
       private$p_check_grid_dims(self$grid, 1)
-      private$p_check_zmat_dims(self$zmat, 0)
+      private$p_check_zmat_dims(self$zmat, 1)
       llp = data.table(x = self$grid$x1, y = self$zmat)
+      setnames(llp, c("x", "y"))
       ggplot2::theme_set(theme)
-      private$p_plot <- ggplot(llp, aes(x, y))
+      private$p_plot <- ggplot(llp, aes(x, y)) +
+        geom_line(col = col, ...)
       return(invisible(self))
     },
     
@@ -40,7 +44,7 @@ Visualizer = R6::R6Class(
       private$p_layer_primary = type
       private$p_vbase = c(as.list(environment()), list(...))
       private$p_check_grid_dims(self$grid, 2)
-      private$p_check_zmat_dims(self$zmat, 2)
+      private$p_check_zmat_dims(self$zmat, length(self$grid$x1))
       llp = list(x = self$grid$x1, y = self$grid$x2, z = self$zmat)
       private$p_plot = plot_ly() %>%
         add_trace(
@@ -216,9 +220,10 @@ Visualizer = R6::R6Class(
       checkmate::assertTRUE(length(grid) == d)
     },
     p_check_zmat_dims = function(zmat, d) {
-      checkmate::assertIntegerish(d, lower = 0, upper = 2)
+      checkmate::assertIntegerish(d, lower = 1)
       checkmate::assertNumeric(zmat)
-      checkmate::assertTRUE(length(dim(zmat)) == d)
+      checkmate::assertTRUE(length(dim(zmat)) == 2)
+      checkmate::assertTRUE(dim(zmat)[2] == d)
     }
   )
 )

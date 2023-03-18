@@ -27,12 +27,13 @@ VisualizerPrediction = R6::R6Class(
       if (predictor$with_intercept) {
         xmat = predictor$xmat[, -1]
       } else xmat = predictor$xmat
-      xdim = ncol(xmat)
+      xdim = ifelse(is.matrix(xmat), ncol(xmat), 1)
       if (xdim > 2) {
         stop(
           sprintf("1- or 2-dimensional inputs required, but xdim = %s`", xdim)
         )
       }
+      if (xdim == 1) xmat = as.matrix(xmat)
       checkmate::assertNumber(padding, lower = 0)
       checkmate::assertNumeric(x1limits, len = 2, null.ok = TRUE)
       checkmate::assertNumeric(x2limits, len = 2, null.ok = TRUE)
@@ -80,7 +81,11 @@ VisualizerPrediction = R6::R6Class(
             apply(xin, 1, function(x) x %*% self$predictor$coeffs)
             }
           )
-      } else self$zmat =  self$grid$x1 %*% self$predictor$coeffs
+      } else {
+        if (self$predictor$with_intercept) {
+          self$zmat = cbind(1, self$grid$x1) %*% self$predictor$coeffs
+        } else self$zmat = self$grid$x1 %*% self$predictor$coeffs
+      }
 
       return(invisible(self))
       
@@ -90,12 +95,34 @@ VisualizerPrediction = R6::R6Class(
       covariate_1, 
       covariate_2 = NULL, 
       marker = list(size = 5, color = "black", symbol = "cross"),
+      shape = "cross",
+      col = "black",
       ...
     ) {
       if (private$p_layer_primary == "line") {
-        # TODO
+        private$p_plot = private$p_plot +
+          geom_point(
+            data.table(
+              x = self$predictor$prediction[[covariate_1]], 
+              y = self$predictor$prediction$target
+            ),
+            mapping = aes(x, y),
+            shape = shape, 
+            col = col, 
+            ...
+          )
       } else if (private$p_layer_primary == "contour") {
-        # TODO
+        private$p_plot = private$p_plot %>% 
+          add_trace(
+            x = self$predictor$prediction[[covariate_1]], 
+            y = self$predictor$prediction[[covariate_2]],
+            mode = "markers", 
+            type = "scatter",
+            marker = marker,
+            showlegend = FALSE, 
+            inherit = FALSE,
+            ...
+          )
       } else if (private$p_layer_primary == "surface") {
         private$p_plot = private$p_plot %>% 
           add_trace(
@@ -115,24 +142,93 @@ VisualizerPrediction = R6::R6Class(
     
     addLayerResiduals = function(
       covariate_1, 
-      covariate_2 = NULL, 
-      line = list(size = 3, color = "black"),
+      covariate_2 = NULL,
+      idx_residuals = NULL,
+      quadratic = FALSE,
+      line = list(size = 3, color = "blue"),
+      marker = list(color = "blue", opacity = 0.1),
+      col = "blue",
+      fill = "blue",
+      alpha = 0.1,
       ...
     ) {
       if (private$p_layer_primary == "line") {
-        # TODO
+        pred = self$predictor$prediction
+        if (quadratic) {
+          plot_dt = data.table(
+            xmin = pred[[covariate_1]], 
+            xmax = pred[[covariate_1]] + (pred$pred - pred$target), 
+            ymin = pred$target,
+            ymax = pred$pred
+          )
+        } else {
+          plot_dt = data.table(
+            x = pred[[covariate_1]], 
+            xend = pred[[covariate_1]], 
+            y = pred$target,
+            yend = pred$pred
+          )
+        }
+        if (!is.null(idx_residuals)) plot_dt = plot_dt[idx_residuals, ]
+        if (quadratic) {
+          private$p_plot = private$p_plot +
+            geom_rect(
+              plot_dt,
+              mapping = aes(
+                x = NULL,
+                y = NULL,
+                xmin = xmin, 
+                xmax = xmax, 
+                ymin = ymin, 
+                ymax = ymax
+                ),
+              alpha = alpha,
+              col = col,
+              fill = fill,
+              ...
+            )
+        } else {
+          private$p_plot = private$p_plot +
+            geom_segment(
+              plot_dt,
+              mapping = aes(x = x, xend = xend, y = y, yend = yend),
+              col = col, 
+              ...
+            )
+        }
       } else if (private$p_layer_primary == "contour") {
-        # TODO
+        warning(
+          "Contour plots do not support residuals. Mapping to marker size"
+        )
+        if (quadratic) stop("Quadratic residuals only supported in 1D")
+        plot_cols = c(covariate_1, covariate_2, "residual")
+        plot_dt = copy(self$predictor$prediction)[, ..plot_cols]
+        plot_dt$residual = abs(plot_dt$residual)
+        setnames(plot_dt, c("x1", "x2", "res"))
+        if (!is.null(idx_residuals)) plot_dt = plot_dt[idx_residuals, ]
+        private$p_plot = private$p_plot %>% 
+          add_trace(
+            data = plot_dt,
+            x = ~x1, 
+            y = ~x2,
+            mode = "markers", 
+            type = "scatter",
+            marker = append(marker, list(size = ~res * 50)),
+            showlegend = FALSE, 
+            inherit = FALSE,
+            ...
+          )
       } else if (private$p_layer_primary == "surface") {
+        if (quadratic) stop("Quadratic residuals only supported in 1D")
         plot_cols = c(covariate_1, covariate_2, "target", "pred")
         plot_dt = copy(self$predictor$prediction)[
           , ..plot_cols
-          ][, aux := NA] # prevents residuals from being connected across points
+          ][, aux := as.double(NA)] # prevents residuals from being connected
         plot_dt = data.table::melt(
           plot_dt, id.vars = c(covariate_1, covariate_2)
         )
+        if (!is.null(idx_residuals)) plot_dt = plot_dt[idx_residuals, ]
         data.table::setorderv(plot_dt, c(covariate_1))
-        print(head(plot_dt))
         private$p_plot = private$p_plot %>% 
           add_paths(
             x = plot_dt[[covariate_1]], 
@@ -145,8 +241,14 @@ VisualizerPrediction = R6::R6Class(
           )
       }
       return(invisible(self))
+    },
+    
+    addLayerHyperplane = function() {
+      # TODO implement adding further prediction hyperplanes
+    },
+    addLegend = function() {
+      # TODO implement proper legends
     }
-
   )
 )
 
@@ -167,6 +269,26 @@ Xmat_univ = model.matrix(~ x_1, dt_univ)
 Xmat_biv = model.matrix(~ x_1 + x_2, dt_biv)
 
 obj = rloss_dict$get("RL_l2")
+obj$reset_xdim(2L)
+obj$reset_fargs(Xmat = Xmat_univ, y = y_univ)
+
+opt = OptimizerGD$new(
+  obj, x_start = c(2, 1.6), print_trace = FALSE, lr = 0.0001
+)
+opt$optimize(steps = 1000)
+
+preddy = LMPredictor$new("test", dt_univ, y ~ x_1, opt$x)
+preddy$predict()
+
+viz = VisualizerPrediction$new(preddy)
+viz$initLayerUnivariate()
+viz$addLayerScatter("x_1")
+viz$addLayerResiduals("x_1", idx_residuals = c(3, 5), quadratic = TRUE)
+viz$addLayerResiduals("x_1", idx_residuals = c(2, 4), col = "green")
+viz$plot()
+
+
+obj = rloss_dict$get("RL_l2")
 obj$reset_xdim(3L)
 obj$reset_fargs(Xmat = Xmat_biv, y = y_biv)
 
@@ -180,7 +302,7 @@ preddy$predict()
 
 viz = VisualizerPrediction$new(preddy)
 viz$initLayerBivariate(
-  type = "surface", colorscale = list(c(0, 1), c("blue", "blue"))
+  type = "contour", line = list(width = 0)
 )
 viz$addLayerScatter("x_1", "x_2")
 viz$addLayerResiduals("x_1", "x_2")
