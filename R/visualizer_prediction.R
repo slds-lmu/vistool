@@ -1,4 +1,6 @@
 #' @title Prediction Visualizer
+#' 
+#' @include visualizer.R
 #'
 #' Visualizer for prediction hypersurfaces.
 #'
@@ -87,7 +89,7 @@ VisualizerPrediction = R6::R6Class(
     addLayerScatter = function(
       covariate_1, 
       covariate_2 = NULL, 
-      marker = list(size = 3, color = "black"),
+      marker = list(size = 5, color = "black", symbol = "cross"),
       ...
     ) {
       if (private$p_layer_primary == "line") {
@@ -111,11 +113,46 @@ VisualizerPrediction = R6::R6Class(
       return(invisible(self))
     },
     
-    addLayerResiduals = function() {}
+    addLayerResiduals = function(
+      covariate_1, 
+      covariate_2 = NULL, 
+      line = list(size = 3, color = "black"),
+      ...
+    ) {
+      if (private$p_layer_primary == "line") {
+        # TODO
+      } else if (private$p_layer_primary == "contour") {
+        # TODO
+      } else if (private$p_layer_primary == "surface") {
+        plot_cols = c(covariate_1, covariate_2, "target", "pred")
+        plot_dt = copy(self$predictor$prediction)[
+          , ..plot_cols
+          ][, aux := NA] # prevents residuals from being connected across points
+        plot_dt = data.table::melt(
+          plot_dt, id.vars = c(covariate_1, covariate_2)
+        )
+        data.table::setorderv(plot_dt, c(covariate_1))
+        print(head(plot_dt))
+        private$p_plot = private$p_plot %>% 
+          add_paths(
+            x = plot_dt[[covariate_1]], 
+            y = plot_dt[[covariate_2]],
+            z = plot_dt$value,
+            line = line,
+            showlegend = FALSE, 
+            inherit = FALSE,
+            ...
+          )
+      }
+      return(invisible(self))
+    }
 
   )
 )
 
+library(data.table)
+library(ggplot2)
+library(plotly)
 n_points <- 10L
 set.seed(123)
 x_1 <- rnorm(n_points, mean = 1, sd = 1)
@@ -139,14 +176,22 @@ opt = OptimizerGD$new(
 opt$optimize(steps = 1000)
 
 preddy = LMPredictor$new("test", dt_biv, y ~ x_1 + x_2, opt$x)
-head(preddy$predict())
+preddy$predict()
 
 viz = VisualizerPrediction$new(preddy)
-viz$initLayerBivariate(type = "surface")
+viz$initLayerBivariate(
+  type = "surface", colorscale = list(c(0, 1), c("blue", "blue"))
+)
 viz$addLayerScatter("x_1", "x_2")
+viz$addLayerResiduals("x_1", "x_2")
 viz$plot()
 
 # foo = VisualizerOptim$new(obj, x1limits = c(-10, 10), x2limits = c(-10, 10))
 # foo$initLayerBivariate()
 # foo$addLayerOptimizationTrace(opt)
 # foo$plot()
+
+mtcars$id <- seq_len(nrow(mtcars))
+ms <- replicate(2, mtcars, simplify = F)
+ms[[2]]$mpg <- 0
+m <- group2NA(dplyr::bind_rows(ms), "id")
