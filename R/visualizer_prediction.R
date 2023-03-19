@@ -243,9 +243,35 @@ VisualizerPrediction = R6::R6Class(
       return(invisible(self))
     },
     
-    addLayerHyperplane = function() {
-      # TODO implement adding further prediction hyperplanes
+    addLayerHyperplane = function(
+      id, coeffs, col = "blue", linetype = "solid", ...
+    ) {
+      private$p_ids = append(private$p_ids, id)
+      this_aes <- list(color = col, linetype = linetype)
+      this_aes <- list(this_aes)
+      names(this_aes) = id
+      private$p_line_aes <- append(private$p_line_aes, this_aes)
+      if (private$p_layer_primary == "line") {
+        private$p_plot <- private$p_plot +
+          geom_abline(
+            data.frame(
+              theta_0 = ifelse(self$predictor$with_intercept, coeffs[1], 0),
+              theta_1 = coeffs[2],
+              color = id,
+              linetype = id
+            ),
+            mapping = aes(
+              intercept = theta_0, 
+              slope = theta_1, 
+              col = color, 
+              linetype = linetype
+            ),
+            show.legend = FALSE, # avoid overlap w initial geom_line() legend
+            ...
+          )
+      }
     },
+    
     addLegend = function() {
       # TODO implement proper legends
     }
@@ -281,11 +307,13 @@ preddy = LMPredictor$new("test", dt_univ, y ~ x_1, opt$x)
 preddy$predict()
 
 viz = VisualizerPrediction$new(preddy)
-viz$initLayerUnivariate()
+viz$initLayerUnivariate(col = "red", linetype = "dashed")
 viz$addLayerScatter("x_1")
-viz$addLayerResiduals("x_1", idx_residuals = c(3, 5), quadratic = TRUE)
-viz$addLayerResiduals("x_1", idx_residuals = c(2, 4), col = "green")
-viz$plot()
+# viz$addLayerResiduals("x_1", idx_residuals = c(3, 5), quadratic = TRUE)
+# viz$addLayerResiduals("x_1", idx_residuals = c(2, 4), col = "green")
+# viz$addLayerHyperplane("foo", coeffs = c(1, 0.7))
+viz$addLayerHyperplane("bar", coeffs = c(1, 0.3), col = "green")
+viz$plot("henlo")
 
 
 obj = rloss_dict$get("RL_l2")

@@ -6,7 +6,7 @@
 #'
 #' This class defines the optimization technique.
 #' @export
-Optimizer = R6Class("Optimizer",
+Optimizer = R6::R6Class("Optimizer",
   public = list(
 
     #' @field id (`character(1)` The id of the objective.
@@ -132,7 +132,7 @@ Optimizer = R6Class("Optimizer",
 #'
 #' This class defines momentum.
 #' @export
-OptimizerMomentum = R6Class("OptimizerMomentum", inherit = Optimizer,
+OptimizerMomentum = R6::R6Class("OptimizerMomentum", inherit = Optimizer,
   public = list(
 
     #' @description Creates a new instance of this [R6][R6::R6Class] class.
@@ -230,7 +230,7 @@ OptimizerMomentum = R6Class("OptimizerMomentum", inherit = Optimizer,
 #'
 #' This class defines gradient descent
 #' @export
-OptimizerGD = R6Class("OptimizerGD", inherit = OptimizerMomentum,
+OptimizerGD = R6::R6Class("OptimizerGD", inherit = OptimizerMomentum,
   public = list(
 
     #' @description Creates a new instance of this [R6][R6::R6Class] class.
@@ -260,7 +260,7 @@ OptimizerGD = R6Class("OptimizerGD", inherit = OptimizerMomentum,
 #'
 #' This class defines Nesterovs momentum using Nesterov accelerated gradient (NAG).
 #' @export
-OptimizerNAG = R6Class("OptimizerNAG", inherit = Optimizer,
+OptimizerNAG = R6::R6Class("OptimizerNAG", inherit = Optimizer,
   public = list(
 
     #' @description Creates a new instance of this [R6][R6::R6Class] class.

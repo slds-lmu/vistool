@@ -18,16 +18,34 @@ Visualizer = R6::R6Class(
     },
 
     initLayerUnivariate = function(
-      theme = theme_bw(), col = "black", ...
+      id = "initial", 
+      theme = theme_bw(), 
+      col = "black", 
+      linetype = "solid",
+      ...
     ) {
       private$p_layer_primary = "line"
       private$p_check_grid_dims(self$grid, 1)
       private$p_check_zmat_dims(self$zmat, 1)
-      llp = data.table(x = self$grid$x1, y = self$zmat)
-      setnames(llp, c("x", "y"))
+      
+      # TODO include other aesthetics
+      private$p_ids = append(private$p_ids, id)
+      this_aes <- list(color = col, linetype = linetype)
+      this_aes <- list(this_aes)
+      names(this_aes) = id
+      private$p_line_aes <- append(private$p_line_aes, this_aes)
+      
+      llp = data.table(
+        x = self$grid$x1, y = self$zmat, color = id, linetype = id
+      )
+      setnames(llp, c("x", "y", "color", "linetype"))
       ggplot2::theme_set(theme)
-      private$p_plot <- ggplot(llp, aes(x, y)) +
-        geom_line(col = col, ...)
+      private$p_plot <- ggplot() +
+        geom_line(
+          llp, 
+          mapping = aes(x = x, y = y, col = color, linetype = linetype), 
+          ...
+        )
       return(invisible(self))
     },
     
@@ -172,7 +190,29 @@ Visualizer = R6::R6Class(
       message(sprintf("Files stored in '%s'. Use, e.g., ImageMagic (http://www.imagemagick.org/) with `convert -delay 20 -loop 0 %s/*.%s myimage.gif` to create gif with 20 ms frames.", dir, dir, fext))
     },
     
-    plot = function() {private$p_plot},
+    plot = function(legend_title = NULL) {
+      if ("ggplot" %in% class(private$p_plot)) {
+        legend_colors = lapply(
+          private$p_ids, function(i) private$p_line_aes[[i]]$color
+        )
+        legend_colors = unlist(legend_colors)[order(unlist(private$p_ids))]
+        legend_ltypes = lapply(
+          private$p_ids, function(i) private$p_line_aes[[i]]$linetype
+        )
+        legend_ltypes = unlist(legend_ltypes)[order(unlist(private$p_ids))]
+        p <- private$p_plot +
+          scale_color_manual(
+            legend_title, 
+            values = legend_colors,
+            guide = guide_legend(
+              override.aes = list(linetype = legend_ltypes)
+            )
+          ) +
+          scale_linetype_manual(values = legend_ltypes, guide = "none")
+        if (is.null(legend_title)) p <- p + theme(legend.position = "none")
+        p
+      } else {private$p_plot}
+    },
     
     save = function(...) {
       private$checkInit()
@@ -204,6 +244,10 @@ Visualizer = R6::R6Class(
     p_opts = list(),
     p_vbase = list(),
     p_layout = list(),
+    #' @field p_colors (`list()`) List of specified layer colors.
+    p_colors = list(),
+    p_ids = list(),
+    p_line_aes = list(),
     checkInit = function() {
       if (is.null(private$p_plot)) stop("Initialize plot with `initLayer*`")
       return(invisible(TRUE))
