@@ -12,7 +12,15 @@ Objective function
 This class defines the objective that is used for optimization.
 }
 \examples{
-ob = Objective$new()
+x = c(0.9, 1)
+
+ob = tfun_dict$get("TF_branin")
+ob$eval(x)
+ob$archive
+ob$evalStore(x)
+ob$archive
+ob$grad(x)
+ob$hess(x)
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

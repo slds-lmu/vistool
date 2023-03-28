@@ -2,6 +2,8 @@
 #' @description Helper function to generate RGB colors.
 #' @param alpha (`numeric(1)`) The alpha value. If `!is.null` the used prefix is 'rgba' instead of 'rgb'.
 #' @return A character of length one containing the RGB color.
+#' @import plotly
+#' @import colorspace
 #' @export
 colSampler = function(alpha = NULL) {
   checkmate::assertNumber(alpha, lower = 0, upper = 1, null.ok = TRUE)

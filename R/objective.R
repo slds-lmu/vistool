@@ -1,8 +1,21 @@
 #' Objective function
 #'
 #' This class defines the objective that is used for optimization.
+#' @importFrom data.table data.table as.data.table
+#' @importFrom R6 R6Class
+#' @import TestFunctions
+#' @import rootSolve
+#' @import stringr
 #' @examples
-#' ob = Objective$new()
+#' x = c(0.9, 1)
+#'
+#' ob = tfun_dict$get("TF_branin")
+#' ob$eval(x)
+#' ob$archive
+#' ob$evalStore(x)
+#' ob$archive
+#' ob$grad(x)
+#' ob$hess(x)
 #' @export
 Objective = R6::R6Class("Objective",
   public = list(
@@ -225,6 +238,10 @@ Objective = R6::R6Class("Objective",
 
 l2norm = function(x) sqrt(sum(crossprod(x)))
 
+#' @title Dictionary for test functions
+#' @examples
+#' tfun_dict$get("TF_branin")
+#' @export
 tfun_dict = R6::R6Class("DictionaryObjective", inherit = mlr3misc::Dictionary,
   cloneable = FALSE)$new()
 

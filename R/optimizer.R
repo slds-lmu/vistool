@@ -5,6 +5,7 @@
 #' Optimizer class
 #'
 #' This class defines the optimization technique.
+#' @importFrom stats optimize
 #' @export
 Optimizer = R6Class("Optimizer",
   public = list(

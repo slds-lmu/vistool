@@ -1,0 +1,13 @@
+^LICENSE$
+^README.html$
+^README\.Rmd$
+^README_files$
+^.*\.Rproj$
+^\.Rproj\.user$
+^\.git$
+^\.github$
+^\.gitignore$
+^\.ignore$
+^docs$
+^inst/extdata/.+\.R$
+^man-roxygen$
