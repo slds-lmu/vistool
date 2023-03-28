@@ -18,6 +18,8 @@ REBUILD = TRUE
 RECREATE_ALL_2DFIGS = FALSE
 ```
 
+[![R-CMD-check](https://github.com/slds-lmu/vistool/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/slds-lmu/vistool/actions/workflows/R-CMD-check.yaml)
+
 # How to use
 
 Just load the package with `devtools::load_all()`. Or install with `remotes::install_github("slds-lmu/vistool", ref = "main")` for a permanent installation.

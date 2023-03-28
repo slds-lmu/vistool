@@ -1,3 +1,5 @@
+[![R-CMD-check](https://github.com/slds-lmu/vistool/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/slds-lmu/vistool/actions/workflows/R-CMD-check.yaml)
+
 Vistool
 ================
 
@@ -349,7 +351,7 @@ with the required signature:
 stepSizeControlDecayTime()
 #> function(x, u, obj, opt) {
 #>     assertStepSizeControl(x, u, obj, opt)
-#> 
+#>
 #>     epoch = nrow(obj$archive)
 #>     return(1 / (1 + decay * epoch))
 #>   }
@@ -603,7 +605,7 @@ orca(p, "README_files/viz_scatter.png")
 #> (orca:13935): Gtk-WARNING **: 10:22:41.904: Theme parsing error: gtk-contained.css:2871:228: Missing closing bracket for :not()
 #> \|Fontconfig warning: "/usr/share/fontconfig/conf.avail/05-reset-dirs-sample.conf", line 6: unknown element "reset-dirs"
 #> /-\|[13974:0217/102242.894889:ERROR:buffer_manager.cc(488)] [.DisplayCompositor]GL ERROR :GL_INVALID_OPERATION : glBufferData: <- error from previous GL command
-#> /-\|/-\|/-\|/ 
+#> /-\|/-\|/-\|/
 
 # List of marker symbols:
 head(schema(F)$traces$scatter3d$attributes$marker$symbol$values)
