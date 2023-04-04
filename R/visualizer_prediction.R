@@ -252,24 +252,21 @@ VisualizerPrediction = R6::R6Class(
       names(this_aes) = id
       private$p_line_aes <- append(private$p_line_aes, this_aes)
       if (private$p_layer_primary == "line") {
+        x_initlayer = ggplot_build(private$p_plot)$data[[1]]$x
         private$p_plot <- private$p_plot +
-          geom_abline(
+          geom_line(
             data.frame(
-              theta_0 = ifelse(self$predictor$with_intercept, coeffs[1], 0),
-              theta_1 = coeffs[2],
+              x = x_initlayer,
+              y = as.matrix(cbind(1, x_initlayer)) %*% coeffs,
               color = id,
               linetype = id
             ),
-            mapping = aes(
-              intercept = theta_0, 
-              slope = theta_1, 
-              col = color, 
-              linetype = linetype
-            ),
+            mapping = aes(x = x, y = y, col = color, linetype = linetype),
             show.legend = FALSE, # avoid overlap w initial geom_line() legend
             ...
           )
       }
+      return(invisible(self))
     },
     
     addLegend = function() {
@@ -306,7 +303,7 @@ opt$optimize(steps = 1000)
 preddy = LMPredictor$new("test", dt_univ, y ~ x_1, opt$x)
 preddy$predict()
 
-viz = VisualizerPrediction$new(preddy)
+viz = VisualizerPrediction$new(preddy, padding = 0.1)
 viz$initLayerUnivariate(col = "red", linetype = "dashed")
 viz$addLayerScatter("x_1")
 # viz$addLayerResiduals("x_1", idx_residuals = c(3, 5), quadratic = TRUE)
@@ -330,7 +327,7 @@ preddy$predict()
 
 viz = VisualizerPrediction$new(preddy)
 viz$initLayerBivariate(
-  type = "contour", line = list(width = 0)
+  type = "surface", line = list(width = 0)
 )
 viz$addLayerScatter("x_1", "x_2")
 viz$addLayerResiduals("x_1", "x_2")
