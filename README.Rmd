@@ -26,6 +26,20 @@ Just load the package with `devtools::load_all()`. Or install with `remotes::ins
 devtools::load_all(quiet = TRUE)
 ```
 
+# Class structure
+
+```{}
+├── VizObject
+    ├── VizObjectOptim
+    ├── VizObjectPrediction
+    └── VizObjectLoss
+├── Optimizer
+└── Visualizer
+    ├── VisualizerOptim
+    ├── VisualizerPrediction
+    └── VisualizerLoss
+```
+
 # Objective
 
 ## Dictionary

@@ -239,12 +239,17 @@ VisualizerPrediction = R6::R6Class(
             inherit = FALSE,
             ...
           )
-      }
+      } 
       return(invisible(self))
     },
     
     addLayerHyperplane = function(
-      id, coeffs, col = "blue", linetype = "solid", ...
+      id, 
+      coeffs, 
+      col = "blue", 
+      linetype = "solid", 
+      colorscale = list(c(0, 1), rep("blue", 2)),
+      ...
     ) {
       private$p_ids = append(private$p_ids, id)
       this_aes <- list(color = col, linetype = linetype)
@@ -265,13 +270,43 @@ VisualizerPrediction = R6::R6Class(
             show.legend = FALSE, # avoid overlap w initial geom_line() legend
             ...
           )
+      } else if (private$p_layer_primary == "contour") {
+        stop("`contour` plot does not support multiple prediction surfaces.")
+      } else if (private$p_layer_primary == "surface") {
+        if (self$predictor$with_intercept) {
+          xmat = self$predictor$xmat[, -1]
+        } else xmat = self$predictor$xmat
+        axis_x1 <- seq(min(xmat[, 1]), max(xmat[, 1]), by = 0.05)
+        axis_x2 <- seq(min(xmat[, 2]), max(xmat[, 2]), by = 0.05)
+        if (self$predictor$with_intercept) {
+          lm_surface <- expand.grid(
+            x_0 = 1, x_1 = axis_x1, x_2 = axis_x2, KEEP.OUT.ATTRS = F
+          )
+        } else {
+          lm_surface <- expand.grid(
+            x_1 = axis_x1, x_2 = axis_x2, KEEP.OUT.ATTRS = F
+          )
+        }
+        lm_surface$y <- as.matrix(lm_surface) %*% coeffs
+        lm_surface <- acast(lm_surface, x_2 ~ x_1, value.var = "y")
+        private$p_plot <- private$p_plot %>%
+          add_trace(
+            z = lm_surface,
+            x = axis_x1,
+            y = axis_x2,
+            type = "surface",
+            colorbar = list(title = id, ticks = "", nticks = 1),
+            colorscale = colorscale,
+            ...
+          )
+      }
+      return(invisible(self))
       }
       return(invisible(self))
     },
-    
-    addLegend = function() {
-      # TODO implement proper legends
-    }
+  
+    # TODO implement proper legends
+    addLegend = function() {}
   )
 )
 
