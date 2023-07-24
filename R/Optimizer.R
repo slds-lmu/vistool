@@ -1,13 +1,11 @@
-# question: do we enforce that x is always 2d?
-#   currently not, as we maybe want to benchmark in some d, then show at least
-#   y-print_traces. restriction seems to have no value, currently
 
-#' Optimizer class
+#' @title Optimizer class
 #'
+#' @description
 #' This class defines the optimization technique.
-#' @importFrom stats optimize
+#'
 #' @export
-Optimizer = R6Class("Optimizer",
+Optimizer = R6::R6Class("Optimizer",
   public = list(
 
     #' @field id (`character(1)` The id of the objective.
@@ -129,11 +127,13 @@ Optimizer = R6Class("Optimizer",
   )
 )
 
-#' Momentum optimizer
+#' @title Momentum optimizer
 #'
+#' @description
 #' This class defines momentum.
+#'
 #' @export
-OptimizerMomentum = R6Class("OptimizerMomentum", inherit = Optimizer,
+OptimizerMomentum = R6::R6Class("OptimizerMomentum", inherit = Optimizer,
   public = list(
 
     #' @description Creates a new instance of this [R6][R6::R6Class] class.
@@ -227,11 +227,13 @@ OptimizerMomentum = R6Class("OptimizerMomentum", inherit = Optimizer,
   )
 )
 
-#' Gradient descent optimizer
+#' @title Gradient descent optimizer
 #'
+#' @description
 #' This class defines gradient descent
+#'
 #' @export
-OptimizerGD = R6Class("OptimizerGD", inherit = OptimizerMomentum,
+OptimizerGD = R6::R6Class("OptimizerGD", inherit = OptimizerMomentum,
   public = list(
 
     #' @description Creates a new instance of this [R6][R6::R6Class] class.
@@ -257,11 +259,13 @@ OptimizerGD = R6Class("OptimizerGD", inherit = OptimizerMomentum,
   )
 )
 
-#' Nesterovs momentum optimizer
+#' @title Nesterovs momentum optimizer
 #'
+#' @description
 #' This class defines Nesterovs momentum using Nesterov accelerated gradient (NAG).
+#'
 #' @export
-OptimizerNAG = R6Class("OptimizerNAG", inherit = Optimizer,
+OptimizerNAG = R6::R6Class("OptimizerNAG", inherit = Optimizer,
   public = list(
 
     #' @description Creates a new instance of this [R6][R6::R6Class] class.
@@ -357,8 +361,14 @@ OptimizerNAG = R6Class("OptimizerNAG", inherit = Optimizer,
   )
 )
 
-#' Merge optimization archives
-#' @param ... Optimization objects.
+#' @title Merge optimization archives
+#'
+#' @description
+#' Merge archives.
+#'
+#' @param ... (`any`)\cr
+#'   Optimization objects.
+#'
 #' @export
 mergeOptimArchives = function(...) {
   opts = list(...)

@@ -11,3 +11,6 @@
 ^docs$
 ^inst/extdata/.+\.R$
 ^man-roxygen$
+^\.editorconfig$
+^\.lintr$
+^attic$
