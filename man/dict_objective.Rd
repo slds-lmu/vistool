@@ -14,6 +14,6 @@ dict_objective
 Dictionary for test functions
 }
 \examples{
-tfun_dict$get("TF_branin")
+dict_objective$get("TF_branin")
 }
 \keyword{datasets}

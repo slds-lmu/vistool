@@ -12,14 +12,21 @@ as_visualizer(x, ...)
 \method{as_visualizer}{Task}(
   x,
   learner,
-  x1_limits,
-  x2_limits,
+  x1_limits = NULL,
+  x2_limits = NULL,
   padding = 0,
   n_points = 100L,
   ...
 )
 
-\method{as_visualizer}{Objective}(x, x1_limits, x2_limits, padding = 0, n_points = 100L, ...)
+\method{as_visualizer}{Objective}(
+  x,
+  x1_limits = NULL,
+  x2_limits = NULL,
+  padding = 0,
+  n_points = 100L,
+  ...
+)
 
 \method{as_visualizer}{LossFunction}(x, y_pred, y_true, ...)
 }

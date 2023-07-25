@@ -227,7 +227,7 @@ l2norm = function(x) sqrt(sum(crossprod(x)))
 
 #' @title Dictionary for test functions
 #' @examples
-#' tfun_dict$get("TF_branin")
+#' dict_objective$get("TF_branin")
 #' @export
 dict_objective = R6::R6Class("DictionaryObjective", inherit = mlr3misc::Dictionary,
   cloneable = FALSE)$new()

@@ -68,6 +68,8 @@ Visualizer2D = R6::R6Class("Visualizer2D",
     #'   Opacity of the layer.
     #' @param colorscale (`list()`)\cr
     #'   The coloring of the contour.
+    #' @param show_title (`logical(1)`)\cr
+    #'   Indicator whether to show the title of the plot.
     #' @param ... (`any`)\cr
     #'   Further arguments passed to `add_trace(...)`.
     init_layer_contour = function(opacity = 0.8, colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")), show_title = TRUE, ...) {
@@ -112,6 +114,8 @@ Visualizer2D = R6::R6Class("Visualizer2D",
     #'   Opacity of the layer.
     #' @param colorscale (`list()`)\cr
     #'   The coloring of the surface.
+    #' @param show_title (`logical(1)`)\cr
+    #'   Indicator whether to show the title of the plot.
     #' @param ... (`any`)\cr
     #'   Further arguments passed to `add_trace(...)`.
     init_layer_surface = function(opacity = 0.8, colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")), show_title = TRUE, ...) {
