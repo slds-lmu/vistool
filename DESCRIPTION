@@ -29,6 +29,7 @@ Suggests:
     mlr3pipelines,
     e1071,
     knitr,
+    patchwork,
     rmarkdown
 RoxygenNote: 7.2.3
 Encoding: UTF-8
