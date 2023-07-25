@@ -48,4 +48,8 @@ remotes::install_github("slds-lmu/vistool")
 
 ## Resources
 
+* [Visualization of Loss Functions](https://slds-lmu.github.io/vistool/articles/loss_functions.html)
+* [Visualization of Model Predictions](https://slds-lmu.github.io/vistool/articles/model.html)
+* [Visualization of Objective Functions](https://slds-lmu.github.io/vistool/articles/objective.html)
+
 
