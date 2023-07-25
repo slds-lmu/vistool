@@ -23,6 +23,7 @@ Imports:
     plotly,
     stringr
 Suggests:
+    ggsci,
     mlr3,
     mlr3learners,
     mlr3pipelines,

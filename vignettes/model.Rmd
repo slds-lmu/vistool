@@ -16,7 +16,9 @@ knitr::opts_chunk$set(
 
 ```{r, message=FALSE}
 library(vistool)
-library(mlr3verse)
+library(mlr3)
+library(mlr3learners)
+library(mlr3pipelines)
 ```
 
 The `Visualizer1DModel` and `Visualizer2DModel` class visualize the predictions of a model on tasks with 1 or 2 features.
