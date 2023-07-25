@@ -15,33 +15,36 @@ as_visualizer = function(x, ...) {
 
 #' @param learner (`mlr3::Learner`)\cr
 #'  The learner to train the model with.
+#' @template param_x1_limits
+#' @template param_x2_limits
 #' @template param_padding
 #' @template param_n_points
 #' @rdname as_visualizer
 #' @export
-as_visualizer.Task = function(x, learner, padding = 0, n_points = 100L, ...) {
+as_visualizer.Task = function(x, learner, x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L, ...) {
   n_features = length(x$feature_names)
   if (n_features == 1) {
-    Visualizer1DModel$new(x, learner, padding = padding, n_points = n_points, ...)
+    Visualizer1DModel$new(x, learner, x1_limits = x1_limits, padding = padding, n_points = n_points, ...)
   } else if (n_features == 2) {
-    Visualizer2DModel$new(x, learner, padding = padding, n_points = n_points, ...)
+    Visualizer2DModel$new(x, learner, x1_limits = x1_limits, x2_limits = x2_limits, padding = padding, n_points = n_points, ...)
   } else {
     stop("Task has more than 2 features.")
   }
 }
 
 #' @rdname as_visualizer
+#' @template param_x1_limits
+#' @template param_x2_limits
 #' @template param_padding
 #' @template param_n_points
 #' @export
-as_visualizer.Objective = function(x, padding = 0, n_points = 100L, ...) {
-  n_features = length(x$xdim)
-  if (n_features == 1) {
-    Visualizer1DObjective$new(x, padding = padding, n_points = n_points, ...)
-  } else if (n_features == 2) {
-    Visualizer2DObjective$new(x, padding = padding, n_points = n_points, ...)
+as_visualizer.Objective = function(x, x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L, ...) {
+  if (x$xdim == 1) {
+    Visualizer1DObjective$new(x, x1_limits = x1_limits, padding = padding, n_points = n_points, ...)
+  } else if (x$xdim == 2) {
+    Visualizer2DObjective$new(x, x1_limits = x1_limits, x2_limits = x2_limits, padding = padding, n_points = n_points, ...)
   } else {
-    stop("Task has more than 2 features.")
+    stop("Objective has more than 2 dimensions.")
   }
 }
 

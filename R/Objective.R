@@ -229,7 +229,7 @@ l2norm = function(x) sqrt(sum(crossprod(x)))
 #' @examples
 #' tfun_dict$get("TF_branin")
 #' @export
-tfun_dict = R6::R6Class("DictionaryObjective", inherit = mlr3misc::Dictionary,
+dict_objective = R6::R6Class("DictionaryObjective", inherit = mlr3misc::Dictionary,
   cloneable = FALSE)$new()
 
 tfuns = c(list(list(minimize = TRUE, name = "branin", desc = "A function. 2 dimensional function.", xdim = 2, limits_lower = c(-2, -2), limits_upper = c(3, 3))),
@@ -273,9 +273,25 @@ for (i in seq_along(tfuns)) {
   tf = tfuns[[i]]
   id = sprintf("TF_%s", tf$name)
   cl = sprintf("TestFunctions::%s", tf$name)
-  suppressWarnings(tfun_dict$add(id, Objective$new(fun = eval(parse(text = cl)),
+  suppressWarnings(dict_objective$add(id, Objective$new(fun = eval(parse(text = cl)),
     id = id, label = tf$name, xdim = tf$xdim, limits_lower = tf$limits_lower,
     limits_upper = tf$limits_upper)))
+}
+
+#' @title Retrieve Objective Functions
+#'
+#' @description
+#' Retrieve an objective function from the dictionary.
+#'
+#' @param .key (`character(1)`)\cr
+#'   Key passed to the respective [dictionary][mlr3misc::Dictionary] to retrieve the object.
+#' @param ... (named `list()`)\cr
+#'   Named arguments passed to the constructor, or to be set as public field.
+#'   See [mlr3misc::dictionary_sugar_get()] for more details.
+#'
+#' @export
+obj = function(.key, ...) {
+  dict_objective$get(.key, ...)
 }
 
 #' @export

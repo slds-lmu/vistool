@@ -9,9 +9,17 @@
 \usage{
 as_visualizer(x, ...)
 
-\method{as_visualizer}{Task}(x, learner, padding = 0, n_points = 100L, ...)
+\method{as_visualizer}{Task}(
+  x,
+  learner,
+  x1_limits,
+  x2_limits,
+  padding = 0,
+  n_points = 100L,
+  ...
+)
 
-\method{as_visualizer}{Objective}(x, padding = 0, n_points = 100L, ...)
+\method{as_visualizer}{Objective}(x, x1_limits, x2_limits, padding = 0, n_points = 100L, ...)
 
 \method{as_visualizer}{LossFunction}(x, y_pred, y_true, ...)
 }
@@ -24,6 +32,12 @@ Additional arguments.}
 
 \item{learner}{(`mlr3::Learner`)\cr
 The learner to train the model with.}
+
+\item{x1_limits}{(`numeric(2)`)\cr
+The x1 limits.}
+
+\item{x2_limits}{(`numeric(2)`)\cr
+The x2 limits.}
 
 \item{padding}{(`numeric(1)`)\cr
 A margin that is added to x1limits and x2limits.

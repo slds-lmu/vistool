@@ -70,9 +70,10 @@ Visualizer2D = R6::R6Class("Visualizer2D",
     #'   The coloring of the contour.
     #' @param ... (`any`)\cr
     #'   Further arguments passed to `add_trace(...)`.
-    init_layer_contour = function(opacity = 0.8, colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")), ...) {
-      checkmate::assertNumber(opacity, lower = 0, upper = 1)
-      checkmate::assertList(colorscale)
+    init_layer_contour = function(opacity = 0.8, colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")), show_title = TRUE, ...) {
+      assert_number(opacity, lower = 0, upper = 1)
+      assert_list(colorscale)
+      assert_flag(show_title)
 
       private$.vbase = c(as.list(environment()), list(...))
       private$.layer_primary = "contour"
@@ -92,7 +93,7 @@ Visualizer2D = R6::R6Class("Visualizer2D",
           ...
         ) %>%
         layout(
-          title = self$plot_lab,
+          title = if (show_title) self$plot_lab else NULL,
           xaxis = list(title = self$x1_lab),
           yaxis = list(title = self$x2_lab))
 
@@ -113,9 +114,10 @@ Visualizer2D = R6::R6Class("Visualizer2D",
     #'   The coloring of the surface.
     #' @param ... (`any`)\cr
     #'   Further arguments passed to `add_trace(...)`.
-    init_layer_surface = function(opacity = 0.8, colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")), ...) {
-      checkmate::assertNumber(opacity, lower = 0, upper = 1)
-      checkmate::assertList(colorscale)
+    init_layer_surface = function(opacity = 0.8, colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")), show_title = TRUE, ...) {
+      assert_number(opacity, lower = 0, upper = 1)
+      assert_list(colorscale)
+      assert_flag(show_title)
 
       private$.vbase = c(as.list(environment()), list(...))
       private$.layer_primary = "surface"
@@ -135,6 +137,7 @@ Visualizer2D = R6::R6Class("Visualizer2D",
           ...
         ) %>%
         layout(
+          title = if (show_title) self$plot_lab else NULL,
           scene = list(
             xaxis = list(title = self$x1_lab),
             yaxis = list(title = self$x2_lab),
@@ -164,15 +167,15 @@ Visualizer2D = R6::R6Class("Visualizer2D",
     #' @param y (`numeric(1)`) The view from which the "camera looks down" to the plot.
     #' @param z (`numeric(1)`) The view from which the "camera looks down" to the plot.
     set_scene = function(x, y, z) {
-      checkmate::assertNumber(x)
-      checkmate::assertNumber(y)
-      checkmate::assertNumber(z)
-
-      private$checkInit()
+      if (is.null(private$.plot)) self$init_layer_surface()
+      assert_number(x)
+      assert_number(y)
+      assert_number(z)
 
       if (private$.layer_primary != "surface") {
         stop("Scene can only be set for `surface` plots")
       }
+
       private$.plot = private$.plot %>%
         layout(scene = list(camera = list(eye = list(x = x, y = y, z = z))))
 
@@ -186,11 +189,11 @@ Visualizer2D = R6::R6Class("Visualizer2D",
     },
 
 
-    #' @description Save the plot by using plotlys `orca()` function.
-    #' @param ... Further arguments passed to `orca()`.
+    #' @description Save the plot by using plotlys `save_image()` function.
+    #' @param ... Further arguments passed to `save_image()`.
     save = function(...) {
-      private$checkInit()
-      orca(private$.plot, ...)
+      if (is.null(private$.plot)) self$init_layer_surface()
+      save_image(private$.plot, ...)
     }
   ),
   private = list(

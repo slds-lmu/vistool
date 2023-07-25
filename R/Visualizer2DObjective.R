@@ -36,18 +36,18 @@ Visualizer2DObjective = R6::R6Class("Visualizer2DObjective",
       }
 
       x1_limits = x1_limits %??% c(objective$limits_lower[1], objective$limits_upper[1])
-      x2_limits = x2_limits %??% c(objective$limits_upper[2], objective$limits_upper[2])
+      x2_limits = x2_limits %??% c(objective$limits_lower[2], objective$limits_upper[2])
 
       if (any(is.na(x1_limits)) || any(is.na(x2_limits))) {
         stop("Limits could not be extracted from the objective. Please use `x_limits`.")
       }
 
       x1_pad = (x1_limits[2] - x1_limits[1]) * padding
-      x2_pad = (x1_limits[2] - x1_limits[1]) * padding
+      x2_pad = (x2_limits[2] - x2_limits[1]) * padding
 
       grid = list(
-        x1 = unique(seq(x1_limits[1] - x1_pad, x1_limits[1] + x1pad, length.out = n_points)),
-        x2 = unique(seq(x2_limits[1] - x2_pad, x2_limits[2] + x2pad, length.out = n_points)))
+        x1 = unique(seq(x1_limits[1] - x1_pad, x1_limits[2] + x1_pad, length.out = n_points)),
+        x2 = unique(seq(x2_limits[1] - x2_pad, x2_limits[2] + x2_pad, length.out = n_points)))
 
       zmat = outer(grid$x1, grid$x2, function(x, y) {
         xin = cbind(x, y)
@@ -98,18 +98,16 @@ Visualizer2DObjective = R6::R6Class("Visualizer2DObjective",
     #'   The colors for the markers.
     #' @param ... Further arguments passed to `add_trace(...)`.
     add_optimization_trace = function(opt, line_color = colSampler(), mcolor_out = "black", npoints = NULL, npmax = NULL, name = NULL, offset = NULL, add_marker_at = 1, marker_shape = "circle", marker_color = NULL, ...) {
-      ## Basic asserts:
-      private$checkInit()
-
-      checkmate::assertR6(opt, "Optimizer")
-      checkmate::assertCount(npoints, null.ok = TRUE)
-      checkmate::assertCount(npmax, null.ok = TRUE)
+      assert_r6(opt, "Optimizer")
+      assert_count(npoints, null.ok = TRUE)
+      assert_count(npmax, null.ok = TRUE)
+      assert_string(line_color)
+      if (is.null(private$.plot)) self$init_layer_surface()
 
       if (nrow(opt$archive) == 0) {
         stop("No optimization trace in `opt$archive`. Did you forget to call `opt$optimize(steps)`?")
       }
 
-      checkmate::assertString(line_color)
       if (private$.layer_primary == "contour") {
         checkmate::assertNumeric(offset, len = 2L, null.ok = TRUE)
         if (is.null(offset)) {

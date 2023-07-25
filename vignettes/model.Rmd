@@ -1,0 +1,97 @@
+---
+title: "Visualization of Model Predictions"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Visualization of Model Predictions}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r, message=FALSE}
+library(vistool)
+library(mlr3verse)
+```
+
+The `Visualizer1DModel` and `Visualizer2DModel` class visualize the predictions of a model on tasks with 1 or 2 features.
+Let's start with the `boston_housing` data set.
+The goal is to predict the median value of owner-occupied homes in $1000s.
+We subset the data set to only use the features `age` and `rm`.
+The `age` feature is the proportion of owner-occupied units built prior to 1940 and `rm` is the average number of rooms per dwelling.
+
+```{r}
+task = tsk("boston_housing")
+task$select(c("age", "rm"))
+```
+
+We load the support vector machine learner for regression.
+
+```{r}
+learner = lrn("regr.svm")
+```
+
+Now we create a visualizer object with the `as_visualizer()` function.
+
+```{r}
+vis = as_visualizer(task, learner)
+```
+
+First, the learner is trained on the entire task.
+After that a grid is created for the two features and the predictions of the model are computed for each grid point.
+The predictions are then visualized using a 3D scatter plot.
+
+```{r, out.width='100%', out.height='700px'}
+vis$plot()
+```
+
+We can also create a 2D contour plot for the predictions.
+
+```{r, out.width='100%', out.height='700px'}
+vis$init_layer_contour()
+vis$plot()
+```
+
+To switch back to the 3D scatter plot initialize the scatter layer again.
+
+```{r}
+vis$init_layer_surface()
+```
+
+We can add the training points to the plot.
+
+```{r, out.width='100%', out.height='700px'}
+vis$add_training_data()
+vis$plot()
+```
+
+It is also possible to visualize classification tasks.
+We use the `pima` data set and impute the missing values.
+We select the features `insulin` and `mass` and train a support vector machine for classification.
+
+```{r}
+task = tsk("pima")
+task = po("imputemean")$train(list(task))[[1]]
+task$select(c("insulin", "mass"))
+learner = lrn("classif.svm", predict_type = "prob")
+```
+
+We create a visualizer object and plot the predictions.
+The z-axis shows the probability of the positive class.
+
+```{r, out.width='100%', out.height='700px'}
+vis = as_visualizer(task, learner)
+vis$plot()
+```
+
+We can add the decision boundary to the plot.
+
+```{r, out.width='100%', out.height='700px'}
+vis$add_decision_boundary()
+vis$plot()
+```

@@ -190,7 +190,7 @@ Return the plot and hence plot it or do further processing.
 \if{html}{\out{<a id="method-Visualizer2D-save"></a>}}
 \if{latex}{\out{\hypertarget{method-Visualizer2D-save}{}}}
 \subsection{Method \code{save()}}{
-Save the plot by using plotlys `orca()` function.
+Save the plot by using plotlys `save_image()` function.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$save(...)}\if{html}{\out{</div>}}
 }
@@ -198,7 +198,7 @@ Save the plot by using plotlys `orca()` function.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{Further arguments passed to `orca()`.}
+\item{\code{...}}{Further arguments passed to `save_image()`.}
 }
 \if{html}{\out{</div>}}
 }

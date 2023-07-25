@@ -4,7 +4,7 @@
 #' @description
 #' This class is used to create visualizations of tasks and learners.
 #'
-#' @template param_x_limits
+#' @template param_x1_limits
 #' @template param_padding
 #' @template param_n_points
 #'
@@ -28,9 +28,7 @@ Visualizer1DModel = R6::R6Class("Visualizer1DModel",
     #'   The task to train the model on.
     #' @param learner ([mlr3::Learner])\cr
     #'   The learner to train the model with.
-    #' @param x_limits (`numeric(2)`)\cr
-    #'  The limits of the x axis.
-    initialize = function(task, learner, x_limits = NULL, padding = 0, n_points = 100L) {
+    initialize = function(task, learner, x1_limits = NULL, padding = 0, n_points = 100L) {
       self$task = assert_task(task)
       self$learner = assert_learner(learner, task = self$task)
       assert_numeric(x_limits, len = 2, null.ok = TRUE)

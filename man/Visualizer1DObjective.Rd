@@ -44,7 +44,7 @@ Creates a new instance of this [R6][R6::R6Class] class.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Visualizer1DObjective$new(
   objective,
-  x_limits = NULL,
+  x1_limits = NULL,
   padding = 0,
   n_points = 100L
 )}\if{html}{\out{</div>}}
@@ -57,8 +57,8 @@ Creates a new instance of this [R6][R6::R6Class] class.
 The objective which was optimized.
 This object is used to generate the surface/contour lines.}
 
-\item{\code{x_limits}}{(`numeric(2)`)\cr
-The limits of the x axis.}
+\item{\code{x1_limits}}{(`numeric(2)`)\cr
+The x1 limits.}
 
 \item{\code{padding}}{(`numeric(1)`)\cr
 A margin that is added to x1limits and x2limits.

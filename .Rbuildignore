@@ -14,3 +14,5 @@
 ^\.editorconfig$
 ^\.lintr$
 ^attic$
+^_pkgdown\.yml$
+^pkgdown$

@@ -46,7 +46,7 @@ Creates a new instance of this [R6][R6::R6Class] class.
 \if{html}{\out{<div class="r">}}\preformatted{Visualizer1DModel$new(
   task,
   learner,
-  x_limits = NULL,
+  x1_limits = NULL,
   padding = 0,
   n_points = 100L
 )}\if{html}{\out{</div>}}
@@ -61,8 +61,8 @@ The task to train the model on.}
 \item{\code{learner}}{([mlr3::Learner])\cr
 The learner to train the model with.}
 
-\item{\code{x_limits}}{(`numeric(2)`)\cr
-The limits of the x axis.}
+\item{\code{x1_limits}}{(`numeric(2)`)\cr
+The x1 limits.}
 
 \item{\code{padding}}{(`numeric(1)`)\cr
 A margin that is added to x1limits and x2limits.
