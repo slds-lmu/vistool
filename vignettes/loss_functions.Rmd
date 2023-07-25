@@ -1,0 +1,87 @@
+---
+title: "Visualization of Loss Functions"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Visualization of Loss Functions}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Loss Functions
+
+```{r, message=FALSE}
+library(vistool)
+```
+
+The `VisualizerLossFunction` class visualizes loss functions.
+Loss functions are wrapped in `LossFunction` objects.
+The package includes a few predefined loss functions that are used for classification and regression.
+
+```{r}
+as.data.table(dict_loss)
+```
+
+To get a loss function from the dictionary, use the `lss()` function
+We retrieve the hinge loss function for classification.
+
+```{r}
+loss_function = lss("hinge")
+```
+
+# Visualization
+
+To visualize the loss function, use the `as_visualizer()` function.
+The `y_pred` arguments contains $y * f(x)$ and `y_true` the true value $y$.
+
+```{r}
+vis = as_visualizer(loss_function, y_pred = seq(-4, 4), y_true = 1)
+```
+
+Use the `plot()` method to plot the loss function.
+
+```{r, out.width='100%'}
+vis$plot()
+```
+
+# Regression Loss Functions
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, out.width='100%', out.height='1000px'}
+library(mlr3misc)
+library(plotly)
+library(ggsci)
+
+visualizers = pmap(list(c("huber", "l1_ae", "l2_se", "log-cosh"), pal_npg("nrc")(4)), function(key, color) {
+  vis = as_visualizer(lss(key), y_pred = seq(-10, 10), y_true = 0)
+  vis$init_layer_lines(color = color)
+  vis$plot()
+})
+
+subplot(visualizers, nrows = 4, shareX = TRUE, shareY = TRUE) %>%
+  layout(
+    title = "Regression Loss Functions",
+    xaxis = list(title = "y - f(x)"),
+    yaxis = list(title = "Loss"))
+```
+
+# Classification Loss Functions
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, out.width='100%', out.height='00px'}
+visualizers = pmap(list(c("cross-entropy", "hinge"), pal_npg("nrc")(2)), function(key, color) {
+  vis = as_visualizer(lss(key), y_pred = seq(-4, 4), y_true = 1)
+  vis$init_layer_lines(color = color)
+  vis$plot()
+})
+
+subplot(visualizers, nrows = 2, shareX = TRUE, shareY = TRUE) %>%
+  layout(
+    title = "Regression Loss Functions",
+    xaxis = list(title = "y - f(x)"),
+    yaxis = list(title = "Loss"))
+```
