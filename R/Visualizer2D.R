@@ -116,15 +116,26 @@ Visualizer2D = R6::R6Class("Visualizer2D",
     #'   The coloring of the surface.
     #' @param show_title (`logical(1)`)\cr
     #'   Indicator whether to show the title of the plot.
+    #' @param show_contours (`logical(1)`)\cr
+    #'  Indicator whether to show the contours of the surface.
     #' @param ... (`any`)\cr
     #'   Further arguments passed to `add_trace(...)`.
-    init_layer_surface = function(opacity = 0.8, colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")), show_title = TRUE, ...) {
+    init_layer_surface = function(opacity = 0.8, colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")), show_contours = FALSE, show_title = TRUE, ...) {
       assert_number(opacity, lower = 0, upper = 1)
       assert_list(colorscale)
       assert_flag(show_title)
 
       private$.vbase = c(as.list(environment()), list(...))
       private$.layer_primary = "surface"
+
+      contours = if (show_contours) {
+        list(
+          z = list(
+            show = TRUE,
+            project = list(z = TRUE),
+            usecolormap = TRUE)
+        )
+      } else NULL
 
       llp = list(x = self$grid$x1, y = self$grid$x2, z = self$zmat)
       private$.plot = plot_ly() %>%
@@ -138,6 +149,7 @@ Visualizer2D = R6::R6Class("Visualizer2D",
           type = "surface",
           opacity = opacity,
           colorscale = colorscale,
+          contours = contours,
           ...
         ) %>%
         layout(

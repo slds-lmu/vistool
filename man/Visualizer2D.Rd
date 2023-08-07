@@ -123,6 +123,7 @@ Initialize the plot as 3D surface.
 \if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$init_layer_surface(
   opacity = 0.8,
   colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")),
+  show_contours = FALSE,
   show_title = TRUE,
   ...
 )}\if{html}{\out{</div>}}
@@ -136,6 +137,9 @@ Opacity of the layer.}
 
 \item{\code{colorscale}}{(`list()`)\cr
 The coloring of the surface.}
+
+\item{\code{show_contours}}{(`logical(1)`)\cr
+Indicator whether to show the contours of the surface.}
 
 \item{\code{show_title}}{(`logical(1)`)\cr
 Indicator whether to show the title of the plot.}

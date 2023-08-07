@@ -65,6 +65,13 @@ To switch back to the 3D scatter plot initialize the scatter layer again.
 vis$init_layer_surface()
 ```
 
+Draw with contour lines above z dimension.
+
+```{r, out.width='100%', out.height='700px'}
+vis$init_layer_surface(show_contours = TRUE)
+vis$plot()
+```
+
 We can add the training points to the plot.
 
 ```{r, out.width='100%', out.height='700px'}
