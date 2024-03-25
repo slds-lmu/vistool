@@ -16,3 +16,4 @@
 ^attic$
 ^_pkgdown\.yml$
 ^pkgdown$
+^LICENSE\.md$
