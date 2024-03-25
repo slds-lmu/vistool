@@ -64,26 +64,29 @@ vis = as_visualizer(task, learner)
 
 # Define a 3D scene
 vis$set_scene(x = 1.4, y = 1.4, z = 1.4)
-
-# View interactively (requires webgl if views in the browser)
-vis$plot()
 ```
 
-<img src="man/figures/README-example-1.png" width="100%" />
+View interactively:
 
 ``` r
-
-# Save static version
-vis$save("man/figures/demo_1.png", width = 500, height = 500)
+vis$plot()
 ```
 
 ![](man/figures/demo_1.png)
 
+Save static version as png:
+
+``` r
+vis$save("man/figures/demo_1.png", width = 500, height = 500)
+```
+
 ## Resources
 
-- [Visualization of Loss
+For visualization of…
+
+- [Loss
   Functions](https://slds-lmu.github.io/vistool/articles/loss_functions.html)
-- [Visualization of Model
+- [Model
   Predictions](https://slds-lmu.github.io/vistool/articles/model.html)
-- [Visualization of Objective
+- [Objective
   Functions](https://slds-lmu.github.io/vistool/articles/objective.html)
