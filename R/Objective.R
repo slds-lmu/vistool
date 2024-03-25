@@ -273,10 +273,26 @@ tfuns = c(list(list(minimize = TRUE, name = "branin", desc = "A function. 2 dime
 for (i in seq_along(tfuns)) {
   tf = tfuns[[i]]
   id = sprintf("TF_%s", tf$name)
-  cl = sprintf("TestFunctions::%s", tf$name)
-  suppressWarnings(dict_objective$add(id, Objective$new(fun = eval(parse(text = cl)),
-    id = id, label = tf$name, xdim = tf$xdim, limits_lower = tf$limits_lower,
-    limits_upper = tf$limits_upper)))
+  # cl = sprintf("TestFunctions::%s", tf$name)
+
+  cl_fun = tryCatch({
+    utils::getFromNamespace(tf$name, "TestFunctions")
+  }, error = function(e) {
+    "skip"
+  })
+
+  if (identical(cl_fun, "skip")) {
+    message("Error retrieving '", tf$name, "' from namespace TestFunctions, skipping.")
+    next
+  }
+
+  suppressWarnings(dict_objective$add(
+      id, Objective$new(
+        fun = cl_fun,
+        id = id, label = tf$name, xdim = tf$xdim, limits_lower = tf$limits_lower,
+        limits_upper = tf$limits_upper
+      )
+  ))
 }
 
 #' @title Retrieve Objective Functions
