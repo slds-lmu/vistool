@@ -26,7 +26,7 @@ RECREATE_ALL_2DFIGS = FALSE
 [![r-cmd-check](https://github.com/slds-lmu/vistool/actions/workflows/r-cmd-check.yaml/badge.svg)](https://github.com/slds-lmu/vistool/actions/workflows/r-cmd-check.yaml)
 <!-- badges: end -->
 
-The goal of `vistool` is to visualize optimization tracing and generally aid in teaching optimization-related concepts.
+The goal of `vistool` is to visualize optimization traces and aid in teaching optimization-related concepts.
 
 ## Installation
 
