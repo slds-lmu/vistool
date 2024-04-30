@@ -31,7 +31,7 @@ Suggests:
     knitr,
     patchwork,
     rmarkdown
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 Encoding: UTF-8
 VignetteBuilder: knitr
 URL: https://slds-lmu.github.io/vistool/

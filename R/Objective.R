@@ -237,7 +237,7 @@ tfuns = c(list(list(minimize = TRUE, name = "branin", desc = "A function. 2 dime
   list(list(minimize = FALSE, name = "franke", desc = "A function. 2 dimensional function.", xdim = 2, limits_lower = c(-0.5, -0.5), limits_upper = c(1, 1))),
   list(list(minimize = FALSE, name = "zhou1998", desc = "A function. 2 dimensional function.", xdim = 2, limits_lower = c(0, 0), limits_upper = c(1, 1))),
   list(list(minimize = TRUE, name = "currin1991", desc = "A function. 2 dimensional function.", xdim = 2, limits_lower = c(0, 0), limits_upper = c(1, 1))),
-  list(list(minimize = FALSE, name = "lim2002", desc = "Some function? 2 dimensional function.", xdim = 2, limits_lower = c(0, 0), limits_upper = c(1, 1))),
+  #list(list(minimize = FALSE, name = "lim2002", desc = "Some function? 2 dimensional function.", xdim = 2, limits_lower = c(0, 0), limits_upper = c(1, 1))),
   list(list(minimize = FALSE, name = "banana", desc = "A banana shaped function. 2 dimensional function.", xdim = 2, limits_lower = c(0, 0), limits_upper = c(1, 1))),
   list(list(minimize = FALSE, name = "sinumoid", desc = "A sinusoid added to a sigmoid function. 2 dimensional function.", xdim = 2, limits_lower = c(0, 0), limits_upper = c(1, 1))),
   list(list(minimize = FALSE, name = "waterfall", desc = "A sinusoid added to a sigmoid function. 2 dimensional function.", xdim = 2, limits_lower = c(0, 0), limits_upper = c(1, 1))),
