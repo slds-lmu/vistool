@@ -70,17 +70,3 @@ ordered_features = function(task, learner) {
   cols = names(learner$state$data_prototype) %??% learner$state$feature_names
   task$data(cols = intersect(cols, task$feature_names))
 }
-
-
-if (FALSE) {
-  learner = LearnerRegrLMFormula$new()
-  learner$param_set$set_values(formula = as.formula("y ~ x1 + x2"))
-
-  data = data.table(x1 = rnorm(100), x2 = rnorm(100), y = rnorm(100))
-  task = as_task_regr(data, target = "y")
-
-  vis = as_visualizer(task, learner)
-  vis$plot()
-  vis$add_training_data()
-  vis$plot()
-}
