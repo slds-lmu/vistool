@@ -7,7 +7,7 @@ Authors@R: c(
            comment = c(ORCID = "0000-0002-8115-0400")),
     person("Daniel", "Schalk", , "daniel.schalk@stat.uni-muenchen.de", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-0950-1947")),
-    person("Lukas", "Burk", , "github@quantenbrot.de", role = c("aut"),
+    person("Lukas", "Burk", , "github@quantenbrot.de", role = "aut",
            comment = c(ORCID = "0000-0001-7528-3795"))
   )
 Description: Visualize the optimization path of several methods.
@@ -19,7 +19,9 @@ Imports:
     checkmate,
     colorspace,
     data.table,
+    mlr3,
     mlr3misc,
+    paradox,
     plotly,
     R6,
     rootSolve,
@@ -29,12 +31,11 @@ Suggests:
     e1071,
     ggsci,
     knitr,
-    mlr3,
     mlr3learners,
     mlr3pipelines,
     patchwork,
     rmarkdown
-VignetteBuilder: 
+VignetteBuilder:
     knitr
 Encoding: UTF-8
 RoxygenNote: 7.3.1
