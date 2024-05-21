@@ -85,6 +85,25 @@ dict_loss$add("log-cosh", LossFunction$new("log-cosh", "Log-Cosh Loss", "regr", 
   log(cosh(y_pred - y_true))
 }))
 
+dict_loss$add("log-barrier", LossFunction$new("log-barrier", "Log-Barrier Loss", "regr", function(y_true, y_pred, epsilon = 1) {
+  abs_res <- abs(y_true - y_pred)
+  abs_res[abs_res > epsilon] <- Inf
+  abs_res[abs_res <= epsilon] <- -epsilon**2 * log(1 - (abs_res[abs_res <= epsilon] / epsilon)**2)
+  sum(abs_res)
+}))
+
+dict_loss$add("epsilon-insensitive", LossFunction$new("epsilon-insensitive", "Epsilon-Insensitive Loss", "regr", function(y_true, y_pred, epsilon = 1) {
+  sum(ifelse(abs(y_true - y_pred) > epsilon, abs(y_true - y_pred) - epsilon, 0L))
+}))
+
+dict_loss$add("pinball", LossFunction$new("pinball", "Pinball Loss", "regr", function(y_true, y_pred, quantile = 5) {
+  sum(ifelse(y_true - y_pred < 0, ((1 - quantile) * (-(y_true - y_pred)), quantile * (y_true - y_pred))
+}))
+
+dict_loss$add("cauchy", LossFunction$new("cauchy", "Cauchy Loss", "regr", function(y_true, y_pred, epsilon = 1) {
+  sum(0.5 * epsilon**2 * log(1 + ((y_true - y_pred) / epsilon)**2))
+}))
+
 dict_loss$add("cross-entropy", LossFunction$new("cross-entropy", "Cross-Entropy", "classif", function(y_true, y_pred) {
   log(1 + exp(-y_true * y_pred))
 }))
@@ -92,7 +111,6 @@ dict_loss$add("cross-entropy", LossFunction$new("cross-entropy", "Cross-Entropy"
 dict_loss$add("hinge", LossFunction$new("hinge", "Hinge Loss", "classif", function(y_true, y_pred) {
   pmax(1 - y_true * y_pred, 0)
 }))
-
 
 #' @export
 as.data.table.DictionaryLoss = function(x, ..., objects = FALSE) {
