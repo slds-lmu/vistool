@@ -31,14 +31,14 @@ Visualizer1DModel = R6::R6Class("Visualizer1DModel",
     initialize = function(task, learner, x1_limits = NULL, padding = 0, n_points = 100L) {
       self$task = assert_task(task)
       self$learner = assert_learner(learner, task = self$task)
-      assert_numeric(x_limits, len = 2, null.ok = TRUE)
+      assert_numeric(x1_limits, len = 2, null.ok = TRUE)
       assert_count(n_points)
       x_lab = self$task$feature_names[1]
       data = task$data()
       self$learner$train(task)
 
-      xlimits = range(data[, x_lab, with = FALSE])
-      x = seq(xlimits[1] - padding, xlimits[2] + padding, length.out = n_points)
+      x1_limits = x1_limits %??% range(data[, x_lab, with = FALSE])
+      x = seq(x1_limits[1] - padding, x1_limits[2] + padding, length.out = n_points)
 
       newdata = set_names(as.data.table(x), self$task$feature_names)
       y = self$learner$predict_newdata(newdata)$response

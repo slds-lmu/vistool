@@ -82,16 +82,40 @@ Visualizer2DModel = R6::R6Class("Visualizer2DModel",
       z = data[, self$task$target_names, with = FALSE][[1]]
       if (self$learner$predict_type == "prob") z = as.integer(z) - 1
 
-      private$.plot = private$.plot %>%
-        add_trace(
-          x = x1,
-          y = x2,
-          z = z,
-          type = "scatter3d",
-          mode = "markers",
-          marker = list(size = 5, color = grey),
-          ...
-        )
+
+      if (private$.layer_primary == "contour") {
+        private$.plot = private$.plot %>%
+          add_trace(
+            x = x1,
+            y = x2,
+            type = "scatter",
+            mode = "markers",
+            marker = list(
+              size = 10,
+              color = z,
+              cmin = min(self$zmat),
+              cmax = max(self$zmat),
+              colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")),
+              line = list(color = 'black', width = 2),
+              showscale = FALSE),
+            text = ~paste("x:", x1, "\ny:", x2, " \nz:", z),
+            hoverinfo = 'text',
+            ...
+          )
+      } else {
+        private$.plot = private$.plot %>%
+          add_trace(
+            x = x1,
+            y = x2,
+            z = z,
+            type = "scatter3d",
+            mode = "markers",
+            marker = list(size = 5, color = grey),
+            ...
+          )
+      }
+
+
 
       return(invisible(self))
     },

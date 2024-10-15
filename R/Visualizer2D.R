@@ -84,8 +84,8 @@ Visualizer2D = R6::R6Class("Visualizer2D",
       private$.plot = plot_ly() %>%
         add_trace(
           name = self$plot_lab,
-          showlegend = FALSE,
-          showscale = FALSE,
+          showlegend = TRUE,
+          showscale = TRUE,
           x = llp$x,
           y = llp$y,
           z = t(llp$z),

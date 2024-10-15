@@ -25,7 +25,7 @@ Visualizer1DObjective = R6::R6Class("Visualizer1DObjective",
     #'   This object is used to generate the surface/contour lines.
     initialize = function(objective, x1_limits = NULL, padding = 0, n_points = 100L) {
       self$objective = assert_r6(objective, "Objective")
-      assert_numeric(x_limits, len = 2, null.ok = TRUE)
+      assert_numeric(x1_limits, len = 2, null.ok = TRUE)
       assert_numeric(padding)
       assert_count(n_points)
 
@@ -33,14 +33,14 @@ Visualizer1DObjective = R6::R6Class("Visualizer1DObjective",
         stopf("`Visualizer1D` requires 1-dimensional inputs, but `objective$xdim = %s`", objective$xdim)
       }
 
-      x_limits = x_limits %??% c(objective$limits_lower, objective$limits_upper)
+      x1_limits = x1_limits %??% c(objective$limits_lower, objective$limits_upper)
 
-      if (any(is.na(x_limits))) {
-        stop("Limits could not be extracted from the objective. Please use `x_limits`.")
+      if (any(is.na(x1_limits))) {
+        stop("Limits could not be extracted from the objective. Please use `x1_limits`.")
       }
 
-      x_pad = (x_limits[2] - x_limits[1]) * padding
-      x = seq(x_limits[1] - x_pad, x_limits[2] + x_pad, length.out = n_points)
+      x_pad = (x1_limits[2] - x1_limits[1]) * padding
+      x = seq(x1_limits[1] - x_pad, x1_limits[2] + x_pad, length.out = n_points)
       y = map_dbl(x, function(x) objective$eval(x))
 
       super$initialize(
