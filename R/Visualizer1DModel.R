@@ -1,3 +1,4 @@
+# FIXME: check that this works with all classif output types
 
 #' @title Visualize Model
 #'
@@ -5,12 +6,10 @@
 #' This class is used to create visualizations of tasks and learners.
 #'
 #' @template param_x1_limits
-#' @template param_padding
 #' @template param_n_points
 #'
 #' @export
-Visualizer1DModel = R6::R6Class("Visualizer1DModel",
-  inherit = Visualizer1D,
+Visualizer1DModel = R6::R6Class("Visualizer1DModel", inherit = Visualizer1DFun,
   public = list(
 
     #' @field task (`mlr3::Task`)\cr
@@ -21,6 +20,11 @@ Visualizer1DModel = R6::R6Class("Visualizer1DModel",
     #' Learner used to train the model.
     learner = NULL,
 
+    # FIXME: add that we can plot data
+    plot_data = NULL,
+
+    n_points = NULL,
+
     #' @description
     #' Creates a new instance of this [R6][R6::R6Class] class.
     #'
@@ -28,30 +32,38 @@ Visualizer1DModel = R6::R6Class("Visualizer1DModel",
     #'   The task to train the model on.
     #' @param learner ([mlr3::Learner])\cr
     #'   The learner to train the model with.
-    initialize = function(task, learner, x1_limits = NULL, padding = 0, n_points = 100L) {
+    initialize = function(task, learner, plot_data = FALSE, xlim = NULL, n_points = 100) {
+      # FIXME: doc complete class, not all args are doced here
       self$task = assert_task(task)
+      fnames = task$feature_names
+      if (length(fnames) != 1)
+        stop("Task must have exactly 1 feature")
       self$learner = assert_learner(learner, task = self$task)
-      assert_numeric(x_limits, len = 2, null.ok = TRUE)
+      assert_flag(plot_data)
       assert_count(n_points)
-      x_lab = self$task$feature_names[1]
-      data = task$data()
+
+      # train learner on task
       self$learner$train(task)
 
-      xlimits = range(data[, x_lab, with = FALSE])
-      x = seq(xlimits[1] - padding, xlimits[2] + padding, length.out = n_points)
+      x_train = task$data()[[fnames[1]]]
+      y_train = task$truth()
 
-      newdata = set_names(as.data.table(x), self$task$feature_names)
-      y = self$learner$predict_newdata(newdata)$response
+      if (is.null(xlim))
+        xlim = range(x_train)
+      x_pred = seq(xlim[1], xlim[2], length.out = n_points)
+      newdata = set_names(as.data.table(x_pred), self$task$feature_names)
+      y_pred = self$learner$predict_newdata(newdata)$response
+      title = sprintf("%s on %s", self$learner$id, self$task$id)
 
-      super$initialize(
-        x = x,
-        y = y,
-        plot_lab = sprintf("%s on %s", self$learner$id, self$task$id),
-        x_lab = x_lab,
-        y_lab = task$target_names
-      )
+      points_x = NULL; points_y = NULL
+      if (plot_data) {
+        points_x = x_train
+        points_y = y_train
+      }
 
-      return(invisible(self))
+      super$initialize(fun_x = x_pred, fun_y = y_pred,
+        title = title, lab_x = fnames[1], lab_y = task$target_names,
+        points_x = points_x, points_y = points_y)
     }
   )
 )

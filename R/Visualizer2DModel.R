@@ -10,8 +10,7 @@
 #' @template param_n_points
 #'
 #' @export
-Visualizer2DModel = R6::R6Class("Visualizer2DModel",
-  inherit = Visualizer2D,
+Visualizer2DModel = R6::R6Class("Visualizer2DModel", inherit = Visualizer2DFun,
   public = list(
 
     #' @field task (`mlr3::Task`)\cr

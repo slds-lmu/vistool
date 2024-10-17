@@ -1,3 +1,7 @@
+#FIXME: run rcmd check
+# FIXME: think about plotting extra points
+# FIXME: can we add optimizer traces? maybe use bbotk?
+
 #' @title Visualize Objective
 #'
 #' @description
@@ -8,8 +12,7 @@
 #' @template param_n_points
 #'
 #' @export
-Visualizer1DObjective = R6::R6Class("Visualizer1DObjective",
-  inherit = Visualizer1D,
+Visualizer1DObj = R6::R6Class("Visualizer1DObj", inherit = Visualizer1DFun,
   public = list(
 
     #' @field objective (`Objective`)\cr
@@ -23,35 +26,20 @@ Visualizer1DObjective = R6::R6Class("Visualizer1DObjective",
     #' @param objective (`Objective`)\cr
     #'   The objective which was optimized.
     #'   This object is used to generate the surface/contour lines.
-    initialize = function(objective, x1_limits = NULL, padding = 0, n_points = 100L) {
+    initialize = function(objective, xlim = NULL, n_points = 100L) {
       self$objective = assert_r6(objective, "Objective")
-      assert_numeric(x_limits, len = 2, null.ok = TRUE)
-      assert_numeric(padding)
-      assert_count(n_points)
-
       if (objective$xdim != 1) {
         stopf("`Visualizer1D` requires 1-dimensional inputs, but `objective$xdim = %s`", objective$xdim)
       }
-
-      x_limits = x_limits %??% c(objective$limits_lower, objective$limits_upper)
-
-      if (any(is.na(x_limits))) {
-        stop("Limits could not be extracted from the objective. Please use `x_limits`.")
-      }
-
-      x_pad = (x_limits[2] - x_limits[1]) * padding
-      x = seq(x_limits[1] - x_pad, x_limits[2] + x_pad, length.out = n_points)
+      xlim = xlim %??% c(objective$lower, objective$upper)
+      if (any(is.na(xlim)))
+        stop("Limits could not be extracted from the objective. Please use `xlim`.")
+      assert_numeric(xlim, len = 2)
+      assert_count(n_points)
+      x = seq(xlim[1], xlim[2], length.out = n_points)
       y = map_dbl(x, function(x) objective$eval(x))
 
-      super$initialize(
-        x = x,
-        y = y,
-        plot_lab = self$objective$label,
-        x_lab = "x",
-        y_lab = "y"
-      )
-
-      return(invisible(self))
+      super$initialize(fun_x = x, fun_y = y, title = self$objective$label, lab_x = "x", lab_y = "y")
     },
 
     #' @description

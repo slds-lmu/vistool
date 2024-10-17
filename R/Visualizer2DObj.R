@@ -9,8 +9,7 @@
 #' @template param_n_points
 #'
 #' @export
-Visualizer2DObjective = R6::R6Class("Visualizer2DObjective",
-  inherit = Visualizer2D,
+Visualizer2DObj = R6::R6Class("Visualizer2DObj", inherit = Visualizer2DFun,
   public = list(
 
     #' @field objective (`Objective`)\cr

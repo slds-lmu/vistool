@@ -1,3 +1,5 @@
+#FIXME: doc API of funs better
+
 
 #' @title Loss Function
 #'
@@ -22,7 +24,7 @@ LossFunction = R6::R6Class("LossFunction",
 
     #' @field properties `character()`\cr
     #' Additional properties of the loss function.
-    properties = NULL,
+    task_type = NULL,
 
     #' @description
     #' Creates a new instance of this [R6][R6::R6Class] class.
@@ -35,11 +37,11 @@ LossFunction = R6::R6Class("LossFunction",
     #'   Additional properties of the loss function.
     #' @param fun (`function(y_true, y_pred, ...)`)\cr
     #'   Loss function.
-    initialize = function(id, label, properties, fun) {
+    initialize = function(id, label, task_type, fun) {
       self$id = assert_character(id)
-      self$fun = assert_function(fun)
       self$label = assert_character(label)
-      self$properties = assert_character(properties)
+      self$task_type = assert_choice(task_type, c("regr", "classif"))
+      self$fun = assert_function(fun)
     }
   )
 )
@@ -68,29 +70,29 @@ lss = function(.key, ...) {
   dict_loss$get(.key, ...)
 }
 
-dict_loss$add("l2_se", LossFunction$new("l2_se", "L2 Squared Error", "regr", function(y_true, y_pred) {
-  (y_true - y_pred)^2
+dict_loss$add("l2_se", LossFunction$new("l2", "L2 Squared Error", "regr", function(r) {
+  (r)^2
 }))
 
-dict_loss$add("l1_ae", LossFunction$new("l1_ae", "L1 Absolute Error", "regr", function(y_true, y_pred) {
-  abs(y_true - y_pred)
+dict_loss$add("l1_ae", LossFunction$new("l1", "L1 Absolute Error", "regr", function(r) {
+  abs(r)
 }))
 
-dict_loss$add("huber", LossFunction$new("huber", "Huber Loss", "regr", function(y_true, y_pred, delta = 1) {
-  a = abs(y_true - y_pred)
+dict_loss$add("huber", LossFunction$new("huber", "Huber Loss", "regr", function(r, delta = 1) {
+  a = abs(r)
   ifelse(a <= delta, 0.5 * a^2, delta * a - delta^2 / 2)
 }))
 
-dict_loss$add("log-cosh", LossFunction$new("log-cosh", "Log-Cosh Loss", "regr", function(y_true, y_pred) {
-  log(cosh(y_pred - y_true))
+dict_loss$add("log-cosh", LossFunction$new("logcosh", "Log-Cosh Loss", "regr", function(r) {
+  log(cosh(r))
 }))
 
-dict_loss$add("cross-entropy", LossFunction$new("cross-entropy", "Cross-Entropy", "classif", function(y_true, y_pred) {
-  log(1 + exp(-y_true * y_pred))
+dict_loss$add("cross-entropy", LossFunction$new("logloss", "Log Loss", "classif", function(r) {
+  log(1 + exp(-r))
 }))
 
-dict_loss$add("hinge", LossFunction$new("hinge", "Hinge Loss", "classif", function(y_true, y_pred) {
-  pmax(1 - y_true * y_pred, 0)
+dict_loss$add("hinge", LossFunction$new("hinge", "Hinge Loss", "classif", function(r) {
+  pmax(1 - r, 0)
 }))
 
 
@@ -101,7 +103,7 @@ as.data.table.DictionaryLoss = function(x, ..., objects = FALSE) {
   setkeyv(map_dtr(x$keys(), function(key) {
     t = x$get(key)
     insert_named(
-      list(key = key, label = t$label, properties = list(t$properties)),
+      list(key = key, label = t$label, task_type = t$task_type),
       if (objects) list(object = list(t))
     )
   }, .fill = TRUE), "key")[]
