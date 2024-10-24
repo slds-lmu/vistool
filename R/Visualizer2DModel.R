@@ -50,7 +50,10 @@ Visualizer2DModel = R6::R6Class("Visualizer2DModel",
 
       newdata = set_names(CJ(grid$x1, grid$x2), self$task$feature_names)
       z = self$learner$predict_newdata(newdata)[[self$learner$predict_type]]
-      if (self$learner$predict_type == "prob") z = z[, "pos"]
+      if (self$learner$predict_type == "prob") {
+        pos_class = self$task$positive
+        z = z[, pos_class]
+      }
       zmat = matrix(z, nrow = n_points, ncol = n_points, byrow = FALSE)
 
       super$initialize(
