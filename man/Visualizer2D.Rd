@@ -15,13 +15,13 @@ List with the `x1` and `x2` grid.}
 \item{\code{zmat}}{(`matrix()`)\cr
 The result of evaluation at each element of the cross product of `grid$x1` and `grid$x2`.}
 
-\item{\code{plot_lab}}{(character(1)\cr
+\item{\code{title}}{(character(1)\cr
 Label of the plot.}
 
-\item{\code{x1_lab}}{(character(1)\cr
+\item{\code{lab_x1}}{(character(1)\cr
 Label of the x1 axis.}
 
-\item{\code{x2_lab}}{(character(1)\cr
+\item{\code{lab_x2}}{(character(1)\cr
 Label of the x2 axis.}
 
 \item{\code{z_lab}}{(character(1)\cr
@@ -33,12 +33,7 @@ Label of the z axis.}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-Visualizer2D-new}{\code{Visualizer2D$new()}}
-\item \href{#method-Visualizer2D-init_layer_contour}{\code{Visualizer2D$init_layer_contour()}}
-\item \href{#method-Visualizer2D-init_layer_surface}{\code{Visualizer2D$init_layer_surface()}}
-\item \href{#method-Visualizer2D-set_layout}{\code{Visualizer2D$set_layout()}}
-\item \href{#method-Visualizer2D-set_scene}{\code{Visualizer2D$set_scene()}}
 \item \href{#method-Visualizer2D-plot}{\code{Visualizer2D$plot()}}
-\item \href{#method-Visualizer2D-save}{\code{Visualizer2D$save()}}
 \item \href{#method-Visualizer2D-clone}{\code{Visualizer2D$clone()}}
 }
 }
@@ -49,11 +44,11 @@ Label of the z axis.}
 Creates a new instance of this [R6][R6::R6Class] class.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$new(
-  grid,
-  zmat,
-  plot_lab = NULL,
-  x1_lab = "x1",
-  x2_lab = "x2",
+  fun_x1,
+  fun_x2,
+  title = NULL,
+  lab_x1 = "x1",
+  lab_x2 = "x2",
   z_lab = "z"
 )}\if{html}{\out{</div>}}
 }
@@ -61,129 +56,23 @@ Creates a new instance of this [R6][R6::R6Class] class.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
+\item{\code{title}}{(`character(1)`)\cr
+Label of the plot.}
+
+\item{\code{lab_x1}}{(`character(1)`)\cr
+Label of the x1 axis.}
+
+\item{\code{lab_x2}}{(`character(1)`)\cr
+Label of the x2 axis.}
+
+\item{\code{z_lab}}{(`character(1)`)\cr
+Label of the z axis.}
+
 \item{\code{grid}}{(`list()`)\cr
 List with the `x1` and `x2` grid.}
 
 \item{\code{zmat}}{(`matrix()`)\cr
 The result of evaluation at each element of the cross product of `grid$x1` and `grid$x2`.}
-
-\item{\code{plot_lab}}{(`character(1)`)\cr
-Label of the plot.}
-
-\item{\code{x1_lab}}{(`character(1)`)\cr
-Label of the x1 axis.}
-
-\item{\code{x2_lab}}{(`character(1)`)\cr
-Label of the x2 axis.}
-
-\item{\code{z_lab}}{(`character(1)`)\cr
-Label of the z axis.}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Visualizer2D-init_layer_contour"></a>}}
-\if{latex}{\out{\hypertarget{method-Visualizer2D-init_layer_contour}{}}}
-\subsection{Method \code{init_layer_contour()}}{
-Initialize the plot with contour lines.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$init_layer_contour(
-  opacity = 0.8,
-  colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")),
-  show_title = TRUE,
-  ...
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{opacity}}{(`numeric(1)`)\cr
-Opacity of the layer.}
-
-\item{\code{colorscale}}{(`list()`)\cr
-The coloring of the contour.}
-
-\item{\code{show_title}}{(`logical(1)`)\cr
-Indicator whether to show the title of the plot.}
-
-\item{\code{...}}{(`any`)\cr
-Further arguments passed to `add_trace(...)`.}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Visualizer2D-init_layer_surface"></a>}}
-\if{latex}{\out{\hypertarget{method-Visualizer2D-init_layer_surface}{}}}
-\subsection{Method \code{init_layer_surface()}}{
-Initialize the plot as 3D surface.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$init_layer_surface(
-  opacity = 0.8,
-  colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")),
-  show_contours = FALSE,
-  show_title = TRUE,
-  ...
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{opacity}}{(`numeric(1)`)\cr
-Opacity of the layer.}
-
-\item{\code{colorscale}}{(`list()`)\cr
-The coloring of the surface.}
-
-\item{\code{show_contours}}{(`logical(1)`)\cr
-Indicator whether to show the contours of the surface.}
-
-\item{\code{show_title}}{(`logical(1)`)\cr
-Indicator whether to show the title of the plot.}
-
-\item{\code{...}}{(`any`)\cr
-Further arguments passed to `add_trace(...)`.}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Visualizer2D-set_layout"></a>}}
-\if{latex}{\out{\hypertarget{method-Visualizer2D-set_layout}{}}}
-\subsection{Method \code{set_layout()}}{
-Set the layout of the plotly plot.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$set_layout(...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{Layout options directly passed to `layout(...)`.}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Visualizer2D-set_scene"></a>}}
-\if{latex}{\out{\hypertarget{method-Visualizer2D-set_scene}{}}}
-\subsection{Method \code{set_scene()}}{
-Set the view for a 3D plot.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$set_scene(x, y, z)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{x}}{(`numeric(1)`) The view from which the "camera looks down" to the plot.}
-
-\item{\code{y}}{(`numeric(1)`) The view from which the "camera looks down" to the plot.}
-
-\item{\code{z}}{(`numeric(1)`) The view from which the "camera looks down" to the plot.}
 }
 \if{html}{\out{</div>}}
 }
@@ -192,28 +81,10 @@ Set the view for a 3D plot.
 \if{html}{\out{<a id="method-Visualizer2D-plot"></a>}}
 \if{latex}{\out{\hypertarget{method-Visualizer2D-plot}{}}}
 \subsection{Method \code{plot()}}{
-Return the plot and hence plot it or do further processing.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$plot()}\if{html}{\out{</div>}}
 }
 
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Visualizer2D-save"></a>}}
-\if{latex}{\out{\hypertarget{method-Visualizer2D-save}{}}}
-\subsection{Method \code{save()}}{
-Save the plot by using plotlys `save_image()` function.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$save(...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{Further arguments passed to `save_image()`.}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Visualizer2D-clone"></a>}}

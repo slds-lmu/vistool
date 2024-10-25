@@ -13,9 +13,9 @@ This class defines the objective that is used for optimization.
 
 \item{\code{label}}{(`character(1)` The label of the objective, i.e. a.}
 
-\item{\code{limits_lower}}{(`numeric()`) The lower limits for each dimension.}
+\item{\code{lower}}{(`numeric()`) The lower limits for each dimension.}
 
-\item{\code{limits_upper}}{(`numeric()`) The upper limits for each dimension.}
+\item{\code{upper}}{(`numeric()`) The upper limits for each dimension.}
 
 \item{\code{minimize}}{(`logical(1)`) Is the problem a minimization problem?}
 }
@@ -57,8 +57,8 @@ Creates a new instance of this [R6][R6::R6Class] class.
   fun,
   label = "f",
   xdim,
-  limits_lower = NA,
-  limits_upper = NA,
+  lower = NA,
+  upper = NA,
   xtest = NULL,
   minimize = FALSE,
   ...
@@ -76,9 +76,9 @@ Creates a new instance of this [R6][R6::R6Class] class.
 
 \item{\code{xdim}}{(`integer(1)`) The input dimension of `fun`. Use `xdim = NA` for an arbitrary input dimension.}
 
-\item{\code{limits_lower}}{(`numeric(xdim)`) The lower boundaries for inputs to `fun`. Must}
+\item{\code{lower}}{(`numeric(xdim)`) The lower boundaries for inputs to `fun`. Must}
 
-\item{\code{limits_upper}}{(`numeric(xdim)`) The upper boundaries for inputs to `fun`. Must
+\item{\code{upper}}{(`numeric(xdim)`) The upper boundaries for inputs to `fun`. Must
 be of length `xdim`.}
 
 \item{\code{xtest}}{(`numeric()`) Test value for `fun` during initialization. If not defined,
@@ -147,7 +147,7 @@ Assert a numeric input if it is suitable or not.
 \describe{
 \item{\code{x}}{(`numeric()`) Input value for `fun`.}
 
-\item{\code{...}}{Additional arguments passed to `checkmate::assertNumeric(...)`.}
+\item{\code{...}}{Additional arguments passed to `assertNumeric(...)`.}
 }
 \if{html}{\out{</div>}}
 }

@@ -9,7 +9,7 @@
 #' @template param_n_points
 #'
 #' @export
-Visualizer1DFun = R6::R6Class("Visualizer1DFun",
+Visualizer1D = R6::R6Class("Visualizer1D",
   public = list(
 
     #' @field x (`numeric(n)`)\cr

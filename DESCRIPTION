@@ -19,6 +19,7 @@ Imports:
     checkmate,
     colorspace,
     data.table,
+    ggplot2,
     mlr3,
     mlr3misc,
     paradox,
@@ -34,8 +35,10 @@ Suggests:
     mlr3learners,
     mlr3pipelines,
     patchwork,
-    rmarkdown
+    rmarkdown,
+    testthat (>= 3.0.0)
 VignetteBuilder:
     knitr
 Encoding: UTF-8
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
+Config/testthat/edition: 3

@@ -9,20 +9,68 @@ This class is used to create 1D visualizations.
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{x}}{(`vector()`)\cr
-x-values.}
+\item{\code{x}}{(`numeric(n)`)\cr
+x-values of function}
 
-\item{\code{y}}{(`vector()`)\cr
-y-values}
+\item{\code{y}}{(`numeric(n)`)\cr
+y-values of function}
 
-\item{\code{plot_lab}}{(character(1)\cr
-Label of the plot.}
+\item{\code{title}}{(character(1)\cr
+Title of plot}
 
-\item{\code{x_lab}}{(character(1)\cr
-Label of the x axis.}
+\item{\code{lab_x}}{(character(1)\cr
+Label of x-axis}
 
-\item{\code{y_lab}}{(character(1)\cr
-Label of the y axis.}
+\item{\code{lab_y}}{(character(1)\cr
+Label of y-axis}
+
+\item{\code{x}}{(`numeric(m)`)\cr
+x-values of extra points to plot.
+Use NULL if no points should be plotted.}
+
+\item{\code{y}}{(`numeric(m)`)\cr
+y-values of extra points to plot.
+Use NULL if no points should be plotted.}
+
+\item{\code{line_col}}{(character(1)\cr
+Color of plotted line}
+
+\item{\code{line_width}}{(numeric(1)\cr
+Width of plotted line}
+
+\item{\code{line_type}}{(character(1)\cr
+Type of plotted line}
+
+\item{\code{points_col}}{(character(1)\cr
+Color of plotted points}
+
+\item{\code{points_size}}{(numeric(1)\cr
+Size of plotted points}
+
+\item{\code{points_shape}}{(integer(1)\cr
+Shape of plotted points}
+
+\item{\code{points_alpha}}{(numeric(1)\cr
+Alpha blending of plotted points}
+}
+\if{html}{\out{</div>}}
+}
+\section{Active bindings}{
+\if{html}{\out{<div class="r6-active-bindings">}}
+\describe{
+\item{\code{x}}{(`numeric(n)`)\cr
+x-values of function}
+
+\item{\code{y}}{(`numeric(n)`)\cr
+y-values of function}
+
+\item{\code{x}}{(`numeric(m)`)\cr
+x-values of extra points to plot.
+Use NULL if no points should be plotted.}
+
+\item{\code{y}}{(`numeric(m)`)\cr
+y-values of extra points to plot.
+Use NULL if no points should be plotted.}
 }
 \if{html}{\out{</div>}}
 }
@@ -30,10 +78,7 @@ Label of the y axis.}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-Visualizer1D-new}{\code{Visualizer1D$new()}}
-\item \href{#method-Visualizer1D-init_layer_lines}{\code{Visualizer1D$init_layer_lines()}}
-\item \href{#method-Visualizer1D-setLayout}{\code{Visualizer1D$setLayout()}}
 \item \href{#method-Visualizer1D-plot}{\code{Visualizer1D$plot()}}
-\item \href{#method-Visualizer1D-save}{\code{Visualizer1D$save()}}
 \item \href{#method-Visualizer1D-clone}{\code{Visualizer1D$clone()}}
 }
 }
@@ -43,62 +88,42 @@ Label of the y axis.}
 \subsection{Method \code{new()}}{
 Creates a new instance of this [R6][R6::R6Class] class.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer1D$new(x, y, plot_lab = NULL, x_lab = "x", y_lab = "y")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer1D$new(
+  fun_x,
+  fun_y,
+  title = NULL,
+  lab_x = "x",
+  lab_y = "y",
+  points_x = NULL,
+  points_y = NULL
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
+\item{\code{title}}{(character(1)\cr
+Title of plot}
+
+\item{\code{lab_x}}{(character(1)\cr
+Label of x-axis}
+
+\item{\code{lab_y}}{(character(1)\cr
+Label of y-axis}
+
+\item{\code{points_x}}{(`numeric()`)\cr
+x-values of extra points to plot.
+Use NULL if no points should be plotted.}
+
+\item{\code{points_y}}{(`numeric()`)\cr
+y-values of extra points to plot.
+Use NULL if no points should be plotted.}
+
 \item{\code{x}}{(`numeric()`)\cr
-x-values.}
+x-values of function}
 
 \item{\code{y}}{(`numeric()`)\cr
-y-values.}
-
-\item{\code{plot_lab}}{(character(1)\cr
-Label of the plot.}
-
-\item{\code{x_lab}}{(character(1)\cr
-Label of the x axis.}
-
-\item{\code{y_lab}}{(character(1)\cr
-Label of the y axis.}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Visualizer1D-init_layer_lines"></a>}}
-\if{latex}{\out{\hypertarget{method-Visualizer1D-init_layer_lines}{}}}
-\subsection{Method \code{init_layer_lines()}}{
-Initialize the plot with a line plot.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer1D$init_layer_lines(...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(`any`)\cr
-Further arguments passed to `add_trace(...)`.}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Visualizer1D-setLayout"></a>}}
-\if{latex}{\out{\hypertarget{method-Visualizer1D-setLayout}{}}}
-\subsection{Method \code{setLayout()}}{
-Set the layout of the plotly plot.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer1D$setLayout(...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(`any`)\cr
-Layout options directly passed to `layout(...)`.}
+y-values of function}
 }
 \if{html}{\out{</div>}}
 }
@@ -107,29 +132,10 @@ Layout options directly passed to `layout(...)`.}
 \if{html}{\out{<a id="method-Visualizer1D-plot"></a>}}
 \if{latex}{\out{\hypertarget{method-Visualizer1D-plot}{}}}
 \subsection{Method \code{plot()}}{
-Return the plot and hence plot it or do further processing.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Visualizer1D$plot()}\if{html}{\out{</div>}}
 }
 
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Visualizer1D-save"></a>}}
-\if{latex}{\out{\hypertarget{method-Visualizer1D-save}{}}}
-\subsection{Method \code{save()}}{
-Save the plot by using plotlys `orca()` function.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer1D$save(...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(`any`)\cr
-Further arguments passed to `orca()`.}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Visualizer1D-clone"></a>}}

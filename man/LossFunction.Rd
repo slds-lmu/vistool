@@ -23,6 +23,14 @@ Additional properties of the loss function.}
 }
 \if{html}{\out{</div>}}
 }
+\section{Active bindings}{
+\if{html}{\out{<div class="r6-active-bindings">}}
+\describe{
+\item{\code{properties}}{`character()`\cr
+Additional properties of the loss function.}
+}
+\if{html}{\out{</div>}}
+}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
@@ -36,7 +44,7 @@ Additional properties of the loss function.}
 \subsection{Method \code{new()}}{
 Creates a new instance of this [R6][R6::R6Class] class.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LossFunction$new(id, label, properties, fun)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{LossFunction$new(id, label, task_type, fun)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -48,11 +56,11 @@ Unique identifier of the loss function.}
 \item{\code{label}}{(`character(1)`)\cr
 Label of the loss function.}
 
-\item{\code{properties}}{(`character()`)\cr
-Additional properties of the loss function.}
-
 \item{\code{fun}}{(`function(y_true, y_pred, ...)`)\cr
 Loss function.}
+
+\item{\code{properties}}{(`character()`)\cr
+Additional properties of the loss function.}
 }
 \if{html}{\out{</div>}}
 }

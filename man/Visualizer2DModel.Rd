@@ -30,14 +30,9 @@ Learner used to train the model.}
 }
 }
 \if{html}{\out{
-<details><summary>Inherited methods</summary>
+<details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="init_layer_contour"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-init_layer_contour'><code>vistool::Visualizer2D$init_layer_contour()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="init_layer_surface"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-init_layer_surface'><code>vistool::Visualizer2D$init_layer_surface()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="plot"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-plot'><code>vistool::Visualizer2D$plot()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="save"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-save'><code>vistool::Visualizer2D$save()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="set_layout"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-set_layout'><code>vistool::Visualizer2D$set_layout()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="set_scene"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-set_scene'><code>vistool::Visualizer2D$set_scene()</code></a></span></li>
 </ul>
 </details>
 }}

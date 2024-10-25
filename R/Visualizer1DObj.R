@@ -12,7 +12,7 @@
 #' @template param_n_points
 #'
 #' @export
-Visualizer1DObj = R6::R6Class("Visualizer1DObj", inherit = Visualizer1DFun,
+Visualizer1DObj = R6::R6Class("Visualizer1DObj", inherit = Visualizer1D,
   public = list(
 
     #' @field objective (`Objective`)\cr

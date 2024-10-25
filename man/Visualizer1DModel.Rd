@@ -30,10 +30,7 @@ Learner used to train the model.}
 \if{html}{\out{
 <details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer1D" data-id="init_layer_lines"><a href='../../vistool/html/Visualizer1D.html#method-Visualizer1D-init_layer_lines'><code>vistool::Visualizer1D$init_layer_lines()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer1D" data-id="plot"><a href='../../vistool/html/Visualizer1D.html#method-Visualizer1D-plot'><code>vistool::Visualizer1D$plot()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer1D" data-id="save"><a href='../../vistool/html/Visualizer1D.html#method-Visualizer1D-save'><code>vistool::Visualizer1D$save()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer1D" data-id="setLayout"><a href='../../vistool/html/Visualizer1D.html#method-Visualizer1D-setLayout'><code>vistool::Visualizer1D$setLayout()</code></a></span></li>
 </ul>
 </details>
 }}
@@ -46,9 +43,9 @@ Creates a new instance of this [R6][R6::R6Class] class.
 \if{html}{\out{<div class="r">}}\preformatted{Visualizer1DModel$new(
   task,
   learner,
-  x1_limits = NULL,
-  padding = 0,
-  n_points = 100L
+  plot_data = FALSE,
+  xlim = NULL,
+  n_points = 100
 )}\if{html}{\out{</div>}}
 }
 
@@ -60,13 +57,6 @@ The task to train the model on.}
 
 \item{\code{learner}}{([mlr3::Learner])\cr
 The learner to train the model with.}
-
-\item{\code{x1_limits}}{(`numeric(2)`)\cr
-The x1 limits.}
-
-\item{\code{padding}}{(`numeric(1)`)\cr
-A margin that is added to x1limits and x2limits.
-The x1 margin is calculated by `max(x1lmits) - min(x1limits) * padding`.}
 
 \item{\code{n_points}}{(`integer(1)`)\cr
 The number of generated point per dimension.

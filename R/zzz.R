@@ -5,6 +5,7 @@
 #' @import TestFunctions
 #' @import mlr3
 #' @import paradox
+#' @import ggplot2
 #'
 #' @importFrom R6 R6Class
 #' @importFrom stats optimize
