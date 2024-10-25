@@ -128,22 +128,46 @@ Visualizer2DModel = R6::R6Class("Visualizer2DModel",
     #'
     #' @param threshold (`numeric(1)`)\cr
     #'  Threshold for the decision boundary.
-    #' @param surfacecolor (`list()`)\cr
-    #'  The coloring of the surface.
     #' @param ... (`any`)\cr
     #'   Further arguments passed to `add_trace(...)`.
-    add_decision_boundary = function(threshold = 0.5, surfacecolor = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")), ...) {
+    add_decision_boundary = function(threshold = 0.5, ...) {
        if (is.null(private$.plot)) self$init_layer_surface()
       z = matrix(threshold, nrow = nrow(self$zmat), ncol = ncol(self$zmat), byrow = TRUE)
 
-      private$.plot = private$.plot %>%
-        add_surface(
-          x = self$grid$x1,
-          y = self$grid$x2,
-          z = z,
-          colorscale  = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")),
-          showscale = FALSE,
-          ...)
+      if (private$.layer_primary == "contour") {
+        llp = list(x = self$grid$x1, y = self$grid$x2, z = self$zmat)
+        private$.plot = private$.plot %>%
+          add_trace(
+            name = "decision boundary",
+            autocontour = FALSE,
+            showlegend = FALSE,
+            showscale = FALSE,
+            x = llp$x,
+            y = llp$y,
+            z = t(llp$z),
+            type = "contour",
+            colorscale = list(c(0, 1), c("rgb(0,0,0)", "rgb(0,0,0)")),
+            ncontours = 1,
+            contours = list(
+              start = threshold,
+              end = threshold,
+              coloring = "lines"
+            ),
+            line = list(
+              color = "black",
+              width = 3
+            ),
+            ...)
+      } else {
+        private$.plot = private$.plot %>%
+          add_surface(
+            x = self$grid$x1,
+            y = self$grid$x2,
+            z = z,
+            colorscale  = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")),
+            showscale = FALSE,
+            ...)
+      }
     }
   )
 )
