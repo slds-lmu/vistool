@@ -39,6 +39,8 @@ Visualizer2D = R6::R6Class("Visualizer2D",
     #' @field points_x2 (`numeric()`)\cr
     points_x2 = NULL,
 
+    #' @field points_y (`numeric()`)\cr
+    #' y-values of points.
     points_y = NULL,
 
     #' @description
@@ -58,7 +60,15 @@ Visualizer2D = R6::R6Class("Visualizer2D",
     #' Label of x-axis.
     #' @param lab_y (`character(1)`)
     #' Label of y-axis.
-    initialize = function(fun_x1, fun_x2, fun_y, title = NULL, lab_x1 = "x1", lab_x2 = "x2", lab_y = "y") {
+    initialize = function(
+      fun_x1,
+      fun_x2,
+      fun_y,
+      title = NULL,
+      lab_x1 = "x1",
+      lab_x2 = "x2",
+      lab_y = "y"
+      ) {
       self$fun_x1 = assert_numeric(fun_x1)
       self$fun_x2 = assert_numeric(fun_x2)
       self$fun_y = assert_numeric(fun_y)
@@ -69,16 +79,28 @@ Visualizer2D = R6::R6Class("Visualizer2D",
     },
 
     plot = function() {
-      data = data.table(fun_x1 = self$fun_x1, fun_x2 = self$fun_x2, fun_y = self$fun_y)
+      data = data.table(
+        fun_x1 = self$fun_x1,
+        fun_x2 = self$fun_x2,
+        fun_y = self$fun_y)
 
       p = ggplot(data, aes(x = fun_x1, y = fun_x2, z = fun_y)) +
         geom_contour_filled() +
         geom_contour(color = "white") +
-        labs(title = self$title, x = self$lab_x1, y = self$lab_x2)
+        labs(title = self$title, x = self$lab_x1, y = self$lab_x2) +
+        theme_minimal()
 
-      if (!is.null(self$points_x1)) {
-        data = data.table(points_x1 = self$points_x1, points_x2 = self$points_x2, points_y = self$points_y)
-        p = p + geom_point(data = data, aes(x = points_x1, y = points_x2, color = self$points_y), size = 5)
+      if (!is.null(self$points_x1) && !is.null(self$points_x2) && !is.null(self$points_y)) {
+        data = data.table(
+          points_x1 = self$points_x1,
+          points_x2 = self$points_x2,
+          points_y = self$points_y)
+
+        p = p + geom_point(aes(x = points_x1, y = points_x2, color = points_y),
+          data = data,
+          size = 2,
+          inherit.aes = FALSE) +
+          scale_color_viridis_d()
       }
 
       return(p)

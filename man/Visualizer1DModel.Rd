@@ -43,9 +43,9 @@ Creates a new instance of this [R6][R6::R6Class] class.
 \if{html}{\out{<div class="r">}}\preformatted{Visualizer1DModel$new(
   task,
   learner,
-  plot_data = FALSE,
   xlim = NULL,
-  n_points = 100
+  n_points = 100,
+  training_points = FALSE
 )}\if{html}{\out{</div>}}
 }
 

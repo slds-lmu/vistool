@@ -92,7 +92,15 @@ Visualizer1D = R6::R6Class("Visualizer1D",
     #' @param points_y (`numeric()`)\cr
     #'   y-values of extra points to plot.
     #'   Use NULL if no points should be plotted.
-    initialize = function(fun_x, fun_y, title = NULL, lab_x = "x", lab_y = "y", points_x = NULL, points_y = NULL) {
+    initialize = function(
+      fun_x,
+      fun_y,
+      title = NULL,
+      lab_x = "x",
+      lab_y = "y",
+      points_x = NULL,
+      points_y = NULL
+      ) {
       self$fun_x = assert_numeric(fun_x)
       self$fun_y = assert_numeric(fun_y)
       self$title = assert_character(title, null.ok = TRUE)
@@ -107,7 +115,6 @@ Visualizer1D = R6::R6Class("Visualizer1D",
       self$points_col = "black"
       self$points_size = 2
       self$points_alpha = 0.3
-      return(invisible(self))
     },
 
     # FIXME: set better defaults here to make plot nicer, maybe ask lukas

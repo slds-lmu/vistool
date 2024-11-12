@@ -24,8 +24,6 @@ Learner used to train the model.}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-Visualizer2DModel-new}{\code{Visualizer2DModel$new()}}
-\item \href{#method-Visualizer2DModel-add_training_data}{\code{Visualizer2DModel$add_training_data()}}
-\item \href{#method-Visualizer2DModel-add_decision_boundary}{\code{Visualizer2DModel$add_decision_boundary()}}
 \item \href{#method-Visualizer2DModel-clone}{\code{Visualizer2DModel$clone()}}
 }
 }
@@ -48,7 +46,8 @@ Creates a new instance of this [R6][R6::R6Class] class.
   x1_limits = NULL,
   x2_limits = NULL,
   padding = 0,
-  n_points = 100L
+  n_points = 100L,
+  training_points = FALSE
 )}\if{html}{\out{</div>}}
 }
 
@@ -74,58 +73,6 @@ The x1 margin is calculated by `max(x1lmits) - min(x1limits) * padding`.}
 \item{\code{n_points}}{(`integer(1)`)\cr
 The number of generated point per dimension.
 Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Visualizer2DModel-add_training_data"></a>}}
-\if{latex}{\out{\hypertarget{method-Visualizer2DModel-add_training_data}{}}}
-\subsection{Method \code{add_training_data()}}{
-Adds the training data to the plot.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer2DModel$add_training_data(size = 5, color = "grey", ...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{size}}{(`numeric(1)`)\cr
-Size of the points.}
-
-\item{\code{color}}{(`character(1)`)\cr
-Color of the points.}
-
-\item{\code{...}}{(`any`)\cr
-Further arguments passed to `add_trace(...)`.}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Visualizer2DModel-add_decision_boundary"></a>}}
-\if{latex}{\out{\hypertarget{method-Visualizer2DModel-add_decision_boundary}{}}}
-\subsection{Method \code{add_decision_boundary()}}{
-Adds the decision boundary to the plot.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer2DModel$add_decision_boundary(
-  threshold = 0.5,
-  surfacecolor = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")),
-  ...
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{threshold}}{(`numeric(1)`)\cr
-Threshold for the decision boundary.}
-
-\item{\code{surfacecolor}}{(`list()`)\cr
-The coloring of the surface.}
-
-\item{\code{...}}{(`any`)\cr
-Further arguments passed to `add_trace(...)`.}
 }
 \if{html}{\out{</div>}}
 }

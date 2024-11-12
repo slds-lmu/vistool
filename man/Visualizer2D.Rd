@@ -9,23 +9,26 @@ This class is used to create 2D visualizations.
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{grid}}{(`list()`)\cr
-List with the `x1` and `x2` grid.}
+\item{\code{fun_x1}}{(`numeric(n)`)}
 
-\item{\code{zmat}}{(`matrix()`)\cr
-The result of evaluation at each element of the cross product of `grid$x1` and `grid$x2`.}
+\item{\code{fun_x2}}{(`numeric(n)`)}
 
-\item{\code{title}}{(character(1)\cr
-Label of the plot.}
+\item{\code{fun_y}}{(`numeric(n)`)}
 
-\item{\code{lab_x1}}{(character(1)\cr
-Label of the x1 axis.}
+\item{\code{title}}{(`character(1)`)}
 
-\item{\code{lab_x2}}{(character(1)\cr
-Label of the x2 axis.}
+\item{\code{lab_x1}}{(`character(1)`)}
 
-\item{\code{z_lab}}{(character(1)\cr
-Label of the z axis.}
+\item{\code{lab_x2}}{(`character(1)`)}
+
+\item{\code{lab_y}}{(`character(1)`)}
+
+\item{\code{points_x1}}{(`numeric()`)\cr}
+
+\item{\code{points_x2}}{(`numeric()`)\cr}
+
+\item{\code{points_y}}{(`numeric()`)\cr
+y-values of points.}
 }
 \if{html}{\out{</div>}}
 }
@@ -46,33 +49,37 @@ Creates a new instance of this [R6][R6::R6Class] class.
 \if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$new(
   fun_x1,
   fun_x2,
+  fun_y,
   title = NULL,
   lab_x1 = "x1",
   lab_x2 = "x2",
-  z_lab = "z"
+  lab_y = "y"
 )}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{title}}{(`character(1)`)\cr
-Label of the plot.}
+\item{\code{fun_x1}}{(`numeric()`)
+x-values of function.}
 
-\item{\code{lab_x1}}{(`character(1)`)\cr
-Label of the x1 axis.}
+\item{\code{fun_x2}}{(`numeric()`)
+x-values of function.}
 
-\item{\code{lab_x2}}{(`character(1)`)\cr
-Label of the x2 axis.}
+\item{\code{fun_y}}{(`numeric()`)
+y-values of function.}
 
-\item{\code{z_lab}}{(`character(1)`)\cr
-Label of the z axis.}
+\item{\code{title}}{(`character(1)`)
+Title of plot.}
 
-\item{\code{grid}}{(`list()`)\cr
-List with the `x1` and `x2` grid.}
+\item{\code{lab_x1}}{(`character(1)`)
+Label of x-axis.}
 
-\item{\code{zmat}}{(`matrix()`)\cr
-The result of evaluation at each element of the cross product of `grid$x1` and `grid$x2`.}
+\item{\code{lab_x2}}{(`character(1)`)
+Label of x-axis.}
+
+\item{\code{lab_y}}{(`character(1)`)
+Label of y-axis.}
 }
 \if{html}{\out{</div>}}
 }

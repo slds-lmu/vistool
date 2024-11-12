@@ -1,4 +1,4 @@
-test_that("multiplication works", {
+test_that("2D Objective works", {
   require_namespaces("mlr3learners")
 
   obj_branin = obj("TF_branin")
@@ -7,3 +7,4 @@ test_that("multiplication works", {
 
   vis$plot()
 })
+

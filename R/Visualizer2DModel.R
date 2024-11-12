@@ -35,8 +35,8 @@ Visualizer2DModel = R6::R6Class("Visualizer2DModel",
       x1_limits = NULL,
       x2_limits = NULL,
       padding = 0,
-      n_points = 100L
-      training_data = FALSE
+      n_points = 100L,
+      training_points = FALSE
       ) {
 
       self$task = assert_task(task)
@@ -44,6 +44,7 @@ Visualizer2DModel = R6::R6Class("Visualizer2DModel",
       assert_numeric(x1_limits, len = 2, null.ok = TRUE)
       assert_numeric(x2_limits, len = 2, null.ok = TRUE)
       assert_count(n_points)
+      assert_flag(training_points)
       lab_x1 = self$task$feature_names[1]
       lab_x2 = self$task$feature_names[2]
       data = task$data()
@@ -59,6 +60,7 @@ Visualizer2DModel = R6::R6Class("Visualizer2DModel",
       y = self$learner$predict_newdata(newdata)[[self$learner$predict_type]]
       if (self$learner$predict_type == "prob") y = y[, task$positive]
 
+
       super$initialize(
         fun_x1 = newdata[, lab_x1, with = FALSE][[1]],
         fun_x2 = newdata[, lab_x2, with = FALSE][[1]],
@@ -69,33 +71,11 @@ Visualizer2DModel = R6::R6Class("Visualizer2DModel",
         lab_y = task$target_names
       )
 
-      if (training_data) {
-
-      }
-    },
-
-    plot = function() {
-      if (training_data) {
+      if (training_points) {
         data = task$data()
         self$points_x1 = data[[lab_x1]]
         self$points_x2 = data[[lab_x2]]
         self$points_y = data[[task$target_names]]
-      }
-
-
-      if (training_data) {
-        data = task$data()
-        # if (self$learner$predict_type == "prob") points_y = as.integer(points_y) - 1
-        browser()
-        super$plot() +
-          geom_point(aes(
-            x = .data[[self$task$feature_names[1]]],
-            y = .data[[self$task$feature_names[2]]],
-            color = .data[[self$task$target_names]]),
-            data = data, size = 5, inherit.aes = FALSE) +
-          scale_color_viridis_c()
-      } else {
-        super$plot()
       }
     }
   )
