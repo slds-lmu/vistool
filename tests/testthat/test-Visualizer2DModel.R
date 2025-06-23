@@ -14,8 +14,8 @@ test_that("2D Model with regression task works", {
 test_that("2D model with regression task and training points works", {
   require_namespaces("mlr3learners")
 
-  task = tsk("mtcars")
-  task$select(c("gear", "cyl"))
+  task = tsk("boston_housing")
+  task$select(c("age", "rm"))
 
   learner = lrn("regr.svm")
 

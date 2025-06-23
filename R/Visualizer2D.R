@@ -84,11 +84,18 @@ Visualizer2D = R6::R6Class("Visualizer2D",
         fun_x2 = self$fun_x2,
         fun_y = self$fun_y)
 
+      # adjust y breaks
+      min_y = min(self$fun_y, self$fun_y)
+      max_y = max(self$fun_y, self$fun_y)
+      breaks = if (!is.null(self$points_y)) pretty(self$points_y, n = 10, min.n = 6L)
+
       p = ggplot(data, aes(x = fun_x1, y = fun_x2, z = fun_y)) +
-        geom_contour_filled() +
+        geom_contour_filled(breaks = breaks, show.legend = TRUE) +
         geom_contour(color = "white") +
         labs(title = self$title, x = self$lab_x1, y = self$lab_x2) +
+        scale_fill_viridis_d(name = self$lab_y, drop = FALSE) +
         theme_minimal()
+
 
       if (!is.null(self$points_x1) && !is.null(self$points_x2) && !is.null(self$points_y)) {
         data = data.table(
@@ -99,8 +106,9 @@ Visualizer2D = R6::R6Class("Visualizer2D",
         p = p + geom_point(aes(x = points_x1, y = points_x2, color = points_y),
           data = data,
           size = 2,
-          inherit.aes = FALSE) +
-          scale_color_viridis_d()
+          inherit.aes = FALSE,
+          show.legend = FALSE) +
+          scale_color_viridis_c(name = self$lab_y, limits = )
       }
 
       return(p)
