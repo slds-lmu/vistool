@@ -126,3 +126,17 @@ vis$plot()
 loss_function = lss("hinge")
 vis = as_visualizer(loss_function, y_pred = seq(-4, 4), y_true = 1)
 vis$plot()
+
+
+## 2D Model Contour Plot with Decision Boundary
+
+library(mlr3verse)
+library(vistools)
+
+task = tsk("spam")
+task$select(c("your", "credit"))
+learner = lrn("classif.svm", predict_type = "prob")
+vis = as_visualizer(task, learner)
+vis$init_layer_contour()
+vis$add_decision_boundary()
+vis$plot()
