@@ -24,7 +24,7 @@ as_visualizer = function(x, ...) {
 as_visualizer.Task = function(x, learner, x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L, ...) {
   n_features = length(x$feature_names)
   if (n_features == 1) {
-    Visualizer1DModel$new(x, learner, x1_limits = x1_limits, padding = padding, n_points = n_points, ...)
+    Visualizer1DModel$new(x, learner, xlim = x1_limits, n_points = n_points, ...)
   } else if (n_features == 2) {
     Visualizer2DModel$new(x, learner, x1_limits = x1_limits, x2_limits = x2_limits, padding = padding, n_points = n_points, ...)
   } else {
@@ -55,7 +55,6 @@ as_visualizer.Objective = function(x, x1_limits = NULL, x2_limits = NULL, paddin
 #'   True value.
 #' @export
 as_visualizer.LossFunction = function(x, y_pred, y_true, ...) {
-  # Create a list with the single loss function
   losses <- list(x)
   VisualizerLossFuns$new(losses)
 }

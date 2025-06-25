@@ -48,7 +48,15 @@ Visualizer3DModel = R6::R6Class("Visualizer3DModel",
         x2 = seq(x2_limits[1] - padding, x2_limits[2] + padding, length.out = n_points)
       )
 
-      newdata = set_names(CJ(grid$x1, grid$x2), self$task$feature_names)
+      newdata = CJ(grid$x1, grid$x2)
+      setnames(newdata, self$task$feature_names)
+      
+      original_types = sapply(self$task$data()[, self$task$feature_names, with = FALSE], class)
+      for (col in names(original_types)) {
+        if (original_types[col] == "integer") {
+          newdata[[col]] = as.integer(round(newdata[[col]]))
+        }
+      }
       z = self$learner$predict_newdata(newdata)[[self$learner$predict_type]]
       if (self$learner$predict_type == "prob") {
         pos_class = self$task$positive

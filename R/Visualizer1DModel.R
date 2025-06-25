@@ -54,7 +54,15 @@ Visualizer1DModel = R6::R6Class("Visualizer1DModel", inherit = Visualizer1D,
       if (is.null(xlim))
         xlim = range(x_train)
       x_pred = seq(xlim[1], xlim[2], length.out = n_points)
-      newdata = set_names(as.data.table(x_pred), self$task$feature_names)
+      newdata = as.data.table(x_pred)
+      setnames(newdata, self$task$feature_names)
+
+      original_types = sapply(self$task$data()[, self$task$feature_names, with = FALSE], class)
+      for (col in names(original_types)) {
+        if (original_types[col] == "integer") {
+          newdata[[col]] = as.integer(round(newdata[[col]]))
+        }
+      }
       y_pred = self$learner$predict_newdata(newdata)$response
       title = sprintf("%s on %s", self$learner$id, self$task$id)
 

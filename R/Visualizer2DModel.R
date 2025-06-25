@@ -56,7 +56,15 @@ Visualizer2DModel = R6::R6Class("Visualizer2DModel",
       x1 = seq(x1_limits[1] - padding, x1_limits[2] + padding, length.out = n_points)
       x2 = seq(x2_limits[1] - padding, x2_limits[2] + padding, length.out = n_points)
 
-      newdata = set_names(CJ(x1, x2), self$task$feature_names)
+      newdata = CJ(x1, x2)
+      setnames(newdata, self$task$feature_names)
+      
+      original_types = sapply(self$task$data()[, self$task$feature_names, with = FALSE], class)
+      for (col in names(original_types)) {
+        if (original_types[col] == "integer") {
+          newdata[[col]] = as.integer(round(newdata[[col]]))
+        }
+      }
       y = self$learner$predict_newdata(newdata)[[self$learner$predict_type]]
       if (self$learner$predict_type == "prob") y = y[, task$positive]
 
