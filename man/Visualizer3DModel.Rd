@@ -7,7 +7,7 @@
 This class is used to create 3D visualizations of learners and tasks.
 }
 \section{Super class}{
-\code{vistool::Visualizer3D} -> \code{Visualizer3DModel}
+\code{\link[vistool:Visualizer3D]{vistool::Visualizer3D}} -> \code{Visualizer3DModel}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

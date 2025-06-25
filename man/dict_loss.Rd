@@ -5,7 +5,7 @@
 \alias{dict_loss}
 \title{Dictionary of Loss Functions}
 \format{
-An object of class \code{DictionaryLoss} (inherits from \code{Dictionary}, \code{R6}) of length 13.
+An object of class \code{DictionaryLoss} (inherits from \code{Dictionary}, \code{R6}) of length 12.
 }
 \usage{
 dict_loss

@@ -62,8 +62,13 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
       # use cols, linetypes and widths
       if (!is.null(self$line_col))
         pl = pl + scale_color_manual(values = self$line_col, labels = loss_labels)
-      else
-        pl = pl + scale_color_npg(labels = loss_labels)
+      else {
+        if (requireNamespace("ggsci", quietly = TRUE)) {
+          pl = pl + ggsci::scale_color_npg(labels = loss_labels)
+        } else {
+          pl = pl + scale_color_discrete(labels = loss_labels)
+        }
+      }
       if (!is.null(self$line_width))
         pl = pl + scale_size_manual(values = self$line_width, labels = loss_labels)
       if (!is.null(self$line_type)) {

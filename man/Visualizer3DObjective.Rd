@@ -7,7 +7,7 @@
 This class is used to create visualizations and animations of optimization traces.
 }
 \section{Super class}{
-\code{vistool::Visualizer3D} -> \code{Visualizer3DObjective}
+\code{\link[vistool:Visualizer3D]{vistool::Visualizer3D}} -> \code{Visualizer3DObjective}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
