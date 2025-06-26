@@ -52,12 +52,12 @@ Visualizer3D = R6::R6Class("Visualizer3D",
     #' @param z_lab (`character(1)`)\cr
     #' Label of the z axis.
     initialize = function(grid, zmat, plot_lab = NULL, x1_lab = "x1", x2_lab = "x2", z_lab = "z") {
-      self$grid = assert_list(grid)
-      self$zmat = assert_matrix(zmat)
-      self$plot_lab = assert_character(plot_lab, null.ok = TRUE)
-      self$x1_lab = assert_character(x1_lab)
-      self$x2_lab = assert_character(x2_lab)
-      self$z_lab = assert_character(z_lab)
+      self$grid = checkmate::assert_list(grid)
+      self$zmat = checkmate::assert_matrix(zmat)
+      self$plot_lab = checkmate::assert_character(plot_lab, null.ok = TRUE)
+      self$x1_lab = checkmate::assert_character(x1_lab)
+      self$x2_lab = checkmate::assert_character(x2_lab)
+      self$z_lab = checkmate::assert_character(z_lab)
       return(invisible(self))
     },
 
@@ -73,9 +73,9 @@ Visualizer3D = R6::R6Class("Visualizer3D",
     #' @param ... (`any`)\cr
     #'   Further arguments passed to `add_trace(...)`.
     init_layer_contour = function(opacity = 0.8, colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")), show_title = TRUE, ...) {
-      assert_number(opacity, lower = 0, upper = 1)
-      assert_list(colorscale)
-      assert_flag(show_title)
+      checkmate::assert_number(opacity, lower = 0, upper = 1)
+      checkmate::assert_list(colorscale)
+      checkmate::assert_flag(show_title)
 
       private$.vbase = c(as.list(environment()), list(...))
       private$.layer_primary = "contour"
@@ -121,9 +121,9 @@ Visualizer3D = R6::R6Class("Visualizer3D",
     #' @param ... (`any`)\cr
     #'   Further arguments passed to `add_trace(...)`.
     init_layer_surface = function(opacity = 0.8, colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")), show_contours = FALSE, show_title = TRUE, ...) {
-      assert_number(opacity, lower = 0, upper = 1)
-      assert_list(colorscale)
-      assert_flag(show_title)
+      checkmate::assert_number(opacity, lower = 0, upper = 1)
+      checkmate::assert_list(colorscale)
+      checkmate::assert_flag(show_title)
 
       private$.vbase = c(as.list(environment()), list(...))
       private$.layer_primary = "surface"
@@ -184,9 +184,9 @@ Visualizer3D = R6::R6Class("Visualizer3D",
     #' @param z (`numeric(1)`) The view from which the "camera looks down" to the plot.
     set_scene = function(x, y, z) {
       if (is.null(private$.plot)) self$init_layer_surface()
-      assert_number(x)
-      assert_number(y)
-      assert_number(z)
+      checkmate::assert_number(x)
+      checkmate::assert_number(y)
+      checkmate::assert_number(z)
 
       if (private$.layer_primary != "surface") {
         stop("Scene can only be set for `surface` plots")

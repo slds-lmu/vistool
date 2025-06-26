@@ -27,17 +27,17 @@ Visualizer1DObj = R6::R6Class("Visualizer1DObj", inherit = Visualizer1D,
     #'   The objective which was optimized.
     #'   This object is used to generate the surface/contour lines.
     initialize = function(objective, xlim = NULL, n_points = 100L) {
-      self$objective = assert_r6(objective, "Objective")
+      self$objective = checkmate::assert_r6(objective, "Objective")
       if (objective$xdim != 1) {
-        stopf("`Visualizer1D` requires 1-dimensional inputs, but `objective$xdim = %s`", objective$xdim)
+        mlr3misc::stopf("`Visualizer1D` requires 1-dimensional inputs, but `objective$xdim = %s`", objective$xdim)
       }
       xlim = xlim %??% c(objective$lower, objective$upper)
       if (any(is.na(xlim)))
         stop("Limits could not be extracted from the objective. Please use `xlim`.")
-      assert_numeric(xlim, len = 2)
-      assert_count(n_points)
+      checkmate::assert_numeric(xlim, len = 2)
+      checkmate::assert_count(n_points)
       x = seq(xlim[1], xlim[2], length.out = n_points)
-      y = map_dbl(x, function(x) objective$eval(x))
+      y = sapply(x, function(x) objective$eval(x))
 
       super$initialize(fun_x = x, fun_y = y, title = self$objective$label, lab_x = "x", lab_y = "y")
     },
@@ -48,7 +48,7 @@ Visualizer1DObj = R6::R6Class("Visualizer1DObj", inherit = Visualizer1D,
     #' @param optimizer (`Optimizer`)\cr
     #'  The optimizer to add to the plot.
     add_optimization_trace = function(optimizer) {
-      assert_r6(optimizer, "Optimizer")
+      checkmate::assert_r6(optimizer, "Optimizer")
 
       archive = optimizer$archive
 

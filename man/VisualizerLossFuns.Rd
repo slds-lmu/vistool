@@ -26,6 +26,7 @@ Loss function.}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-VisualizerLossFuns-new}{\code{VisualizerLossFuns$new()}}
+\item \href{#method-VisualizerLossFuns-init_layer_lines}{\code{VisualizerLossFuns$init_layer_lines()}}
 \item \href{#method-VisualizerLossFuns-plot}{\code{VisualizerLossFuns$plot()}}
 \item \href{#method-VisualizerLossFuns-clone}{\code{VisualizerLossFuns$clone()}}
 }
@@ -47,6 +48,15 @@ Loss function.}
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-VisualizerLossFuns-init_layer_lines"></a>}}
+\if{latex}{\out{\hypertarget{method-VisualizerLossFuns-init_layer_lines}{}}}
+\subsection{Method \code{init_layer_lines()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{VisualizerLossFuns$init_layer_lines(color = NULL)}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-VisualizerLossFuns-plot"></a>}}

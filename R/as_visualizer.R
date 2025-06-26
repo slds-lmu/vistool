@@ -56,5 +56,8 @@ as_visualizer.Objective = function(x, x1_limits = NULL, x2_limits = NULL, paddin
 #' @export
 as_visualizer.LossFunction = function(x, y_pred, y_true, ...) {
   losses <- list(x)
-  VisualizerLossFuns$new(losses)
+  vis <- VisualizerLossFuns$new(losses)
+  vis$y_pred <- y_pred
+  vis$y_true <- y_true
+  vis
 }

@@ -52,36 +52,53 @@ vis$plot()
 
 # Regression Loss Functions
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, out.width='100%', out.height='1000px'}
+Here we visualize multiple regression loss functions:
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
 library(mlr3misc)
-library(plotly)
-library(ggsci)
+library(ggplot2)
 
-visualizers = pmap(list(c("huber", "l1_ae", "l2_se", "log-cosh"), pal_npg("nrc")(4)), function(key, color) {
-  vis = as_visualizer(lss(key), y_pred = seq(-10, 10), y_true = 0)
-  vis$init_layer_lines(color = color)
-  vis$plot()
-})
+# Create individual plots for each loss function
+plots <- list()
+loss_names <- c("huber", "l1_ae", "l2_se", "log-cosh")
 
-subplot(visualizers, nrows = 4, shareX = TRUE, shareY = TRUE) %>%
-  layout(
-    title = "Regression Loss Functions",
-    xaxis = list(title = "y - f(x)"),
-    yaxis = list(title = "Loss"))
+for (i in seq_along(loss_names)) {
+  key <- loss_names[i]
+  loss_func <- lss(key)
+  vis <- as_visualizer(loss_func, y_pred = seq(-10, 10), y_true = 0)
+  plots[[i]] <- vis$plot() + ggplot2::ggtitle(loss_func$label)
+}
+
+# Combine plots using patchwork if available, or just show them individually
+if (requireNamespace("patchwork", quietly = TRUE)) {
+  patchwork::wrap_plots(plots, ncol = 2)
+} else {
+  # If patchwork is not available, just show the first plot as an example
+  plots[[1]]
+}
 ```
 
 # Classification Loss Functions
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, out.width='100%', out.height='00px'}
-visualizers = pmap(list(c("cross-entropy", "hinge"), pal_npg("nrc")(2)), function(key, color) {
-  vis = as_visualizer(lss(key), y_pred = seq(-4, 4), y_true = 1)
-  vis$init_layer_lines(color = color)
-  vis$plot()
-})
+Here we visualize classification loss functions:
 
-subplot(visualizers, nrows = 2, shareX = TRUE, shareY = TRUE) %>%
-  layout(
-    title = "Regression Loss Functions",
-    xaxis = list(title = "y - f(x)"),
-    yaxis = list(title = "Loss"))
+```{r, echo=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
+# Create individual plots for each loss function
+plots <- list()
+loss_names <- c("cross-entropy", "hinge")
+
+for (i in seq_along(loss_names)) {
+  key <- loss_names[i]
+  loss_func <- lss(key)
+  vis <- as_visualizer(loss_func, y_pred = seq(-4, 4), y_true = 1)
+  plots[[i]] <- vis$plot() + ggplot2::ggtitle(loss_func$label)
+}
+
+# Combine plots using patchwork if available, or just show them individually
+if (requireNamespace("patchwork", quietly = TRUE)) {
+  patchwork::wrap_plots(plots, ncol = 2)
+} else {
+  # If patchwork is not available, just show the first plot as an example
+  plots[[1]]
+}
 ```

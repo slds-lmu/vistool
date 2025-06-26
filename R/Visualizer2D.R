@@ -69,13 +69,13 @@ Visualizer2D = R6::R6Class("Visualizer2D",
       lab_x2 = "x2",
       lab_y = "y"
       ) {
-      self$fun_x1 = assert_numeric(fun_x1)
-      self$fun_x2 = assert_numeric(fun_x2)
-      self$fun_y = assert_numeric(fun_y)
-      self$title = assert_character(title, null.ok = TRUE)
-      self$lab_x1 = assert_character(lab_x1)
-      self$lab_x2 = assert_character(lab_x2)
-      self$lab_y = assert_character(lab_y)
+      self$fun_x1 = checkmate::assert_numeric(fun_x1)
+      self$fun_x2 = checkmate::assert_numeric(fun_x2)
+      self$fun_y = checkmate::assert_numeric(fun_y)
+      self$title = checkmate::assert_character(title, null.ok = TRUE)
+      self$lab_x1 = checkmate::assert_character(lab_x1)
+      self$lab_x2 = checkmate::assert_character(lab_x2)
+      self$lab_y = checkmate::assert_character(lab_y)
     },
 
     plot = function() {

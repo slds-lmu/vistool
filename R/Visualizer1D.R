@@ -101,13 +101,13 @@ Visualizer1D = R6::R6Class("Visualizer1D",
       points_x = NULL,
       points_y = NULL
       ) {
-      self$fun_x = assert_numeric(fun_x)
-      self$fun_y = assert_numeric(fun_y)
-      self$title = assert_character(title, null.ok = TRUE)
-      self$lab_x = assert_character(lab_x)
-      self$lab_y = assert_character(lab_y)
-      self$points_x = assert_numeric(points_x, null.ok = TRUE)
-      self$points_y = assert_numeric(points_y, null.ok = TRUE)
+      self$fun_x = checkmate::assert_numeric(fun_x)
+      self$fun_y = checkmate::assert_numeric(fun_y)
+      self$title = checkmate::assert_character(title, null.ok = TRUE)
+      self$lab_x = checkmate::assert_character(lab_x)
+      self$lab_y = checkmate::assert_character(lab_y)
+      self$points_x = checkmate::assert_numeric(points_x, null.ok = TRUE)
+      self$points_y = checkmate::assert_numeric(points_y, null.ok = TRUE)
       self$line_type = "solid"
       self$line_col = "red"
       self$line_width = 3

@@ -39,12 +39,12 @@ Visualizer2DModel = R6::R6Class("Visualizer2DModel",
       training_points = FALSE
       ) {
 
-      self$task = assert_task(task)
-      self$learner = assert_learner(learner, task = self$task)
-      assert_numeric(x1_limits, len = 2, null.ok = TRUE)
-      assert_numeric(x2_limits, len = 2, null.ok = TRUE)
-      assert_count(n_points)
-      assert_flag(training_points)
+      self$task = mlr3::assert_task(task)
+      self$learner = mlr3::assert_learner(learner, task = self$task)
+      checkmate::assert_numeric(x1_limits, len = 2, null.ok = TRUE)
+      checkmate::assert_numeric(x2_limits, len = 2, null.ok = TRUE)
+      checkmate::assert_count(n_points)
+      checkmate::assert_flag(training_points)
       lab_x1 = self$task$feature_names[1]
       lab_x2 = self$task$feature_names[2]
       data = task$data()

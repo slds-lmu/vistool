@@ -37,13 +37,13 @@ Visualizer1DModel = R6::R6Class("Visualizer1DModel", inherit = Visualizer1D,
       training_points = FALSE
       ) {
       # FIXME: doc complete class, not all args are doced here
-      self$task = assert_task(task)
+      self$task = mlr3::assert_task(task)
       fnames = task$feature_names
       if (length(fnames) != 1)
         stop("Task must have exactly 1 feature")
-      self$learner = assert_learner(learner, task = self$task)
-      assert_count(n_points)
-      assert_flag(training_points)
+      self$learner = mlr3::assert_learner(learner, task = self$task)
+      checkmate::assert_count(n_points)
+      checkmate::assert_flag(training_points)
 
       # train learner on task
       self$learner$train(task)

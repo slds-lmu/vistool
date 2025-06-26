@@ -38,10 +38,10 @@ LossFunction = R6::R6Class("LossFunction",
     #' @param fun (`function(y_true, y_pred, ...)`)\cr
     #'   Loss function.
     initialize = function(id, label, task_type, fun) {
-      self$id = assert_character(id)
-      self$label = assert_character(label)
-      self$task_type = assert_choice(task_type, c("regr", "classif"))
-      self$fun = assert_function(fun)
+      self$id = checkmate::assert_character(id)
+      self$label = checkmate::assert_character(label)
+      self$task_type = checkmate::assert_choice(task_type, c("regr", "classif"))
+      self$fun = checkmate::assert_function(fun)
     }
   )
 )
@@ -98,11 +98,11 @@ dict_loss$add("hinge", LossFunction$new("hinge", "Hinge Loss", "classif", functi
 
 #' @export
 as.data.table.DictionaryLoss = function(x, ..., objects = FALSE) {
-  assert_flag(objects)
+  checkmate::assert_flag(objects)
 
-  setkeyv(map_dtr(x$keys(), function(key) {
+  setkeyv(mlr3misc::map_dtr(x$keys(), function(key) {
     t = x$get(key)
-    insert_named(
+    mlr3misc::insert_named(
       list(key = key, label = t$label, task_type = t$task_type),
       if (objects) list(object = list(t))
     )

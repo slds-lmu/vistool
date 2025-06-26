@@ -31,14 +31,14 @@ Visualizer2DObj = R6::R6Class("Visualizer2DObj",
       padding = 0,
       n_points = 100L
       ) {
-      self$objective = assert_r6(objective, "Objective")
-      assert_numeric(x1_limits, len = 2, null.ok = TRUE)
-      assert_numeric(x2_limits, len = 2, null.ok = TRUE)
-      assert_numeric(padding)
-      assert_count(n_points)
+      self$objective = checkmate::assert_r6(objective, "Objective")
+      checkmate::assert_numeric(x1_limits, len = 2, null.ok = TRUE)
+      checkmate::assert_numeric(x2_limits, len = 2, null.ok = TRUE)
+      checkmate::assert_numeric(padding)
+      checkmate::assert_count(n_points)
 
       if (objective$xdim != 2) {
-        stopf("`Visualizer2D` requires 2-dimensional inputs, but `objective$xdim = %s`", objective$xdim)
+        mlr3misc::stopf("`Visualizer2D` requires 2-dimensional inputs, but `objective$xdim = %s`", objective$xdim)
       }
 
       x1_limits = x1_limits %??% c(objective$lower[1], objective$upper[1])
@@ -55,8 +55,8 @@ Visualizer2DObj = R6::R6Class("Visualizer2DObj",
       x2 = unique(seq(x2_limits[1] - x2_pad, x2_limits[2] + x2_pad, length.out = n_points))
       grid = CJ(x1, x2)
 
-      y = pmap_dbl(grid, function(x1, x2) {
-         self$objective$eval(c(x1, x2))
+      y = apply(grid, 1, function(row) {
+         self$objective$eval(c(row[1], row[2]))
       })
 
       super$initialize(

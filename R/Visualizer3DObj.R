@@ -25,14 +25,14 @@ Visualizer3DObjective = R6::R6Class("Visualizer3DObjective",
     #'   The objective which was optimized.
     #'   This object is used to generate the surface/contour lines.
     initialize = function(objective, x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L) {
-      self$objective = assert_r6(objective, "Objective")
-      assert_numeric(x1_limits, len = 2, null.ok = TRUE)
-      assert_numeric(x2_limits, len = 2, null.ok = TRUE)
-      assert_numeric(padding)
-      assert_count(n_points)
+      self$objective = checkmate::assert_r6(objective, "Objective")
+      checkmate::assert_numeric(x1_limits, len = 2, null.ok = TRUE)
+      checkmate::assert_numeric(x2_limits, len = 2, null.ok = TRUE)
+      checkmate::assert_numeric(padding)
+      checkmate::assert_count(n_points)
 
       if (objective$xdim != 2) {
-        stopf("`Visualizer2D` requires 2-dimensional inputs, but `objective$xdim = %s`", objective$xdim)
+        mlr3misc::stopf("`Visualizer2D` requires 2-dimensional inputs, but `objective$xdim = %s`", objective$xdim)
       }
 
       x1_limits = x1_limits %??% c(objective$limits_lower[1], objective$limits_upper[1])
@@ -98,10 +98,10 @@ Visualizer3DObjective = R6::R6Class("Visualizer3DObjective",
     #'   The colors for the markers.
     #' @param ... Further arguments passed to `add_trace(...)`.
     add_optimization_trace = function(opt, line_color = colSampler(), mcolor_out = "black", npoints = NULL, npmax = NULL, name = NULL, offset = NULL, add_marker_at = 1, marker_shape = "circle", marker_color = NULL, ...) {
-      assert_r6(opt, "Optimizer")
-      assert_count(npoints, null.ok = TRUE)
-      assert_count(npmax, null.ok = TRUE)
-      assert_string(line_color)
+      checkmate::assert_r6(opt, "Optimizer")
+      checkmate::assert_count(npoints, null.ok = TRUE)
+      checkmate::assert_count(npmax, null.ok = TRUE)
+      checkmate::assert_string(line_color)
       if (is.null(private$.plot)) self$init_layer_surface()
 
       if (nrow(opt$archive) == 0) {
