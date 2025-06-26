@@ -85,34 +85,51 @@ Visualizer2D = R6::R6Class("Visualizer2D",
         fun_y = self$fun_y)
 
       # adjust y breaks
-      min_y = min(self$fun_y, self$fun_y)
-      max_y = max(self$fun_y, self$fun_y)
-      breaks = if (!is.null(self$points_y)) pretty(self$points_y, n = 10, min.n = 6L)
+      min_y = min(self$fun_y)
+      max_y = max(self$fun_y)
+      breaks = if (!is.null(self$points_y)) {
+        pretty(c(min_y, max_y), n = 10, min.n = 6L)
+      } else {
+        pretty(c(min_y, max_y), n = 10, min.n = 6L)
+      }
 
       p = ggplot(data, aes(x = fun_x1, y = fun_x2, z = fun_y)) +
         geom_contour_filled(breaks = breaks, show.legend = TRUE) +
-        geom_contour(color = "white") +
+        geom_contour(color = "white", alpha = 0.3) +
         labs(title = self$title, x = self$lab_x1, y = self$lab_x2) +
         scale_fill_viridis_d(name = self$lab_y, drop = FALSE) +
         theme_minimal()
 
+      # add decision boundary if available (for classification)
+      if (!is.null(private$.decision_threshold)) {
+        p = p + geom_contour(aes(z = fun_y), breaks = private$.decision_threshold, 
+                           color = "black", size = 1.5, alpha = 0.8)
+      }
 
+      # add training points if available
       if (!is.null(self$points_x1) && !is.null(self$points_x2) && !is.null(self$points_y)) {
-        data = data.table(
+        points_data = data.table(
           points_x1 = self$points_x1,
           points_x2 = self$points_x2,
           points_y = self$points_y)
 
+        # determine color scale limits based on function values
+        color_limits = c(min(self$fun_y), max(self$fun_y))
+        
         p = p + geom_point(aes(x = points_x1, y = points_x2, color = points_y),
-          data = data,
+          data = points_data,
           size = 2,
           inherit.aes = FALSE,
           show.legend = FALSE) +
-          scale_color_viridis_c(name = self$lab_y, limits = )
+          scale_color_viridis_c(name = self$lab_y, limits = color_limits)
       }
 
       return(p)
     }
+  ),
+  
+  private = list(
+    .decision_threshold = NULL
   )
 )
 

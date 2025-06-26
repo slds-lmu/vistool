@@ -1,3 +1,6 @@
+library(devtools)
+devtools::load_all(".")
+
 library(mlr3verse)
 library(mlr3oml)
 

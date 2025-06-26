@@ -66,7 +66,15 @@ Visualizer2DModel = R6::R6Class("Visualizer2DModel",
         }
       }
       y = self$learner$predict_newdata(newdata)[[self$learner$predict_type]]
-      if (self$learner$predict_type == "prob") y = y[, task$positive]
+      if (self$learner$predict_type == "prob") {
+        # for binary classification, use the positive class
+        # for multi-class, use the first class
+        if (length(task$class_names) == 2 && !is.null(task$positive)) {
+          y = y[, task$positive]
+        } else {
+          y = y[, 1]
+        }
+      }
 
 
       super$initialize(
@@ -85,6 +93,61 @@ Visualizer2DModel = R6::R6Class("Visualizer2DModel",
         self$points_x2 = data[[lab_x2]]
         self$points_y = data[[task$target_names]]
       }
+
+      return(invisible(self))
+    },
+
+    #' @description
+    #' Adds the training data to the plot.
+    #'
+    #' @param size (`numeric(1)`)\cr
+    #'  Size of the points.
+    #' @param color (`character(1)`)\cr
+    #' Color of the points.
+    add_training_data = function(size = 2, color = NULL) {
+      data = self$task$data()
+      self$points_x1 = data[[self$task$feature_names[1]]]
+      self$points_x2 = data[[self$task$feature_names[2]]]
+      self$points_y = data[[self$task$target_names]]
+      
+      # for classification tasks with prob predict type, convert to numeric
+      if (self$learner$predict_type == "prob") {
+        self$points_y = as.integer(self$points_y) - 1
+      }
+
+      return(invisible(self))
+    },
+
+    #' @description
+    #' Initialize the contour layer. For ggplot2-based 2D visualizers, this method 
+    #' exists for API compatibility but doesn't need to do anything since contours 
+    #' are created by default in the plot() method.
+    #'
+    #' @param ... Additional arguments (ignored for ggplot2 compatibility).
+    init_layer_contour = function(...) {
+      # This method exists for API compatibility with 3D visualizers
+      # For 2D ggplot2 visualizers, contours are created by default in plot()
+      return(invisible(self))
+    },
+
+    #' @description
+    #' Adds the decision boundary to the plot.
+    #'
+    #' @param threshold (`numeric(1)`)\cr
+    #'  Threshold for the decision boundary.
+    add_decision_boundary = function(threshold = 0.5) {
+      if (self$learner$predict_type != "prob") {
+        stop("Decision boundary can only be added for probability predictions")
+      }
+      
+      # Store the threshold for use in plotting
+      private$.decision_threshold = threshold
+      
+      return(invisible(self))
     }
+  ),
+  
+  private = list(
+    .decision_threshold = NULL
   )
 )
