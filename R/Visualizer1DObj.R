@@ -51,15 +51,25 @@ Visualizer1DObj = R6::R6Class("Visualizer1DObj", inherit = Visualizer1D,
       checkmate::assert_r6(optimizer, "Optimizer")
 
       archive = optimizer$archive
-
-      private$.plot = private$.plot %>%
-        add_trace(
-          x = archive$x_in,
-          y = archive$fval_in,
-          color = archive$step,
-          type = "scatter",
-          mode = "markers"
-        )
+      
+      # Extract x and y values from archive for plotting
+      if (nrow(archive) > 0) {
+        # For 1D objectives, x_in is a list of vectors, we need the first element
+        x_vals = sapply(archive$x_in, function(x) x[1])
+        y_vals = archive$fval_in
+        
+        # Add points to the visualizer
+        self$points_x = x_vals
+        self$points_y = y_vals
+        
+        # Set some default styling if not set
+        if (is.null(self$points_col)) self$points_col = "red"
+        if (is.null(self$points_size)) self$points_size = 2
+        if (is.null(self$points_shape)) self$points_shape = 16
+        if (is.null(self$points_alpha)) self$points_alpha = 0.8
+      }
+      
+      invisible(self)
     }
   )
 )

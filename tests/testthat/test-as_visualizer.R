@@ -55,7 +55,7 @@ test_that("as_visualizer works for Task with auto type selection", {
   task_3d$select(c("gear", "cyl", "hp"))
   
   # This should fail because the visualizer can't handle >2 features automatically
-  expect_error(as_visualizer(task_3d, learner), "Can't assign 3 names to a 2-column")
+  expect_error(as_visualizer(task_3d, learner), "exactly 2 features")
 })
 
 test_that("as_visualizer works for Task with explicit type selection", {
@@ -206,6 +206,6 @@ test_that("as_visualizer Task dimension validation works", {
   
   expect_error(
     as_visualizer(task_multi, learner),
-    "Can't assign 3 names to a 2-column"
+    "exactly 2 features"
   )
 })

@@ -35,6 +35,13 @@ Visualizer3DModel = R6::R6Class("Visualizer3DModel",
       checkmate::assert_numeric(x1_limits, len = 2, null.ok = TRUE)
       checkmate::assert_numeric(x2_limits, len = 2, null.ok = TRUE)
       checkmate::assert_count(n_points)
+      
+      # Validate that task has exactly 2 features
+      if (length(self$task$feature_names) != 2) {
+        mlr3misc::stopf("3D Model visualization requires a task with exactly 2 features, but got %d", 
+                       length(self$task$feature_names))
+      }
+      
       x1 = self$task$feature_names[1]
       x2 = self$task$feature_names[2]
       data = task$data()

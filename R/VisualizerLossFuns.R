@@ -27,10 +27,17 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
     #' @description
     #' Creates a new instance of this [R6][R6::R6Class] class.
     #'
-    #' @param loss_function [LossFunction]\cr
-    #'   Loss function.
-    initialize = function(losses) {
+    #' @param losses (`list`)\cr
+    #'   List of LossFunction objects.
+    #' @param y_pred (`numeric()`)\cr
+    #'   Predicted values. Optional.
+    #' @param y_true (`numeric()`)\cr
+    #'   True values. Optional.
+    initialize = function(losses, y_pred = NULL, y_true = NULL) {
       checkmate::assert_list(losses, "LossFunction")
+      checkmate::assert_numeric(y_pred, null.ok = TRUE)
+      checkmate::assert_numeric(y_true, null.ok = TRUE)
+      
       tts = unique(sapply(losses, function(x) x$task_type))
       if (length(tts) > 1)
         mlr3misc::stopf("'LossFunction$task_type' all need to be the same, but found: %s", mlr3misc::str_collapse(tts))
@@ -46,6 +53,8 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
       self$line_width = rep(0.5, n)
       self$line_col = NULL
       self$line_type = rep("solid", n)
+      self$y_pred = y_pred
+      self$y_true = y_true
     },
 
     init_layer_lines = function(color = NULL) {
@@ -75,7 +84,7 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
         variable.name = "loss_fun", value.name = "loss_val")
       # plot
       pl = ggplot(data = dd, aes(x = r, y = loss_val,
-        col = loss_fun, linetype = loss_fun, size = loss_fun))
+        col = loss_fun, linetype = loss_fun, linewidth = loss_fun))
       pl = pl + geom_line()
       # use cols, linetypes and widths
       if (!is.null(self$line_col)) {
@@ -88,7 +97,7 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
         }
       }
       if (!is.null(self$line_width))
-        pl = pl + scale_size_manual(values = self$line_width, labels = loss_labels)
+        pl = pl + scale_linewidth_manual(values = self$line_width, labels = loss_labels)
       if (!is.null(self$line_type)) {
         pl = pl + scale_linetype_manual(values = self$line_type, labels = loss_labels)
       }

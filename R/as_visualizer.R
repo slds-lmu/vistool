@@ -123,7 +123,7 @@ as_visualizer.LossFunction = function(x, type = "auto", x1_limits = NULL, x2_lim
   checkmate::assert_choice(type, choices = c("auto", "1d", "2d", "3d"))
   # For loss functions, default to 1D visualizer
   if (type == "auto" || type == "1d") {
-    return(VisualizerLossFuns$new(list(x)))  # VisualizerLossFuns expects a list of losses
+    return(VisualizerLossFuns$new(list(x), ...))  # Pass additional arguments
   } else {
     stop("Only 1D visualization is currently supported for LossFunction.")
   }

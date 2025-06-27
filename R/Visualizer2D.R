@@ -103,7 +103,7 @@ Visualizer2D = R6::R6Class("Visualizer2D",
       # add decision boundary if available (for classification)
       if (!is.null(private$.decision_threshold)) {
         p = p + geom_contour(aes(z = fun_y), breaks = private$.decision_threshold, 
-                           color = "black", size = 1.5, alpha = 0.8)
+                           color = "black", linewidth = 1.5, alpha = 0.8)
       }
 
       # add training points if available

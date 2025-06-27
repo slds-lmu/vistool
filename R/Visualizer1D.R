@@ -122,7 +122,7 @@ Visualizer1D = R6::R6Class("Visualizer1D",
     plot = function() {
       dd = data.frame(x = self$fun_x, y = self$fun_y)
       pl = ggplot(data = dd, aes(x = x, y = y))
-      pl = pl + geom_line(size = self$line_width, col = self$line_col, linetype = self$line_type)
+      pl = pl + geom_line(linewidth = self$line_width, col = self$line_col, linetype = self$line_type)
       # use specified axis labels and legend title
       pl = pl + labs(title = self$title, x = self$lab_x, y = self$lab_y)
       if (!is.null(self$points_x)) {
