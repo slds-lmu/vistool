@@ -40,9 +40,9 @@ as_visualizer.Task = function(x, learner, x1_limits = NULL, x2_limits = NULL, pa
 #' @export
 as_visualizer.Objective = function(x, x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L, ...) {
   if (x$xdim == 1) {
-    Visualizer1DObjective$new(x, x1_limits = x1_limits, padding = padding, n_points = n_points, ...)
+    Visualizer1DObj$new(x, x1_limits = x1_limits, padding = padding, n_points = n_points, ...)
   } else if (x$xdim == 2) {
-    Visualizer2DObjective$new(x, x1_limits = x1_limits, x2_limits = x2_limits, padding = padding, n_points = n_points, ...)
+    Visualizer2DObj$new(x, x1_limits = x1_limits, x2_limits = x2_limits, padding = padding, n_points = n_points, ...)
   } else {
     stop("Objective has more than 2 dimensions.")
   }

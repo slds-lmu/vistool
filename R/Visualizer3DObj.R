@@ -9,7 +9,7 @@
 #' @template param_n_points
 #'
 #' @export
-Visualizer3DObjective = R6::R6Class("Visualizer3DObjective",
+Visualizer3DObj = R6::R6Class("Visualizer3DObj",
   inherit = Visualizer3D,
   public = list(
 
@@ -32,7 +32,7 @@ Visualizer3DObjective = R6::R6Class("Visualizer3DObjective",
       checkmate::assert_count(n_points)
 
       if (objective$xdim != 2) {
-        mlr3misc::stopf("`Visualizer2D` requires 2-dimensional inputs, but `objective$xdim = %s`", objective$xdim)
+        mlr3misc::stopf("`Visualizer3D` requires 2-dimensional inputs, but `objective$xdim = %s`", objective$xdim)
       }
 
       x1_limits = x1_limits %??% c(objective$limits_lower[1], objective$limits_upper[1])

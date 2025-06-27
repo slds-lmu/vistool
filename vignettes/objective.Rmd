@@ -19,7 +19,7 @@ library(vistool)
 library(plotly)
 ```
 
-The `Visualizer1DObjective` and `Visualizer2DObjective` classes visualize 1 and 2-dimensional objective functions.
+The `Visualizer1DObj` and `Visualizer2DObj` classes visualize 1 and 2-dimensional objective functions.
 The package contains predefined objective functions.
 
 ```{r}
@@ -46,7 +46,7 @@ obj_branin$grad(x)
 obj_branin$hess(x)
 ```
 
-We create a `Visualizer2DObjective` to visualize the objective function.
+We create a `Visualizer2DObj` to visualize the objective function.
 
 ```{r}
 viz = as_visualizer(obj_branin)
@@ -291,8 +291,8 @@ viz = as_visualizer(obj("TF_franke"))
 
 # Add 10 grid lines per dim, limits (sometimes) can be obtained form the
 # objective:
-llower = viz$objective$limits_lower
-lupper = viz$objective$limits_upper
+llower = viz$objective$lower
+lupper = viz$objective$upper
 ssize = (lupper - llower) / 10
 
 viz$init_layer_surface(opacity = 1, colorscale = list(c(0, 1), c("white", "black")),

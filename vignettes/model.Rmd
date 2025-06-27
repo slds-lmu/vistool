@@ -68,7 +68,7 @@ vis$init_layer_surface()
 Draw with contour lines above z dimension.
 
 ```{r, out.width='100%', out.height='700px'}
-vis$init_layer_surface(show_contours = TRUE)
+vis$init_layer_surface()
 vis$plot()
 ```
 

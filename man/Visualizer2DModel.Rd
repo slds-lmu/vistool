@@ -24,13 +24,20 @@ Learner used to train the model.}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-Visualizer2DModel-new}{\code{Visualizer2DModel$new()}}
+\item \href{#method-Visualizer2DModel-add_training_data}{\code{Visualizer2DModel$add_training_data()}}
+\item \href{#method-Visualizer2DModel-init_layer_contour}{\code{Visualizer2DModel$init_layer_contour()}}
+\item \href{#method-Visualizer2DModel-add_decision_boundary}{\code{Visualizer2DModel$add_decision_boundary()}}
 \item \href{#method-Visualizer2DModel-clone}{\code{Visualizer2DModel$clone()}}
 }
 }
 \if{html}{\out{
 <details open><summary>Inherited methods</summary>
 <ul>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="add_optimization_trace"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-add_optimization_trace'><code>vistool::Visualizer2D$add_optimization_trace()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="init_layer_surface"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-init_layer_surface'><code>vistool::Visualizer2D$init_layer_surface()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="plot"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-plot'><code>vistool::Visualizer2D$plot()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="set_layout"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-set_layout'><code>vistool::Visualizer2D$set_layout()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="set_scene"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-set_scene'><code>vistool::Visualizer2D$set_scene()</code></a></span></li>
 </ul>
 </details>
 }}
@@ -73,6 +80,64 @@ The x1 margin is calculated by `max(x1lmits) - min(x1limits) * padding`.}
 \item{\code{n_points}}{(`integer(1)`)\cr
 The number of generated point per dimension.
 Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Visualizer2DModel-add_training_data"></a>}}
+\if{latex}{\out{\hypertarget{method-Visualizer2DModel-add_training_data}{}}}
+\subsection{Method \code{add_training_data()}}{
+Adds the training data to the plot.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer2DModel$add_training_data(size = 2, color = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{size}}{(`numeric(1)`)\cr
+Size of the points.}
+
+\item{\code{color}}{(`character(1)`)\cr
+Color of the points.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Visualizer2DModel-init_layer_contour"></a>}}
+\if{latex}{\out{\hypertarget{method-Visualizer2DModel-init_layer_contour}{}}}
+\subsection{Method \code{init_layer_contour()}}{
+Initialize the contour layer. For ggplot2-based 2D visualizers, this method 
+exists for API compatibility but doesn't need to do anything since contours 
+are created by default in the plot() method.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer2DModel$init_layer_contour(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{Additional arguments (ignored for ggplot2 compatibility).}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Visualizer2DModel-add_decision_boundary"></a>}}
+\if{latex}{\out{\hypertarget{method-Visualizer2DModel-add_decision_boundary}{}}}
+\subsection{Method \code{add_decision_boundary()}}{
+Adds the decision boundary to the plot.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer2DModel$add_decision_boundary(threshold = 0.5)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{threshold}}{(`numeric(1)`)\cr
+Threshold for the decision boundary.}
 }
 \if{html}{\out{</div>}}
 }

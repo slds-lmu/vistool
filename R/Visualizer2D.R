@@ -125,6 +125,62 @@ Visualizer2D = R6::R6Class("Visualizer2D",
       }
 
       return(p)
+    },
+    
+    #' @description
+    #' Initialize contour layer (compatibility method, no-op for ggplot2 version).
+    #' @param ... Additional arguments (ignored for compatibility).
+    init_layer_contour = function(...) {
+      # No-op for compatibility with plotly version
+      invisible(self)
+    },
+    
+    #' @description
+    #' Initialize surface layer (compatibility method, no-op for ggplot2 version).
+    #' @param ... Additional arguments (ignored for compatibility).
+    init_layer_surface = function(...) {
+      # No-op for compatibility with plotly version
+      invisible(self)
+    },
+    
+    #' @description
+    #' Add optimization trace (compatibility method, no-op for ggplot2 version).
+    #' @param ... Additional arguments (ignored for compatibility).
+    add_optimization_trace = function(...) {
+      # No-op for compatibility with plotly version
+      invisible(self)
+    },
+    
+    #' @description
+    #' Set layout (compatibility method, no-op for ggplot2 version).
+    #' @param ... Additional arguments (ignored for compatibility).
+    set_layout = function(...) {
+      # No-op for compatibility with plotly version
+      invisible(self)
+    },
+    
+    #' @description
+    #' Set scene (compatibility method, no-op for ggplot2 version).
+    #' @param ... Additional arguments (ignored for compatibility).
+    set_scene = function(...) {
+      # No-op for compatibility with plotly version
+      invisible(self)
+    },
+    
+    #' @description
+    #' Add layer taylor (compatibility method, no-op for ggplot2 version).
+    #' @param ... Additional arguments (ignored for compatibility).
+    add_layer_taylor = function(...) {
+      # No-op for compatibility with plotly version
+      invisible(self)
+    },
+    
+    #' @description
+    #' Add layer hessian (compatibility method, no-op for ggplot2 version).
+    #' @param ... Additional arguments (ignored for compatibility).
+    add_layer_hessian = function(...) {
+      # No-op for compatibility with plotly version
+      invisible(self)
     }
   ),
   

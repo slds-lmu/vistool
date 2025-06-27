@@ -37,6 +37,11 @@ y-values of points.}
 \itemize{
 \item \href{#method-Visualizer2D-new}{\code{Visualizer2D$new()}}
 \item \href{#method-Visualizer2D-plot}{\code{Visualizer2D$plot()}}
+\item \href{#method-Visualizer2D-init_layer_contour}{\code{Visualizer2D$init_layer_contour()}}
+\item \href{#method-Visualizer2D-init_layer_surface}{\code{Visualizer2D$init_layer_surface()}}
+\item \href{#method-Visualizer2D-add_optimization_trace}{\code{Visualizer2D$add_optimization_trace()}}
+\item \href{#method-Visualizer2D-set_layout}{\code{Visualizer2D$set_layout()}}
+\item \href{#method-Visualizer2D-set_scene}{\code{Visualizer2D$set_scene()}}
 \item \href{#method-Visualizer2D-clone}{\code{Visualizer2D$clone()}}
 }
 }
@@ -92,6 +97,91 @@ Label of y-axis.}
 \if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$plot()}\if{html}{\out{</div>}}
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Visualizer2D-init_layer_contour"></a>}}
+\if{latex}{\out{\hypertarget{method-Visualizer2D-init_layer_contour}{}}}
+\subsection{Method \code{init_layer_contour()}}{
+Initialize contour layer (compatibility method, no-op for ggplot2 version).
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$init_layer_contour(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{Additional arguments (ignored for compatibility).}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Visualizer2D-init_layer_surface"></a>}}
+\if{latex}{\out{\hypertarget{method-Visualizer2D-init_layer_surface}{}}}
+\subsection{Method \code{init_layer_surface()}}{
+Initialize surface layer (compatibility method, no-op for ggplot2 version).
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$init_layer_surface(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{Additional arguments (ignored for compatibility).}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Visualizer2D-add_optimization_trace"></a>}}
+\if{latex}{\out{\hypertarget{method-Visualizer2D-add_optimization_trace}{}}}
+\subsection{Method \code{add_optimization_trace()}}{
+Add optimization trace (compatibility method, no-op for ggplot2 version).
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$add_optimization_trace(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{Additional arguments (ignored for compatibility).}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Visualizer2D-set_layout"></a>}}
+\if{latex}{\out{\hypertarget{method-Visualizer2D-set_layout}{}}}
+\subsection{Method \code{set_layout()}}{
+Set layout (compatibility method, no-op for ggplot2 version).
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$set_layout(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{Additional arguments (ignored for compatibility).}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Visualizer2D-set_scene"></a>}}
+\if{latex}{\out{\hypertarget{method-Visualizer2D-set_scene}{}}}
+\subsection{Method \code{set_scene()}}{
+Set scene (compatibility method, no-op for ggplot2 version).
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$set_scene(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{Additional arguments (ignored for compatibility).}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Visualizer2D-clone"></a>}}
