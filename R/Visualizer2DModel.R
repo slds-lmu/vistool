@@ -29,6 +29,16 @@ Visualizer2DModel = R6::R6Class("Visualizer2DModel",
     #'   The task to train the model on.
     #' @param learner ([mlr3::Learner])\cr
     #'   The learner to train the model with.
+    #' @param x1_limits (`numeric(2)`)\cr
+    #'   Limits for the first feature axis.
+    #' @param x2_limits (`numeric(2)`)\cr
+    #'   Limits for the second feature axis.
+    #' @param padding (`numeric(1)`)\cr
+    #'   Padding around the data limits.
+    #' @param n_points (`integer(1)`)\cr
+    #'   Number of points to use for visualization.
+    #' @param training_points (`logical(1)`)\cr
+    #'   Whether to show training points on the plot.
     initialize = function(
       task,
       learner,

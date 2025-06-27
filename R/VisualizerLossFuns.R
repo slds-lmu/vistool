@@ -7,19 +7,52 @@
 VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
   public = list(
 
-    #' @field loss_function [LossFunction]\cr
-    #' Loss function.
+    #' @field losses (`list`)\cr
+    #' List of LossFunction objects.
     losses = NULL,
+
+    #' @field task_type (`character(1)`)\cr
+    #' Task type (regr or classif).
     task_type = NULL,
+
+    #' @field lab_x (`character(1)`)\cr
+    #' Label for x-axis.
     lab_x = NULL,
+
+    #' @field lab_y (`character(1)`)\cr
+    #' Label for y-axis.
     lab_y = NULL,
+
+    #' @field title (`character(1)`)\cr
+    #' Title of the plot.
     title = NULL,
+
+    #' @field x_range (`numeric(2)`)\cr
+    #' Range for x-axis values.
     x_range = NULL,
+
+    #' @field line_width (`numeric()`)\cr
+    #' Line widths for different loss functions.
     line_width = NULL,
+
+    #' @field line_col (`character()`)\cr
+    #' Line colors for different loss functions.
     line_col = NULL,
+
+    #' @field line_type (`character()`)\cr
+    #' Line types for different loss functions.
     line_type = NULL,
+
+    #' @field legend_title (`element`)\cr
+    #' Legend title element.
     legend_title = element_blank(),
+
+    #' @field y_pred (`numeric()`)\cr
+    #' Predicted values.
     y_pred = NULL,
+
+    #' @field y_true (`numeric()`)\cr
+    #' True values.
     y_true = NULL,
 
     # FIXME: better doc the class
@@ -57,6 +90,11 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
       self$y_true = y_true
     },
 
+    #' @description
+    #' Initialize line layer for the plot.
+    #' @param color (`character()`)\cr
+    #'   Colors to use for the lines. If NULL, default colors will be used.
+    #' @return Returns self invisibly.
     init_layer_lines = function(color = NULL) {
       if (!is.null(color)) {
         self$line_col = color
@@ -64,6 +102,9 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
       invisible(self)
     },
 
+    #' @description
+    #' Create and return the ggplot2 plot.
+    #' @return A ggplot2 object showing the loss functions.
     plot = function() {
       # get lossfun labels so we can use them for legend
       loss_labels = sapply(self$losses, function(x) x$label)

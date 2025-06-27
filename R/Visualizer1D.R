@@ -12,11 +12,11 @@
 Visualizer1D = R6::R6Class("Visualizer1D",
   public = list(
 
-    #' @field x (`numeric(n)`)\cr
+    #' @field fun_x (`numeric(n)`)\cr
     #' x-values of function
     fun_x = NULL,
 
-    #' @field y (`numeric(n)`)\cr
+    #' @field fun_y (`numeric(n)`)\cr
     #' y-values of function
     fun_y = NULL,
 
@@ -33,12 +33,12 @@ Visualizer1D = R6::R6Class("Visualizer1D",
     #' Label of y-axis
     lab_y = NULL,
 
-    #' @field x (`numeric(m)`)\cr
+    #' @field points_x (`numeric(m)`)\cr
     #' x-values of extra points to plot.
     #' Use NULL if no points should be plotted.
     points_x = NULL,
 
-    #' @field y (`numeric(m)`)\cr
+    #' @field points_y (`numeric(m)`)\cr
     #' y-values of extra points to plot.
     #' Use NULL if no points should be plotted.
     points_y = NULL,
@@ -76,9 +76,9 @@ Visualizer1D = R6::R6Class("Visualizer1D",
     #' @description
     #' Creates a new instance of this [R6][R6::R6Class] class.
     #'
-    #' @param x (`numeric()`)\cr
+    #' @param fun_x (`numeric()`)\cr
     #'   x-values of function
-    #' @param y (`numeric()`)\cr
+    #' @param fun_y (`numeric()`)\cr
     #'   y-values of function
     #' @param title (character(1)\cr
     #'   Title of plot
@@ -119,6 +119,9 @@ Visualizer1D = R6::R6Class("Visualizer1D",
 
     # FIXME: set better defaults here to make plot nicer, maybe ask lukas
 
+    #' @description
+    #' Create and return the ggplot2 plot.
+    #' @return A ggplot2 object.
     plot = function() {
       dd = data.frame(x = self$fun_x, y = self$fun_y)
       pl = ggplot(data = dd, aes(x = x, y = y))

@@ -9,16 +9,41 @@ Visualize one or multiple loss functions.
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{loss_function}}{[LossFunction]\cr
-Loss function.}
-}
-\if{html}{\out{</div>}}
-}
-\section{Active bindings}{
-\if{html}{\out{<div class="r6-active-bindings">}}
-\describe{
-\item{\code{loss_function}}{[LossFunction]\cr
-Loss function.}
+\item{\code{losses}}{(`list`)\cr
+List of LossFunction objects.}
+
+\item{\code{task_type}}{(`character(1)`)\cr
+Task type (regr or classif).}
+
+\item{\code{lab_x}}{(`character(1)`)\cr
+Label for x-axis.}
+
+\item{\code{lab_y}}{(`character(1)`)\cr
+Label for y-axis.}
+
+\item{\code{title}}{(`character(1)`)\cr
+Title of the plot.}
+
+\item{\code{x_range}}{(`numeric(2)`)\cr
+Range for x-axis values.}
+
+\item{\code{line_width}}{(`numeric()`)\cr
+Line widths for different loss functions.}
+
+\item{\code{line_col}}{(`character()`)\cr
+Line colors for different loss functions.}
+
+\item{\code{line_type}}{(`character()`)\cr
+Line types for different loss functions.}
+
+\item{\code{legend_title}}{(`element`)\cr
+Legend title element.}
+
+\item{\code{y_pred}}{(`numeric()`)\cr
+Predicted values.}
+
+\item{\code{y_true}}{(`numeric()`)\cr
+True values.}
 }
 \if{html}{\out{</div>}}
 }
@@ -59,19 +84,35 @@ True values. Optional.}
 \if{html}{\out{<a id="method-VisualizerLossFuns-init_layer_lines"></a>}}
 \if{latex}{\out{\hypertarget{method-VisualizerLossFuns-init_layer_lines}{}}}
 \subsection{Method \code{init_layer_lines()}}{
+Initialize line layer for the plot.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{VisualizerLossFuns$init_layer_lines(color = NULL)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{color}}{(`character()`)\cr
+Colors to use for the lines. If NULL, default colors will be used.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Returns self invisibly.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-VisualizerLossFuns-plot"></a>}}
 \if{latex}{\out{\hypertarget{method-VisualizerLossFuns-plot}{}}}
 \subsection{Method \code{plot()}}{
+Create and return the ggplot2 plot.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{VisualizerLossFuns$plot()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+A ggplot2 object showing the loss functions.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-VisualizerLossFuns-clone"></a>}}

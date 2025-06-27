@@ -35,7 +35,6 @@ LearnerRegrLMFormula = R6Class("LearnerRegrLMFormula",
           formula       = p_uty(tags = c("train", "predict", "required"))
         ),
         man = "mlr3::mlr_learners_regr.lm_formula",
-        data_formats = c("data.table", "Matrix"),
         label = "Linear Model with Formula"
       )
     }

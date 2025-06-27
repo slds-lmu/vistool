@@ -70,18 +70,19 @@ The task to train the model on.}
 The learner to train the model with.}
 
 \item{\code{x1_limits}}{(`numeric(2)`)\cr
-The x1 limits.}
+Limits for the first feature axis.}
 
 \item{\code{x2_limits}}{(`numeric(2)`)\cr
-The x2 limits.}
+Limits for the second feature axis.}
 
 \item{\code{padding}}{(`numeric(1)`)\cr
-A margin that is added to x1limits and x2limits.
-The x1 margin is calculated by `max(x1lmits) - min(x1limits) * padding`.}
+Padding around the data limits.}
 
 \item{\code{n_points}}{(`integer(1)`)\cr
-The number of generated point per dimension.
-Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
+Number of points to use for visualization.}
+
+\item{\code{training_points}}{(`logical(1)`)\cr
+Whether to show training points on the plot.}
 }
 \if{html}{\out{</div>}}
 }

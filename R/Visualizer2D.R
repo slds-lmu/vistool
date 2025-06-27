@@ -78,6 +78,9 @@ Visualizer2D = R6::R6Class("Visualizer2D",
       self$lab_y = checkmate::assert_character(lab_y)
     },
 
+    #' @description
+    #' Create and return the ggplot2 plot.
+    #' @return A ggplot2 object.
     plot = function() {
       data = data.table(
         fun_x1 = self$fun_x1,

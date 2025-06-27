@@ -20,6 +20,8 @@ Visualizer1DModel = R6::R6Class("Visualizer1DModel", inherit = Visualizer1D,
     #' Learner used to train the model.
     learner = NULL,
 
+    #' @field n_points (`integer(1)`)\cr
+    #' Number of points to use for visualization.
     n_points = NULL,
 
     #' @description
@@ -29,6 +31,12 @@ Visualizer1DModel = R6::R6Class("Visualizer1DModel", inherit = Visualizer1D,
     #'   The task to train the model on.
     #' @param learner ([mlr3::Learner])\cr
     #'   The learner to train the model with.
+    #' @param xlim (`numeric(2)`)\cr
+    #'   Limits for the x-axis. If NULL, will be determined from task data.
+    #' @param n_points (`integer(1)`)\cr
+    #'   Number of points to use for visualization.
+    #' @param training_points (`logical(1)`)\cr
+    #'   Whether to show training points on the plot.
     initialize = function(
       task,
       learner,

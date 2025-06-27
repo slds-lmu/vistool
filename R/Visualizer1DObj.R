@@ -26,6 +26,10 @@ Visualizer1DObj = R6::R6Class("Visualizer1DObj", inherit = Visualizer1D,
     #' @param objective (`Objective`)\cr
     #'   The objective which was optimized.
     #'   This object is used to generate the surface/contour lines.
+    #' @param xlim (`numeric(2)`)\cr
+    #'   Limits for the x-axis. If NULL, will be determined from objective bounds.
+    #' @param n_points (`integer(1)`)\cr
+    #'   Number of points to use for visualization.
     initialize = function(objective, xlim = NULL, n_points = 100L) {
       self$objective = checkmate::assert_r6(objective, "Objective")
       if (objective$xdim != 1) {

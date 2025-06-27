@@ -9,10 +9,10 @@ This class is used to create 1D visualizations.
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{x}}{(`numeric(n)`)\cr
+\item{\code{fun_x}}{(`numeric(n)`)\cr
 x-values of function}
 
-\item{\code{y}}{(`numeric(n)`)\cr
+\item{\code{fun_y}}{(`numeric(n)`)\cr
 y-values of function}
 
 \item{\code{title}}{(character(1)\cr
@@ -24,11 +24,11 @@ Label of x-axis}
 \item{\code{lab_y}}{(character(1)\cr
 Label of y-axis}
 
-\item{\code{x}}{(`numeric(m)`)\cr
+\item{\code{points_x}}{(`numeric(m)`)\cr
 x-values of extra points to plot.
 Use NULL if no points should be plotted.}
 
-\item{\code{y}}{(`numeric(m)`)\cr
+\item{\code{points_y}}{(`numeric(m)`)\cr
 y-values of extra points to plot.
 Use NULL if no points should be plotted.}
 
@@ -52,25 +52,6 @@ Shape of plotted points}
 
 \item{\code{points_alpha}}{(numeric(1)\cr
 Alpha blending of plotted points}
-}
-\if{html}{\out{</div>}}
-}
-\section{Active bindings}{
-\if{html}{\out{<div class="r6-active-bindings">}}
-\describe{
-\item{\code{x}}{(`numeric(n)`)\cr
-x-values of function}
-
-\item{\code{y}}{(`numeric(n)`)\cr
-y-values of function}
-
-\item{\code{x}}{(`numeric(m)`)\cr
-x-values of extra points to plot.
-Use NULL if no points should be plotted.}
-
-\item{\code{y}}{(`numeric(m)`)\cr
-y-values of extra points to plot.
-Use NULL if no points should be plotted.}
 }
 \if{html}{\out{</div>}}
 }
@@ -102,6 +83,12 @@ Creates a new instance of this [R6][R6::R6Class] class.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
+\item{\code{fun_x}}{(`numeric()`)\cr
+x-values of function}
+
+\item{\code{fun_y}}{(`numeric()`)\cr
+y-values of function}
+
 \item{\code{title}}{(character(1)\cr
 Title of plot}
 
@@ -118,12 +105,6 @@ Use NULL if no points should be plotted.}
 \item{\code{points_y}}{(`numeric()`)\cr
 y-values of extra points to plot.
 Use NULL if no points should be plotted.}
-
-\item{\code{x}}{(`numeric()`)\cr
-x-values of function}
-
-\item{\code{y}}{(`numeric()`)\cr
-y-values of function}
 }
 \if{html}{\out{</div>}}
 }
@@ -132,10 +113,14 @@ y-values of function}
 \if{html}{\out{<a id="method-Visualizer1D-plot"></a>}}
 \if{latex}{\out{\hypertarget{method-Visualizer1D-plot}{}}}
 \subsection{Method \code{plot()}}{
+Create and return the ggplot2 plot.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Visualizer1D$plot()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+A ggplot2 object.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Visualizer1D-clone"></a>}}

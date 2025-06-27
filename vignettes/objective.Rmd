@@ -16,6 +16,8 @@ knitr::opts_chunk$set(
 
 ```{r, message=FALSE}
 library(vistool)
+library(plotly)
+library(purrr)
 ```
 
 The package provides automatic visualization selection through the `as_visualizer()` function, which creates 1D and 2D visualizations with ggplot2, and 3D visualizations with plotly.

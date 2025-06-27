@@ -49,9 +49,11 @@ Creates a new instance of this [R6][R6::R6Class] class.
 The objective which was optimized.
 This object is used to generate the surface/contour lines.}
 
+\item{\code{xlim}}{(`numeric(2)`)\cr
+Limits for the x-axis. If NULL, will be determined from objective bounds.}
+
 \item{\code{n_points}}{(`integer(1)`)\cr
-The number of generated point per dimension.
-Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
+Number of points to use for visualization.}
 }
 \if{html}{\out{</div>}}
 }

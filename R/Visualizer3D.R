@@ -257,7 +257,7 @@ Visualizer3D = R6::R6Class("Visualizer3D",
 #' @description Helper function to generate RGB colors.
 #' @param alpha (`numeric(1)`) The alpha value. If `!is.null` the used prefix is 'rgba' instead of 'rgb'.
 #' @return A character of length one containing the RGB color.
-#' @import plotly
+#' @importFrom plotly plot_ly add_trace add_surface layout save_image schema
 #' @import colorspace
 #' @export
 colSampler = function(alpha = NULL) {

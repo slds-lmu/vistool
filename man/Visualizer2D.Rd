@@ -95,10 +95,14 @@ Label of y-axis.}
 \if{html}{\out{<a id="method-Visualizer2D-plot"></a>}}
 \if{latex}{\out{\hypertarget{method-Visualizer2D-plot}{}}}
 \subsection{Method \code{plot()}}{
+Create and return the ggplot2 plot.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$plot()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+A ggplot2 object.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Visualizer2D-init_layer_contour"></a>}}

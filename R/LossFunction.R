@@ -22,8 +22,8 @@ LossFunction = R6::R6Class("LossFunction",
     #' Label of the loss function.
     label = NULL,
 
-    #' @field properties `character()`\cr
-    #' Additional properties of the loss function.
+    #' @field task_type `character(1)`\cr
+    #' Task type for which the loss function is designed.
     task_type = NULL,
 
     #' @description
@@ -33,8 +33,8 @@ LossFunction = R6::R6Class("LossFunction",
     #'    Unique identifier of the loss function.
     #' @param label (`character(1)`)\cr
     #'   Label of the loss function.
-    #' @param properties (`character()`)\cr
-    #'   Additional properties of the loss function.
+    #' @param task_type (`character(1)`)\cr
+    #'   Task type for which the loss function is designed.
     #' @param fun (`function(y_true, y_pred, ...)`)\cr
     #'   Loss function.
     initialize = function(id, label, task_type, fun) {

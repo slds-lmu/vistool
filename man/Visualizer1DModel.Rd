@@ -17,6 +17,9 @@ Task used to train the model.}
 
 \item{\code{learner}}{(`mlr3::Learner`)\cr
 Learner used to train the model.}
+
+\item{\code{n_points}}{(`integer(1)`)\cr
+Number of points to use for visualization.}
 }
 \if{html}{\out{</div>}}
 }
@@ -58,9 +61,14 @@ The task to train the model on.}
 \item{\code{learner}}{([mlr3::Learner])\cr
 The learner to train the model with.}
 
+\item{\code{xlim}}{(`numeric(2)`)\cr
+Limits for the x-axis. If NULL, will be determined from task data.}
+
 \item{\code{n_points}}{(`integer(1)`)\cr
-The number of generated point per dimension.
-Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
+Number of points to use for visualization.}
+
+\item{\code{training_points}}{(`logical(1)`)\cr
+Whether to show training points on the plot.}
 }
 \if{html}{\out{</div>}}
 }

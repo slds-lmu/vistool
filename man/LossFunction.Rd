@@ -18,16 +18,8 @@ Loss function.}
 \item{\code{label}}{`character(1)`\cr
 Label of the loss function.}
 
-\item{\code{properties}}{`character()`\cr
-Additional properties of the loss function.}
-}
-\if{html}{\out{</div>}}
-}
-\section{Active bindings}{
-\if{html}{\out{<div class="r6-active-bindings">}}
-\describe{
-\item{\code{properties}}{`character()`\cr
-Additional properties of the loss function.}
+\item{\code{task_type}}{`character(1)`\cr
+Task type for which the loss function is designed.}
 }
 \if{html}{\out{</div>}}
 }
@@ -56,11 +48,11 @@ Unique identifier of the loss function.}
 \item{\code{label}}{(`character(1)`)\cr
 Label of the loss function.}
 
+\item{\code{task_type}}{(`character(1)`)\cr
+Task type for which the loss function is designed.}
+
 \item{\code{fun}}{(`function(y_true, y_pred, ...)`)\cr
 Loss function.}
-
-\item{\code{properties}}{(`character()`)\cr
-Additional properties of the loss function.}
 }
 \if{html}{\out{</div>}}
 }
