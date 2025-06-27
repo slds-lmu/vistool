@@ -12,6 +12,7 @@ as_visualizer(x, ...)
 \method{as_visualizer}{Task}(
   x,
   learner,
+  type = "auto",
   x1_limits = NULL,
   x2_limits = NULL,
   padding = 0,
@@ -21,6 +22,7 @@ as_visualizer(x, ...)
 
 \method{as_visualizer}{Objective}(
   x,
+  type = "auto",
   x1_limits = NULL,
   x2_limits = NULL,
   padding = 0,
@@ -39,6 +41,10 @@ Additional arguments.}
 
 \item{learner}{(`mlr3::Learner`)\cr
 The learner to train the model with.}
+
+\item{type}{(`character(1)`)\cr
+The type of visualization: "auto" (default), "1d", "2d", or "3d". 
+If "auto", automatically chooses based on the number of dimensions.}
 
 \item{x1_limits}{(`numeric(2)`)\cr
 The x1 limits.}
@@ -61,5 +67,7 @@ Predicted values.}
 True value.}
 }
 \description{
-This function converts to a visualizer.
+This function converts to a visualizer. Automatically chooses between 1D, 2D, and 3D 
+visualizations based on the number of features/dimensions, or allows explicit control
+via the `type` parameter.
 }

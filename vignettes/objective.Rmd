@@ -16,10 +16,9 @@ knitr::opts_chunk$set(
 
 ```{r, message=FALSE}
 library(vistool)
-library(plotly)
 ```
 
-The `Visualizer1DObj` and `Visualizer2DObj` classes visualize 1 and 2-dimensional objective functions.
+The package provides automatic visualization selection through the `as_visualizer()` function, which creates 1D and 2D visualizations with ggplot2, and 3D visualizations with plotly.
 The package contains predefined objective functions.
 
 ```{r}
@@ -46,25 +45,33 @@ obj_branin$grad(x)
 obj_branin$hess(x)
 ```
 
-We create a `Visualizer2DObj` to visualize the objective function.
+We create a visualizer using the `as_visualizer()` function, which automatically selects the appropriate visualization type based on the objective's dimensionality. For 2D objectives, it defaults to 2D visualization (using ggplot2) but can be overridden with `type = "3d"` for interactive surface and contour plots using plotly.
 
 ```{r}
-# Use 3D visualizer directly for surface and contour plots
-viz = Visualizer3DObj$new(obj_branin)
+# Automatic visualization selection based on objective dimensions
+viz = as_visualizer(obj_branin)
 ```
 
-The objective can be visualized with a surface
+The objective can be visualized as a 2D contour plot using ggplot2:
 
 ```{r, out.width='100%', out.height='700px'}
-viz$init_layer_surface()
 viz$plot()
+```
+
+For interactive 3D visualization with surface and contour plots, specify `type = "3d"`:
+
+```{r, out.width='100%', out.height='700px'}
+# Use 3D visualizer for interactive plotly visualization
+viz_3d = as_visualizer(obj_branin, type = "3d")
+viz_3d$init_layer_surface()
+viz_3d$plot()
 ```
 
 and contour plot.
 
 ```{r, out.width='100%', out.height='700px'}
-viz$init_layer_contour()
-viz$plot()
+viz_3d$init_layer_contour()
+viz_3d$plot()
 ```
 
 ### Custom Objectives
@@ -163,8 +170,8 @@ Still not very satisfying.
 A layer of the `Visualizer` class is `$add_optimization_trace()` that gets the optimizer as argument and adds the optimization trace to the plot:
 
 ```{r, out.width='100%', out.height='700px'}
-# Use 3D visualizer directly for optimization trace visualization
-viz = Visualizer3DObj$new(obj_banana)
+# Use 2D ggplot2 visualizer for optimization trace visualization
+viz = as_visualizer(obj_banana)
 viz$add_optimization_trace(opt)
 viz$plot()
 ```
@@ -232,8 +239,8 @@ Visualizing the traces is done as before by adding optimization trace layer.
 We can do this for all optimizers to add multiple traces to the plot (colors are picked randomly, see the [`Visualizer`](#visualizer) section for more details about plotting):
 
 ```{r, out.width='100%', out.height='700px'}
-# Use 3D visualizer directly for optimization trace visualization
-viz = Visualizer3DObj$new(obj_banana)
+# Use 2D ggplot2 visualizer for optimization trace visualization
+viz = as_visualizer(obj_banana)
 
 viz$add_optimization_trace(oo1)
 viz$add_optimization_trace(oo2)
@@ -264,39 +271,45 @@ tail(my_oo$archive)
 
 ## Visualizer class
 
-The `Visualizer` class is initialized by calling `as_visualizer(obj)` for a given `Objective`. Furhter arguments are `x1limits` and `x2limits` as well as `padding` to stretch the limits by a factor and `npoints` to specify the number of generated point per dimension, hence `npoints^2` points are evaluated to create the initial layers.
+The `Visualizer` class is initialized by calling `as_visualizer(obj)` for a given `Objective`. This function automatically selects the appropriate visualization type:
+
+- **1D objectives**: Uses `Visualizer1DObj` with ggplot2
+- **2D objectives**: Uses `Visualizer2DObj` with ggplot2 by default, or `Visualizer3DObj` with plotly when `type = "3d"` is specified for interactive surface/contour plots
+- **3D+ objectives**: Uses `Visualizer3DObj` with plotly
+
+Further arguments are `x1_limits` and `x2_limits` as well as `padding` to stretch the limits by a factor and `n_points` to specify the number of generated point per dimension, hence `n_points^2` points are evaluated to create the initial layers.
 
 ## Initial layers
 
-An initial layer is always required to which other layers (such as optimization traces) are added step by step.
+For 3D visualizations (plotly-based), an initial layer is always required to which other layers (such as optimization traces) are added step by step.
 The two available base layers are contour lines `$init_layer_contour()` and `$init_layer_surface()`.
 
-For both, the first argument tis the opacity and the second a colorscale:
+For both, the first argument is the opacity and the second a colorscale:
 
 ```{r, out.width='100%', out.height='700px'}
 # Use 3D visualizer for contour layer initialization
-viz = Visualizer3DObj$new(obj("TF_franke"))
+viz = as_visualizer(obj("TF_franke"), type = "3d")
 viz$init_layer_contour(opacity = 1, colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")))
 viz$plot()
 ```
 
 ```{r, out.width='100%', out.height='700px'}
 # Use 3D visualizer for contour layer initialization
-viz = Visualizer3DObj$new(obj("TF_franke"))
+viz = as_visualizer(obj("TF_franke"), type = "3d")
 viz$init_layer_contour(colorscale = list(c(0, 1), c("white", "blue")))
 viz$plot()
 ```
 
 ```{r, out.width='100%', out.height='700px'}
 # Use 2D ggplot2 visualizer for simple plotting
-viz = as_visualizer(obj("TF_franke"))
+viz = as_visualizer(obj("TF_franke"), type = "2d")
 viz$plot()
 ```
 
 For 2D visualizations, the plotting is now handled by `ggplot2`. Further customization can be done by modifying the returned ggplot object:
 
 ```{r, out.width='100%', out.height='700px'}
-viz = as_visualizer(obj("TF_franke"))
+viz = as_visualizer(obj("TF_franke"), type = "2d")
 p = viz$plot()
 
 # Add customizations to the ggplot object
@@ -321,8 +334,8 @@ oo3$optimize(steps = 100)
 ```
 
 ```{r, out.width='100%', out.height='700px'}
-# Use 3D visualizer directly for optimization trace visualization with contours
-viz = Visualizer3DObj$new(obj_lm, x1_limits = c(-0.5, 5), x2_limits = c(-3.2, 2.8))
+# Use 3D visualizer for optimization trace visualization with contours
+viz = as_visualizer(obj_lm, x1_limits = c(-0.5, 5), x2_limits = c(-3.2, 2.8), type = "3d")
 
 viz$init_layer_contour()
 
@@ -344,8 +357,8 @@ viz$plot()
 
 ```{r, out.width='100%', out.height='700px'}
 obj = obj("TF_banana")
-# Use 3D visualizer directly for 3D features like surface, taylor, and hessian layers
-viz = Visualizer3DObj$new(obj)
+# Use 3D visualizer for 3D features like surface, taylor, and hessian layers
+viz = as_visualizer(obj, type = "3d")
 viz$init_layer_surface()
 
 x0 = c(0.85, 0.47)
@@ -360,7 +373,7 @@ viz$plot()
 
 ```{r, out.width='100%', out.height='700px'}
 obj = obj("TF_banana")
-viz = as_visualizer(obj)
+viz = as_visualizer(obj, type = "2d")
 p = viz$plot()
 class(p)
 
@@ -391,7 +404,7 @@ keys = tab[list(2), key, on = "xdim"]
 visualizers = map(keys, function(key) {
   objective = obj(key)
   # Use 3D visualizer with contour for plotly compatibility
-  vis = Visualizer3DObj$new(objective)
+  vis = as_visualizer(objective, type = "3d")
   vis$init_layer_contour(show_title = FALSE)
   vis$plot() %>%
     add_annotations(

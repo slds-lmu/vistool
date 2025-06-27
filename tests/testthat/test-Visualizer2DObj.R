@@ -3,7 +3,7 @@ test_that("2D Objective works", {
 
   obj_branin = obj("TF_branin")
 
-  vis = Visualizer2DObj$new(obj_branin)
+  vis = as_visualizer(obj_branin, type = "2d")
 
   vis$plot()
 })

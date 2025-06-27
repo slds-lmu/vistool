@@ -21,7 +21,7 @@ library(mlr3learners)
 library(mlr3pipelines)
 ```
 
-The `Visualizer1DModel` and `Visualizer2DModel` class visualize the predictions of a model on tasks with 1 or 2 features.
+The `as_visualizer()` function automatically creates appropriate visualizers for model predictions on tasks with different numbers of features.
 Let's start with the `boston_housing` data set.
 The goal is to predict the median value of owner-occupied homes in $1000s.
 We subset the data set to only use the features `age` and `rm`.
@@ -41,7 +41,7 @@ learner = lrn("regr.svm")
 Now we create a visualizer object.
 
 ```{r}
-vis = Visualizer2DModel$new(task, learner)
+vis = as_visualizer(task, learner)
 ```
 
 First, the learner is trained on the entire task.
