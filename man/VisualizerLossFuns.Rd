@@ -37,14 +37,20 @@ Loss function.}
 \subsection{Method \code{new()}}{
 Creates a new instance of this [R6][R6::R6Class] class.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{VisualizerLossFuns$new(losses)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{VisualizerLossFuns$new(losses, y_pred = NULL, y_true = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{loss_function}}{[LossFunction]\cr
-Loss function.}
+\item{\code{losses}}{(`list`)\cr
+List of LossFunction objects.}
+
+\item{\code{y_pred}}{(`numeric()`)\cr
+Predicted values. Optional.}
+
+\item{\code{y_true}}{(`numeric()`)\cr
+True values. Optional.}
 }
 \if{html}{\out{</div>}}
 }

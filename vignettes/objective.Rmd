@@ -116,6 +116,8 @@ viz_lm$plot()
 More advanced is to add points to the `ggplot` object:
 
 ```{r, out.width='100%', out.height='700px'}
+library(ggplot2)
+
 # Extract x and y coordinates from the optimizer archive
 archive_data = data.frame(
   x = sapply(obj_lm$archive$x, function(x) x[1]),
@@ -123,7 +125,7 @@ archive_data = data.frame(
 )
 
 # Add points to the ggplot using inherit.aes = FALSE to avoid conflicts
-viz_lm$plot() + geom_point(data = archive_data, aes(x = x, y = y), 
+viz_lm$plot() + ggplot2::geom_point(data = archive_data, aes(x = x, y = y), 
                            color = "red", size = 3, inherit.aes = FALSE)
 ```
 
@@ -221,6 +223,7 @@ For now we don't know how well it worked. Let's collect all archives with `merge
 ```{r}
 arx = mergeOptimArchives(oo1, oo2, oo3, oo4, oo5, oo6)
 
+library(ggplot2)
 library(patchwork)
 gg1 = ggplot(arx, aes(x = iteration, y = step_size, color = optim_id))
 gg2 = ggplot(arx, aes(x = iteration, y = fval_out, color = optim_id))
@@ -309,6 +312,8 @@ viz$plot()
 For 2D visualizations, the plotting is now handled by `ggplot2`. Further customization can be done by modifying the returned ggplot object:
 
 ```{r, out.width='100%', out.height='700px'}
+library(ggplot2)
+
 viz = as_visualizer(obj("TF_franke"), type = "2d")
 p = viz$plot()
 
@@ -372,6 +377,8 @@ viz$plot()
 ## Manual layers (TODO)
 
 ```{r, out.width='100%', out.height='700px'}
+library(ggplot2)
+
 obj = obj("TF_banana")
 viz = as_visualizer(obj, type = "2d")
 p = viz$plot()

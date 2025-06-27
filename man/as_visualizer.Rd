@@ -30,21 +30,29 @@ as_visualizer(x, ...)
   ...
 )
 
-\method{as_visualizer}{LossFunction}(x, y_pred, y_true, ...)
+\method{as_visualizer}{LossFunction}(
+  x,
+  type = "auto",
+  x1_limits = NULL,
+  x2_limits = NULL,
+  padding = 0,
+  n_points = 100L,
+  ...
+)
 }
 \arguments{
-\item{x}{(`any`)\cr
+\item{x}{(`any`)
 Object to convert to a visualizer.}
 
-\item{...}{(`any`)\cr
+\item{...}{(`any`)
 Additional arguments.}
 
-\item{learner}{(`mlr3::Learner`)\cr
+\item{learner}{(`mlr3::Learner`)
 The learner to train the model with.}
 
-\item{type}{(`character(1)`)\cr
+\item{type}{(`character(1)`)
 The type of visualization: "auto" (default), "1d", "2d", or "3d". 
-If "auto", automatically chooses based on the number of dimensions.}
+If "auto", automatically chooses based on the loss function's dimensionality.}
 
 \item{x1_limits}{(`numeric(2)`)\cr
 The x1 limits.}
@@ -59,15 +67,20 @@ The x1 margin is calculated by `max(x1lmits) - min(x1limits) * padding`.}
 \item{n_points}{(`integer(1)`)\cr
 The number of generated point per dimension.
 Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
-
-\item{y_pred}{(`numeric()`)\cr
-Predicted values.}
-
-\item{y_true}{(`numeric(1)`)\cr
-True value.}
+}
+\value{
+An object inheriting from a Visualizer class (Visualizer1D, Visualizer2D, Visualizer3D, etc.)
+depending on the input and selected type.
 }
 \description{
 This function converts to a visualizer. Automatically chooses between 1D, 2D, and 3D 
 visualizations based on the number of features/dimensions, or allows explicit control
-via the `type` parameter.
+via the `type` parameter. 1D and 2D visualizations use ggplot2, while 3D visualizations use plotly.
+}
+\details{
+If `type = "auto"` (default), the function will inspect the input and select the appropriate visualizer:
+- 1D: For objects with 1 feature/dimension (uses ggplot2)
+- 2D: For objects with 2 features/dimensions (uses ggplot2)
+- 3D: For objects with 3 or more features/dimensions (uses plotly)
+You can override this by specifying `type = "1d"`, `type = "2d"`, or `type = "3d"`.
 }
