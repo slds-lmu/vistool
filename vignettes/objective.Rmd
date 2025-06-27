@@ -383,7 +383,7 @@ grid = data.frame(x1 = runif(nsim), x2 = runif(nsim))
 grid$y = apply(grid[, c("x1", "x2")], 1, viz$objective$eval) + rnorm(nsim, sd = 0.05)
 
 # Add points to the ggplot
-p + geom_point(data = grid, aes(x = x1, y = x2), color = "red", size = 1, alpha = 0.7)
+p + geom_point(data = grid, aes(x = x1, y = x2), color = "red", size = 1, alpha = 0.7, inherit.aes = FALSE)
 ```
 
 ## Animations (TODO)
