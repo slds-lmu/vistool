@@ -74,6 +74,9 @@ Visualizer2DModel = R6::R6Class("Visualizer2DModel",
         } else {
           y = y[, 1]
         }
+      } else if (self$learner$predict_type == "response" && is.factor(y)) {
+        # Convert factor response to numeric for visualization
+        y = as.numeric(y) - 1  # Convert to 0-based indexing
       }
 
 
@@ -110,8 +113,10 @@ Visualizer2DModel = R6::R6Class("Visualizer2DModel",
       self$points_x2 = data[[self$task$feature_names[2]]]
       self$points_y = data[[self$task$target_names]]
       
-      # for classification tasks with prob predict type, convert to numeric
-      if (self$learner$predict_type == "prob") {
+      # Convert factors to numeric for visualization
+      if (self$learner$predict_type == "prob" && is.factor(self$points_y)) {
+        self$points_y = as.integer(self$points_y) - 1
+      } else if (self$learner$predict_type == "response" && is.factor(self$points_y)) {
         self$points_y = as.integer(self$points_y) - 1
       }
 

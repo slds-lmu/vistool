@@ -42,6 +42,8 @@ y-values of points.}
 \item \href{#method-Visualizer2D-add_optimization_trace}{\code{Visualizer2D$add_optimization_trace()}}
 \item \href{#method-Visualizer2D-set_layout}{\code{Visualizer2D$set_layout()}}
 \item \href{#method-Visualizer2D-set_scene}{\code{Visualizer2D$set_scene()}}
+\item \href{#method-Visualizer2D-add_layer_taylor}{\code{Visualizer2D$add_layer_taylor()}}
+\item \href{#method-Visualizer2D-add_layer_hessian}{\code{Visualizer2D$add_layer_hessian()}}
 \item \href{#method-Visualizer2D-clone}{\code{Visualizer2D$clone()}}
 }
 }
@@ -173,6 +175,40 @@ Set layout (compatibility method, no-op for ggplot2 version).
 Set scene (compatibility method, no-op for ggplot2 version).
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$set_scene(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{Additional arguments (ignored for compatibility).}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Visualizer2D-add_layer_taylor"></a>}}
+\if{latex}{\out{\hypertarget{method-Visualizer2D-add_layer_taylor}{}}}
+\subsection{Method \code{add_layer_taylor()}}{
+Add layer taylor (compatibility method, no-op for ggplot2 version).
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$add_layer_taylor(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{Additional arguments (ignored for compatibility).}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Visualizer2D-add_layer_hessian"></a>}}
+\if{latex}{\out{\hypertarget{method-Visualizer2D-add_layer_hessian}{}}}
+\subsection{Method \code{add_layer_hessian()}}{
+Add layer hessian (compatibility method, no-op for ggplot2 version).
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$add_layer_hessian(...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{

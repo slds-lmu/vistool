@@ -35,8 +35,8 @@ Visualizer3DObj = R6::R6Class("Visualizer3DObj",
         mlr3misc::stopf("`Visualizer3D` requires 2-dimensional inputs, but `objective$xdim = %s`", objective$xdim)
       }
 
-      x1_limits = x1_limits %??% c(objective$limits_lower[1], objective$limits_upper[1])
-      x2_limits = x2_limits %??% c(objective$limits_lower[2], objective$limits_upper[2])
+      x1_limits = x1_limits %??% c(objective$lower[1], objective$upper[1])
+      x2_limits = x2_limits %??% c(objective$lower[2], objective$upper[2])
 
       if (any(is.na(x1_limits)) || any(is.na(x2_limits))) {
         stop("Limits could not be extracted from the objective. Please use `x_limits`.")

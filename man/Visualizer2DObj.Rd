@@ -28,6 +28,8 @@ This object is used to generate the surface/contour lines.}
 \if{html}{\out{
 <details><summary>Inherited methods</summary>
 <ul>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="add_layer_hessian"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-add_layer_hessian'><code>vistool::Visualizer2D$add_layer_hessian()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="add_layer_taylor"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-add_layer_taylor'><code>vistool::Visualizer2D$add_layer_taylor()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="add_optimization_trace"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-add_optimization_trace'><code>vistool::Visualizer2D$add_optimization_trace()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="init_layer_contour"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-init_layer_contour'><code>vistool::Visualizer2D$init_layer_contour()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="init_layer_surface"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-init_layer_surface'><code>vistool::Visualizer2D$init_layer_surface()</code></a></span></li>
