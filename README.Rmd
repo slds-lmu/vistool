@@ -110,7 +110,9 @@ vis$plot()
 
 Save static version as png:
 
-```{r example-save}
+```{r example-save, eval=FALSE}
+# only works if Python kaleido package is installed
+# see installation instructions above for setting up plotly save functionality
 vis$save("man/figures/demo_1.png", width = 500, height = 500)
 ```
 

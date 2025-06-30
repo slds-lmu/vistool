@@ -20,6 +20,7 @@ Imports:
     colorspace,
     data.table,
     ggplot2,
+    magrittr,
     mlr3,
     mlr3misc,
     paradox,
