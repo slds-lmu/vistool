@@ -10,8 +10,7 @@
 LossFunction = R6::R6Class("LossFunction",
   public = list(
 
-    #' @field id `character(1)`\cr
-    #' Unique identifier of the loss function.
+    #' @template field_id
     id = NULL,
 
     #' @field fun `function(y_true, y_pred, ...)`\cr
@@ -29,8 +28,7 @@ LossFunction = R6::R6Class("LossFunction",
     #' @description
     #' Creates a new instance of this [R6][R6::R6Class] class.
     #'
-    #' @param id (`character(1)`)\cr
-    #'    Unique identifier of the loss function.
+    #' @template param_id
     #' @param label (`character(1)`)\cr
     #'   Label of the loss function.
     #' @param task_type (`character(1)`)\cr
@@ -61,9 +59,7 @@ dict_loss = R6::R6Class("DictionaryLoss", inherit = Dictionary, cloneable = FALS
 #'
 #' @param .key (`character(1)`)\cr
 #'   Key passed to the respective [dictionary][mlr3misc::Dictionary] to retrieve the object.
-#' @param ... (named `list()`)\cr
-#'   Named arguments passed to the constructor, or to be set as public field.
-#'   See [mlr3misc::dictionary_sugar_get()] for more details.
+#' @template param_dots
 #'
 #' @export
 lss = function(.key, ...) {
@@ -96,6 +92,17 @@ dict_loss$add("hinge", LossFunction$new("hinge", "Hinge Loss", "classif", functi
 }))
 
 
+#' @title Convert Dictionary to Data Table
+#'
+#' @description
+#' Converts a loss function dictionary to a data table.
+#'
+#' @param x (`DictionaryLoss`)\cr
+#'   The dictionary to convert.
+#' @template param_dots
+#' @param objects (`logical(1)`)\cr
+#'   Whether to include the objects in the result.
+#'
 #' @export
 as.data.table.DictionaryLoss = function(x, ..., objects = FALSE) {
   checkmate::assert_flag(objects)

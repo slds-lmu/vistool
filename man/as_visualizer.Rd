@@ -41,18 +41,18 @@ as_visualizer(x, ...)
 )
 }
 \arguments{
-\item{x}{(`any`)
+\item{x}{(`any`)\cr
 Object to convert to a visualizer.}
 
-\item{...}{(`any`)
+\item{...}{(`any`)\cr
 Additional arguments.}
 
-\item{learner}{(`mlr3::Learner`)
+\item{learner}{(`mlr3::Learner`)\cr
 The learner to train the model with.}
 
-\item{type}{(`character(1)`)
+\item{type}{(`character(1)`)\cr
 The type of visualization: "auto" (default), "1d", "2d", or "3d". 
-If "auto", automatically chooses based on the loss function's dimensionality.}
+If "auto", automatically chooses based on the number of features/dimensions.}
 
 \item{x1_limits}{(`numeric(2)`)\cr
 The x1 limits.}

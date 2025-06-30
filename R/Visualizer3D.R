@@ -12,12 +12,10 @@
 Visualizer3D = R6::R6Class("Visualizer3D",
   public = list(
 
-    #' @field grid (`list()`)\cr
-    #' List with the `x1` and `x2` grid.
+    #' @template field_grid_x1x2
     grid = NULL,
 
-    #' @field zmat (`matrix()`)\cr
-    #' The result of evaluation at each element of the cross product of `grid$x1` and `grid$x2`.
+    #' @template field_zmat
     zmat = NULL,
 
     #' @field plot_lab (character(1)\cr
@@ -43,14 +41,10 @@ Visualizer3D = R6::R6Class("Visualizer3D",
     #'   List with the `x1` and `x2` grid.
     #' @param zmat (`matrix()`)\cr
     #'   The result of evaluation at each element of the cross product of `grid$x1` and `grid$x2`.
-    #' @param plot_lab (`character(1)`)\cr
-    #'  Label of the plot.
-    #' @param x1_lab (`character(1)`)\cr
-    #'  Label of the x1 axis.
-    #' @param x2_lab (`character(1)`)\cr
-    #' Label of the x2 axis.
-    #' @param z_lab (`character(1)`)\cr
-    #' Label of the z axis.
+    #' @template param_plot_lab
+    #' @template param_x1_lab
+    #' @template param_x2_lab
+    #' @template param_z_lab
     initialize = function(grid, zmat, plot_lab = NULL, x1_lab = "x1", x2_lab = "x2", z_lab = "z") {
       self$grid = checkmate::assert_list(grid)
       self$zmat = checkmate::assert_matrix(zmat)
@@ -64,14 +58,10 @@ Visualizer3D = R6::R6Class("Visualizer3D",
     #' @description
     #' Initialize the plot with contour lines.
     #'
-    #' @param opacity (`numeric(1)`)\cr
-    #'   Opacity of the layer.
-    #' @param colorscale (`list()`)\cr
-    #'   The coloring of the contour.
-    #' @param show_title (`logical(1)`)\cr
-    #'   Indicator whether to show the title of the plot.
-    #' @param ... (`any`)\cr
-    #'   Further arguments passed to `add_trace(...)`.
+    #' @template param_opacity
+    #' @template param_colorscale
+    #' @template param_show_title
+    #' @template param_dots_trace
     init_layer_contour = function(opacity = 0.8, colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")), show_title = TRUE, ...) {
       checkmate::assert_number(opacity, lower = 0, upper = 1)
       checkmate::assert_list(colorscale)
@@ -110,16 +100,12 @@ Visualizer3D = R6::R6Class("Visualizer3D",
     #' @description
     #' Initialize the plot as 3D surface.
     #'
-    #' @param opacity (`numeric(1)`)\cr
-    #'   Opacity of the layer.
-    #' @param colorscale (`list()`)\cr
-    #'   The coloring of the surface.
-    #' @param show_title (`logical(1)`)\cr
-    #'   Indicator whether to show the title of the plot.
+    #' @template param_opacity
+    #' @template param_colorscale
+    #' @template param_show_title
     #' @param show_contours (`logical(1)`)\cr
     #'  Indicator whether to show the contours of the surface.
-    #' @param ... (`any`)\cr
-    #'   Further arguments passed to `add_trace(...)`.
+    #' @template param_dots_trace
     init_layer_surface = function(opacity = 0.8, colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")), show_contours = FALSE, show_title = TRUE, ...) {
       checkmate::assert_number(opacity, lower = 0, upper = 1)
       checkmate::assert_list(colorscale)

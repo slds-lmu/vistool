@@ -58,14 +58,19 @@ Creates a new instance of this [R6][R6::R6Class] class.
 \item{\code{task}}{([mlr3::Task])\cr
 The task to train the model on.}
 
-\item{\code{learner}}{([mlr3::Learner])\cr
+\item{\code{learner}}{(`mlr3::Learner`)\cr
 The learner to train the model with.}
 
 \item{\code{xlim}}{(`numeric(2)`)\cr
 Limits for the x-axis. If NULL, will be determined from task data.}
 
 \item{\code{n_points}}{(`integer(1)`)\cr
-Number of points to use for visualization.}
+The number of generated point per dimension.
+Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
+
+\item{\code{n_points}}{(`integer(1)`)\cr
+The number of generated point per dimension.
+Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
 
 \item{\code{training_points}}{(`logical(1)`)\cr
 Whether to show training points on the plot.}

@@ -10,9 +10,8 @@ lss(.key, ...)
 \item{.key}{(`character(1)`)\cr
 Key passed to the respective [dictionary][mlr3misc::Dictionary] to retrieve the object.}
 
-\item{...}{(named `list()`)\cr
-Named arguments passed to the constructor, or to be set as public field.
-See [mlr3misc::dictionary_sugar_get()] for more details.}
+\item{...}{(`any`)\cr
+Additional arguments.}
 }
 \description{
 Retrieve a loss function from the dictionary.

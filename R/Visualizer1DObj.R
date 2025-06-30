@@ -15,21 +15,16 @@
 Visualizer1DObj = R6::R6Class("Visualizer1DObj", inherit = Visualizer1D,
   public = list(
 
-    #' @field objective (`Objective`)\cr
-    #' The objective which was optimized.
-    #' This object is used to generate the surface/contour lines.
+    #' @template field_objective
     objective = NULL,
 
     #' @description
     #' Creates a new instance of this [R6][R6::R6Class] class.
     #'
-    #' @param objective (`Objective`)\cr
-    #'   The objective which was optimized.
-    #'   This object is used to generate the surface/contour lines.
+    #' @template param_objective
     #' @param xlim (`numeric(2)`)\cr
     #'   Limits for the x-axis. If NULL, will be determined from objective bounds.
-    #' @param n_points (`integer(1)`)\cr
-    #'   Number of points to use for visualization.
+    #' @template param_n_points
     initialize = function(objective, xlim = NULL, n_points = 100L) {
       self$objective = checkmate::assert_r6(objective, "Objective")
       if (objective$xdim != 1) {
@@ -51,6 +46,7 @@ Visualizer1DObj = R6::R6Class("Visualizer1DObj", inherit = Visualizer1D,
     #'
     #' @param optimizer (`Optimizer`)\cr
     #'  The optimizer to add to the plot.
+    #' @template return_self_invisible
     add_optimization_trace = function(optimizer) {
       checkmate::assert_r6(optimizer, "Optimizer")
 

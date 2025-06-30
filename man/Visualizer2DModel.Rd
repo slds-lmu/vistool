@@ -66,20 +66,36 @@ Creates a new instance of this [R6][R6::R6Class] class.
 \item{\code{task}}{([mlr3::Task])\cr
 The task to train the model on.}
 
-\item{\code{learner}}{([mlr3::Learner])\cr
+\item{\code{learner}}{(`mlr3::Learner`)\cr
 The learner to train the model with.}
 
 \item{\code{x1_limits}}{(`numeric(2)`)\cr
-Limits for the first feature axis.}
+The x1 limits.}
+
+\item{\code{x1_limits}}{(`numeric(2)`)\cr
+The x1 limits.}
 
 \item{\code{x2_limits}}{(`numeric(2)`)\cr
-Limits for the second feature axis.}
+The x2 limits.}
+
+\item{\code{x2_limits}}{(`numeric(2)`)\cr
+The x2 limits.}
 
 \item{\code{padding}}{(`numeric(1)`)\cr
-Padding around the data limits.}
+A margin that is added to x1limits and x2limits.
+The x1 margin is calculated by `max(x1lmits) - min(x1limits) * padding`.}
+
+\item{\code{padding}}{(`numeric(1)`)\cr
+A margin that is added to x1limits and x2limits.
+The x1 margin is calculated by `max(x1lmits) - min(x1limits) * padding`.}
 
 \item{\code{n_points}}{(`integer(1)`)\cr
-Number of points to use for visualization.}
+The number of generated point per dimension.
+Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
+
+\item{\code{n_points}}{(`integer(1)`)\cr
+The number of generated point per dimension.
+Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
 
 \item{\code{training_points}}{(`logical(1)`)\cr
 Whether to show training points on the plot.}

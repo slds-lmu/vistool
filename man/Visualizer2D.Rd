@@ -116,7 +116,23 @@ Initialize contour layer (compatibility method, no-op for ggplot2 version).
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{Additional arguments (ignored for compatibility).}
+\item{\code{...}}{\cr
+Additional arguments (ignored for compatibility).}
+
+\item{\code{...}}{\cr
+Additional arguments (ignored for compatibility).}
+
+\item{\code{...}}{\cr
+Additional arguments (ignored for compatibility).}
+
+\item{\code{...}}{\cr
+Additional arguments (ignored for compatibility).}
+
+\item{\code{...}}{\cr
+Additional arguments (ignored for compatibility).}
+
+\item{\code{...}}{\cr
+Additional arguments (ignored for compatibility).}
 }
 \if{html}{\out{</div>}}
 }
@@ -133,7 +149,23 @@ Initialize surface layer (compatibility method, no-op for ggplot2 version).
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{Additional arguments (ignored for compatibility).}
+\item{\code{...}}{\cr
+Additional arguments (ignored for compatibility).}
+
+\item{\code{...}}{\cr
+Additional arguments (ignored for compatibility).}
+
+\item{\code{...}}{\cr
+Additional arguments (ignored for compatibility).}
+
+\item{\code{...}}{\cr
+Additional arguments (ignored for compatibility).}
+
+\item{\code{...}}{\cr
+Additional arguments (ignored for compatibility).}
+
+\item{\code{...}}{\cr
+Additional arguments (ignored for compatibility).}
 }
 \if{html}{\out{</div>}}
 }
@@ -150,7 +182,23 @@ Add optimization trace (compatibility method, no-op for ggplot2 version).
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{Additional arguments (ignored for compatibility).}
+\item{\code{...}}{\cr
+Additional arguments (ignored for compatibility).}
+
+\item{\code{...}}{\cr
+Additional arguments (ignored for compatibility).}
+
+\item{\code{...}}{\cr
+Additional arguments (ignored for compatibility).}
+
+\item{\code{...}}{\cr
+Additional arguments (ignored for compatibility).}
+
+\item{\code{...}}{\cr
+Additional arguments (ignored for compatibility).}
+
+\item{\code{...}}{\cr
+Additional arguments (ignored for compatibility).}
 }
 \if{html}{\out{</div>}}
 }
@@ -167,7 +215,23 @@ Set layout (compatibility method, no-op for ggplot2 version).
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{Additional arguments (ignored for compatibility).}
+\item{\code{...}}{\cr
+Additional arguments (ignored for compatibility).}
+
+\item{\code{...}}{\cr
+Additional arguments (ignored for compatibility).}
+
+\item{\code{...}}{\cr
+Additional arguments (ignored for compatibility).}
+
+\item{\code{...}}{\cr
+Additional arguments (ignored for compatibility).}
+
+\item{\code{...}}{\cr
+Additional arguments (ignored for compatibility).}
+
+\item{\code{...}}{\cr
+Additional arguments (ignored for compatibility).}
 }
 \if{html}{\out{</div>}}
 }
@@ -184,7 +248,23 @@ Set scene (compatibility method, no-op for ggplot2 version).
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{Additional arguments (ignored for compatibility).}
+\item{\code{...}}{\cr
+Additional arguments (ignored for compatibility).}
+
+\item{\code{...}}{\cr
+Additional arguments (ignored for compatibility).}
+
+\item{\code{...}}{\cr
+Additional arguments (ignored for compatibility).}
+
+\item{\code{...}}{\cr
+Additional arguments (ignored for compatibility).}
+
+\item{\code{...}}{\cr
+Additional arguments (ignored for compatibility).}
+
+\item{\code{...}}{\cr
+Additional arguments (ignored for compatibility).}
 }
 \if{html}{\out{</div>}}
 }
@@ -201,7 +281,23 @@ Add layer taylor (compatibility method, no-op for ggplot2 version).
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{Additional arguments (ignored for compatibility).}
+\item{\code{...}}{\cr
+Additional arguments (ignored for compatibility).}
+
+\item{\code{...}}{\cr
+Additional arguments (ignored for compatibility).}
+
+\item{\code{...}}{\cr
+Additional arguments (ignored for compatibility).}
+
+\item{\code{...}}{\cr
+Additional arguments (ignored for compatibility).}
+
+\item{\code{...}}{\cr
+Additional arguments (ignored for compatibility).}
+
+\item{\code{...}}{\cr
+Additional arguments (ignored for compatibility).}
 }
 \if{html}{\out{</div>}}
 }

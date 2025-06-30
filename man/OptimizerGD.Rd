@@ -52,17 +52,22 @@ Creates a new instance of this [R6][R6::R6Class] class.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{objective}}{(`Objective`) The objective to optimize.}
+\item{\code{objective}}{(`Objective`)\cr
+The objective to optimize.}
 
-\item{\code{x_start}}{(`numeric()`) Start value of the optimization. Note, after
+\item{\code{x_start}}{(`numeric()`)\cr
+Start value of the optimization. Note, after
 the first call of `$optimize()` the last value is used to continue
 optimization. Get this value with `$x`.}
 
-\item{\code{lr}}{(`numeric(1)`) Step size with which the update is multiplied.}
+\item{\code{lr}}{(`numeric(1)`)\cr
+Step size with which the update is multiplied.}
 
-\item{\code{id}}{(`character(1)`) Id of the object.}
+\item{\code{id}}{(`character(1)`)\cr
+Id of the object.}
 
-\item{\code{print_trace}}{(`logical(1)`) Indicator whether to print the status of `$optimize()`.}
+\item{\code{print_trace}}{(`logical(1)`)\cr
+Indicator whether to print the status of `$optimize()`.}
 }
 \if{html}{\out{</div>}}
 }

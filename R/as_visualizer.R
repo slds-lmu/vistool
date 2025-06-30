@@ -5,10 +5,8 @@
 #' visualizations based on the number of features/dimensions, or allows explicit control
 #' via the `type` parameter. 1D and 2D visualizations use ggplot2, while 3D visualizations use plotly.
 #'
-#' @param x (`any`)
-#'  Object to convert to a visualizer.
-#' @param ... (`any`)
-#'  Additional arguments.
+#' @template param_x
+#' @template param_dots
 #'
 #' @return An object inheriting from a Visualizer class (Visualizer1D, Visualizer2D, Visualizer3D, etc.)
 #' depending on the input and selected type.
@@ -25,11 +23,8 @@ as_visualizer = function(x, ...) {
   UseMethod("as_visualizer")
 }
 
-#' @param learner (`mlr3::Learner`)
-#'  The learner to train the model with.
-#' @param type (`character(1)`)
-#'  The type of visualization: "auto" (default), "1d", "2d", or "3d". 
-#'  If "auto", automatically chooses based on the number of features.
+#' @template param_learner
+#' @template param_type
 #' @template param_x1_limits
 #' @template param_x2_limits
 #' @template param_padding
@@ -70,9 +65,7 @@ as_visualizer.Task = function(x, learner, type = "auto", x1_limits = NULL, x2_li
   }
 }
 
-#' @param type (`character(1)`)
-#'  The type of visualization: "auto" (default), "1d", "2d", or "3d". 
-#'  If "auto", automatically chooses based on the number of dimensions.
+#' @template param_type
 #' @template param_x1_limits
 #' @template param_x2_limits
 #' @template param_padding
@@ -110,9 +103,7 @@ as_visualizer.Objective = function(x, type = "auto", x1_limits = NULL, x2_limits
   }
 }
 
-#' @param type (`character(1)`)
-#'  The type of visualization: "auto" (default), "1d", "2d", or "3d". 
-#'  If "auto", automatically chooses based on the loss function's dimensionality.
+#' @template param_type
 #' @template param_x1_limits
 #' @template param_x2_limits
 #' @template param_padding

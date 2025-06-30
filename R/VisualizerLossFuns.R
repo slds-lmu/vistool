@@ -94,7 +94,7 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
     #' Initialize line layer for the plot.
     #' @param color (`character()`)\cr
     #'   Colors to use for the lines. If NULL, default colors will be used.
-    #' @return Returns self invisibly.
+    #' @template return_self_invisible
     init_layer_lines = function(color = NULL) {
       if (!is.null(color)) {
         self$line_col = color

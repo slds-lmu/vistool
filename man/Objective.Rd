@@ -3,13 +3,17 @@
 \name{Objective}
 \alias{Objective}
 \title{Objective function}
+\value{
+Returns self invisibly.
+}
 \description{
 This class defines the objective that is used for optimization.
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{id}}{(`character(1)` The id of the objective.}
+\item{\code{id}}{(`character(1)`)\cr
+The id of the object.}
 
 \item{\code{label}}{(`character(1)` The label of the objective, i.e. a.}
 
@@ -68,7 +72,8 @@ Creates a new instance of this [R6][R6::R6Class] class.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{id}}{(`character(1)` The id of the objective.}
+\item{\code{id}}{(`character(1)`)\cr
+Id of the object.}
 
 \item{\code{fun}}{(`function` The objective function. The first argument must be a numerical input of length `xdim`.}
 
@@ -86,7 +91,8 @@ be of length `xdim`.}
 
 \item{\code{minimize}}{(`logical(1)`) Is the problem a minimization problem? Default is no (`FALSE`).}
 
-\item{\code{...}}{Additional arguments passed to `fun`.}
+\item{\code{...}}{\cr
+Additional arguments passed to `fun`.}
 }
 \if{html}{\out{</div>}}
 }
@@ -182,8 +188,6 @@ Evaluate the hessian of the objective function at x.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{x}}{(`numeric`) The numerical input of `fun`.}
-
-\item{\code{...}}{Additional arguments passed to `fun`.}
 }
 \if{html}{\out{</div>}}
 }
@@ -204,8 +208,6 @@ Method to add custom logger to the objective.
 The arguments of `l` must be `x`, `fval` and `grad`.}
 
 \item{\code{label}}{(`character(1)`) The name of the logger.}
-
-\item{\code{...}}{Additional arguments passed to `fun`.}
 }
 \if{html}{\out{</div>}}
 }

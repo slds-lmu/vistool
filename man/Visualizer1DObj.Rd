@@ -3,6 +3,9 @@
 \name{Visualizer1DObj}
 \alias{Visualizer1DObj}
 \title{Visualize Objective}
+\value{
+Returns self invisibly.
+}
 \description{
 This class is used to create visualizations of optimization traces.
 }
@@ -13,8 +16,7 @@ This class is used to create visualizations of optimization traces.
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
 \item{\code{objective}}{(`Objective`)\cr
-The objective which was optimized.
-This object is used to generate the surface/contour lines.}
+The objective function.}
 }
 \if{html}{\out{</div>}}
 }
@@ -46,14 +48,18 @@ Creates a new instance of this [R6][R6::R6Class] class.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{objective}}{(`Objective`)\cr
-The objective which was optimized.
-This object is used to generate the surface/contour lines.}
+The objective to optimize.}
 
 \item{\code{xlim}}{(`numeric(2)`)\cr
 Limits for the x-axis. If NULL, will be determined from objective bounds.}
 
 \item{\code{n_points}}{(`integer(1)`)\cr
-Number of points to use for visualization.}
+The number of generated point per dimension.
+Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
+
+\item{\code{n_points}}{(`integer(1)`)\cr
+The number of generated point per dimension.
+Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
 }
 \if{html}{\out{</div>}}
 }

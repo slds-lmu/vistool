@@ -14,7 +14,7 @@ assertStepSizeControl = function(x, u, obj, opt) {
 #' Conduct line search in each iteration to adjust the update.
 #' @param lower (`numeric(1)`) The lower bound for the step_size.
 #' @param upper (`numeric(1)`) The upper bound for the step_size.
-#' @return The step size as number.
+#' @template return_step_size
 #' @export
 stepSizeControlLineSearch = function(lower = 0, upper = 10) {
   checkmate::assertNumber(lower)
@@ -32,8 +32,8 @@ stepSizeControlLineSearch = function(lower = 0, upper = 10) {
 
 #' Conduct time decay to adjust the update.
 #' See https://neptune.ai/blog/how-to-choose-a-learning-rate-scheduler
-#' @param decay (`numeric(1)`) The decay parameter indicating how fast the step size is reduced.
-#' @return The step size as number.
+#' @template param_decay
+#' @template return_step_size
 #' @export
 stepSizeControlDecayTime = function(decay = 0.01) {
   checkmate::assertNumber(decay, lower = 0, upper = 1)
@@ -48,8 +48,8 @@ stepSizeControlDecayTime = function(decay = 0.01) {
 
 #' Conduct exponential decay to adjust the update.
 #' See https://neptune.ai/blog/how-to-choose-a-learning-rate-scheduler
-#' @param decay (`numeric(1)`) The decay parameter indicating how fast the step size is reduced.
-#' @return The step size as number.
+#' @template param_decay
+#' @template return_step_size
 #' @export
 stepSizeControlDecayExp = function(decay = 0.01) {
   checkmate::assertNumber(decay, lower = 0, upper = 1)
@@ -65,7 +65,7 @@ stepSizeControlDecayExp = function(decay = 0.01) {
 #' Conduct linear decay to adjust the update.
 #' See https://neptune.ai/blog/how-to-choose-a-learning-rate-scheduler
 #' @param iter_zero (`integer(1)`) The iteration at which the update is shrinked to zero.
-#' @return The step size as number.
+#' @template return_step_size
 #' @export
 stepSizeControlDecayLinear = function(iter_zero = 100L) {
   checkmate::assertIntegerish(iter_zero, lower = 0, len = 1)
@@ -88,7 +88,7 @@ stepSizeControlDecayLinear = function(iter_zero = 100L) {
 #' after each `every_iter`.
 #' @param every_iter (`integer(1)`) Number indicates after how many iterations the
 #' learning rate is reduced by `drop_rate`.
-#' @return The step size as number.
+#' @template return_step_size
 #' @export
 stepSizeControlDecaySteps = function(drop_rate = 0.1, every_iter = 10) {
   checkmate::assertNumber(drop_rate, lower = 0, upper = 1)

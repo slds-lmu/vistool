@@ -13,17 +13,13 @@ Visualizer3DObj = R6::R6Class("Visualizer3DObj",
   inherit = Visualizer3D,
   public = list(
 
-    #' @field objective (`Objective`)\cr
-    #' The objective which was optimized.
-    #' This object is used to generate the surface/contour lines.
+    #' @template field_objective
     objective = NULL,
 
     #' @description
     #' Creates a new instance of this [R6][R6::R6Class] class.
     #'
-    #' @param objective (`Objective`)\cr
-    #'   The objective which was optimized.
-    #'   This object is used to generate the surface/contour lines.
+    #' @template param_objective
     initialize = function(objective, x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L) {
       self$objective = checkmate::assert_r6(objective, "Objective")
       checkmate::assert_numeric(x1_limits, len = 2, null.ok = TRUE)

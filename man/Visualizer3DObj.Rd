@@ -13,8 +13,7 @@ This class is used to create visualizations and animations of optimization trace
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
 \item{\code{objective}}{(`Objective`)\cr
-The objective which was optimized.
-This object is used to generate the surface/contour lines.}
+The objective function.}
 }
 \if{html}{\out{</div>}}
 }
@@ -60,8 +59,7 @@ Creates a new instance of this [R6][R6::R6Class] class.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{objective}}{(`Objective`)\cr
-The objective which was optimized.
-This object is used to generate the surface/contour lines.}
+The objective to optimize.}
 
 \item{\code{x1_limits}}{(`numeric(2)`)\cr
 The x1 limits.}

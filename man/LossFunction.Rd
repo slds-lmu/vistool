@@ -9,8 +9,8 @@ This class is used to create loss functions.
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{id}}{`character(1)`\cr
-Unique identifier of the loss function.}
+\item{\code{id}}{(`character(1)`)\cr
+The id of the object.}
 
 \item{\code{fun}}{`function(y_true, y_pred, ...)`\cr
 Loss function.}
@@ -43,7 +43,7 @@ Creates a new instance of this [R6][R6::R6Class] class.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{id}}{(`character(1)`)\cr
-Unique identifier of the loss function.}
+Id of the object.}
 
 \item{\code{label}}{(`character(1)`)\cr
 Label of the loss function.}

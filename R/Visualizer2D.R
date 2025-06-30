@@ -132,7 +132,7 @@ Visualizer2D = R6::R6Class("Visualizer2D",
     
     #' @description
     #' Initialize contour layer (compatibility method, no-op for ggplot2 version).
-    #' @param ... Additional arguments (ignored for compatibility).
+    #' @template param_dots_compatibility
     init_layer_contour = function(...) {
       # No-op for compatibility with plotly version
       invisible(self)
@@ -140,7 +140,7 @@ Visualizer2D = R6::R6Class("Visualizer2D",
     
     #' @description
     #' Initialize surface layer (compatibility method, no-op for ggplot2 version).
-    #' @param ... Additional arguments (ignored for compatibility).
+    #' @template param_dots_compatibility
     init_layer_surface = function(...) {
       # No-op for compatibility with plotly version
       invisible(self)
@@ -148,7 +148,7 @@ Visualizer2D = R6::R6Class("Visualizer2D",
     
     #' @description
     #' Add optimization trace (compatibility method, no-op for ggplot2 version).
-    #' @param ... Additional arguments (ignored for compatibility).
+    #' @template param_dots_compatibility
     add_optimization_trace = function(...) {
       # No-op for compatibility with plotly version
       invisible(self)
@@ -156,7 +156,7 @@ Visualizer2D = R6::R6Class("Visualizer2D",
     
     #' @description
     #' Set layout (compatibility method, no-op for ggplot2 version).
-    #' @param ... Additional arguments (ignored for compatibility).
+    #' @template param_dots_compatibility
     set_layout = function(...) {
       # No-op for compatibility with plotly version
       invisible(self)
@@ -164,7 +164,7 @@ Visualizer2D = R6::R6Class("Visualizer2D",
     
     #' @description
     #' Set scene (compatibility method, no-op for ggplot2 version).
-    #' @param ... Additional arguments (ignored for compatibility).
+    #' @template param_dots_compatibility
     set_scene = function(...) {
       # No-op for compatibility with plotly version
       invisible(self)
@@ -172,7 +172,7 @@ Visualizer2D = R6::R6Class("Visualizer2D",
     
     #' @description
     #' Add layer taylor (compatibility method, no-op for ggplot2 version).
-    #' @param ... Additional arguments (ignored for compatibility).
+    #' @template param_dots_compatibility
     add_layer_taylor = function(...) {
       # No-op for compatibility with plotly version
       invisible(self)

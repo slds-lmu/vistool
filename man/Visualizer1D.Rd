@@ -15,13 +15,13 @@ x-values of function}
 \item{\code{fun_y}}{(`numeric(n)`)\cr
 y-values of function}
 
-\item{\code{title}}{(character(1)\cr
+\item{\code{title}}{(`character(1)`)\cr
 Title of plot}
 
-\item{\code{lab_x}}{(character(1)\cr
+\item{\code{lab_x}}{(`character(1)`)\cr
 Label of x-axis}
 
-\item{\code{lab_y}}{(character(1)\cr
+\item{\code{lab_y}}{(`character(1)`)\cr
 Label of y-axis}
 
 \item{\code{points_x}}{(`numeric(m)`)\cr
@@ -32,25 +32,25 @@ Use NULL if no points should be plotted.}
 y-values of extra points to plot.
 Use NULL if no points should be plotted.}
 
-\item{\code{line_col}}{(character(1)\cr
+\item{\code{line_col}}{(`character(1)`)\cr
 Color of plotted line}
 
-\item{\code{line_width}}{(numeric(1)\cr
+\item{\code{line_width}}{(`numeric(1)`)\cr
 Width of plotted line}
 
-\item{\code{line_type}}{(character(1)\cr
+\item{\code{line_type}}{(`character(1)`)\cr
 Type of plotted line}
 
-\item{\code{points_col}}{(character(1)\cr
+\item{\code{points_col}}{(`character(1)`)\cr
 Color of plotted points}
 
-\item{\code{points_size}}{(numeric(1)\cr
+\item{\code{points_size}}{(`numeric(1)`)\cr
 Size of plotted points}
 
-\item{\code{points_shape}}{(integer(1)\cr
+\item{\code{points_shape}}{(`integer(1)`)\cr
 Shape of plotted points}
 
-\item{\code{points_alpha}}{(numeric(1)\cr
+\item{\code{points_alpha}}{(`numeric(1)`)\cr
 Alpha blending of plotted points}
 }
 \if{html}{\out{</div>}}
@@ -89,13 +89,13 @@ x-values of function}
 \item{\code{fun_y}}{(`numeric()`)\cr
 y-values of function}
 
-\item{\code{title}}{(character(1)\cr
+\item{\code{title}}{(`character(1)`)\cr
 Title of plot}
 
-\item{\code{lab_x}}{(character(1)\cr
+\item{\code{lab_x}}{(`character(1)`)\cr
 Label of x-axis}
 
-\item{\code{lab_y}}{(character(1)\cr
+\item{\code{lab_y}}{(`character(1)`)\cr
 Label of y-axis}
 
 \item{\code{points_x}}{(`numeric()`)\cr

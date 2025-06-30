@@ -27,8 +27,7 @@ Visualizer3DModel = R6::R6Class("Visualizer3DModel",
     #'
     #' @param task ([mlr3::Task])\cr
     #'   The task to train the model on.
-    #' @param learner ([mlr3::Learner])\cr
-    #'   The learner to train the model with.
+    #' @template param_learner
     initialize = function(task, learner, x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L) {
       self$task = mlr3::assert_task(task)
       self$learner = mlr3::assert_learner(learner, task = self$task)

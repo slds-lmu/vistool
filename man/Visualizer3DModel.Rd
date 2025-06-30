@@ -63,7 +63,7 @@ Creates a new instance of this [R6][R6::R6Class] class.
 \item{\code{task}}{([mlr3::Task])\cr
 The task to train the model on.}
 
-\item{\code{learner}}{([mlr3::Learner])\cr
+\item{\code{learner}}{(`mlr3::Learner`)\cr
 The learner to train the model with.}
 
 \item{\code{x1_limits}}{(`numeric(2)`)\cr

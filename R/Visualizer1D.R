@@ -20,16 +20,16 @@ Visualizer1D = R6::R6Class("Visualizer1D",
     #' y-values of function
     fun_y = NULL,
 
-    #' @field title (character(1)\cr
+    #' @field title (`character(1)`)\cr
     #' Title of plot
     title = NULL,
 
-    #' @field lab_x (character(1)\cr
+    #' @field lab_x (`character(1)`)\cr
     #' Label of x-axis
     lab_x = NULL,
     # FIXME: make consistent names with other visualizers
 
-    #' @field lab_y (character(1)\cr
+    #' @field lab_y (`character(1)`)\cr
     #' Label of y-axis
     lab_y = NULL,
 
@@ -43,31 +43,31 @@ Visualizer1D = R6::R6Class("Visualizer1D",
     #' Use NULL if no points should be plotted.
     points_y = NULL,
 
-    #' @field line_col (character(1)\cr
+    #' @field line_col (`character(1)`)\cr
     #' Color of plotted line
     line_col = NULL,
 
-    #' @field line_width (numeric(1)\cr
+    #' @field line_width (`numeric(1)`)\cr
     #' Width of plotted line
     line_width = NULL,
 
-    #' @field line_type (character(1)\cr
+    #' @field line_type (`character(1)`)\cr
     #' Type of plotted line
     line_type = NULL,
 
-    #' @field points_col (character(1)\cr
+    #' @field points_col (`character(1)`)\cr
     #' Color of plotted points
     points_col = NULL,
 
-    #' @field points_size (numeric(1)\cr
+    #' @field points_size (`numeric(1)`)\cr
     #' Size of plotted points
     points_size = NULL,
 
-    #' @field points_shape (integer(1)\cr
+    #' @field points_shape (`integer(1)`)\cr
     #'  Shape of plotted points
     points_shape = NULL,
 
-    #' @field points_alpha (numeric(1)\cr
+    #' @field points_alpha (`numeric(1)`)\cr
     #'  Alpha blending of plotted points
     points_alpha = NULL,
 
@@ -80,11 +80,11 @@ Visualizer1D = R6::R6Class("Visualizer1D",
     #'   x-values of function
     #' @param fun_y (`numeric()`)\cr
     #'   y-values of function
-    #' @param title (character(1)\cr
+    #' @param title (`character(1)`)\cr
     #'   Title of plot
-    #' @param lab_x (character(1)\cr
+    #' @param lab_x (`character(1)`)\cr
     #'   Label of x-axis
-    #' @param lab_y (character(1)\cr
+    #' @param lab_y (`character(1)`)\cr
     #'   Label of y-axis
     #' @param points_x (`numeric()`)\cr
     #'   x-values of extra points to plot.

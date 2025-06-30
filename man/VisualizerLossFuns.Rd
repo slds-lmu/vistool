@@ -3,6 +3,9 @@
 \name{VisualizerLossFuns}
 \alias{VisualizerLossFuns}
 \title{Visualizer for Losses}
+\value{
+Returns self invisibly.
+}
 \description{
 Visualize one or multiple loss functions.
 }
@@ -96,9 +99,6 @@ Initialize line layer for the plot.
 Colors to use for the lines. If NULL, default colors will be used.}
 }
 \if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Returns self invisibly.
 }
 }
 \if{html}{\out{<hr>}}

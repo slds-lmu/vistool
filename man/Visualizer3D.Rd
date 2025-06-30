@@ -102,11 +102,23 @@ Initialize the plot with contour lines.
 \item{\code{opacity}}{(`numeric(1)`)\cr
 Opacity of the layer.}
 
+\item{\code{opacity}}{(`numeric(1)`)\cr
+Opacity of the layer.}
+
 \item{\code{colorscale}}{(`list()`)\cr
-The coloring of the contour.}
+The coloring of the surface/contour.}
+
+\item{\code{colorscale}}{(`list()`)\cr
+The coloring of the surface/contour.}
 
 \item{\code{show_title}}{(`logical(1)`)\cr
 Indicator whether to show the title of the plot.}
+
+\item{\code{show_title}}{(`logical(1)`)\cr
+Indicator whether to show the title of the plot.}
+
+\item{\code{...}}{(`any`)\cr
+Further arguments passed to `add_trace(...)`.}
 
 \item{\code{...}}{(`any`)\cr
 Further arguments passed to `add_trace(...)`.}
@@ -135,14 +147,26 @@ Initialize the plot as 3D surface.
 \item{\code{opacity}}{(`numeric(1)`)\cr
 Opacity of the layer.}
 
+\item{\code{opacity}}{(`numeric(1)`)\cr
+Opacity of the layer.}
+
 \item{\code{colorscale}}{(`list()`)\cr
-The coloring of the surface.}
+The coloring of the surface/contour.}
+
+\item{\code{colorscale}}{(`list()`)\cr
+The coloring of the surface/contour.}
 
 \item{\code{show_contours}}{(`logical(1)`)\cr
 Indicator whether to show the contours of the surface.}
 
 \item{\code{show_title}}{(`logical(1)`)\cr
 Indicator whether to show the title of the plot.}
+
+\item{\code{show_title}}{(`logical(1)`)\cr
+Indicator whether to show the title of the plot.}
+
+\item{\code{...}}{(`any`)\cr
+Further arguments passed to `add_trace(...)`.}
 
 \item{\code{...}}{(`any`)\cr
 Further arguments passed to `add_trace(...)`.}

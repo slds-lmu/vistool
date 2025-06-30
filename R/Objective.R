@@ -6,7 +6,7 @@
 #' @export
 Objective = R6::R6Class("Objective",
   public = list(
-    #' @field id (`character(1)` The id of the objective.
+    #' @template field_id
     id = NULL,
 
     # TODO: how to manage and use labels?
@@ -26,7 +26,7 @@ Objective = R6::R6Class("Objective",
     # x = listcol, unclear whether thats best, we can always add an unwrapper
 
     #' @description Creates a new instance of this [R6][R6::R6Class] class.
-    #' @param id (`character(1)` The id of the objective.
+    #' @template param_id
     #' @param fun (`function` The objective function. The first argument must be a numerical input of length `xdim`.
     #' @param label (`character(1)` The label of the objective, i.e. a.
     #' @param xdim (`integer(1)`) The input dimension of `fun`. Use `xdim = NA` for an arbitrary input dimension.
@@ -36,7 +36,8 @@ Objective = R6::R6Class("Objective",
     #' @param xtest (`numeric()`) Test value for `fun` during initialization. If not defined,
     #' `xtest = rep(0, ifelse(is.na(xdim), 2, xdim))` is used.
     #' @param minimize (`logical(1)`) Is the problem a minimization problem? Default is no (`FALSE`).
-    #' @param ... Additional arguments passed to `fun`.
+    #' @template param_dots_fun
+    #' @template return_self_invisible
     initialize = function(id, fun, label = "f", xdim, lower = NA,
       upper = NA, xtest = NULL, minimize = FALSE, ...) {
 
@@ -68,7 +69,6 @@ Objective = R6::R6Class("Objective",
 
     #' @description Evaluate the objective function.
     #' @param x (`numeric`) The numerical input of `fun`.
-    # #' @param ... Additional arguments passed to `fun`.
     #' @return The result of `fun(x)`.
     eval = function(x) {
       if (! is.na(private$p_xdim)) {
@@ -81,7 +81,6 @@ Objective = R6::R6Class("Objective",
     #' the input vector `x`, result of fun `fval`, the gradient `grad`, the norm of the gradient
     #' `gnorm`, and additional logs that were added by `$addLogFun`.
     #' @param x (`numeric`) The numerical input of `fun`.
-    # #' @param ... Additional arguments passed to `fun`.
     #' @return Invisible list of logs that are added to the archive.
     evalStore = function(x) {
       if (! is.na(private$p_xdim)) {
@@ -125,7 +124,6 @@ Objective = R6::R6Class("Objective",
 
     #' @description Evaluate the hessian of the objective function at x.
     #' @param x (`numeric`) The numerical input of `fun`.
-    #' @param ... Additional arguments passed to `fun`.
     hess = function(x) {
       if (is.null(private$p_hessian)) {
         #return(private$p_hessianFallback(x))
@@ -140,7 +138,6 @@ Objective = R6::R6Class("Objective",
     #' @param l (`function`) Function that returns a single numerical value or a string.
     #' The arguments of `l` must be `x`, `fval` and `grad`.
     #' @param label (`character(1)`) The name of the logger.
-    #' @param ... Additional arguments passed to `fun`.
     addLogFun = function(l, label) {
       assertFunction(l, c("x", "fval", "grad"))
       xtest = private$p_xtest
