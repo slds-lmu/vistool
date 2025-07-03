@@ -120,8 +120,15 @@ Visualizer1D <- R6::R6Class("Visualizer1D",
 
     #' @description
     #' Create and return the ggplot2 plot.
+    #' @param text_size (`numeric(1)`)\cr
+    #'   Base text size for plot elements. Default is 11.
+    #' @param theme (`character(1)`)\cr
+    #'   ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "minimal".
     #' @return A ggplot2 object.
-    plot = function() {
+    plot = function(text_size = 11, theme = "minimal") {
+      checkmate::assert_number(text_size, lower = 1)
+      checkmate::assert_choice(theme, choices = c("minimal", "bw", "classic", "gray", "light", "dark", "void"))
+      
       dd <- data.frame(x = self$fun_x, y = self$fun_y)
       pl <- ggplot(data = dd, aes(x = x, y = y))
       pl <- pl + geom_line(linewidth = self$line_width, col = self$line_col, linetype = self$line_type)
@@ -134,6 +141,19 @@ Visualizer1D <- R6::R6Class("Visualizer1D",
           shape = self$points_shape, alpha = self$points_alpha
         )
       }
+      
+      # apply theme
+      theme_fun <- switch(theme,
+        "minimal" = ggplot2::theme_minimal,
+        "bw" = ggplot2::theme_bw,
+        "classic" = ggplot2::theme_classic,
+        "gray" = ggplot2::theme_gray,
+        "light" = ggplot2::theme_light,
+        "dark" = ggplot2::theme_dark,
+        "void" = ggplot2::theme_void
+      )
+      pl <- pl + theme_fun(base_size = text_size)
+      
       return(pl)
     }
   )

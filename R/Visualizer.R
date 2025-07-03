@@ -10,8 +10,12 @@ Visualizer <- R6::R6Class("Visualizer",
 
     #' @description
     #' Abstract method to be implemented by subclasses.
+    #' @param text_size (`numeric(1)`)\cr
+    #'   Base text size for plot elements. Default is 11.
+    #' @param theme (`character(1)`)\cr
+    #'   ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "minimal".
     #' @return The plot object.
-    plot = function() {
+    plot = function(text_size = 11, theme = "minimal") {
       stop("Abstract method 'plot' must be implemented by subclass")
     },
 
@@ -49,9 +53,9 @@ Visualizer <- R6::R6Class("Visualizer",
   ),
   private = list(
 
-    # Save a ggplot2 object
+    # save a ggplot2 object
     save_ggplot = function(plot_obj, filename, width, height, dpi, ...) {
-      # Default dimensions for ggplot2 (in inches)
+      # default dimensions for ggplot2
       if (is.null(width)) width <- 10
       if (is.null(height)) height <- 6
 
@@ -65,9 +69,9 @@ Visualizer <- R6::R6Class("Visualizer",
       )
     },
 
-    # Save a plotly object
+    # save a plotly object
     save_plotly = function(plot_obj, filename, width, height, ...) {
-      # Default dimensions for plotly (in pixels)
+      # default dimensions for plotly (in pixels)
       if (is.null(width)) width <- 800
       if (is.null(height)) height <- 600
 

@@ -5,6 +5,7 @@
 #'
 #' @export
 VisualizerLossFuns <- R6::R6Class("VisualizerLossFuns",
+  inherit = Visualizer,
   public = list(
 
     #' @field losses (`list`)\cr
@@ -105,8 +106,15 @@ VisualizerLossFuns <- R6::R6Class("VisualizerLossFuns",
 
     #' @description
     #' Create and return the ggplot2 plot.
+    #' @param text_size (`numeric(1)`)\cr
+    #'   Base text size for plot elements. Default is 11.
+    #' @param theme (`character(1)`)\cr
+    #'   ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "bw".
     #' @return A ggplot2 object showing the loss functions.
-    plot = function() {
+    plot = function(text_size = 11, theme = "bw") {
+      checkmate::assert_number(text_size, lower = 1)
+      checkmate::assert_choice(theme, choices = c("minimal", "bw", "classic", "gray", "light", "dark", "void"))
+      
       # get lossfun labels so we can use them for legend
       loss_labels <- sapply(self$losses, function(x) x$label)
       # eval losses on defined range, then melt data into long format
@@ -122,7 +130,7 @@ VisualizerLossFuns <- R6::R6Class("VisualizerLossFuns",
       }
       loss_seqs <- data.table::as.data.table(lapply(self$losses, function(ll) ll$fun(r_seq)))
       dd <- cbind(r = r_seq, loss_seqs)
-      dd <- melt(dd,
+      dd <- data.table::melt(dd,
         id.vars = "r", measure.vars = colnames(loss_seqs),
         variable.name = "loss_fun", value.name = "loss_val"
       )
@@ -132,22 +140,61 @@ VisualizerLossFuns <- R6::R6Class("VisualizerLossFuns",
         col = loss_fun, linetype = loss_fun, linewidth = loss_fun
       ))
       pl <- pl + geom_line()
-      # use cols, linetypes and widths
+      # intelligent color selection
       if (!is.null(self$line_col)) {
-        pl <- pl + scale_color_manual(values = self$line_col, labels = loss_labels)
+        # use user-specified colors
+        color_values <- self$line_col
       } else {
-        if (requireNamespace("ggsci", quietly = TRUE)) {
-          pl <- pl + ggsci::scale_color_npg(labels = loss_labels)
+        # smart default color selection
+        n_losses <- length(unique(dd$loss_fun))
+        if (n_losses == 1) {
+          color_values <- "#FF8C00"  # orange
+        } else if (n_losses == 2) {
+          color_values <- c("#FF8C00", "#1E90FF")  # orange, dodger blue
+        } else if (n_losses == 3) {
+          color_values <- c("#FF8C00", "#1E90FF", "#32CD32")  # orange, dodger blue, lime green
+        } else if (n_losses == 4) {
+          color_values <- c("#FF8C00", "#1E90FF", "#32CD32", "#DC143C")  # orange, dodger blue, lime green, crimson
         } else {
-          pl <- pl + scale_color_discrete(labels = loss_labels)
+          # for 5+ functions, use a colorblind-friendly palette
+          if (requireNamespace("ggsci", quietly = TRUE)) {
+            # use ggsci NPG palette which is generally colorblind-friendly
+            color_values <- ggsci::pal_npg("nrc")(n_losses)
+          } else {
+            # fallback to viridis-like colors (colorblind-friendly)
+            color_values <- rainbow(n_losses, start = 0, end = 0.8)
+          }
         }
       }
+      
+      # apply color scale
+      pl <- pl + scale_color_manual(values = color_values, labels = loss_labels)
+      
+      # apply line width
       if (!is.null(self$line_width)) {
         pl <- pl + scale_linewidth_manual(values = self$line_width, labels = loss_labels)
+      } else {
+        # defaults for linewidth
+        pl <- pl + scale_linewidth_manual(values = rep(1.2, length(unique(dd$loss_fun))), labels = loss_labels)
       }
+      
+      # apply line type
       if (!is.null(self$line_type)) {
         pl <- pl + scale_linetype_manual(values = self$line_type, labels = loss_labels)
       }
+      
+      # apply theme
+      theme_fun <- switch(theme,
+        "minimal" = ggplot2::theme_minimal,
+        "bw" = ggplot2::theme_bw,
+        "classic" = ggplot2::theme_classic,
+        "gray" = ggplot2::theme_gray,
+        "light" = ggplot2::theme_light,
+        "dark" = ggplot2::theme_dark,
+        "void" = ggplot2::theme_void
+      )
+      pl <- pl + theme_fun(base_size = text_size) + theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      
       # use specified axis labels and legend title
       pl <- pl + labs(x = self$lab_x, y = self$lab_y)
       pl <- pl + theme(legend.title = self$legend_title)

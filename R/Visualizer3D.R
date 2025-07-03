@@ -190,8 +190,29 @@ Visualizer3D <- R6::R6Class("Visualizer3D",
     },
 
     #' @description Return the plot and hence plot it or do further processing.
-    plot = function() {
+    #' @param text_size (`numeric(1)`)\cr
+    #'   Base text size for plot elements. Default is 12. For 3D plotly plots, this controls axis labels and title sizes.
+    #' @param theme (`character(1)`)\cr
+    #'   Theme parameter for compatibility with ggplot2-based visualizers. Ignored for 3D plotly plots.
+    plot = function(text_size = 12, theme = "minimal") {
+      checkmate::assert_number(text_size, lower = 1)
+      checkmate::assert_choice(theme, choices = c("minimal", "bw", "classic", "gray", "light", "dark", "void"))
+      
       if (is.null(private$.plot)) self$init_layer_surface()
+      
+      # apply text size to plotly layout
+      if (!is.null(private$.plot)) {
+        private$.plot <- private$.plot %>%
+          layout(
+            title = list(text = self$plot_lab, font = list(size = text_size + 2)),
+            scene = list(
+              xaxis = list(title = list(text = self$x1_lab, font = list(size = text_size))),
+              yaxis = list(title = list(text = self$x2_lab, font = list(size = text_size))),
+              zaxis = list(title = list(text = self$z_lab, font = list(size = text_size)))
+            )
+          )
+      }
+      
       return(private$.plot)
     }
   ),

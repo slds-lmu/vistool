@@ -79,8 +79,15 @@ Visualizer2D <- R6::R6Class("Visualizer2D",
 
     #' @description
     #' Create and return the ggplot2 plot.
+    #' @param text_size (`numeric(1)`)\cr
+    #'   Base text size for plot elements. Default is 11.
+    #' @param theme (`character(1)`)\cr
+    #'   ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "minimal".
     #' @return A ggplot2 object.
-    plot = function() {
+    plot = function(text_size = 11, theme = "minimal") {
+      checkmate::assert_number(text_size, lower = 1)
+      checkmate::assert_choice(theme, choices = c("minimal", "bw", "classic", "gray", "light", "dark", "void"))
+      
       data <- data.table(
         fun_x1 = self$fun_x1,
         fun_x2 = self$fun_x2,
@@ -100,8 +107,7 @@ Visualizer2D <- R6::R6Class("Visualizer2D",
         geom_contour_filled(breaks = breaks, show.legend = TRUE) +
         geom_contour(color = "white", alpha = 0.3) +
         labs(title = self$title, x = self$lab_x1, y = self$lab_x2) +
-        scale_fill_viridis_d(name = self$lab_y, drop = FALSE) +
-        theme_minimal()
+        scale_fill_viridis_d(name = self$lab_y, drop = FALSE)
 
       # add decision boundary if available (for classification)
       if (!is.null(private$.decision_threshold)) {
@@ -130,6 +136,18 @@ Visualizer2D <- R6::R6Class("Visualizer2D",
         ) +
           scale_color_viridis_c(name = self$lab_y, limits = color_limits)
       }
+
+      # apply theme
+      theme_fun <- switch(theme,
+        "minimal" = ggplot2::theme_minimal,
+        "bw" = ggplot2::theme_bw,
+        "classic" = ggplot2::theme_classic,
+        "gray" = ggplot2::theme_gray,
+        "light" = ggplot2::theme_light,
+        "dark" = ggplot2::theme_dark,
+        "void" = ggplot2::theme_void
+      )
+      p <- p + theme_fun(base_size = text_size)
 
       return(p)
     },

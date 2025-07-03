@@ -20,6 +20,7 @@ Imports:
     colorspace,
     data.table,
     ggplot2,
+    ggsci,
     magrittr,
     mlr3,
     mlr3misc,
@@ -31,7 +32,6 @@ Imports:
     TestFunctions
 Suggests:
     e1071,
-    ggsci,
     knitr,
     mlr3learners,
     mlr3pipelines,

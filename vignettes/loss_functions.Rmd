@@ -10,7 +10,11 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  dpi = 150,
+  dev = "png",
+  out.width = "100%",
+  fig.retina = 2
 )
 ```
 
@@ -47,35 +51,25 @@ vis <- as_visualizer(loss_function, y_pred = seq(-4, 4), y_true = 1)
 Use the `plot()` method to plot the loss function.
 
 ```{r, out.width='100%'}
-vis$plot()
+vis$plot(text_size = 6)
 ```
 
 # Regression Loss Functions
 
 Here we visualize multiple regression loss functions:
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
-library(mlr3misc)
-library(ggplot2)
+```{r, echo=TRUE, message=FALSE, warning=FALSE, out.width='100%'}
+loss_huber = lss("huber")
+loss_l2 = lss("l2_se")
+loss_l1 = lss("l1_ae")
+loss_logcosh = lss("log-cosh")
 
-# Create individual plots for each loss function
-plots <- list()
-loss_names <- c("huber", "l1_ae", "l2_se", "log-cosh")
-
-for (i in seq_along(loss_names)) {
-  key <- loss_names[i]
-  loss_func <- lss(key)
-  vis <- as_visualizer(loss_func, y_pred = seq(-10, 10), y_true = 0)
-  plots[[i]] <- vis$plot() + ggplot2::ggtitle(loss_func$label)
-}
-
-# Combine plots using patchwork if available, or just show them individually
-if (requireNamespace("patchwork", quietly = TRUE)) {
-  patchwork::wrap_plots(plots, ncol = 2)
-} else {
-  # If patchwork is not available, just show the first plot as an example
-  plots[[1]]
-}
+vis_combined = VisualizerLossFuns$new(
+  list(loss_huber, loss_l2, loss_l1, loss_logcosh),
+  y_pred = seq(-4, 4),
+  y_true = 0
+)
+vis_combined$plot(text_size = 4)
 ```
 
 # Classification Loss Functions
@@ -83,24 +77,15 @@ if (requireNamespace("patchwork", quietly = TRUE)) {
 Here we visualize classification loss functions:
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
-# Create individual plots for each loss function
-plots <- list()
-loss_names <- c("cross-entropy", "hinge")
+loss_hinge <- lss("cross-entropy")
+loss_crossentropy <- lss("hinge")
 
-for (i in seq_along(loss_names)) {
-  key <- loss_names[i]
-  loss_func <- lss(key)
-  vis <- as_visualizer(loss_func, y_pred = seq(-4, 4), y_true = 1)
-  plots[[i]] <- vis$plot() + ggplot2::ggtitle(loss_func$label)
-}
-
-# Combine plots using patchwork if available, or just show them individually
-if (requireNamespace("patchwork", quietly = TRUE)) {
-  patchwork::wrap_plots(plots, ncol = 2)
-} else {
-  # If patchwork is not available, just show the first plot as an example
-  plots[[1]]
-}
+vis_combined = VisualizerLossFuns$new(
+  list(loss_hinge, loss_crossentropy),
+  y_pred = seq(-4, 4),
+  y_true = 1
+)
+vis_combined$plot(text_size = 4)
 ```
 
 # Custom Loss Functions
@@ -116,5 +101,5 @@ custom_loss <- LossFunction$new(
 )
 
 vis <- as_visualizer(custom_loss, y_pred = seq(-10, 10), y_true = 0)
-vis$plot()
+vis$plot(text_size = 6)
 ```
