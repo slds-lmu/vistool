@@ -1,7 +1,7 @@
-#' @title Visualize Base Class
+#' @title Visualize 2D Functions
 #'
 #' @description
-#' This class is used to create 2D visualizations.
+#' Visualizes a two-dimensional function \eqn{f: \mathbb{R}^2 \to \mathbb{R}}.
 #'
 #' @template param_x1_limits
 #' @template param_x2_limits
@@ -10,6 +10,7 @@
 #'
 #' @export
 Visualizer2D = R6::R6Class("Visualizer2D",
+  inherit = Visualizer,
   public = list(
 
     #' @field fun_x1 (`numeric(n)`)

@@ -2,9 +2,12 @@
 % Please edit documentation in R/Visualizer2D.R
 \name{Visualizer2D}
 \alias{Visualizer2D}
-\title{Visualize Base Class}
+\title{Visualize 2D Functions}
 \description{
-This class is used to create 2D visualizations.
+Visualizes a two-dimensional function \eqn{f: \mathbb{R}^2 \to \mathbb{R}}.
+}
+\section{Super class}{
+\code{\link[vistool:Visualizer]{vistool::Visualizer}} -> \code{Visualizer2D}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -47,6 +50,13 @@ y-values of points.}
 \item \href{#method-Visualizer2D-clone}{\code{Visualizer2D$clone()}}
 }
 }
+\if{html}{\out{
+<details open><summary>Inherited methods</summary>
+<ul>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href='../../vistool/html/Visualizer.html#method-Visualizer-save'><code>vistool::Visualizer$save()</code></a></span></li>
+</ul>
+</details>
+}}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Visualizer2D-new"></a>}}
 \if{latex}{\out{\hypertarget{method-Visualizer2D-new}{}}}

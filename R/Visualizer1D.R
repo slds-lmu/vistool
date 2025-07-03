@@ -1,7 +1,7 @@
-#' @title Visualize Base Class
+#' @title Visualize 1D Functions
 #'
 #' @description
-#' This class is used to create 1D visualizations.
+#' Visualizes a one-dimensional function \eqn{f: \mathbb{R} \to \mathbb{R}}.
 #'
 #' @template param_x1_limits
 #' @template param_x2_limits
@@ -10,6 +10,7 @@
 #'
 #' @export
 Visualizer1D = R6::R6Class("Visualizer1D",
+  inherit = Visualizer,
   public = list(
 
     #' @field fun_x (`numeric(n)`)\cr

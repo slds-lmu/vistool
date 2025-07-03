@@ -6,8 +6,8 @@
 \description{
 This class is used to create visualizations of tasks and learners.
 }
-\section{Super class}{
-\code{\link[vistool:Visualizer1D]{vistool::Visualizer1D}} -> \code{Visualizer1DModel}
+\section{Super classes}{
+\code{\link[vistool:Visualizer]{vistool::Visualizer}} -> \code{\link[vistool:Visualizer1D]{vistool::Visualizer1D}} -> \code{Visualizer1DModel}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -33,6 +33,7 @@ Number of points to use for visualization.}
 \if{html}{\out{
 <details open><summary>Inherited methods</summary>
 <ul>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href='../../vistool/html/Visualizer.html#method-Visualizer-save'><code>vistool::Visualizer$save()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer1D" data-id="plot"><a href='../../vistool/html/Visualizer1D.html#method-Visualizer1D-plot'><code>vistool::Visualizer1D$plot()</code></a></span></li>
 </ul>
 </details>

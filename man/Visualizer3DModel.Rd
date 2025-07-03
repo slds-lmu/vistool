@@ -6,8 +6,8 @@
 \description{
 This class is used to create 3D visualizations of learners and tasks.
 }
-\section{Super class}{
-\code{\link[vistool:Visualizer3D]{vistool::Visualizer3D}} -> \code{Visualizer3DModel}
+\section{Super classes}{
+\code{\link[vistool:Visualizer]{vistool::Visualizer}} -> \code{\link[vistool:Visualizer3D]{vistool::Visualizer3D}} -> \code{Visualizer3DModel}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -32,10 +32,10 @@ Learner used to train the model.}
 \if{html}{\out{
 <details><summary>Inherited methods</summary>
 <ul>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href='../../vistool/html/Visualizer.html#method-Visualizer-save'><code>vistool::Visualizer$save()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer3D" data-id="init_layer_contour"><a href='../../vistool/html/Visualizer3D.html#method-Visualizer3D-init_layer_contour'><code>vistool::Visualizer3D$init_layer_contour()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer3D" data-id="init_layer_surface"><a href='../../vistool/html/Visualizer3D.html#method-Visualizer3D-init_layer_surface'><code>vistool::Visualizer3D$init_layer_surface()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer3D" data-id="plot"><a href='../../vistool/html/Visualizer3D.html#method-Visualizer3D-plot'><code>vistool::Visualizer3D$plot()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer3D" data-id="save"><a href='../../vistool/html/Visualizer3D.html#method-Visualizer3D-save'><code>vistool::Visualizer3D$save()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer3D" data-id="set_layout"><a href='../../vistool/html/Visualizer3D.html#method-Visualizer3D-set_layout'><code>vistool::Visualizer3D$set_layout()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer3D" data-id="set_scene"><a href='../../vistool/html/Visualizer3D.html#method-Visualizer3D-set_scene'><code>vistool::Visualizer3D$set_scene()</code></a></span></li>
 </ul>

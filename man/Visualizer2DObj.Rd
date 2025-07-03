@@ -6,8 +6,8 @@
 \description{
 This class is used to create visualizations and animations of optimization traces.
 }
-\section{Super class}{
-\code{\link[vistool:Visualizer2D]{vistool::Visualizer2D}} -> \code{Visualizer2DObj}
+\section{Super classes}{
+\code{\link[vistool:Visualizer]{vistool::Visualizer}} -> \code{\link[vistool:Visualizer2D]{vistool::Visualizer2D}} -> \code{Visualizer2DObj}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -27,6 +27,7 @@ The objective function.}
 \if{html}{\out{
 <details><summary>Inherited methods</summary>
 <ul>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href='../../vistool/html/Visualizer.html#method-Visualizer-save'><code>vistool::Visualizer$save()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="add_layer_hessian"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-add_layer_hessian'><code>vistool::Visualizer2D$add_layer_hessian()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="add_layer_taylor"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-add_layer_taylor'><code>vistool::Visualizer2D$add_layer_taylor()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="add_optimization_trace"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-add_optimization_trace'><code>vistool::Visualizer2D$add_optimization_trace()</code></a></span></li>

@@ -1,7 +1,7 @@
-#' @title Visualize Base Class
+#' @title Visualize 3D Functions
 #'
 #' @description
-#' This class is used to create 3D visualizations.
+#' Visualizes a three-dimensional function \eqn{f: \mathbb{R}^3 \to \mathbb{R}} via interactive plotly renderings.
 #'
 #' @template param_x1_limits
 #' @template param_x2_limits
@@ -10,6 +10,7 @@
 #'
 #' @export
 Visualizer3D = R6::R6Class("Visualizer3D",
+  inherit = Visualizer,
   public = list(
 
     #' @template field_grid_x1x2
@@ -188,14 +189,6 @@ Visualizer3D = R6::R6Class("Visualizer3D",
     plot = function() {
       if (is.null(private$.plot)) self$init_layer_surface()
       return(private$.plot)
-    },
-
-
-    #' @description Save the plot by using plotlys `save_image()` function.
-    #' @param ... Further arguments passed to `save_image()`.
-    save = function(...) {
-      if (is.null(private$.plot)) self$init_layer_surface()
-      save_image(private$.plot, ...)
     }
   ),
   private = list(

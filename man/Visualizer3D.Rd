@@ -2,9 +2,12 @@
 % Please edit documentation in R/Visualizer3D.R
 \name{Visualizer3D}
 \alias{Visualizer3D}
-\title{Visualize Base Class}
+\title{Visualize 3D Functions}
 \description{
-This class is used to create 3D visualizations.
+Visualizes a three-dimensional function \eqn{f: \mathbb{R}^3 \to \mathbb{R}} via interactive plotly renderings.
+}
+\section{Super class}{
+\code{\link[vistool:Visualizer]{vistool::Visualizer}} -> \code{Visualizer3D}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -38,10 +41,16 @@ Label of the z axis.}
 \item \href{#method-Visualizer3D-set_layout}{\code{Visualizer3D$set_layout()}}
 \item \href{#method-Visualizer3D-set_scene}{\code{Visualizer3D$set_scene()}}
 \item \href{#method-Visualizer3D-plot}{\code{Visualizer3D$plot()}}
-\item \href{#method-Visualizer3D-save}{\code{Visualizer3D$save()}}
 \item \href{#method-Visualizer3D-clone}{\code{Visualizer3D$clone()}}
 }
 }
+\if{html}{\out{
+<details open><summary>Inherited methods</summary>
+<ul>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href='../../vistool/html/Visualizer.html#method-Visualizer-save'><code>vistool::Visualizer$save()</code></a></span></li>
+</ul>
+</details>
+}}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Visualizer3D-new"></a>}}
 \if{latex}{\out{\hypertarget{method-Visualizer3D-new}{}}}
@@ -221,23 +230,6 @@ Return the plot and hence plot it or do further processing.
 \if{html}{\out{<div class="r">}}\preformatted{Visualizer3D$plot()}\if{html}{\out{</div>}}
 }
 
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Visualizer3D-save"></a>}}
-\if{latex}{\out{\hypertarget{method-Visualizer3D-save}{}}}
-\subsection{Method \code{save()}}{
-Save the plot by using plotlys `save_image()` function.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer3D$save(...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{Further arguments passed to `save_image()`.}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Visualizer3D-clone"></a>}}

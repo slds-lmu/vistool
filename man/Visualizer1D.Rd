@@ -2,9 +2,12 @@
 % Please edit documentation in R/Visualizer1D.R
 \name{Visualizer1D}
 \alias{Visualizer1D}
-\title{Visualize Base Class}
+\title{Visualize 1D Functions}
 \description{
-This class is used to create 1D visualizations.
+Visualizes a one-dimensional function \eqn{f: \mathbb{R} \to \mathbb{R}}.
+}
+\section{Super class}{
+\code{\link[vistool:Visualizer]{vistool::Visualizer}} -> \code{Visualizer1D}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -63,6 +66,13 @@ Alpha blending of plotted points}
 \item \href{#method-Visualizer1D-clone}{\code{Visualizer1D$clone()}}
 }
 }
+\if{html}{\out{
+<details open><summary>Inherited methods</summary>
+<ul>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href='../../vistool/html/Visualizer.html#method-Visualizer-save'><code>vistool::Visualizer$save()</code></a></span></li>
+</ul>
+</details>
+}}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Visualizer1D-new"></a>}}
 \if{latex}{\out{\hypertarget{method-Visualizer1D-new}{}}}
