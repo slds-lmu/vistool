@@ -1,4 +1,3 @@
-
 #' @title Visualize Model
 #'
 #' @description
@@ -10,7 +9,7 @@
 #' @template param_n_points
 #'
 #' @export
-Visualizer2DModel = R6::R6Class("Visualizer2DModel",
+Visualizer2DModel <- R6::R6Class("Visualizer2DModel",
   inherit = Visualizer2D,
   public = list(
 
@@ -34,54 +33,51 @@ Visualizer2DModel = R6::R6Class("Visualizer2DModel",
     #' @template param_n_points
     #' @param training_points (`logical(1)`)\cr
     #'   Whether to show training points on the plot.
-    initialize = function(
-      task,
-      learner,
-      x1_limits = NULL,
-      x2_limits = NULL,
-      padding = 0,
-      n_points = 100L,
-      training_points = FALSE
-      ) {
-
-      self$task = mlr3::assert_task(task)
-      self$learner = mlr3::assert_learner(learner, task = self$task)
+    initialize = function(task,
+                          learner,
+                          x1_limits = NULL,
+                          x2_limits = NULL,
+                          padding = 0,
+                          n_points = 100L,
+                          training_points = FALSE) {
+      self$task <- mlr3::assert_task(task)
+      self$learner <- mlr3::assert_learner(learner, task = self$task)
       checkmate::assert_numeric(x1_limits, len = 2, null.ok = TRUE)
       checkmate::assert_numeric(x2_limits, len = 2, null.ok = TRUE)
       checkmate::assert_count(n_points)
       checkmate::assert_flag(training_points)
-      lab_x1 = self$task$feature_names[1]
-      lab_x2 = self$task$feature_names[2]
-      data = task$data()
+      lab_x1 <- self$task$feature_names[1]
+      lab_x2 <- self$task$feature_names[2]
+      data <- task$data()
       self$learner$train(task)
 
-      x1_limits = range(data[, lab_x1, with = FALSE])
-      x2_limits = range(data[, lab_x2, with = FALSE])
+      x1_limits <- range(data[, lab_x1, with = FALSE])
+      x2_limits <- range(data[, lab_x2, with = FALSE])
 
-      x1 = seq(x1_limits[1] - padding, x1_limits[2] + padding, length.out = n_points)
-      x2 = seq(x2_limits[1] - padding, x2_limits[2] + padding, length.out = n_points)
+      x1 <- seq(x1_limits[1] - padding, x1_limits[2] + padding, length.out = n_points)
+      x2 <- seq(x2_limits[1] - padding, x2_limits[2] + padding, length.out = n_points)
 
-      newdata = CJ(x1, x2)
+      newdata <- CJ(x1, x2)
       setnames(newdata, self$task$feature_names)
-      
-      original_types = sapply(self$task$data()[, self$task$feature_names, with = FALSE], class)
+
+      original_types <- sapply(self$task$data()[, self$task$feature_names, with = FALSE], class)
       for (col in names(original_types)) {
         if (original_types[col] == "integer") {
-          newdata[[col]] = as.integer(round(newdata[[col]]))
+          newdata[[col]] <- as.integer(round(newdata[[col]]))
         }
       }
-      y = self$learner$predict_newdata(newdata)[[self$learner$predict_type]]
+      y <- self$learner$predict_newdata(newdata)[[self$learner$predict_type]]
       if (self$learner$predict_type == "prob") {
         # for binary classification, use the positive class
         # for multi-class, use the first class
         if (length(task$class_names) == 2 && !is.null(task$positive)) {
-          y = y[, task$positive]
+          y <- y[, task$positive]
         } else {
-          y = y[, 1]
+          y <- y[, 1]
         }
       } else if (self$learner$predict_type == "response" && is.factor(y)) {
         # Convert factor response to numeric for visualization
-        y = as.numeric(y) - 1  # Convert to 0-based indexing
+        y <- as.numeric(y) - 1 # Convert to 0-based indexing
       }
 
 
@@ -96,10 +92,10 @@ Visualizer2DModel = R6::R6Class("Visualizer2DModel",
       )
 
       if (training_points) {
-        data = task$data()
-        self$points_x1 = data[[lab_x1]]
-        self$points_x2 = data[[lab_x2]]
-        self$points_y = data[[task$target_names]]
+        data <- task$data()
+        self$points_x1 <- data[[lab_x1]]
+        self$points_x2 <- data[[lab_x2]]
+        self$points_y <- data[[task$target_names]]
       }
 
       return(invisible(self))
@@ -113,24 +109,24 @@ Visualizer2DModel = R6::R6Class("Visualizer2DModel",
     #' @param color (`character(1)`)\cr
     #' Color of the points.
     add_training_data = function(size = 2, color = NULL) {
-      data = self$task$data()
-      self$points_x1 = data[[self$task$feature_names[1]]]
-      self$points_x2 = data[[self$task$feature_names[2]]]
-      self$points_y = data[[self$task$target_names]]
-      
+      data <- self$task$data()
+      self$points_x1 <- data[[self$task$feature_names[1]]]
+      self$points_x2 <- data[[self$task$feature_names[2]]]
+      self$points_y <- data[[self$task$target_names]]
+
       # Convert factors to numeric for visualization
       if (self$learner$predict_type == "prob" && is.factor(self$points_y)) {
-        self$points_y = as.integer(self$points_y) - 1
+        self$points_y <- as.integer(self$points_y) - 1
       } else if (self$learner$predict_type == "response" && is.factor(self$points_y)) {
-        self$points_y = as.integer(self$points_y) - 1
+        self$points_y <- as.integer(self$points_y) - 1
       }
 
       return(invisible(self))
     },
 
     #' @description
-    #' Initialize the contour layer. For ggplot2-based 2D visualizers, this method 
-    #' exists for API compatibility but doesn't need to do anything since contours 
+    #' Initialize the contour layer. For ggplot2-based 2D visualizers, this method
+    #' exists for API compatibility but doesn't need to do anything since contours
     #' are created by default in the plot() method.
     #'
     #' @param ... Additional arguments (ignored for ggplot2 compatibility).
@@ -149,14 +145,13 @@ Visualizer2DModel = R6::R6Class("Visualizer2DModel",
       if (self$learner$predict_type != "prob") {
         stop("Decision boundary can only be added for probability predictions")
       }
-      
+
       # Store the threshold for use in plotting
-      private$.decision_threshold = threshold
-      
+      private$.decision_threshold <- threshold
+
       return(invisible(self))
     }
   ),
-  
   private = list(
     .decision_threshold = NULL
   )

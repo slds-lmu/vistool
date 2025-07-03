@@ -28,20 +28,20 @@ We subset the data set to only use the features `age` and `rm`.
 The `age` feature is the proportion of owner-occupied units built prior to 1940 and `rm` is the average number of rooms per dwelling.
 
 ```{r}
-task = tsk("boston_housing")
+task <- tsk("boston_housing")
 task$select(c("age", "rm"))
 ```
 
 We load the support vector machine learner for regression.
 
 ```{r}
-learner = lrn("regr.svm")
+learner <- lrn("regr.svm")
 ```
 
 Now we create a visualizer object.
 
 ```{r}
-vis = as_visualizer(task, learner)
+vis <- as_visualizer(task, learner)
 ```
 
 First, the learner is trained on the entire task.
@@ -84,17 +84,17 @@ We use the `pima` data set and impute the missing values.
 We select the features `insulin` and `mass` and train a support vector machine for classification.
 
 ```{r}
-task = tsk("pima")
-task = po("imputemean")$train(list(task))[[1]]
+task <- tsk("pima")
+task <- po("imputemean")$train(list(task))[[1]]
 task$select(c("insulin", "mass"))
-learner = lrn("classif.svm", predict_type = "prob")
+learner <- lrn("classif.svm", predict_type = "prob")
 ```
 
 We create a visualizer object and plot the predictions.
 The z-axis shows the probability of the positive class.
 
 ```{r, out.width='100%', out.height='700px'}
-vis = as_visualizer(task, learner)
+vis <- as_visualizer(task, learner)
 vis$plot()
 ```
 

@@ -32,7 +32,7 @@ To get a loss function from the dictionary, use the `lss()` function
 We retrieve the hinge loss function for classification.
 
 ```{r}
-loss_function = lss("hinge")
+loss_function <- lss("hinge")
 ```
 
 # Visualization
@@ -41,7 +41,7 @@ To visualize the loss function, use the `as_visualizer()` function.
 The `y_pred` arguments contains $y * f(x)$ and `y_true` the true value $y$.
 
 ```{r}
-vis = as_visualizer(loss_function, y_pred = seq(-4, 4), y_true = 1)
+vis <- as_visualizer(loss_function, y_pred = seq(-4, 4), y_true = 1)
 ```
 
 Use the `plot()` method to plot the loss function.
@@ -108,13 +108,13 @@ if (requireNamespace("patchwork", quietly = TRUE)) {
 We can also define and visualize custom loss functions:
 
 ```{r, echo=TRUE, message=FALSE, warning=FALSE, out.width='100%'}
-custom_loss = LossFunction$new(
+custom_loss <- LossFunction$new(
   id = "custom_loss",
   label = "Sinusoidal-Exponential Loss",
   task_type = "regr",
-  fun = function(r) abs(r) * exp(-abs(r)/3) + 0.5 * sin(2 * r)
+  fun = function(r) abs(r) * exp(-abs(r) / 3) + 0.5 * sin(2 * r)
 )
 
-vis = as_visualizer(custom_loss, y_pred = seq(-10, 10), y_true = 0)
+vis <- as_visualizer(custom_loss, y_pred = seq(-10, 10), y_true = 0)
 vis$plot()
 ```

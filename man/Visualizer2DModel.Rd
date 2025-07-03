@@ -129,8 +129,8 @@ Color of the points.}
 \if{html}{\out{<a id="method-Visualizer2DModel-init_layer_contour"></a>}}
 \if{latex}{\out{\hypertarget{method-Visualizer2DModel-init_layer_contour}{}}}
 \subsection{Method \code{init_layer_contour()}}{
-Initialize the contour layer. For ggplot2-based 2D visualizers, this method 
-exists for API compatibility but doesn't need to do anything since contours 
+Initialize the contour layer. For ggplot2-based 2D visualizers, this method
+exists for API compatibility but doesn't need to do anything since contours
 are created by default in the plot() method.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Visualizer2DModel$init_layer_contour(...)}\if{html}{\out{</div>}}

@@ -73,7 +73,7 @@ An object inheriting from a Visualizer class (Visualizer1D, Visualizer2D, Visual
 depending on the input and selected type.
 }
 \description{
-This function converts to a visualizer. Automatically chooses between 1D, 2D, and 3D 
+This function converts to a visualizer. Automatically chooses between 1D, 2D, and 3D
 visualizations based on the number of features/dimensions, or allows explicit control
 via the `type` parameter. 1D and 2D visualizations use ggplot2, while 3D visualizations use plotly.
 }

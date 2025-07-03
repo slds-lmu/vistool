@@ -16,8 +16,8 @@ knitr::opts_chunk$set(
   fig.path = "man/figures/README-",
   out.width = "100%"
 )
-REBUILD = TRUE
-RECREATE_ALL_2DFIGS = FALSE
+REBUILD <- TRUE
+RECREATE_ALL_2DFIGS <- FALSE
 ```
 
 # vistool
@@ -77,16 +77,16 @@ This examples shows how to visualize the prediction surface of an SVM on the `pi
 
 ```{r example}
 # Create an example task, add missing data imputation and select 2 features
-task = tsk("pima")
-task = po("imputemean")$train(list(task))[[1]]
+task <- tsk("pima")
+task <- po("imputemean")$train(list(task))[[1]]
 task$select(c("insulin", "mass"))
 
 # Select example learner
-learner = lrn("classif.svm", predict_type = "prob")
+learner <- lrn("classif.svm", predict_type = "prob")
 
 # Create the Visualizer object from task and learner
 # Use 3D visualization for interactive plotly surface plot
-vis = as_visualizer(task, learner, type = "3d")
+vis <- as_visualizer(task, learner, type = "3d")
 
 # Define a 3D scene
 vis$set_scene(x = 1.4, y = 1.4, z = 1.4)
@@ -96,7 +96,7 @@ For comparison, you can also create 2D ggplot2 visualizations:
 
 ```{r example-2d, eval=FALSE}
 # 2D visualization with ggplot2 (default for 2-feature tasks)
-vis_2d = as_visualizer(task, learner)  # or explicitly: type = "2d"
+vis_2d <- as_visualizer(task, learner) # or explicitly: type = "2d"
 vis_2d$plot()
 ```
 
@@ -115,6 +115,10 @@ Save static version as png:
 # see installation instructions above for setting up plotly save functionality
 vis$save("man/figures/demo_1.png", width = 500, height = 500)
 ```
+
+## Contributing
+
+For developers interested in contributing to `vistool`, please see the [Developer Reference](DEVELOPMENT.md).
 
 ## Resources 
 

@@ -1,4 +1,4 @@
-#FIXME: doc API of funs better
+# FIXME: doc API of funs better
 
 
 #' @title Loss Function
@@ -7,7 +7,7 @@
 #' This class is used to create loss functions.
 #'
 #' @export
-LossFunction = R6::R6Class("LossFunction",
+LossFunction <- R6::R6Class("LossFunction",
   public = list(
 
     #' @template field_id
@@ -36,10 +36,10 @@ LossFunction = R6::R6Class("LossFunction",
     #' @param fun (`function(y_true, y_pred, ...)`)\cr
     #'   Loss function.
     initialize = function(id, label, task_type, fun) {
-      self$id = checkmate::assert_character(id)
-      self$label = checkmate::assert_character(label)
-      self$task_type = checkmate::assert_choice(task_type, c("regr", "classif"))
-      self$fun = checkmate::assert_function(fun)
+      self$id <- checkmate::assert_character(id)
+      self$label <- checkmate::assert_character(label)
+      self$task_type <- checkmate::assert_choice(task_type, c("regr", "classif"))
+      self$fun <- checkmate::assert_function(fun)
     }
   )
 )
@@ -50,7 +50,7 @@ LossFunction = R6::R6Class("LossFunction",
 #' Dictionary of loss functions.
 #'
 #' @export
-dict_loss = R6::R6Class("DictionaryLoss", inherit = Dictionary, cloneable = FALSE)$new()
+dict_loss <- R6::R6Class("DictionaryLoss", inherit = Dictionary, cloneable = FALSE)$new()
 
 #' @title Retrieve Loss Function
 #'
@@ -62,7 +62,7 @@ dict_loss = R6::R6Class("DictionaryLoss", inherit = Dictionary, cloneable = FALS
 #' @template param_dots
 #'
 #' @export
-lss = function(.key, ...) {
+lss <- function(.key, ...) {
   dict_loss$get(.key, ...)
 }
 
@@ -75,7 +75,7 @@ dict_loss$add("l1_ae", LossFunction$new("l1", "L1 Absolute Error", "regr", funct
 }))
 
 dict_loss$add("huber", LossFunction$new("huber", "Huber Loss", "regr", function(r, delta = 1) {
-  a = abs(r)
+  a <- abs(r)
   ifelse(a <= delta, 0.5 * a^2, delta * a - delta^2 / 2)
 }))
 
@@ -123,11 +123,11 @@ dict_loss$add("cauchy", LossFunction$new("cauchy", "Cauchy Loss", "regr", functi
 #'   Whether to include the objects in the result.
 #'
 #' @export
-as.data.table.DictionaryLoss = function(x, ..., objects = FALSE) {
+as.data.table.DictionaryLoss <- function(x, ..., objects = FALSE) {
   checkmate::assert_flag(objects)
 
   setkeyv(mlr3misc::map_dtr(x$keys(), function(key) {
-    t = x$get(key)
+    t <- x$get(key)
     mlr3misc::insert_named(
       list(key = key, label = t$label, task_type = t$task_type),
       if (objects) list(object = list(t))

@@ -1,7 +1,7 @@
 #' @title Convert to visualizer
 #'
 #' @description
-#' This function converts to a visualizer. Automatically chooses between 1D, 2D, and 3D 
+#' This function converts to a visualizer. Automatically chooses between 1D, 2D, and 3D
 #' visualizations based on the number of features/dimensions, or allows explicit control
 #' via the `type` parameter. 1D and 2D visualizations use ggplot2, while 3D visualizations use plotly.
 #'
@@ -19,7 +19,7 @@
 #' You can override this by specifying `type = "1d"`, `type = "2d"`, or `type = "3d"`.
 #'
 #' @export
-as_visualizer = function(x, ...) {
+as_visualizer <- function(x, ...) {
   UseMethod("as_visualizer")
 }
 
@@ -31,20 +31,20 @@ as_visualizer = function(x, ...) {
 #' @template param_n_points
 #' @rdname as_visualizer
 #' @export
-as_visualizer.Task = function(x, learner, type = "auto", x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L, ...) {
+as_visualizer.Task <- function(x, learner, type = "auto", x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L, ...) {
   checkmate::assert_choice(type, choices = c("auto", "1d", "2d", "3d"))
-  n_features = length(x$feature_names)
+  n_features <- length(x$feature_names)
   # Determine visualization type
   if (type == "auto") {
     if (n_features == 1) {
-      vis_type = "1d"
+      vis_type <- "1d"
     } else if (n_features == 2) {
-      vis_type = "2d"
+      vis_type <- "2d"
     } else {
-      vis_type = "3d"
+      vis_type <- "3d"
     }
   } else {
-    vis_type = type
+    vis_type <- type
   }
   # Validate type against features
   if (vis_type == "1d" && n_features != 1) {
@@ -72,19 +72,19 @@ as_visualizer.Task = function(x, learner, type = "auto", x1_limits = NULL, x2_li
 #' @template param_n_points
 #' @rdname as_visualizer
 #' @export
-as_visualizer.Objective = function(x, type = "auto", x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L, ...) {
+as_visualizer.Objective <- function(x, type = "auto", x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L, ...) {
   checkmate::assert_choice(type, choices = c("auto", "1d", "2d", "3d"))
-  n_dim = x$xdim
+  n_dim <- x$xdim
   if (type == "auto") {
     if (n_dim == 1) {
-      vis_type = "1d"
+      vis_type <- "1d"
     } else if (n_dim == 2) {
-      vis_type = "2d"
+      vis_type <- "2d"
     } else {
-      vis_type = "3d"
+      vis_type <- "3d"
     }
   } else {
-    vis_type = type
+    vis_type <- type
   }
   if (vis_type == "1d" && n_dim != 1) {
     stop("1D visualization requires an objective with exactly 1 dimension.")
@@ -110,11 +110,11 @@ as_visualizer.Objective = function(x, type = "auto", x1_limits = NULL, x2_limits
 #' @template param_n_points
 #' @rdname as_visualizer
 #' @export
-as_visualizer.LossFunction = function(x, type = "auto", x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L, ...) {
+as_visualizer.LossFunction <- function(x, type = "auto", x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L, ...) {
   checkmate::assert_choice(type, choices = c("auto", "1d", "2d", "3d"))
   # For loss functions, default to 1D visualizer
   if (type == "auto" || type == "1d") {
-    return(VisualizerLossFuns$new(list(x), ...))  # Pass additional arguments
+    return(VisualizerLossFuns$new(list(x), ...)) # Pass additional arguments
   } else {
     stop("Only 1D visualization is currently supported for LossFunction.")
   }

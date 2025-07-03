@@ -4,7 +4,7 @@
 #' Visualize one or multiple loss functions.
 #'
 #' @export
-VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
+VisualizerLossFuns <- R6::R6Class("VisualizerLossFuns",
   public = list(
 
     #' @field losses (`list`)\cr
@@ -70,24 +70,25 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
       checkmate::assert_list(losses, "LossFunction")
       checkmate::assert_numeric(y_pred, null.ok = TRUE)
       checkmate::assert_numeric(y_true, null.ok = TRUE)
-      
-      tts = unique(sapply(losses, function(x) x$task_type))
-      if (length(tts) > 1)
+
+      tts <- unique(sapply(losses, function(x) x$task_type))
+      if (length(tts) > 1) {
         mlr3misc::stopf("'LossFunction$task_type' all need to be the same, but found: %s", mlr3misc::str_collapse(tts))
-      ids = sapply(losses, function(x) x$id)
-      names(losses) = ids
-      self$losses = losses
-      self$task_type = unique(tts)
-      self$title = ""
-      self$lab_x = ifelse(self$task_type == "classif", "y * f", "y - f")
-      self$lab_y = "Loss"
-      self$x_range = c(-5, 5)
-      n = length(losses)
-      self$line_width = rep(0.5, n)
-      self$line_col = NULL
-      self$line_type = rep("solid", n)
-      self$y_pred = y_pred
-      self$y_true = y_true
+      }
+      ids <- sapply(losses, function(x) x$id)
+      names(losses) <- ids
+      self$losses <- losses
+      self$task_type <- unique(tts)
+      self$title <- ""
+      self$lab_x <- ifelse(self$task_type == "classif", "y * f", "y - f")
+      self$lab_y <- "Loss"
+      self$x_range <- c(-5, 5)
+      n <- length(losses)
+      self$line_width <- rep(0.5, n)
+      self$line_col <- NULL
+      self$line_type <- rep("solid", n)
+      self$y_pred <- y_pred
+      self$y_true <- y_true
     },
 
     #' @description
@@ -97,7 +98,7 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
     #' @template return_self_invisible
     init_layer_lines = function(color = NULL) {
       if (!is.null(color)) {
-        self$line_col = color
+        self$line_col <- color
       }
       invisible(self)
     },
@@ -107,46 +108,50 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
     #' @return A ggplot2 object showing the loss functions.
     plot = function() {
       # get lossfun labels so we can use them for legend
-      loss_labels = sapply(self$losses, function(x) x$label)
+      loss_labels <- sapply(self$losses, function(x) x$label)
       # eval losses on defined range, then melt data into long format
       if (!is.null(self$y_pred) && !is.null(self$y_true)) {
         # calculate residuals based on task type
         if (self$task_type == "classif") {
-          r_seq = self$y_true * self$y_pred  # y * f(x) for classification
+          r_seq <- self$y_true * self$y_pred # y * f(x) for classification
         } else {
-          r_seq = self$y_true - self$y_pred  # y - f(x) for regression
+          r_seq <- self$y_true - self$y_pred # y - f(x) for regression
         }
       } else {
-        r_seq = seq(self$x_range[1], self$x_range[2], by = 0.01)
+        r_seq <- seq(self$x_range[1], self$x_range[2], by = 0.01)
       }
-      loss_seqs = data.table::as.data.table(lapply(self$losses, function(ll) ll$fun(r_seq)))
-      dd = cbind(r = r_seq, loss_seqs)
-      dd = melt(dd, id.vars = "r", measure.vars = colnames(loss_seqs),
-        variable.name = "loss_fun", value.name = "loss_val")
+      loss_seqs <- data.table::as.data.table(lapply(self$losses, function(ll) ll$fun(r_seq)))
+      dd <- cbind(r = r_seq, loss_seqs)
+      dd <- melt(dd,
+        id.vars = "r", measure.vars = colnames(loss_seqs),
+        variable.name = "loss_fun", value.name = "loss_val"
+      )
       # plot
-      pl = ggplot(data = dd, aes(x = r, y = loss_val,
-        col = loss_fun, linetype = loss_fun, linewidth = loss_fun))
-      pl = pl + geom_line()
+      pl <- ggplot(data = dd, aes(
+        x = r, y = loss_val,
+        col = loss_fun, linetype = loss_fun, linewidth = loss_fun
+      ))
+      pl <- pl + geom_line()
       # use cols, linetypes and widths
       if (!is.null(self$line_col)) {
-        pl = pl + scale_color_manual(values = self$line_col, labels = loss_labels)
+        pl <- pl + scale_color_manual(values = self$line_col, labels = loss_labels)
       } else {
         if (requireNamespace("ggsci", quietly = TRUE)) {
-          pl = pl + ggsci::scale_color_npg(labels = loss_labels)
+          pl <- pl + ggsci::scale_color_npg(labels = loss_labels)
         } else {
-          pl = pl + scale_color_discrete(labels = loss_labels)
+          pl <- pl + scale_color_discrete(labels = loss_labels)
         }
       }
-      if (!is.null(self$line_width))
-        pl = pl + scale_linewidth_manual(values = self$line_width, labels = loss_labels)
+      if (!is.null(self$line_width)) {
+        pl <- pl + scale_linewidth_manual(values = self$line_width, labels = loss_labels)
+      }
       if (!is.null(self$line_type)) {
-        pl = pl + scale_linetype_manual(values = self$line_type, labels = loss_labels)
+        pl <- pl + scale_linetype_manual(values = self$line_type, labels = loss_labels)
       }
       # use specified axis labels and legend title
-      pl = pl + labs(x = self$lab_x, y = self$lab_y)
-      pl = pl + theme(legend.title = self$legend_title)
+      pl <- pl + labs(x = self$lab_x, y = self$lab_y)
+      pl <- pl + theme(legend.title = self$legend_title)
       return(pl)
     }
   )
 )
-

@@ -9,7 +9,7 @@
 #' @template param_n_points
 #'
 #' @export
-Visualizer1D = R6::R6Class("Visualizer1D",
+Visualizer1D <- R6::R6Class("Visualizer1D",
   inherit = Visualizer,
   public = list(
 
@@ -72,7 +72,7 @@ Visualizer1D = R6::R6Class("Visualizer1D",
     #'  Alpha blending of plotted points
     points_alpha = NULL,
 
-    #FIXME: add point-size, point col, point-symbol
+    # FIXME: add point-size, point col, point-symbol
 
     #' @description
     #' Creates a new instance of this [R6][R6::R6Class] class.
@@ -93,29 +93,27 @@ Visualizer1D = R6::R6Class("Visualizer1D",
     #' @param points_y (`numeric()`)\cr
     #'   y-values of extra points to plot.
     #'   Use NULL if no points should be plotted.
-    initialize = function(
-      fun_x,
-      fun_y,
-      title = NULL,
-      lab_x = "x",
-      lab_y = "y",
-      points_x = NULL,
-      points_y = NULL
-      ) {
-      self$fun_x = checkmate::assert_numeric(fun_x)
-      self$fun_y = checkmate::assert_numeric(fun_y)
-      self$title = checkmate::assert_character(title, null.ok = TRUE)
-      self$lab_x = checkmate::assert_character(lab_x)
-      self$lab_y = checkmate::assert_character(lab_y)
-      self$points_x = checkmate::assert_numeric(points_x, null.ok = TRUE)
-      self$points_y = checkmate::assert_numeric(points_y, null.ok = TRUE)
-      self$line_type = "solid"
-      self$line_col = "red"
-      self$line_width = 3
-      self$points_shape = 19
-      self$points_col = "black"
-      self$points_size = 2
-      self$points_alpha = 0.3
+    initialize = function(fun_x,
+                          fun_y,
+                          title = NULL,
+                          lab_x = "x",
+                          lab_y = "y",
+                          points_x = NULL,
+                          points_y = NULL) {
+      self$fun_x <- checkmate::assert_numeric(fun_x)
+      self$fun_y <- checkmate::assert_numeric(fun_y)
+      self$title <- checkmate::assert_character(title, null.ok = TRUE)
+      self$lab_x <- checkmate::assert_character(lab_x)
+      self$lab_y <- checkmate::assert_character(lab_y)
+      self$points_x <- checkmate::assert_numeric(points_x, null.ok = TRUE)
+      self$points_y <- checkmate::assert_numeric(points_y, null.ok = TRUE)
+      self$line_type <- "solid"
+      self$line_col <- "red"
+      self$line_width <- 3
+      self$points_shape <- 19
+      self$points_col <- "black"
+      self$points_size <- 2
+      self$points_alpha <- 0.3
     },
 
     # FIXME: set better defaults here to make plot nicer, maybe ask lukas
@@ -124,15 +122,17 @@ Visualizer1D = R6::R6Class("Visualizer1D",
     #' Create and return the ggplot2 plot.
     #' @return A ggplot2 object.
     plot = function() {
-      dd = data.frame(x = self$fun_x, y = self$fun_y)
-      pl = ggplot(data = dd, aes(x = x, y = y))
-      pl = pl + geom_line(linewidth = self$line_width, col = self$line_col, linetype = self$line_type)
+      dd <- data.frame(x = self$fun_x, y = self$fun_y)
+      pl <- ggplot(data = dd, aes(x = x, y = y))
+      pl <- pl + geom_line(linewidth = self$line_width, col = self$line_col, linetype = self$line_type)
       # use specified axis labels and legend title
-      pl = pl + labs(title = self$title, x = self$lab_x, y = self$lab_y)
+      pl <- pl + labs(title = self$title, x = self$lab_x, y = self$lab_y)
       if (!is.null(self$points_x)) {
-        dd2 = data.frame(x = self$points_x, y = self$points_y)
-        pl = pl + geom_point(data = dd2, size = self$points_size, col = self$points_col,
-          shape = self$points_shape, alpha = self$points_alpha)
+        dd2 <- data.frame(x = self$points_x, y = self$points_y)
+        pl <- pl + geom_point(
+          data = dd2, size = self$points_size, col = self$points_col,
+          shape = self$points_shape, alpha = self$points_alpha
+        )
       }
       return(pl)
     }

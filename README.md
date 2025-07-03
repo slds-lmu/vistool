@@ -108,10 +108,15 @@ vis$plot()
 Save static version as png:
 
 ``` r
-# Only works if Python kaleido package is installed
-# See installation instructions above for setting up plotly save functionality
+# only works if Python kaleido package is installed
+# see installation instructions above for setting up plotly save functionality
 vis$save("man/figures/demo_1.png", width = 500, height = 500)
 ```
+
+## Contributing
+
+For anyone interested in contributing to `vistool`, please see the [Developer Reference](DEVELOPMENT.md).
+  tasks
 
 ## Resources
 

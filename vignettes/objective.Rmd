@@ -30,13 +30,13 @@ as.data.table(dict_objective)
 To get an objective function from the dictionary, use the `obj()` function.
 
 ```{r}
-obj_branin = obj("TF_branin")
+obj_branin <- obj("TF_branin")
 ```
 
 We can evaluate the objective function at a point.
 
 ```{r}
-x = c(0.9, 1)
+x <- c(0.9, 1)
 obj_branin$eval(x)
 ```
 
@@ -51,7 +51,7 @@ We create a visualizer using the `as_visualizer()` function, which automatically
 
 ```{r}
 # Automatic visualization selection based on objective dimensions
-viz = as_visualizer(obj_branin)
+viz <- as_visualizer(obj_branin)
 ```
 
 The objective can be visualized as a 2D contour plot using ggplot2:
@@ -64,7 +64,7 @@ For interactive 3D visualization with surface and contour plots, specify `type =
 
 ```{r, out.width='100%', out.height='700px'}
 # Use 3D visualizer for interactive plotly visualization
-viz_3d = as_visualizer(obj_branin, type = "3d")
+viz_3d <- as_visualizer(obj_branin, type = "3d")
 viz_3d$init_layer_surface()
 viz_3d$plot()
 ```
@@ -82,9 +82,9 @@ Let's define a loss for a linear model on the iris data with target `Sepal.Width
 
 ```{r}
 # Define the linear model loss function as SSE:
-l2norm = function(x) sqrt(sum(crossprod(x)))
+l2norm <- function(x) sqrt(sum(crossprod(x)))
 
-mylm = function(x, Xmat, y) {
+mylm <- function(x, Xmat, y) {
   l2norm(y - Xmat %*% x)
 }
 ```
@@ -95,11 +95,11 @@ These arguments must be specified just once:
 
 ```{r}
 # Use the iris dataset with response `Sepal.Width` and feature `Petal.Width`:
-Xmat = model.matrix(~ Petal.Width, data = iris)
-y = iris$Sepal.Width
+Xmat <- model.matrix(~Petal.Width, data = iris)
+y <- iris$Sepal.Width
 
 # Create a new object:
-obj_lm = Objective$new(id = "iris LM", fun = mylm, xdim = 2,  Xmat = Xmat, y = y, minimize = TRUE)
+obj_lm <- Objective$new(id = "iris LM", fun = mylm, xdim = 2, Xmat = Xmat, y = y, minimize = TRUE)
 
 obj_lm$evalStore(c(1, 2))
 obj_lm$evalStore(c(2, 3))
@@ -111,7 +111,7 @@ obj_lm$archive
 Visualize lm `Objective`:
 
 ```{r, out.width='100%', out.height='700px'}
-viz_lm = as_visualizer(obj_lm, x1_limits = c(-0.5, 5), x2_limits = c(-3.2, 2.8))
+viz_lm <- as_visualizer(obj_lm, x1_limits = c(-0.5, 5), x2_limits = c(-3.2, 2.8))
 viz_lm$plot()
 ```
 
@@ -121,14 +121,16 @@ More advanced is to add points to the `ggplot` object:
 library(ggplot2)
 
 # Extract x and y coordinates from the optimizer archive
-archive_data = data.frame(
+archive_data <- data.frame(
   x = sapply(obj_lm$archive$x, function(x) x[1]),
   y = sapply(obj_lm$archive$x, function(x) x[2])
 )
 
 # Add points to the ggplot using inherit.aes = FALSE to avoid conflicts
-viz_lm$plot() + ggplot2::geom_point(data = archive_data, aes(x = x, y = y), 
-                           color = "red", size = 3, inherit.aes = FALSE)
+viz_lm$plot() + ggplot2::geom_point(
+  data = archive_data, aes(x = x, y = y),
+  color = "red", size = 3, inherit.aes = FALSE
+)
 ```
 
 ### Optimizer
@@ -143,8 +145,8 @@ Available optimizer are:
 Creating an optimizer is done by (let's use an x value that works well):
 
 ```{r}
-obj_banana = obj("TF_banana")
-opt = OptimizerGD$new(obj_banana, x_start = c(0.8, 0.6), lr = 0.01)
+obj_banana <- obj("TF_banana")
+opt <- OptimizerGD$new(obj_banana, x_start = c(0.8, 0.6), lr = 0.01)
 ```
 
 With these value set, optimization is done by calling `$optimize()` with the number of steps as argument:
@@ -175,7 +177,7 @@ A layer of the `Visualizer` class is `$add_optimization_trace()` that gets the o
 
 ```{r, out.width='100%', out.height='700px'}
 # Use 2D ggplot2 visualizer for optimization trace visualization
-viz = as_visualizer(obj_banana)
+viz <- as_visualizer(obj_banana)
 viz$add_optimization_trace(opt)
 viz$plot()
 ```
@@ -201,16 +203,16 @@ stepSizeControlDecayTime()
 Let's define multiple gradient descent optimizers and optimize 100 steps with a step size control:
 
 ```{r}
-x0 = c(0.8, 0.6)
-lr = 0.01
-obj_banana = obj("TF_banana")
+x0 <- c(0.8, 0.6)
+lr <- 0.01
+obj_banana <- obj("TF_banana")
 
-oo1 = OptimizerGD$new(obj_banana, x_start = x0, lr = lr, id = "GD without LR Control", print_trace = FALSE)
-oo2 = OptimizerGD$new(obj_banana, x_start = x0, lr = lr, id = "GD with Line Search", print_trace = FALSE)
-oo3 = OptimizerGD$new(obj_banana, x_start = x0, lr = lr, id = "GD with Time Decay", print_trace = FALSE)
-oo4 = OptimizerGD$new(obj_banana, x_start = x0, lr = lr, id = "GD with Exp Decay", print_trace = FALSE)
-oo5 = OptimizerGD$new(obj_banana, x_start = x0, lr = lr, id = "GD with Linear Decay", print_trace = FALSE)
-oo6 = OptimizerGD$new(obj_banana, x_start = x0, lr = lr, id = "GD with Step Decay", print_trace = FALSE)
+oo1 <- OptimizerGD$new(obj_banana, x_start = x0, lr = lr, id = "GD without LR Control", print_trace = FALSE)
+oo2 <- OptimizerGD$new(obj_banana, x_start = x0, lr = lr, id = "GD with Line Search", print_trace = FALSE)
+oo3 <- OptimizerGD$new(obj_banana, x_start = x0, lr = lr, id = "GD with Time Decay", print_trace = FALSE)
+oo4 <- OptimizerGD$new(obj_banana, x_start = x0, lr = lr, id = "GD with Exp Decay", print_trace = FALSE)
+oo5 <- OptimizerGD$new(obj_banana, x_start = x0, lr = lr, id = "GD with Linear Decay", print_trace = FALSE)
+oo6 <- OptimizerGD$new(obj_banana, x_start = x0, lr = lr, id = "GD with Step Decay", print_trace = FALSE)
 
 oo1$optimize(steps = 100)
 oo2$optimize(steps = 100, stepSizeControlLineSearch())
@@ -223,16 +225,16 @@ oo6$optimize(steps = 100, stepSizeControlDecaySteps())
 For now we don't know how well it worked. Let's collect all archives with `mergeOptimArchives()` and visualize the step sizes and function values with `patchwork` magic:
 
 ```{r}
-arx = mergeOptimArchives(oo1, oo2, oo3, oo4, oo5, oo6)
+arx <- mergeOptimArchives(oo1, oo2, oo3, oo4, oo5, oo6)
 
 library(ggplot2)
 library(patchwork)
-gg1 = ggplot(arx, aes(x = iteration, y = step_size, color = optim_id))
-gg2 = ggplot(arx, aes(x = iteration, y = fval_out, color = optim_id))
+gg1 <- ggplot(arx, aes(x = iteration, y = step_size, color = optim_id))
+gg2 <- ggplot(arx, aes(x = iteration, y = fval_out, color = optim_id))
 
 (gg1 + ggtitle("Step sizes") |
- gg1 + ylim(0, 1) + ggtitle("Step sizes (zoomed)") |
- gg2 + ggtitle("Objective")) +
+  gg1 + ylim(0, 1) + ggtitle("Step sizes (zoomed)") |
+  gg2 + ggtitle("Objective")) +
   plot_layout(guides = "collect") &
   geom_line() &
   theme_minimal() &
@@ -245,7 +247,7 @@ We can do this for all optimizers to add multiple traces to the plot (colors are
 
 ```{r, out.width='100%', out.height='700px'}
 # Use 2D ggplot2 visualizer for optimization trace visualization
-viz = as_visualizer(obj_banana)
+viz <- as_visualizer(obj_banana)
 
 viz$add_optimization_trace(oo1)
 viz$add_optimization_trace(oo2)
@@ -261,13 +263,13 @@ Practically, it should be no issue to also combine multiple control functions.
 The important thing is to keep the signature of the function by allowing the function to get the arguments `x` (current value), `u` (current update), `obj` (`Objective` object), and `opt` (`Optimizer` object):
 
 ```{r}
-myStepSizeControl = function(x, u, obj, opt) {
-  sc1 = stepSizeControlLineSearch(0, 10)
-  sc2 = stepSizeControlDecayTime(0.1)
+myStepSizeControl <- function(x, u, obj, opt) {
+  sc1 <- stepSizeControlLineSearch(0, 10)
+  sc2 <- stepSizeControlDecayTime(0.1)
   return(sc1(x, u, obj, opt) * sc2(x, u, obj, opt))
 }
 
-my_oo = OptimizerGD$new(obj_banana, x_start = x0, lr = lr, id = "GD without LR Control", print_trace = FALSE)
+my_oo <- OptimizerGD$new(obj_banana, x_start = x0, lr = lr, id = "GD without LR Control", print_trace = FALSE)
 my_oo$optimize(100, myStepSizeControl)
 tail(my_oo$archive)
 ```
@@ -293,21 +295,21 @@ For both, the first argument is the opacity and the second a colorscale:
 
 ```{r, out.width='100%', out.height='700px'}
 # Use 3D visualizer for contour layer initialization
-viz = as_visualizer(obj("TF_franke"), type = "3d")
+viz <- as_visualizer(obj("TF_franke"), type = "3d")
 viz$init_layer_contour(opacity = 1, colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")))
 viz$plot()
 ```
 
 ```{r, out.width='100%', out.height='700px'}
 # Use 3D visualizer for contour layer initialization
-viz = as_visualizer(obj("TF_franke"), type = "3d")
+viz <- as_visualizer(obj("TF_franke"), type = "3d")
 viz$init_layer_contour(colorscale = list(c(0, 1), c("white", "blue")))
 viz$plot()
 ```
 
 ```{r, out.width='100%', out.height='700px'}
 # Use 2D ggplot2 visualizer for simple plotting
-viz = as_visualizer(obj("TF_franke"), type = "2d")
+viz <- as_visualizer(obj("TF_franke"), type = "2d")
 viz$plot()
 ```
 
@@ -316,8 +318,8 @@ For 2D visualizations, the plotting is now handled by `ggplot2`. Further customi
 ```{r, out.width='100%', out.height='700px'}
 library(ggplot2)
 
-viz = as_visualizer(obj("TF_franke"), type = "2d")
-p = viz$plot()
+viz <- as_visualizer(obj("TF_franke"), type = "2d")
+p <- viz$plot()
 
 # Add customizations to the ggplot object
 p + theme_minimal() + labs(title = "TF Franke Function")
@@ -331,9 +333,9 @@ As shown previously, optimization traces can be added by `$add_optimization_trac
 # Reset the archive to have an empty objective:
 obj_lm$clearArchive()
 
-oo1 = OptimizerGD$new(obj_lm, x_start = c(0, -0.05), lr = 0.001, print_trace = FALSE)
-oo2 = OptimizerMomentum$new(obj_lm, x_start = c(-0.05, 0), lr = 0.001, print_trace = FALSE)
-oo3 = OptimizerNAG$new(obj_lm, x_start = c(0, 0), lr = 0.001, print_trace = FALSE)
+oo1 <- OptimizerGD$new(obj_lm, x_start = c(0, -0.05), lr = 0.001, print_trace = FALSE)
+oo2 <- OptimizerMomentum$new(obj_lm, x_start = c(-0.05, 0), lr = 0.001, print_trace = FALSE)
+oo3 <- OptimizerNAG$new(obj_lm, x_start = c(0, 0), lr = 0.001, print_trace = FALSE)
 
 oo1$optimize(steps = 100)
 oo2$optimize(steps = 100)
@@ -342,7 +344,7 @@ oo3$optimize(steps = 100)
 
 ```{r, out.width='100%', out.height='700px'}
 # Use 3D visualizer for optimization trace visualization with contours
-viz = as_visualizer(obj_lm, x1_limits = c(-0.5, 5), x2_limits = c(-3.2, 2.8), type = "3d")
+viz <- as_visualizer(obj_lm, x1_limits = c(-0.5, 5), x2_limits = c(-3.2, 2.8), type = "3d")
 
 viz$init_layer_contour()
 
@@ -363,15 +365,16 @@ viz$plot()
 ## Overlaying layers (TODO)
 
 ```{r, out.width='100%', out.height='700px'}
-obj = obj("TF_banana")
+obj <- obj("TF_banana")
 # Use 3D visualizer for 3D features like surface, taylor, and hessian layers
-viz = as_visualizer(obj, type = "3d")
+viz <- as_visualizer(obj, type = "3d")
 viz$init_layer_surface()
 
-x0 = c(0.85, 0.47)
+x0 <- c(0.85, 0.47)
 viz$add_layer_taylor(x0, npoints_per_dim = 5, degree = 1, x1margin = 0.3, x2margin = 0.3, contours = list(
-    x = list(show = TRUE, start = 0, end = 1, size = 0.03, color = "black"),
-    y = list(show = TRUE, start = 0, end = 1, size = 0.03, color = "black")))
+  x = list(show = TRUE, start = 0, end = 1, size = 0.03, color = "black"),
+  y = list(show = TRUE, start = 0, end = 1, size = 0.03, color = "black")
+))
 viz$add_layer_hessian(x0)
 viz$plot()
 ```
@@ -381,15 +384,15 @@ viz$plot()
 ```{r, out.width='100%', out.height='700px'}
 library(ggplot2)
 
-obj = obj("TF_banana")
-viz = as_visualizer(obj, type = "2d")
-p = viz$plot()
+obj <- obj("TF_banana")
+viz <- as_visualizer(obj, type = "2d")
+p <- viz$plot()
 class(p)
 
 # For 2D visualizations using ggplot2, we can add additional layers
-nsim = 100
-grid = data.frame(x1 = runif(nsim), x2 = runif(nsim))
-grid$y = apply(grid[, c("x1", "x2")], 1, viz$objective$eval) + rnorm(nsim, sd = 0.05)
+nsim <- 100
+grid <- data.frame(x1 = runif(nsim), x2 = runif(nsim))
+grid$y <- apply(grid[, c("x1", "x2")], 1, viz$objective$eval) + rnorm(nsim, sd = 0.05)
 
 # Add points to the ggplot
 p + geom_point(data = grid, aes(x = x1, y = x2), color = "red", size = 1, alpha = 0.7, inherit.aes = FALSE)
@@ -407,13 +410,13 @@ library(mlr3misc)
 library(plotly)
 library(ggsci)
 
-tab = as.data.table(dict_objective)
-keys = tab[list(2), key, on = "xdim"]
+tab <- as.data.table(dict_objective)
+keys <- tab[list(2), key, on = "xdim"]
 
-visualizers = map(keys, function(key) {
-  objective = obj(key)
+visualizers <- map(keys, function(key) {
+  objective <- obj(key)
   # Use 3D visualizer with contour for plotly compatibility
-  vis = as_visualizer(objective, type = "3d")
+  vis <- as_visualizer(objective, type = "3d")
   vis$init_layer_contour(show_title = FALSE)
   vis$plot() %>%
     add_annotations(

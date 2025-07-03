@@ -9,7 +9,7 @@
 #' @template param_n_points
 #'
 #' @export
-Visualizer2D = R6::R6Class("Visualizer2D",
+Visualizer2D <- R6::R6Class("Visualizer2D",
   inherit = Visualizer,
   public = list(
 
@@ -61,43 +61,42 @@ Visualizer2D = R6::R6Class("Visualizer2D",
     #' Label of x-axis.
     #' @param lab_y (`character(1)`)
     #' Label of y-axis.
-    initialize = function(
-      fun_x1,
-      fun_x2,
-      fun_y,
-      title = NULL,
-      lab_x1 = "x1",
-      lab_x2 = "x2",
-      lab_y = "y"
-      ) {
-      self$fun_x1 = checkmate::assert_numeric(fun_x1)
-      self$fun_x2 = checkmate::assert_numeric(fun_x2)
-      self$fun_y = checkmate::assert_numeric(fun_y)
-      self$title = checkmate::assert_character(title, null.ok = TRUE)
-      self$lab_x1 = checkmate::assert_character(lab_x1)
-      self$lab_x2 = checkmate::assert_character(lab_x2)
-      self$lab_y = checkmate::assert_character(lab_y)
+    initialize = function(fun_x1,
+                          fun_x2,
+                          fun_y,
+                          title = NULL,
+                          lab_x1 = "x1",
+                          lab_x2 = "x2",
+                          lab_y = "y") {
+      self$fun_x1 <- checkmate::assert_numeric(fun_x1)
+      self$fun_x2 <- checkmate::assert_numeric(fun_x2)
+      self$fun_y <- checkmate::assert_numeric(fun_y)
+      self$title <- checkmate::assert_character(title, null.ok = TRUE)
+      self$lab_x1 <- checkmate::assert_character(lab_x1)
+      self$lab_x2 <- checkmate::assert_character(lab_x2)
+      self$lab_y <- checkmate::assert_character(lab_y)
     },
 
     #' @description
     #' Create and return the ggplot2 plot.
     #' @return A ggplot2 object.
     plot = function() {
-      data = data.table(
+      data <- data.table(
         fun_x1 = self$fun_x1,
         fun_x2 = self$fun_x2,
-        fun_y = self$fun_y)
+        fun_y = self$fun_y
+      )
 
       # adjust y breaks
-      min_y = min(self$fun_y)
-      max_y = max(self$fun_y)
-      breaks = if (!is.null(self$points_y)) {
+      min_y <- min(self$fun_y)
+      max_y <- max(self$fun_y)
+      breaks <- if (!is.null(self$points_y)) {
         pretty(c(min_y, max_y), n = 10, min.n = 6L)
       } else {
         pretty(c(min_y, max_y), n = 10, min.n = 6L)
       }
 
-      p = ggplot(data, aes(x = fun_x1, y = fun_x2, z = fun_y)) +
+      p <- ggplot(data, aes(x = fun_x1, y = fun_x2, z = fun_y)) +
         geom_contour_filled(breaks = breaks, show.legend = TRUE) +
         geom_contour(color = "white", alpha = 0.3) +
         labs(title = self$title, x = self$lab_x1, y = self$lab_x2) +
@@ -106,31 +105,35 @@ Visualizer2D = R6::R6Class("Visualizer2D",
 
       # add decision boundary if available (for classification)
       if (!is.null(private$.decision_threshold)) {
-        p = p + geom_contour(aes(z = fun_y), breaks = private$.decision_threshold, 
-                           color = "black", linewidth = 1.5, alpha = 0.8)
+        p <- p + geom_contour(aes(z = fun_y),
+          breaks = private$.decision_threshold,
+          color = "black", linewidth = 1.5, alpha = 0.8
+        )
       }
 
       # add training points if available
       if (!is.null(self$points_x1) && !is.null(self$points_x2) && !is.null(self$points_y)) {
-        points_data = data.table(
+        points_data <- data.table(
           points_x1 = self$points_x1,
           points_x2 = self$points_x2,
-          points_y = self$points_y)
+          points_y = self$points_y
+        )
 
         # determine color scale limits based on function values
-        color_limits = c(min(self$fun_y), max(self$fun_y))
-        
-        p = p + geom_point(aes(x = points_x1, y = points_x2, color = points_y),
+        color_limits <- c(min(self$fun_y), max(self$fun_y))
+
+        p <- p + geom_point(aes(x = points_x1, y = points_x2, color = points_y),
           data = points_data,
           size = 2,
           inherit.aes = FALSE,
-          show.legend = FALSE) +
+          show.legend = FALSE
+        ) +
           scale_color_viridis_c(name = self$lab_y, limits = color_limits)
       }
 
       return(p)
     },
-    
+
     #' @description
     #' Initialize contour layer (compatibility method, no-op for ggplot2 version).
     #' @template param_dots_compatibility
@@ -138,7 +141,7 @@ Visualizer2D = R6::R6Class("Visualizer2D",
       # No-op for compatibility with plotly version
       invisible(self)
     },
-    
+
     #' @description
     #' Initialize surface layer (compatibility method, no-op for ggplot2 version).
     #' @template param_dots_compatibility
@@ -146,7 +149,7 @@ Visualizer2D = R6::R6Class("Visualizer2D",
       # No-op for compatibility with plotly version
       invisible(self)
     },
-    
+
     #' @description
     #' Add optimization trace (compatibility method, no-op for ggplot2 version).
     #' @template param_dots_compatibility
@@ -154,7 +157,7 @@ Visualizer2D = R6::R6Class("Visualizer2D",
       # No-op for compatibility with plotly version
       invisible(self)
     },
-    
+
     #' @description
     #' Set layout (compatibility method, no-op for ggplot2 version).
     #' @template param_dots_compatibility
@@ -162,7 +165,7 @@ Visualizer2D = R6::R6Class("Visualizer2D",
       # No-op for compatibility with plotly version
       invisible(self)
     },
-    
+
     #' @description
     #' Set scene (compatibility method, no-op for ggplot2 version).
     #' @template param_dots_compatibility
@@ -170,7 +173,7 @@ Visualizer2D = R6::R6Class("Visualizer2D",
       # No-op for compatibility with plotly version
       invisible(self)
     },
-    
+
     #' @description
     #' Add layer taylor (compatibility method, no-op for ggplot2 version).
     #' @template param_dots_compatibility
@@ -178,7 +181,7 @@ Visualizer2D = R6::R6Class("Visualizer2D",
       # No-op for compatibility with plotly version
       invisible(self)
     },
-    
+
     #' @description
     #' Add layer hessian (compatibility method, no-op for ggplot2 version).
     #' @param ... Additional arguments (ignored for compatibility).
@@ -187,9 +190,7 @@ Visualizer2D = R6::R6Class("Visualizer2D",
       invisible(self)
     }
   ),
-  
   private = list(
     .decision_threshold = NULL
   )
 )
-

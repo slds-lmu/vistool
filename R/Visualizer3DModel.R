@@ -1,4 +1,3 @@
-
 #' @title Visualize Model
 #'
 #' @description
@@ -10,7 +9,7 @@
 #' @template param_n_points
 #'
 #' @export
-Visualizer3DModel = R6::R6Class("Visualizer3DModel",
+Visualizer3DModel <- R6::R6Class("Visualizer3DModel",
   inherit = Visualizer3D,
   public = list(
 
@@ -29,46 +28,48 @@ Visualizer3DModel = R6::R6Class("Visualizer3DModel",
     #'   The task to train the model on.
     #' @template param_learner
     initialize = function(task, learner, x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L) {
-      self$task = mlr3::assert_task(task)
-      self$learner = mlr3::assert_learner(learner, task = self$task)
+      self$task <- mlr3::assert_task(task)
+      self$learner <- mlr3::assert_learner(learner, task = self$task)
       checkmate::assert_numeric(x1_limits, len = 2, null.ok = TRUE)
       checkmate::assert_numeric(x2_limits, len = 2, null.ok = TRUE)
       checkmate::assert_count(n_points)
-      
+
       # Validate that task has exactly 2 features
       if (length(self$task$feature_names) != 2) {
-        mlr3misc::stopf("3D Model visualization requires a task with exactly 2 features, but got %d", 
-                       length(self$task$feature_names))
+        mlr3misc::stopf(
+          "3D Model visualization requires a task with exactly 2 features, but got %d",
+          length(self$task$feature_names)
+        )
       }
-      
-      x1 = self$task$feature_names[1]
-      x2 = self$task$feature_names[2]
-      data = task$data()
+
+      x1 <- self$task$feature_names[1]
+      x2 <- self$task$feature_names[2]
+      data <- task$data()
       self$learner$train(task)
 
-      x1_limits = range(data[, x1, with = FALSE])
-      x2_limits = range(data[, x2, with = FALSE])
+      x1_limits <- range(data[, x1, with = FALSE])
+      x2_limits <- range(data[, x2, with = FALSE])
 
-      grid = list(
+      grid <- list(
         x1 = seq(x1_limits[1] - padding, x1_limits[2] + padding, length.out = n_points),
         x2 = seq(x2_limits[1] - padding, x2_limits[2] + padding, length.out = n_points)
       )
 
-      newdata = CJ(grid$x1, grid$x2)
+      newdata <- CJ(grid$x1, grid$x2)
       setnames(newdata, self$task$feature_names)
-      
-      original_types = sapply(self$task$data()[, self$task$feature_names, with = FALSE], class)
+
+      original_types <- sapply(self$task$data()[, self$task$feature_names, with = FALSE], class)
       for (col in names(original_types)) {
         if (original_types[col] == "integer") {
-          newdata[[col]] = as.integer(round(newdata[[col]]))
+          newdata[[col]] <- as.integer(round(newdata[[col]]))
         }
       }
-      z = self$learner$predict_newdata(newdata)[[self$learner$predict_type]]
+      z <- self$learner$predict_newdata(newdata)[[self$learner$predict_type]]
       if (self$learner$predict_type == "prob") {
-        pos_class = self$task$positive
-        z = z[, pos_class]
+        pos_class <- self$task$positive
+        z <- z[, pos_class]
       }
-      zmat = matrix(z, nrow = n_points, ncol = n_points, byrow = TRUE)
+      zmat <- matrix(z, nrow = n_points, ncol = n_points, byrow = TRUE)
 
       super$initialize(
         grid = grid,
@@ -91,17 +92,17 @@ Visualizer3DModel = R6::R6Class("Visualizer3DModel",
     #' Color of the points.
     #' @param ... (`any`)\cr
     #'   Further arguments passed to `add_trace(...)`.
-    add_training_data = function(size = 5, color = "grey",...) {
+    add_training_data = function(size = 5, color = "grey", ...) {
       if (is.null(private$.plot)) self$init_layer_surface()
-      data = self$task$data()
-      x1 = data[, self$task$feature_names[1], with = FALSE][[1]]
-      x2 = data[, self$task$feature_names[2], with = FALSE][[1]]
-      z = data[, self$task$target_names, with = FALSE][[1]]
-      if (self$learner$predict_type == "prob") z = as.integer(z) - 1
+      data <- self$task$data()
+      x1 <- data[, self$task$feature_names[1], with = FALSE][[1]]
+      x2 <- data[, self$task$feature_names[2], with = FALSE][[1]]
+      z <- data[, self$task$target_names, with = FALSE][[1]]
+      if (self$learner$predict_type == "prob") z <- as.integer(z) - 1
 
 
       if (private$.layer_primary == "contour") {
-        private$.plot = private$.plot %>%
+        private$.plot <- private$.plot %>%
           add_trace(
             x = x1,
             y = x2,
@@ -113,14 +114,15 @@ Visualizer3DModel = R6::R6Class("Visualizer3DModel",
               cmin = min(self$zmat),
               cmax = max(self$zmat),
               colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")),
-              line = list(color = 'black', width = 2),
-              showscale = FALSE),
-            text = ~paste("x:", x1, "\ny:", x2, " \nz:", z),
-            hoverinfo = 'text',
+              line = list(color = "black", width = 2),
+              showscale = FALSE
+            ),
+            text = ~ paste("x:", x1, "\ny:", x2, " \nz:", z),
+            hoverinfo = "text",
             ...
           )
       } else {
-        private$.plot = private$.plot %>%
+        private$.plot <- private$.plot %>%
           add_trace(
             x = x1,
             y = x2,
@@ -145,12 +147,12 @@ Visualizer3DModel = R6::R6Class("Visualizer3DModel",
     #' @param ... (`any`)\cr
     #'   Further arguments passed to `add_trace(...)`.
     add_decision_boundary = function(threshold = 0.5, ...) {
-       if (is.null(private$.plot)) self$init_layer_surface()
-      z = matrix(threshold, nrow = nrow(self$zmat), ncol = ncol(self$zmat), byrow = TRUE)
+      if (is.null(private$.plot)) self$init_layer_surface()
+      z <- matrix(threshold, nrow = nrow(self$zmat), ncol = ncol(self$zmat), byrow = TRUE)
 
       if (private$.layer_primary == "contour") {
-        llp = list(x = self$grid$x1, y = self$grid$x2, z = self$zmat)
-        private$.plot = private$.plot %>%
+        llp <- list(x = self$grid$x1, y = self$grid$x2, z = self$zmat)
+        private$.plot <- private$.plot %>%
           add_trace(
             name = "decision boundary",
             autocontour = FALSE,
@@ -171,16 +173,18 @@ Visualizer3DModel = R6::R6Class("Visualizer3DModel",
               color = "black",
               width = 3
             ),
-            ...)
+            ...
+          )
       } else {
-        private$.plot = private$.plot %>%
+        private$.plot <- private$.plot %>%
           add_surface(
             x = self$grid$x1,
             y = self$grid$x2,
             z = z,
-            colorscale  = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")),
+            colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")),
             showscale = FALSE,
-            ...)
+            ...
+          )
       }
     }
   )

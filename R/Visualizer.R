@@ -5,16 +5,16 @@
 #' and saving plots across different plotting backends (ggplot2 for 1D/2D, plotly for 3D).
 #'
 #' @export
-Visualizer = R6::R6Class("Visualizer",
+Visualizer <- R6::R6Class("Visualizer",
   public = list(
-    
+
     #' @description
     #' Abstract method to be implemented by subclasses.
     #' @return The plot object.
     plot = function() {
       stop("Abstract method 'plot' must be implemented by subclass")
     },
-    
+
     #' @description
     #' Save the plot to a file. The format is determined by the file extension.
     #' @param filename (`character(1)`)\cr
@@ -31,10 +31,10 @@ Visualizer = R6::R6Class("Visualizer",
       checkmate::assert_number(width, null.ok = TRUE)
       checkmate::assert_number(height, null.ok = TRUE)
       checkmate::assert_number(dpi, lower = 1)
-      
+
       # Get the plot object
-      plot_obj = self$plot()
-      
+      plot_obj <- self$plot()
+
       # Check if it's a ggplot2 or plotly object and save accordingly
       if (inherits(plot_obj, "ggplot")) {
         private$save_ggplot(plot_obj, filename, width, height, dpi, ...)
@@ -43,19 +43,18 @@ Visualizer = R6::R6Class("Visualizer",
       } else {
         stop("Unknown plot type. Cannot save plot.")
       }
-      
+
       invisible(self)
     }
   ),
-  
   private = list(
-    
+
     # Save a ggplot2 object
     save_ggplot = function(plot_obj, filename, width, height, dpi, ...) {
       # Default dimensions for ggplot2 (in inches)
-      if (is.null(width)) width = 10
-      if (is.null(height)) height = 6
-      
+      if (is.null(width)) width <- 10
+      if (is.null(height)) height <- 6
+
       ggplot2::ggsave(
         filename = filename,
         plot = plot_obj,
@@ -65,13 +64,13 @@ Visualizer = R6::R6Class("Visualizer",
         ...
       )
     },
-    
+
     # Save a plotly object
     save_plotly = function(plot_obj, filename, width, height, ...) {
       # Default dimensions for plotly (in pixels)
-      if (is.null(width)) width = 800
-      if (is.null(height)) height = 600
-      
+      if (is.null(width)) width <- 800
+      if (is.null(height)) height <- 600
+
       plotly::save_image(
         p = plot_obj,
         file = filename,

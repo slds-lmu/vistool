@@ -9,7 +9,7 @@
 #' @template param_n_points
 #'
 #' @export
-Visualizer3D = R6::R6Class("Visualizer3D",
+Visualizer3D <- R6::R6Class("Visualizer3D",
   inherit = Visualizer,
   public = list(
 
@@ -47,12 +47,12 @@ Visualizer3D = R6::R6Class("Visualizer3D",
     #' @template param_x2_lab
     #' @template param_z_lab
     initialize = function(grid, zmat, plot_lab = NULL, x1_lab = "x1", x2_lab = "x2", z_lab = "z") {
-      self$grid = checkmate::assert_list(grid)
-      self$zmat = checkmate::assert_matrix(zmat)
-      self$plot_lab = checkmate::assert_character(plot_lab, null.ok = TRUE)
-      self$x1_lab = checkmate::assert_character(x1_lab)
-      self$x2_lab = checkmate::assert_character(x2_lab)
-      self$z_lab = checkmate::assert_character(z_lab)
+      self$grid <- checkmate::assert_list(grid)
+      self$zmat <- checkmate::assert_matrix(zmat)
+      self$plot_lab <- checkmate::assert_character(plot_lab, null.ok = TRUE)
+      self$x1_lab <- checkmate::assert_character(x1_lab)
+      self$x2_lab <- checkmate::assert_character(x2_lab)
+      self$z_lab <- checkmate::assert_character(z_lab)
       return(invisible(self))
     },
 
@@ -68,11 +68,11 @@ Visualizer3D = R6::R6Class("Visualizer3D",
       checkmate::assert_list(colorscale)
       checkmate::assert_flag(show_title)
 
-      private$.vbase = c(as.list(environment()), list(...))
-      private$.layer_primary = "contour"
+      private$.vbase <- c(as.list(environment()), list(...))
+      private$.layer_primary <- "contour"
 
-      llp = list(x = self$grid$x1, y = self$grid$x2, z = self$zmat)
-      private$.plot = plot_ly() %>%
+      llp <- list(x = self$grid$x1, y = self$grid$x2, z = self$zmat)
+      private$.plot <- plot_ly() %>%
         add_trace(
           name = self$plot_lab,
           showlegend = TRUE,
@@ -88,11 +88,12 @@ Visualizer3D = R6::R6Class("Visualizer3D",
         layout(
           title = if (show_title) self$plot_lab else NULL,
           xaxis = list(title = self$x1_lab),
-          yaxis = list(title = self$x2_lab))
+          yaxis = list(title = self$x2_lab)
+        )
 
-      if (! private$.freeze_plot) {    # Used in animate to not overwrite the
-        private$.opts = list()         # plot over and over again when calling
-        private$.layer_arrow = list()  # `$initLayerXXX`.
+      if (!private$.freeze_plot) { # Used in animate to not overwrite the
+        private$.opts <- list() # plot over and over again when calling
+        private$.layer_arrow <- list() # `$initLayerXXX`.
       }
 
       return(invisible(self))
@@ -112,20 +113,23 @@ Visualizer3D = R6::R6Class("Visualizer3D",
       checkmate::assert_list(colorscale)
       checkmate::assert_flag(show_title)
 
-      private$.vbase = c(as.list(environment()), list(...))
-      private$.layer_primary = "surface"
+      private$.vbase <- c(as.list(environment()), list(...))
+      private$.layer_primary <- "surface"
 
-      contours = if (show_contours) {
+      contours <- if (show_contours) {
         list(
           z = list(
             show = TRUE,
             project = list(z = TRUE),
-            usecolormap = TRUE)
+            usecolormap = TRUE
+          )
         )
-      } else NULL
+      } else {
+        NULL
+      }
 
-      llp = list(x = self$grid$x1, y = self$grid$x2, z = self$zmat)
-      private$.plot = plot_ly() %>%
+      llp <- list(x = self$grid$x1, y = self$grid$x2, z = self$zmat)
+      private$.plot <- plot_ly() %>%
         add_trace(
           name = self$plot_lab,
           showlegend = FALSE,
@@ -148,9 +152,9 @@ Visualizer3D = R6::R6Class("Visualizer3D",
           )
         )
 
-      if (! private$.freeze_plot) { # Used in animate to not overwrite the plot over and over again.
-        private$.opts = list()
-        private$.layer_arrow = list()
+      if (!private$.freeze_plot) { # Used in animate to not overwrite the plot over and over again.
+        private$.opts <- list()
+        private$.layer_arrow <- list()
       }
 
       return(invisible(self))
@@ -159,8 +163,8 @@ Visualizer3D = R6::R6Class("Visualizer3D",
     #' @description Set the layout of the plotly plot.
     #' @param ... Layout options directly passed to `layout(...)`.
     set_layout = function(...) {
-      private$.layout = list(...)
-      private$.plot = private$.plot %>% layout(...)
+      private$.layout <- list(...)
+      private$.plot <- private$.plot %>% layout(...)
 
       return(invisible(self))
     },
@@ -179,7 +183,7 @@ Visualizer3D = R6::R6Class("Visualizer3D",
         stop("Scene can only be set for `surface` plots")
       }
 
-      private$.plot = private$.plot %>%
+      private$.plot <- private$.plot %>%
         layout(scene = list(camera = list(eye = list(x = x, y = y, z = z))))
 
       return(invisible(self))
@@ -206,14 +210,11 @@ Visualizer3D = R6::R6Class("Visualizer3D",
     # resets this list. An optimizer is added after each call to `$addLayerOptimizationTrace()`.
     # this private field is exclusively used to create animations with `$animate()`.
     .opts = list(),
-
     .vbase = list(),
-
     .layout = list(),
 
     # @field .freeze_plot (`logical(1)`) Indicator whether to freeze saving the plot elements.
     .freeze_plot = FALSE,
-
     checkInit = function() {
       if (is.null(private$.plot)) {
         stop("Initialize plot with `initLayer*`")
@@ -237,17 +238,17 @@ Visualizer3D = R6::R6Class("Visualizer3D",
 #' @param alpha (`numeric(1)`) The alpha value. If `!is.null` the used prefix is 'rgba' instead of 'rgb'.
 #' @return A character of length one containing the RGB color.
 #' @export
-colSampler = function(alpha = NULL) {
+colSampler <- function(alpha = NULL) {
   checkmate::assertNumber(alpha, lower = 0, upper = 1, null.ok = TRUE)
-  r = sample(seq(0, 255), 1)
-  g = sample(seq(0, 255), 1)
-  b = sample(seq(0, 255), 1)
+  r <- sample(seq(0, 255), 1)
+  g <- sample(seq(0, 255), 1)
+  b <- sample(seq(0, 255), 1)
 
   if (is.null(alpha)) {
-    rgb = "rgb"
+    rgb <- "rgb"
   } else {
-    rgb = "rgba"
+    rgb <- "rgba"
   }
-  clr = sprintf("%s(%s)", rgb, paste(c(r, g, b, alpha), collapse = ", "))
+  clr <- sprintf("%s(%s)", rgb, paste(c(r, g, b, alpha), collapse = ", "))
   return(clr)
 }

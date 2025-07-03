@@ -9,7 +9,7 @@
 #' @template param_n_points
 #'
 #' @export
-Visualizer2DObj = R6::R6Class("Visualizer2DObj",
+Visualizer2DObj <- R6::R6Class("Visualizer2DObj",
   inherit = Visualizer2D,
   public = list(
 
@@ -20,14 +20,12 @@ Visualizer2DObj = R6::R6Class("Visualizer2DObj",
     #' Creates a new instance of this [R6][R6::R6Class] class.
     #'
     #' @template param_objective
-    initialize = function(
-      objective,
-      x1_limits = NULL,
-      x2_limits = NULL,
-      padding = 0,
-      n_points = 100L
-      ) {
-      self$objective = checkmate::assert_r6(objective, "Objective")
+    initialize = function(objective,
+                          x1_limits = NULL,
+                          x2_limits = NULL,
+                          padding = 0,
+                          n_points = 100L) {
+      self$objective <- checkmate::assert_r6(objective, "Objective")
       checkmate::assert_numeric(x1_limits, len = 2, null.ok = TRUE)
       checkmate::assert_numeric(x2_limits, len = 2, null.ok = TRUE)
       checkmate::assert_numeric(padding)
@@ -37,22 +35,22 @@ Visualizer2DObj = R6::R6Class("Visualizer2DObj",
         mlr3misc::stopf("`Visualizer2D` requires 2-dimensional inputs, but `objective$xdim = %s`", objective$xdim)
       }
 
-      x1_limits = x1_limits %??% c(objective$lower[1], objective$upper[1])
-      x2_limits = x2_limits %??% c(objective$lower[2], objective$upper[2])
+      x1_limits <- x1_limits %??% c(objective$lower[1], objective$upper[1])
+      x2_limits <- x2_limits %??% c(objective$lower[2], objective$upper[2])
 
       if (any(is.na(x1_limits)) || any(is.na(x2_limits))) {
         stop("Limits could not be extracted from the objective. Please use `x_limits`.")
       }
 
-      x1_pad = (x1_limits[2] - x1_limits[1]) * padding
-      x2_pad = (x2_limits[2] - x2_limits[1]) * padding
+      x1_pad <- (x1_limits[2] - x1_limits[1]) * padding
+      x2_pad <- (x2_limits[2] - x2_limits[1]) * padding
 
-      x1 = unique(seq(x1_limits[1] - x1_pad, x1_limits[2] + x1_pad, length.out = n_points))
-      x2 = unique(seq(x2_limits[1] - x2_pad, x2_limits[2] + x2_pad, length.out = n_points))
-      grid = CJ(x1, x2)
+      x1 <- unique(seq(x1_limits[1] - x1_pad, x1_limits[2] + x1_pad, length.out = n_points))
+      x2 <- unique(seq(x2_limits[1] - x2_pad, x2_limits[2] + x2_pad, length.out = n_points))
+      grid <- CJ(x1, x2)
 
-      y = apply(grid, 1, function(row) {
-         self$objective$eval(c(row[1], row[2]))
+      y <- apply(grid, 1, function(row) {
+        self$objective$eval(c(row[1], row[2]))
       })
 
       super$initialize(
