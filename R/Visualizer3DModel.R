@@ -68,7 +68,7 @@ Visualizer3DModel = R6::R6Class("Visualizer3DModel",
         pos_class = self$task$positive
         z = z[, pos_class]
       }
-      zmat = matrix(z, nrow = n_points, ncol = n_points, byrow = FALSE)
+      zmat = matrix(z, nrow = n_points, ncol = n_points, byrow = TRUE)
 
       super$initialize(
         grid = grid,

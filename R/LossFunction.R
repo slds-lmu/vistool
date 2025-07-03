@@ -91,6 +91,25 @@ dict_loss$add("hinge", LossFunction$new("hinge", "Hinge Loss", "classif", functi
   pmax(1 - r, 0)
 }))
 
+dict_loss$add("log-barrier", LossFunction$new("log-barrier", "Log-Barrier Loss", "regr", function(r, epsilon = 1) {
+  abs_res <- abs(r)
+  abs_res[abs_res > epsilon] <- Inf
+  abs_res[abs_res <= epsilon] <- -epsilon^2 * log(1 - (abs_res[abs_res <= epsilon] / epsilon)^2)
+  abs_res
+}))
+
+dict_loss$add("epsilon-insensitive", LossFunction$new("epsilon-insensitive", "Epsilon-Insensitive Loss", "regr", function(r, epsilon = 1) {
+  ifelse(abs(r) > epsilon, abs(r) - epsilon, 0)
+}))
+
+dict_loss$add("pinball", LossFunction$new("pinball", "Pinball Loss", "regr", function(r, quantile = 0.5) {
+  ifelse(r < 0, (1 - quantile) * (-r), quantile * r)
+}))
+
+dict_loss$add("cauchy", LossFunction$new("cauchy", "Cauchy Loss", "regr", function(r, epsilon = 1) {
+  0.5 * epsilon^2 * log(1 + (r / epsilon)^2)
+}))
+
 
 #' @title Convert Dictionary to Data Table
 #'
