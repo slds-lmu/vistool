@@ -227,9 +227,20 @@ Set the view for a 3D plot.
 \subsection{Method \code{plot()}}{
 Return the plot and hence plot it or do further processing.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer3D$plot()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer3D$plot(text_size = 12, theme = "minimal")}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{text_size}}{(`numeric(1)`)\cr
+Base text size for plot elements. Default is 12. For 3D plotly plots, this controls axis labels and title sizes.}
+
+\item{\code{theme}}{(`character(1)`)\cr
+Theme parameter for compatibility with ggplot2-based visualizers. Ignored for 3D plotly plots.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Visualizer3D-clone"></a>}}

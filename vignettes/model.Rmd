@@ -42,10 +42,10 @@ We load the support vector machine learner for regression.
 learner <- lrn("regr.svm")
 ```
 
-Now we create a visualizer object.
+Now we create a visualizer object, using the `plotly` backend (`type = "3d"`).
 
 ```{r}
-vis <- as_visualizer(task, learner)
+vis <- as_visualizer(task, learner, type = "3d")
 ```
 
 First, the learner is trained on the entire task.
@@ -72,7 +72,7 @@ vis$init_layer_surface()
 Draw with contour lines above z dimension.
 
 ```{r, out.width='100%', out.height='700px'}
-vis$init_layer_surface()
+vis$init_layer_surface(show_contours = TRUE)
 vis$plot()
 ```
 
@@ -99,12 +99,12 @@ The z-axis shows the probability of the positive class.
 
 ```{r, out.width='100%', out.height='700px'}
 vis <- as_visualizer(task, learner)
-vis$plot()
+vis$plot(text_size = 3)
 ```
 
 We can add the decision boundary to the plot.
 
 ```{r, out.width='100%', out.height='700px'}
 vis$add_decision_boundary()
-vis$plot()
+vis$plot(text_size = 3)
 ```

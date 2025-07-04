@@ -1,7 +1,7 @@
 #' @title Visualize 3D Functions
 #'
 #' @description
-#' Visualizes a three-dimensional function \eqn{f: \mathbb{R}^3 \to \mathbb{R}} via interactive plotly renderings.
+#' Visualizes a two-dimensional function \eqn{f: \mathbb{R}^2 \to \mathbb{R}} via interactive plotly renderings.
 #'
 #' @template param_x1_limits
 #' @template param_x2_limits

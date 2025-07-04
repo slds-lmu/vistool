@@ -71,7 +71,7 @@ test_that("Visualizer2D basic functionality works", {
   expect_true(length(p$layers) >= 1)
 })
 
-test_that("Visualizer2D no-op methods work", {
+test_that("Visualizer2D optimization trace and compatibility methods work", {
   # Create simple visualizer
   x1 <- seq(-1, 1, length.out = 3)
   x2 <- seq(-1, 1, length.out = 3)
@@ -84,11 +84,28 @@ test_that("Visualizer2D no-op methods work", {
     fun_y = z_vals
   )
 
-  # These should be no-ops for ggplot2 version
-  expect_silent(vis$add_optimization_trace())
+  # Test that add_optimization_trace now requires an optimizer argument
+  expect_error(
+    vis$add_optimization_trace(),
+    "argument \"optimizer\" is missing"
+  )
+  
+  # set_layout should still be a no-op for compatibility
   expect_silent(vis$set_layout())
 
+  # Test with a valid optimizer
+  obj <- Objective$new(
+    id = "test",
+    fun = function(x) sum(x^2),
+    xdim = 2,
+    lower = c(-1, -1),
+    upper = c(1, 1),
+    minimize = TRUE
+  )
+  opt <- OptimizerGD$new(obj, x_start = c(0.5, 0.5), lr = 0.1, print_trace = FALSE)
+  opt$optimize(steps = 2L)
+  
   # Should return self for chaining
-  result <- vis$add_optimization_trace()
+  result <- vis$add_optimization_trace(opt)
   expect_identical(result, vis)
 })

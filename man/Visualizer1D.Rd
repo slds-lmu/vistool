@@ -125,9 +125,20 @@ Use NULL if no points should be plotted.}
 \subsection{Method \code{plot()}}{
 Create and return the ggplot2 plot.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer1D$plot()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer1D$plot(text_size = 11, theme = "minimal")}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{text_size}}{(`numeric(1)`)\cr
+Base text size for plot elements. Default is 11.}
+
+\item{\code{theme}}{(`character(1)`)\cr
+ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "minimal".}
+}
+\if{html}{\out{</div>}}
+}
 \subsection{Returns}{
 A ggplot2 object.
 }

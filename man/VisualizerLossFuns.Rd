@@ -9,6 +9,9 @@ Returns self invisibly.
 \description{
 Visualize one or multiple loss functions.
 }
+\section{Super class}{
+\code{\link[vistool:Visualizer]{vistool::Visualizer}} -> \code{VisualizerLossFuns}
+}
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
@@ -59,6 +62,13 @@ True values.}
 \item \href{#method-VisualizerLossFuns-clone}{\code{VisualizerLossFuns$clone()}}
 }
 }
+\if{html}{\out{
+<details open><summary>Inherited methods</summary>
+<ul>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href='../../vistool/html/Visualizer.html#method-Visualizer-save'><code>vistool::Visualizer$save()</code></a></span></li>
+</ul>
+</details>
+}}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-VisualizerLossFuns-new"></a>}}
 \if{latex}{\out{\hypertarget{method-VisualizerLossFuns-new}{}}}
@@ -107,9 +117,20 @@ Colors to use for the lines. If NULL, default colors will be used.}
 \subsection{Method \code{plot()}}{
 Create and return the ggplot2 plot.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{VisualizerLossFuns$plot()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{VisualizerLossFuns$plot(text_size = 11, theme = "bw")}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{text_size}}{(`numeric(1)`)\cr
+Base text size for plot elements. Default is 11.}
+
+\item{\code{theme}}{(`character(1)`)\cr
+ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "bw".}
+}
+\if{html}{\out{</div>}}
+}
 \subsection{Returns}{
 A ggplot2 object showing the loss functions.
 }

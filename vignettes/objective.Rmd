@@ -51,17 +51,16 @@ obj_branin$grad(x)
 obj_branin$hess(x)
 ```
 
-We create a visualizer using the `as_visualizer()` function, which automatically selects the appropriate visualization type based on the objective's dimensionality. For 2D objectives, it defaults to 2D visualization (using ggplot2) but can be overridden with `type = "3d"` for interactive surface and contour plots using plotly.
+We create a visualizer using the `as_visualizer()` function, which automatically selects the appropriate visualization type based on the objective's dimensionality. For 2D objectives, it defaults to 2D visualization (using ggplot2) but can be overridden with `type = "3d"` for interactive surface and contour plots using `plotly`.
 
 ```{r}
-# Automatic visualization selection based on objective dimensions
 viz <- as_visualizer(obj_branin)
 ```
 
 The objective can be visualized as a 2D contour plot using ggplot2:
 
 ```{r, out.width='100%', out.height='700px'}
-viz$plot()
+viz$plot(text_size = 3)
 ```
 
 For interactive 3D visualization with surface and contour plots, specify `type = "3d"`:
@@ -116,25 +115,29 @@ Visualize lm `Objective`:
 
 ```{r, out.width='100%', out.height='700px'}
 viz_lm <- as_visualizer(obj_lm, x1_limits = c(-0.5, 5), x2_limits = c(-3.2, 2.8))
-viz_lm$plot()
+viz_lm$plot(text_size = 4)
 ```
 
-More advanced is to add points to the `ggplot` object:
+We can add also add points to the `ggplot2` object:
 
 ```{r, out.width='100%', out.height='700px'}
 library(ggplot2)
 
-# Extract x and y coordinates from the optimizer archive
 archive_data <- data.frame(
   x = sapply(obj_lm$archive$x, function(x) x[1]),
   y = sapply(obj_lm$archive$x, function(x) x[2])
 )
 
-# Add points to the ggplot using inherit.aes = FALSE to avoid conflicts
 viz_lm$plot() + ggplot2::geom_point(
   data = archive_data, aes(x = x, y = y),
-  color = "red", size = 3, inherit.aes = FALSE
+  color = "red", size = 2, inherit.aes = FALSE
 )
+```
+
+Or, in 3D:
+```{r, out.width='100%', out.height='700px'}
+viz_lm <- as_visualizer(obj_lm, x1_limits = c(-0.5, 5), x2_limits = c(-3.2, 2.8), type = "3d")
+viz_lm$plot() %>% add_trace(x = archive_data$x, y = archive_data$y, z = obj_lm$archive$fval, type = "scatter3d", mode = "markers")
 ```
 
 ### Optimizer
@@ -347,16 +350,50 @@ oo3$optimize(steps = 100)
 ```
 
 ```{r, out.width='100%', out.height='700px'}
-# Use 3D visualizer for optimization trace visualization with contours
 viz <- as_visualizer(obj_lm, x1_limits = c(-0.5, 5), x2_limits = c(-3.2, 2.8), type = "3d")
 
-viz$init_layer_contour()
 
 viz$add_optimization_trace(oo1, add_marker_at = round(seq(1, 100, len = 10L)))
 viz$add_optimization_trace(oo2, add_marker_at = c(1, 50, 90), marker_shape = c("square", "star-triangle-down", "cross"))
 viz$add_optimization_trace(oo3, add_marker_at = 100, marker_shape = "star")
 
 viz$plot()
+```
+
+Alternatively, using the `ggplot2` backend:
+
+```{r, out.width='100%', out.height='700px'}
+viz_2d <- as_visualizer(obj_lm, x1_limits = c(-0.5, 5), x2_limits = c(-3.2, 2.8))
+
+viz_2d$add_optimization_trace(oo1, 
+  line_color = "#1f77b4", 
+  line_width = 1.5,
+  marker_size = 3,
+  add_marker_at = c(1, 25, 50, 75, 100),
+  name = "Gradient Descent"
+)
+
+viz_2d$add_optimization_trace(oo2, 
+  line_color = "#ff7f0e", 
+  line_width = 1.5,
+  line_type = "dashed",
+  marker_size = 3,
+  marker_shape = 17,  # triangle
+  add_marker_at = c(1, 30, 60, 100),
+  name = "Momentum"
+)
+
+viz_2d$add_optimization_trace(oo3, 
+  line_color = "#2ca02c", 
+  line_width = 1.5,
+  line_type = "dotted",
+  marker_size = 3,
+  marker_shape = 15,  # square
+  add_marker_at = c(1, 20, 40, 80, 100),
+  name = "Nesterov AG"
+)
+
+viz_2d$plot()
 ```
 
 ## Setting the layout and scene (TODO)

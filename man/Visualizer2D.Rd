@@ -107,9 +107,20 @@ Label of y-axis.}
 \subsection{Method \code{plot()}}{
 Create and return the ggplot2 plot.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$plot()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$plot(text_size = 11, theme = "minimal")}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{text_size}}{(`numeric(1)`)\cr
+Base text size for plot elements. Default is 11.}
+
+\item{\code{theme}}{(`character(1)`)\cr
+ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "minimal".}
+}
+\if{html}{\out{</div>}}
+}
 \subsection{Returns}{
 A ggplot2 object.
 }
@@ -126,9 +137,6 @@ Initialize contour layer (compatibility method, no-op for ggplot2 version).
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{\cr
-Additional arguments (ignored for compatibility).}
-
 \item{\code{...}}{\cr
 Additional arguments (ignored for compatibility).}
 
@@ -173,9 +181,6 @@ Additional arguments (ignored for compatibility).}
 
 \item{\code{...}}{\cr
 Additional arguments (ignored for compatibility).}
-
-\item{\code{...}}{\cr
-Additional arguments (ignored for compatibility).}
 }
 \if{html}{\out{</div>}}
 }
@@ -184,33 +189,71 @@ Additional arguments (ignored for compatibility).}
 \if{html}{\out{<a id="method-Visualizer2D-add_optimization_trace"></a>}}
 \if{latex}{\out{\hypertarget{method-Visualizer2D-add_optimization_trace}{}}}
 \subsection{Method \code{add_optimization_trace()}}{
-Add optimization trace (compatibility method, no-op for ggplot2 version).
+Add optimization trace to the plot.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$add_optimization_trace(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$add_optimization_trace(
+  optimizer,
+  line_color = NULL,
+  line_width = 1.2,
+  line_type = "solid",
+  npoints = NULL,
+  npmax = NULL,
+  name = NULL,
+  add_marker_at = 1,
+  marker_size = 3,
+  marker_shape = 16,
+  marker_color = NULL,
+  show_start_end = TRUE,
+  alpha = 0.8
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{\cr
-Additional arguments (ignored for compatibility).}
+\item{\code{optimizer}}{(`Optimizer`)\cr
+The optimizer from which the archive is extracted and used to plot the trace.}
 
-\item{\code{...}}{\cr
-Additional arguments (ignored for compatibility).}
+\item{\code{line_color}}{(`character(1)`)\cr
+The color of the trace line. If NULL, a random color is generated.}
 
-\item{\code{...}}{\cr
-Additional arguments (ignored for compatibility).}
+\item{\code{line_width}}{(`numeric(1)`)\cr
+The width of the trace line. Default is 1.2.}
 
-\item{\code{...}}{\cr
-Additional arguments (ignored for compatibility).}
+\item{\code{line_type}}{(`character(1)`)\cr
+The line type for the trace. Default is "solid".}
 
-\item{\code{...}}{\cr
-Additional arguments (ignored for compatibility).}
+\item{\code{npoints}}{(`integer(1)`)\cr
+The number of used points from the archive. Default is NULL which means all points are used.}
 
-\item{\code{...}}{\cr
-Additional arguments (ignored for compatibility).}
+\item{\code{npmax}}{(`integer(1)`)\cr
+The maximum number of points to use. Default is NULL.}
+
+\item{\code{name}}{(`character(1)`)\cr
+The name of the trace in the legend. Default is NULL which creates a name from optimizer and objective IDs.}
+
+\item{\code{add_marker_at}}{(`integer()`)\cr
+Vector of iterations at which markers are added. Default is first iteration only.}
+
+\item{\code{marker_size}}{(`numeric(1)`)\cr
+Size of the markers. Default is 3.}
+
+\item{\code{marker_shape}}{(`character(1)` or `integer(1)`)\cr
+Shape of the markers. Default is "circle" (16).}
+
+\item{\code{marker_color}}{(`character(1)`)\cr
+Color of the markers. If NULL, uses line_color.}
+
+\item{\code{show_start_end}}{(`logical(1)`)\cr
+Whether to highlight start and end points differently. Default is TRUE.}
+
+\item{\code{alpha}}{(`numeric(1)`)\cr
+Transparency level for the trace. Default is 0.8.}
 }
 \if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Returns self invisibly for method chaining.
 }
 }
 \if{html}{\out{<hr>}}
@@ -225,9 +268,6 @@ Set layout (compatibility method, no-op for ggplot2 version).
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{\cr
-Additional arguments (ignored for compatibility).}
-
 \item{\code{...}}{\cr
 Additional arguments (ignored for compatibility).}
 
@@ -272,9 +312,6 @@ Additional arguments (ignored for compatibility).}
 
 \item{\code{...}}{\cr
 Additional arguments (ignored for compatibility).}
-
-\item{\code{...}}{\cr
-Additional arguments (ignored for compatibility).}
 }
 \if{html}{\out{</div>}}
 }
@@ -291,9 +328,6 @@ Add layer taylor (compatibility method, no-op for ggplot2 version).
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{\cr
-Additional arguments (ignored for compatibility).}
-
 \item{\code{...}}{\cr
 Additional arguments (ignored for compatibility).}
 
