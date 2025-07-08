@@ -1,29 +1,29 @@
-test_that("Visualizer3DObj creation works", {
+test_that("VisualizerSurfaceObj creation works", {
   obj <- obj("TF_branin") # 2D objective
 
-  vis <- Visualizer3DObj$new(obj)
+  vis <- VisualizerSurfaceObj$new(obj)
 
-  expect_s3_class(vis, "Visualizer3DObj")
-  expect_s3_class(vis, "Visualizer3D")
+  expect_s3_class(vis, "VisualizerSurfaceObj")
+  expect_s3_class(vis, "VisualizerSurface")
   expect_identical(vis$objective, obj)
 })
 
-test_that("Visualizer3DObj with custom limits works", {
+test_that("VisualizerSurfaceObj with custom limits works", {
   obj <- obj("TF_branin")
 
-  vis <- Visualizer3DObj$new(
+  vis <- VisualizerSurfaceObj$new(
     obj,
     x1_limits = c(0, 5),
     x2_limits = c(0, 5),
     n_points = 20L
   )
 
-  expect_s3_class(vis, "Visualizer3DObj")
+  expect_s3_class(vis, "VisualizerSurfaceObj")
 })
 
-test_that("Visualizer3DObj surface initialization works", {
+test_that("VisualizerSurfaceObj surface initialization works", {
   obj <- obj("TF_branin")
-  vis <- Visualizer3DObj$new(obj, n_points = 10L)
+  vis <- VisualizerSurfaceObj$new(obj, n_points = 10L)
 
   # Initialize surface layer
   vis$init_layer_surface()
@@ -32,9 +32,9 @@ test_that("Visualizer3DObj surface initialization works", {
   expect_true(!is.null(vis$plot()))
 })
 
-test_that("Visualizer3DObj contour initialization works", {
+test_that("VisualizerSurfaceObj contour initialization works", {
   obj <- obj("TF_branin")
-  vis <- Visualizer3DObj$new(obj, n_points = 10L)
+  vis <- VisualizerSurfaceObj$new(obj, n_points = 10L)
 
   # Initialize contour layer
   vis$init_layer_contour()
@@ -43,11 +43,11 @@ test_that("Visualizer3DObj contour initialization works", {
   expect_true(!is.null(vis$plot()))
 })
 
-test_that("Visualizer3DObj optimization trace works", {
+test_that("VisualizerSurfaceObj optimization trace works", {
   skip_if_not_installed("mlr3learners")
 
   obj <- obj("TF_branin")
-  vis <- Visualizer3DObj$new(obj, n_points = 10L)
+  vis <- VisualizerSurfaceObj$new(obj, n_points = 10L)
   vis$init_layer_surface()
 
   # Create and run optimizer
@@ -62,7 +62,7 @@ test_that("Visualizer3DObj optimization trace works", {
   expect_s3_class(p, "plotly")
 })
 
-test_that("Visualizer3DObj input validation works", {
+test_that("VisualizerSurfaceObj input validation works", {
   # 1D objective should fail
   obj_1d <- Objective$new(
     id = "test_1d",
@@ -73,7 +73,7 @@ test_that("Visualizer3DObj input validation works", {
   )
 
   expect_error(
-    Visualizer3DObj$new(obj_1d),
+    VisualizerSurfaceObj$new(obj_1d),
     "2-dimensional inputs"
   )
 
@@ -87,12 +87,12 @@ test_that("Visualizer3DObj input validation works", {
   )
 
   expect_error(
-    Visualizer3DObj$new(obj_3d),
+    VisualizerSurfaceObj$new(obj_3d),
     "2-dimensional inputs"
   )
 })
 
-test_that("Visualizer3DObj with missing limits works", {
+test_that("VisualizerSurfaceObj with missing limits works", {
   # Objective without bounds
   obj <- Objective$new(
     id = "test",
@@ -104,20 +104,20 @@ test_that("Visualizer3DObj with missing limits works", {
 
   # Should fail without explicit limits
   expect_error(
-    Visualizer3DObj$new(obj),
+    VisualizerSurfaceObj$new(obj),
     "Limits could not be extracted"
   )
 
   # Should work with explicit limits
-  vis <- Visualizer3DObj$new(
+  vis <- VisualizerSurfaceObj$new(
     obj,
     x1_limits = c(-2, 2),
     x2_limits = c(-2, 2)
   )
-  expect_s3_class(vis, "Visualizer3DObj")
+  expect_s3_class(vis, "VisualizerSurfaceObj")
 })
 
-test_that("Visualizer3DObj padding works", {
+test_that("VisualizerSurfaceObj padding works", {
   obj <- Objective$new(
     id = "test",
     fun = function(x) sum(x^2),
@@ -126,7 +126,7 @@ test_that("Visualizer3DObj padding works", {
     upper = c(1, 1)
   )
 
-  vis <- Visualizer3DObj$new(obj, padding = 0.2, n_points = 5L)
+  vis <- VisualizerSurfaceObj$new(obj, padding = 0.2, n_points = 5L)
 
   # Check that padding was applied (can't directly access private fields,
   # but we can initialize and check the plot works)
@@ -135,9 +135,9 @@ test_that("Visualizer3DObj padding works", {
   expect_s3_class(p, "plotly")
 })
 
-test_that("Visualizer3DObj scene setting works", {
+test_that("VisualizerSurfaceObj scene setting works", {
   obj <- obj("TF_branin")
-  vis <- Visualizer3DObj$new(obj, n_points = 5L)
+  vis <- VisualizerSurfaceObj$new(obj, n_points = 5L)
   vis$init_layer_surface()
 
   # Set scene
@@ -147,12 +147,12 @@ test_that("Visualizer3DObj scene setting works", {
   expect_s3_class(p, "plotly")
 })
 
-test_that("Visualizer3DObj save functionality works", {
+test_that("VisualizerSurfaceObj save functionality works", {
   skip_if_not_installed("reticulate")
   skip_on_ci() # Skip on CI as it requires Python setup
 
   obj <- obj("TF_branin")
-  vis <- Visualizer3DObj$new(obj, n_points = 5L)
+  vis <- VisualizerSurfaceObj$new(obj, n_points = 5L)
   vis$init_layer_surface()
 
   # Test save (may fail if kaleido not installed, but shouldn't error in R)
@@ -162,9 +162,9 @@ test_that("Visualizer3DObj save functionality works", {
   expect_true("save" %in% names(vis))
 })
 
-test_that("Visualizer3DObj multiple optimization traces work", {
+test_that("VisualizerSurfaceObj multiple optimization traces work", {
   obj <- obj("TF_branin")
-  vis <- Visualizer3DObj$new(obj, n_points = 10L)
+  vis <- VisualizerSurfaceObj$new(obj, n_points = 10L)
   vis$init_layer_contour()
 
   # Create multiple optimizers

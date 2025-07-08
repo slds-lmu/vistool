@@ -1,26 +1,26 @@
-test_that("Visualizer3DModel creation works", {
+test_that("VisualizerSurfaceModel creation works", {
   skip_if_not_installed("mlr3learners")
 
   task <- tsk("mtcars")
   task$select(c("gear", "cyl"))
   learner <- lrn("regr.lm")
 
-  vis <- Visualizer3DModel$new(task, learner)
+  vis <- VisualizerSurfaceModel$new(task, learner)
 
-  expect_s3_class(vis, "Visualizer3DModel")
-  expect_s3_class(vis, "Visualizer3D")
+  expect_s3_class(vis, "VisualizerSurfaceModel")
+  expect_s3_class(vis, "VisualizerSurface")
   expect_identical(vis$task, task)
   expect_identical(vis$learner, learner)
 })
 
-test_that("Visualizer3DModel with custom limits works", {
+test_that("VisualizerSurfaceModel with custom limits works", {
   skip_if_not_installed("mlr3learners")
 
   task <- tsk("mtcars")
   task$select(c("gear", "cyl"))
   learner <- lrn("regr.lm")
 
-  vis <- Visualizer3DModel$new(
+  vis <- VisualizerSurfaceModel$new(
     task,
     learner,
     x1_limits = c(3, 5),
@@ -28,17 +28,17 @@ test_that("Visualizer3DModel with custom limits works", {
     n_points = 10L
   )
 
-  expect_s3_class(vis, "Visualizer3DModel")
+  expect_s3_class(vis, "VisualizerSurfaceModel")
 })
 
-test_that("Visualizer3DModel surface initialization works", {
+test_that("VisualizerSurfaceModel surface initialization works", {
   skip_if_not_installed("mlr3learners")
 
   task <- tsk("mtcars")
   task$select(c("gear", "cyl"))
   learner <- lrn("regr.lm")
 
-  vis <- Visualizer3DModel$new(task, learner, n_points = 5L)
+  vis <- VisualizerSurfaceModel$new(task, learner, n_points = 5L)
 
   # Initialize surface layer
   vis$init_layer_surface()
@@ -48,14 +48,14 @@ test_that("Visualizer3DModel surface initialization works", {
   expect_s3_class(p, "plotly")
 })
 
-test_that("Visualizer3DModel training data works", {
+test_that("VisualizerSurfaceModel training data works", {
   skip_if_not_installed("mlr3learners")
 
   task <- tsk("mtcars")
   task$select(c("gear", "cyl"))
   learner <- lrn("regr.lm")
 
-  vis <- Visualizer3DModel$new(task, learner, n_points = 5L)
+  vis <- VisualizerSurfaceModel$new(task, learner, n_points = 5L)
   vis$init_layer_surface()
 
   # Add training data
@@ -65,16 +65,16 @@ test_that("Visualizer3DModel training data works", {
   expect_s3_class(p, "plotly")
 })
 
-test_that("Visualizer3DModel with classification works", {
+test_that("VisualizerSurfaceModel with classification works", {
   skip_if_not_installed("mlr3learners")
 
   task <- tsk("spam")
   task$select(c("you", "credit"))
   learner <- lrn("classif.svm", predict_type = "prob")
 
-  vis <- Visualizer3DModel$new(task, learner, n_points = 5L)
+  vis <- VisualizerSurfaceModel$new(task, learner, n_points = 5L)
 
-  expect_s3_class(vis, "Visualizer3DModel")
+  expect_s3_class(vis, "VisualizerSurfaceModel")
 
   # Should be able to initialize
   vis$init_layer_surface()
@@ -82,7 +82,7 @@ test_that("Visualizer3DModel with classification works", {
   expect_s3_class(p, "plotly")
 })
 
-test_that("Visualizer3DModel input validation works", {
+test_that("VisualizerSurfaceModel input validation works", {
   skip_if_not_installed("mlr3learners")
 
   # Task with wrong number of features
@@ -91,7 +91,7 @@ test_that("Visualizer3DModel input validation works", {
   learner <- lrn("regr.lm")
 
   expect_error(
-    Visualizer3DModel$new(task_1d, learner),
+    VisualizerSurfaceModel$new(task_1d, learner),
     "exactly 2 features"
   )
 
@@ -99,12 +99,12 @@ test_that("Visualizer3DModel input validation works", {
   task_3d$select(c("gear", "cyl", "hp"))
 
   expect_error(
-    Visualizer3DModel$new(task_3d, learner),
+    VisualizerSurfaceModel$new(task_3d, learner),
     "exactly 2 features"
   )
 })
 
-test_that("Visualizer3DModel with different learner types works", {
+test_that("VisualizerSurfaceModel with different learner types works", {
   skip_if_not_installed("mlr3learners")
 
   task <- tsk("mtcars")
@@ -117,8 +117,8 @@ test_that("Visualizer3DModel with different learner types works", {
   )
 
   for (learner in learners) {
-    vis <- Visualizer3DModel$new(task, learner, n_points = 3L)
-    expect_s3_class(vis, "Visualizer3DModel")
+    vis <- VisualizerSurfaceModel$new(task, learner, n_points = 3L)
+    expect_s3_class(vis, "VisualizerSurfaceModel")
 
     vis$init_layer_surface()
     p <- vis$plot()
@@ -126,14 +126,14 @@ test_that("Visualizer3DModel with different learner types works", {
   }
 })
 
-test_that("Visualizer3DModel scene and camera work", {
+test_that("VisualizerSurfaceModel scene and camera work", {
   skip_if_not_installed("mlr3learners")
 
   task <- tsk("mtcars")
   task$select(c("gear", "cyl"))
   learner <- lrn("regr.lm")
 
-  vis <- Visualizer3DModel$new(task, learner, n_points = 5L)
+  vis <- VisualizerSurfaceModel$new(task, learner, n_points = 5L)
   vis$init_layer_surface()
 
   # Set scene
@@ -143,14 +143,14 @@ test_that("Visualizer3DModel scene and camera work", {
   expect_s3_class(p, "plotly")
 })
 
-test_that("Visualizer3DModel padding works", {
+test_that("VisualizerSurfaceModel padding works", {
   skip_if_not_installed("mlr3learners")
 
   task <- tsk("mtcars")
   task$select(c("gear", "cyl"))
   learner <- lrn("regr.lm")
 
-  vis <- Visualizer3DModel$new(task, learner, padding = 0.1, n_points = 5L)
+  vis <- VisualizerSurfaceModel$new(task, learner, padding = 0.1, n_points = 5L)
 
   # Should work with padding
   vis$init_layer_surface()
@@ -158,14 +158,14 @@ test_that("Visualizer3DModel padding works", {
   expect_s3_class(p, "plotly")
 })
 
-test_that("Visualizer3DModel training data customization works", {
+test_that("VisualizerSurfaceModel training data customization works", {
   skip_if_not_installed("mlr3learners")
 
   task <- tsk("mtcars")
   task$select(c("gear", "cyl"))
   learner <- lrn("regr.lm")
 
-  vis <- Visualizer3DModel$new(task, learner, n_points = 5L)
+  vis <- VisualizerSurfaceModel$new(task, learner, n_points = 5L)
   vis$init_layer_surface()
 
   # Add training data with custom parameters

@@ -51,8 +51,9 @@ Additional arguments.}
 The learner to train the model with.}
 
 \item{type}{(`character(1)`)\cr
-The type of visualization: "auto" (default), "1d", "2d", or "3d". 
-If "auto", automatically chooses based on the number of features/dimensions.}
+The type of visualization: "auto" (default), "1d", "2d", or "surface". 
+If "auto", automatically chooses between 1D and 2D ggplot2 visualizations based on the number of features/dimensions.
+Use "surface" for interactive plotly surface plots (2D inputs only, Models and Objectives only).}
 
 \item{x1_limits}{(`numeric(2)`)\cr
 The x1 limits.}
@@ -69,18 +70,18 @@ The number of generated point per dimension.
 Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
 }
 \value{
-An object inheriting from a Visualizer class (Visualizer1D, Visualizer2D, Visualizer3D, etc.)
+An object inheriting from a Visualizer class (Visualizer1D, Visualizer2D, VisualizerSurface, etc.)
 depending on the input and selected type.
 }
 \description{
-This function converts to a visualizer. Automatically chooses between 1D, 2D, and 3D
-visualizations based on the number of features/dimensions, or allows explicit control
-via the `type` parameter. 1D and 2D visualizations use ggplot2, while 3D visualizations use plotly.
+This function converts to a visualizer. Automatically chooses between 1D and 2D
+visualizations based on the number of features/dimensions using ggplot2 backend.
+For 2D inputs, you can optionally use `type = "surface"` to get interactive plotly
+surface plots (available for Models and Objectives only).
 }
 \details{
-If `type = "auto"` (default), the function will inspect the input and select the appropriate visualizer:
+If `type = "auto"` (default), the function will inspect the input and select the appropriate ggplot2 visualizer:
 - 1D: For objects with 1 feature/dimension (uses ggplot2)
 - 2D: For objects with 2 features/dimensions (uses ggplot2)
-- 3D: For objects with 3 or more features/dimensions (uses plotly)
-You can override this by specifying `type = "1d"`, `type = "2d"`, or `type = "3d"`.
+You can override this by specifying `type = "1d"`, `type = "2d"`, or for 2D inputs only: `type = "surface"` (uses plotly for interactive surfaces, Models and Objectives only).
 }

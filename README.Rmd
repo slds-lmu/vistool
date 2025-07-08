@@ -30,18 +30,23 @@ The goal of `vistool` is to visualize optimization traces and aid in teaching op
 
 ## Backend Selection with as_visualizer()
 
-The `as_visualizer()` function provides intelligent automatic backend selection:
+The `as_visualizer()` function provides intelligent automatic backend selection between two visualization backends:
 
-- **Automatic selection**: Chooses ggplot2 for 1D/2D objectives and plotly for 3D+ objectives
-- **Manual override**: Use `type = "2d"` to force ggplot2 or `type = "3d"` to force plotly 
-- **1D visualizations**: Always use ggplot2 (fast, publication-ready plots)
-- **2D visualizations**: ggplot2 by default, plotly available for interactivity
-- **3D+ visualizations**: Always use plotly (interactive surface and contour plots)
+### ggplot2 Backend (Default)
+- **When**: Used for `type = "1d"` and `type = "2d"` visualizations
+- **Pros**: Fast rendering, publication-ready static plots, no additional dependencies
+- **Best for**: Quick exploration, static reports, publications
 
-**Why this matters:**
-- ggplot2 visualizations work immediately with base R dependencies
-- plotly visualizations require Python dependencies but provide interactivity
-- The function automatically selects the best backend for your data dimensions
+### plotly Backend (Interactive)
+- **When**: Used for `type = "surface"` visualizations (2D functions only)
+- **Pros**: Interactive 3D surface plots, zoom/pan/rotate capabilities, hover information
+- **Cons**: Requires Python dependencies for saving (see installation section)
+- **Best for**: Interactive exploration, presentations, web applications
+
+### Automatic Selection Rules
+- **1D data**: Always uses ggplot2 (`Visualizer1D*`)
+- **2D data**: Defaults to ggplot2 (`Visualizer2D*`), but you can choose plotly with `type = "surface"` (`VisualizerSurface*`)
+- **Manual override**: Specify `type = "2d"` for ggplot2 or `type = "surface"` for plotly on 2D data
 
 ## Installation
 
@@ -52,8 +57,13 @@ You can install the development version of vistool from [GitHub](https://github.
 pak::pak("slds-lmu/vistool")
 ```
 
-Please note that 3D visualization features rely on [`plotly`]() which in turns relies on certain functionality provided by Python packages, which are accessed via reticulate.  
-Most importantly this affects the `$save()` functionality for 3D plots, which uses `plotly::save_image()` internally, and requires the `kaleido` Python package. 2D visualizations use ggplot2 and can be saved using standard ggplot2 methods.
+Please note that surface visualization features (plotly backend) rely on [`plotly`](https://plotly.com/r/) which in turn relies on certain functionality provided by Python packages, accessed via reticulate.  
+
+**For basic usage**: The plotly backend works out of the box for interactive viewing.
+
+**For saving plots**: The `$save()` functionality for surface plots uses `plotly::save_image()` internally, which requires the `kaleido` Python package. ggplot2 visualizations can be saved using standard ggplot2 methods without additional dependencies.
+
+### Optional: Setup for Saving Plotly Plots
 
 The following instructions are provided by `?plotly::save_image` and assume you do not have `miniconda` installed already:
 
@@ -73,7 +83,7 @@ library(mlr3verse)
 ```
 
 
-This examples shows how to visualize the prediction surface of an SVM on the `pima` task included in `mlr3`:
+This example shows how to visualize the prediction surface of an SVM on the `pima` task included in `mlr3`:
 
 ```{r example}
 # Create an example task, add missing data imputation and select 2 features
@@ -84,26 +94,22 @@ task$select(c("insulin", "mass"))
 # Select example learner
 learner <- lrn("classif.svm", predict_type = "prob")
 
-# Create the Visualizer object from task and learner
-# Use 3D visualization for interactive plotly surface plot
-vis <- as_visualizer(task, learner, type = "3d")
-
-# Define a 3D scene
-vis$set_scene(x = 1.4, y = 1.4, z = 1.4)
-```
-
-For comparison, you can also create 2D ggplot2 visualizations:
-
-```{r example-2d, eval=FALSE}
-# 2D visualization with ggplot2 (default for 2-feature tasks)
+# Create 2D ggplot2 visualization (default for 2-feature tasks)
 vis_2d <- as_visualizer(task, learner) # or explicitly: type = "2d"
 vis_2d$plot()
 ```
 
-View interactively:
+For interactive exploration, you can create surface visualizations with plotly:
 
-```{r example-plot, eval=FALSE}
-vis$plot()
+```{r example-surface, eval=FALSE}
+# Create surface visualization for interactive plotly surface plot
+vis_surface <- as_visualizer(task, learner, type = "surface")
+
+# Define a 3D scene
+vis_surface$set_scene(x = 1.4, y = 1.4, z = 1.4)
+
+# View interactively
+vis_surface$plot()
 ```
 
 ![](man/figures/demo_1.png)
@@ -113,7 +119,7 @@ Save static version as png:
 ```{r example-save, eval=FALSE}
 # only works if Python kaleido package is installed
 # see installation instructions above for setting up plotly save functionality
-vis$save("man/figures/demo_1.png", width = 500, height = 500)
+vis_surface$save("man/figures/demo_1.png", width = 500, height = 500)
 ```
 
 ## Contributing

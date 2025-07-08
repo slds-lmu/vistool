@@ -36,7 +36,7 @@ test_that("Unified save method works for all visualizers", {
     x2 = seq(-1, 1, length.out = 10)
   )
   zmat <- outer(grid$x1, grid$x2, function(x, y) x^2 + y^2)
-  vis3d <- Visualizer3D$new(
+  vis3d <- VisualizerSurface$new(
     grid = grid,
     zmat = zmat,
     plot_lab = "Test 3D Function"
@@ -45,7 +45,7 @@ test_that("Unified save method works for all visualizers", {
   # Note: plotly save requires additional setup for headless environments
   # so we'll just test that the method exists and can be called
   expect_true("save" %in% names(vis3d))
-  expect_s3_class(vis3d, "Visualizer3D")
+  expect_s3_class(vis3d, "VisualizerSurface")
   expect_s3_class(vis3d, "Visualizer")
 })
 

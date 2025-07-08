@@ -1,7 +1,8 @@
-#' @title Visualize 3D Functions
+#' @title Visualize 2D Functions as Interactive Surfaces
 #'
 #' @description
 #' Visualizes a two-dimensional function \eqn{f: \mathbb{R}^2 \to \mathbb{R}} via interactive plotly renderings.
+#' Creates 3D surface and contour plots for better visualization of 2D functions.
 #'
 #' @template param_x1_limits
 #' @template param_x2_limits
@@ -9,7 +10,7 @@
 #' @template param_n_points
 #'
 #' @export
-Visualizer3D <- R6::R6Class("Visualizer3D",
+VisualizerSurface <- R6::R6Class("VisualizerSurface",
   inherit = Visualizer,
   public = list(
 

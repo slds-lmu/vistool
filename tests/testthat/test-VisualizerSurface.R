@@ -1,4 +1,4 @@
-test_that("Visualizer3D base class works", {
+test_that("VisualizerSurface base class works", {
   skip_if_not_installed("plotly")
 
   # Create simple grid data
@@ -8,19 +8,19 @@ test_that("Visualizer3D base class works", {
   z_vals <- with(grid, x1^2 + x2^2)
   z_matrix <- matrix(z_vals, nrow = length(x1), ncol = length(x2))
 
-  vis <- Visualizer3D$new(
+  vis <- VisualizerSurface$new(
     grid = list(x1 = x1, x2 = x2),
     zmat = z_matrix,
-    plot_lab = "Test 3D Function"
+    plot_lab = "Test Surface Function"
   )
 
-  expect_s3_class(vis, "Visualizer3D")
-  expect_equal(vis$plot_lab, "Test 3D Function")
+  expect_s3_class(vis, "VisualizerSurface")
+  expect_equal(vis$plot_lab, "Test Surface Function")
   expect_true(is.list(vis$grid))
   expect_true(is.matrix(vis$zmat))
 })
 
-test_that("Visualizer3D surface initialization works", {
+test_that("VisualizerSurface surface initialization works", {
   skip_if_not_installed("plotly")
 
   # Create simple data
@@ -28,7 +28,7 @@ test_that("Visualizer3D surface initialization works", {
   x2 <- seq(-1, 1, length.out = 3)
   z_matrix <- outer(x1, x2, function(x, y) x^2 + y^2)
 
-  vis <- Visualizer3D$new(
+  vis <- VisualizerSurface$new(
     grid = list(x1 = x1, x2 = x2),
     zmat = z_matrix
   )
@@ -41,7 +41,7 @@ test_that("Visualizer3D surface initialization works", {
   expect_s3_class(p, "plotly")
 })
 
-test_that("Visualizer3D contour initialization works", {
+test_that("VisualizerSurface contour initialization works", {
   skip_if_not_installed("plotly")
 
   # Create simple data
@@ -49,7 +49,7 @@ test_that("Visualizer3D contour initialization works", {
   x2 <- seq(-1, 1, length.out = 3)
   z_matrix <- outer(x1, x2, function(x, y) x^2 + y^2)
 
-  vis <- Visualizer3D$new(
+  vis <- VisualizerSurface$new(
     grid = list(x1 = x1, x2 = x2),
     zmat = z_matrix
   )
@@ -62,7 +62,7 @@ test_that("Visualizer3D contour initialization works", {
   expect_s3_class(p, "plotly")
 })
 
-test_that("Visualizer3D scene setting works", {
+test_that("VisualizerSurface scene setting works", {
   skip_if_not_installed("plotly")
 
   # Create simple data
@@ -70,7 +70,7 @@ test_that("Visualizer3D scene setting works", {
   x2 <- seq(-1, 1, length.out = 3)
   z_matrix <- outer(x1, x2, function(x, y) x^2 + y^2)
 
-  vis <- Visualizer3D$new(
+  vis <- VisualizerSurface$new(
     grid = list(x1 = x1, x2 = x2),
     zmat = z_matrix
   )
@@ -84,7 +84,7 @@ test_that("Visualizer3D scene setting works", {
   expect_s3_class(p, "plotly")
 })
 
-test_that("Visualizer3D input validation works", {
+test_that("VisualizerSurface input validation works", {
   skip_if_not_installed("plotly")
 
   # Test with mismatched dimensions
@@ -92,12 +92,12 @@ test_that("Visualizer3D input validation works", {
   x2 <- seq(-1, 1, length.out = 4) # Different length
   z_matrix <- matrix(1:12, nrow = 3, ncol = 4)
 
-  vis <- Visualizer3D$new(
+  vis <- VisualizerSurface$new(
     grid = list(x1 = x1, x2 = x2),
     zmat = z_matrix
   )
 
-  expect_s3_class(vis, "Visualizer3D")
+  expect_s3_class(vis, "VisualizerSurface")
 
   # Should still work even with different grid lengths
   vis$init_layer_surface()

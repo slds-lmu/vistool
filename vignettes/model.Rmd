@@ -26,6 +26,9 @@ library(mlr3pipelines)
 ```
 
 The `as_visualizer()` function automatically creates appropriate visualizers for model predictions on tasks with different numbers of features.
+By default (`type = "auto"`), it uses ggplot2 for 1D and 2D visualizations. 
+For 2D tasks, you can optionally specify `type = "surface"` to get interactive plotly surface plots.
+
 Let's start with the `boston_housing` data set.
 The goal is to predict the median value of owner-occupied homes in $1000s.
 We subset the data set to only use the features `age` and `rm`.
@@ -42,15 +45,15 @@ We load the support vector machine learner for regression.
 learner <- lrn("regr.svm")
 ```
 
-Now we create a visualizer object, using the `plotly` backend (`type = "3d"`).
+Now we create a visualizer object, using the `plotly` backend (`type = "surface"`).
 
 ```{r}
-vis <- as_visualizer(task, learner, type = "3d")
+vis <- as_visualizer(task, learner, type = "surface")
 ```
 
 First, the learner is trained on the entire task.
 After that a grid is created for the two features and the predictions of the model are computed for each grid point.
-The predictions are then visualized using a 3D scatter plot.
+The predictions are then visualized using an interactive surface plot.
 
 ```{r, out.width='100%', out.height='700px'}
 vis$plot()
@@ -63,7 +66,7 @@ vis$init_layer_contour()
 vis$plot()
 ```
 
-To switch back to the 3D scatter plot initialize the scatter layer again.
+To switch back to the surface plot initialize the surface layer again.
 
 ```{r}
 vis$init_layer_surface()
@@ -94,11 +97,17 @@ task$select(c("insulin", "mass"))
 learner <- lrn("classif.svm", predict_type = "prob")
 ```
 
-We create a visualizer object and plot the predictions.
-The z-axis shows the probability of the positive class.
+We create a visualizer object using the default ggplot2 backend.
+
+```{r}
+vis <- as_visualizer(task, learner)
+vis$plot()
+```
+
+For an interactive surface plot, we can use `type = "surface"`.
 
 ```{r, out.width='100%', out.height='700px'}
-vis <- as_visualizer(task, learner)
+vis <- as_visualizer(task, learner, type = "surface")
 vis$plot(text_size = 3)
 ```
 

@@ -4,32 +4,29 @@ test_that("as_visualizer works for Objective with auto type selection", {
   vis_1d <- as_visualizer(obj_1d)
   expect_s3_class(vis_1d, "Visualizer1DObj")
 
-  # Test 2D objective
+  # Test 2D objective (auto should default to ggplot2)
   obj_2d <- obj("TF_branin")
   vis_2d <- as_visualizer(obj_2d)
   expect_s3_class(vis_2d, "Visualizer2DObj")
 
-  # Note: Visualizer3DObj requires 2D inputs (creates 3D plots from 2D objectives)
-  # For objectives with 3D+ dimensions, auto selection should create a 3D visualizer
-  # but it will only use the first 2 dimensions
+  # For objectives with 3D+ dimensions, auto selection should error
   obj_3d <- Objective$new(
     id = "test_3d", fun = function(x) sum(x^2), xdim = 3,
     lower = c(-1, -1, -1), upper = c(1, 1, 1)
   )
-  # This should fail because Visualizer3DObj only accepts 2D objectives
-  expect_error(as_visualizer(obj_3d), "requires 2-dimensional inputs")
+  expect_error(as_visualizer(obj_3d), "Auto visualization only supports 1D and 2D objectives")
 })
 
 test_that("as_visualizer works for Objective with explicit type selection", {
   obj_2d <- obj("TF_branin")
 
-  # Test explicit 2D
+  # Test explicit 2D (ggplot2)
   vis_2d <- as_visualizer(obj_2d, type = "2d")
   expect_s3_class(vis_2d, "Visualizer2DObj")
 
-  # Test explicit 3D for 2D objective
-  vis_3d <- as_visualizer(obj_2d, type = "3d")
-  expect_s3_class(vis_3d, "Visualizer3DObj")
+  # Test explicit surface for 2D objective (plotly)
+  vis_surface <- as_visualizer(obj_2d, type = "surface")
+  expect_s3_class(vis_surface, "VisualizerSurfaceObj")
 })
 
 test_that("as_visualizer works for Task with auto type selection", {
@@ -43,21 +40,18 @@ test_that("as_visualizer works for Task with auto type selection", {
   vis_1d <- as_visualizer(task_1d, learner)
   expect_s3_class(vis_1d, "Visualizer1DModel")
 
-  # Test 2D task
+  # Test 2D task (auto should default to ggplot2)
   task_2d <- tsk("mtcars")
   task_2d$select(c("gear", "cyl"))
 
   vis_2d <- as_visualizer(task_2d, learner)
   expect_s3_class(vis_2d, "Visualizer2DModel")
 
-  # Test task with >2 features
-  # Note: Visualizer3DModel also requires exactly 2 features and will create a grid from them
-  # Tasks with >2 features should cause an error unless only 2 are selected
+  # Test task with >2 features (auto should error)
   task_3d <- tsk("mtcars")
   task_3d$select(c("gear", "cyl", "hp"))
 
-  # This should fail because the visualizer can't handle >2 features automatically
-  expect_error(as_visualizer(task_3d, learner), "exactly 2 features")
+  expect_error(as_visualizer(task_3d, learner), "Auto visualization only supports 1D and 2D tasks")
 })
 
 test_that("as_visualizer works for Task with explicit type selection", {
@@ -67,13 +61,13 @@ test_that("as_visualizer works for Task with explicit type selection", {
   task_2d$select(c("gear", "cyl"))
   learner <- lrn("regr.lm")
 
-  # Test explicit 2D
+  # Test explicit 2D (ggplot2)
   vis_2d <- as_visualizer(task_2d, learner, type = "2d")
   expect_s3_class(vis_2d, "Visualizer2DModel")
 
-  # Test explicit 3D for 2D task
-  vis_3d <- as_visualizer(task_2d, learner, type = "3d")
-  expect_s3_class(vis_3d, "Visualizer3DModel")
+  # Test explicit surface for 2D task (plotly)
+  vis_surface <- as_visualizer(task_2d, learner, type = "surface")
+  expect_s3_class(vis_surface, "VisualizerSurfaceModel")
 })
 
 test_that("as_visualizer works for LossFunction", {
@@ -110,12 +104,17 @@ test_that("as_visualizer error handling works", {
   # Test dimension mismatch errors
   expect_error(
     as_visualizer(obj_1d, type = "2d"),
-    "2D visualization requires an objective with exactly 2 dimensions"
+    "2D and surface visualizations require an objective with exactly 2 dimensions"
   )
 
   expect_error(
     as_visualizer(obj_2d, type = "1d"),
     "1D visualization requires an objective with exactly 1 dimension"
+  )
+
+  expect_error(
+    as_visualizer(obj_1d, type = "surface"),
+    "2D and surface visualizations require an objective with exactly 2 dimensions"
   )
 
   # Test invalid type - the actual error message uses checkmate format
@@ -129,17 +128,17 @@ test_that("as_visualizer automatic type selection follows documented behavior", 
   # Test that auto selection follows the documented rules:
   # 1D -> Visualizer1DObj (ggplot2)
   # 2D -> Visualizer2DObj (ggplot2)
-  # 3D+ -> Currently not supported; Visualizer3DObj requires 2D inputs
+  # 3D+ -> Error (must specify type explicitly)
 
   # 1D objective
   obj_1d <- Objective$new(id = "test_1d", fun = function(x) x^2, xdim = 1, lower = -5, upper = 5)
   vis_1d_auto <- as_visualizer(obj_1d) # type = "auto" is default
   expect_s3_class(vis_1d_auto, "Visualizer1DObj")
 
-  # 2D objective
+  # 2D objective (should default to ggplot2, not plotly)
   obj_2d <- obj("TF_branin")
   vis_2d_auto <- as_visualizer(obj_2d) # type = "auto" is default
-  expect_s3_class(vis_2d_auto, "Visualizer2DObj") # Should be 2D ggplot2, not 3D plotly
+  expect_s3_class(vis_2d_auto, "Visualizer2DObj") # Should be 2D ggplot2, not surface plotly
 })
 
 test_that("as_visualizer backend selection works correctly", {
@@ -152,12 +151,12 @@ test_that("as_visualizer backend selection works correctly", {
   plot_2d <- vis_2d_ggplot$plot()
   expect_s3_class(plot_2d, "ggplot")
 
-  # Test explicit 3D (plotly)
-  vis_2d_plotly <- as_visualizer(obj_2d, type = "3d")
-  expect_s3_class(vis_2d_plotly, "Visualizer3DObj")
+  # Test explicit surface (plotly)
+  vis_2d_plotly <- as_visualizer(obj_2d, type = "surface")
+  expect_s3_class(vis_2d_plotly, "VisualizerSurfaceObj")
   vis_2d_plotly$init_layer_surface()
-  plot_3d <- vis_2d_plotly$plot()
-  expect_s3_class(plot_3d, "plotly")
+  plot_surface <- vis_2d_plotly$plot()
+  expect_s3_class(plot_surface, "plotly")
 
   # Test 1D objective (always ggplot2)
   obj_1d <- Objective$new(id = "test_1d", fun = function(x) x^2, xdim = 1, lower = -5, upper = 5)
@@ -176,11 +175,11 @@ test_that("as_visualizer creates objects that can plot", {
   plot_2d <- vis_2d$plot()
   expect_s3_class(plot_2d, "ggplot")
 
-  # Test 3D plotly visualizer
-  vis_3d <- as_visualizer(obj_2d, type = "3d")
-  vis_3d$init_layer_surface()
-  plot_3d <- vis_3d$plot()
-  expect_s3_class(plot_3d, "plotly")
+  # Test surface plotly visualizer
+  vis_surface <- as_visualizer(obj_2d, type = "surface")
+  vis_surface$init_layer_surface()
+  plot_surface <- vis_surface$plot()
+  expect_s3_class(plot_surface, "plotly")
 })
 
 test_that("as_visualizer Task dimension validation works", {
@@ -195,7 +194,7 @@ test_that("as_visualizer Task dimension validation works", {
   # Test dimension validation for tasks
   expect_error(
     as_visualizer(task_1d, learner, type = "2d"),
-    "2D visualization requires a task with exactly 2 features"
+    "2D and surface visualizations require a task with exactly 2 features"
   )
 
   expect_error(
@@ -203,12 +202,41 @@ test_that("as_visualizer Task dimension validation works", {
     "1D visualization requires a task with exactly 1 feature"
   )
 
-  # Test that tasks with >2 features fail when trying to create 3D visualizers
+  expect_error(
+    as_visualizer(task_1d, learner, type = "surface"),
+    "2D and surface visualizations require a task with exactly 2 features"
+  )
+
+  # Test that tasks with >2 features fail in auto mode
   task_multi <- tsk("mtcars")
   task_multi$select(c("gear", "cyl", "hp"))
 
   expect_error(
     as_visualizer(task_multi, learner),
-    "exactly 2 features"
+    "Auto visualization only supports 1D and 2D tasks"
   )
+})
+
+test_that("as_visualizer LossFunction type validation works", {
+  loss_func <- lss("l2_se")
+  y_pred <- seq(-4, 4, length.out = 100)
+  y_true <- 1
+
+  # Test that LossFunction only accepts "auto" and "1d" types
+  expect_error(
+    as_visualizer(loss_func, type = "2d", y_pred = y_pred, y_true = y_true),
+    "Must be element of set"
+  )
+
+  expect_error(
+    as_visualizer(loss_func, type = "surface", y_pred = y_pred, y_true = y_true),
+    "Must be element of set"
+  )
+
+  # Test that "auto" and "1d" work
+  vis_auto <- as_visualizer(loss_func, type = "auto", y_pred = y_pred, y_true = y_true)
+  expect_s3_class(vis_auto, "VisualizerLossFuns")
+
+  vis_1d <- as_visualizer(loss_func, type = "1d", y_pred = y_pred, y_true = y_true)
+  expect_s3_class(vis_1d, "VisualizerLossFuns")
 })

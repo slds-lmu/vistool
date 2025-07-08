@@ -1,7 +1,8 @@
-#' @title Visualize Model
+#' @title Visualize Model as Interactive Surface
 #'
 #' @description
-#' This class is used to create 3D visualizations of learners and tasks.
+#' This class is used to create interactive 3D surface visualizations of learners and tasks
+#' for 2D input data using plotly.
 #'
 #' @template param_x1_limits
 #' @template param_x2_limits
@@ -9,8 +10,8 @@
 #' @template param_n_points
 #'
 #' @export
-Visualizer3DModel <- R6::R6Class("Visualizer3DModel",
-  inherit = Visualizer3D,
+VisualizerSurfaceModel <- R6::R6Class("VisualizerSurfaceModel",
+  inherit = VisualizerSurface,
   public = list(
 
     #' @field task (`mlr3::Task`)\cr

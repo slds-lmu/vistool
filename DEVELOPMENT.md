@@ -100,7 +100,7 @@ vistool/
 - **`Visualizer`**: Base visualization class
   - `Visualizer1D*`: 1D plotting with ggplot2
   - `Visualizer2D*`: 2D plotting with ggplot2  
-  - `Visualizer3D*`: 3D plotting with plotly
+  - `VisualizerSurface*`: Interactive surface plotting with plotly for 2D functions
 - **`as_visualizer()`**: Smart constructor that selects appropriate visualizer
 
 ## Development Workflow

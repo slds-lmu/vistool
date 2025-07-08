@@ -1,7 +1,8 @@
-#' @title Visualize Objective
+#' @title Visualize Objective as Interactive Surface
 #'
 #' @description
-#' This class is used to create visualizations and animations of optimization traces.
+#' This class is used to create interactive surface visualizations and animations of optimization traces
+#' for 2D objectives using plotly.
 #'
 #' @template param_x1_limits
 #' @template param_x2_limits
@@ -9,8 +10,8 @@
 #' @template param_n_points
 #'
 #' @export
-Visualizer3DObj <- R6::R6Class("Visualizer3DObj",
-  inherit = Visualizer3D,
+VisualizerSurfaceObj <- R6::R6Class("VisualizerSurfaceObj",
+  inherit = VisualizerSurface,
   public = list(
 
     #' @template field_objective
@@ -28,7 +29,7 @@ Visualizer3DObj <- R6::R6Class("Visualizer3DObj",
       checkmate::assert_count(n_points)
 
       if (objective$xdim != 2) {
-        mlr3misc::stopf("`Visualizer3D` requires 2-dimensional inputs, but `objective$xdim = %s`", objective$xdim)
+        mlr3misc::stopf("`VisualizerSurface` requires 2-dimensional inputs, but `objective$xdim = %s`", objective$xdim)
       }
 
       x1_limits <- x1_limits %??% c(objective$lower[1], objective$upper[1])
