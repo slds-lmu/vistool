@@ -258,6 +258,24 @@ Visualizer2DObj <- R6::R6Class("Visualizer2DObj",
       }
       
       return(p)
+    },
+
+    #' @description
+    #' Add Taylor approximation layer (not implemented for ggplot2).
+    #' @param ... Additional arguments (ignored).
+    #' @details This method is only available for surface visualizers (type="surface").
+    add_layer_taylor = function(...) {
+      warning("add_layer_taylor() is only available for VisualizerSurface (type='surface'). ggplot2-based 2D visualizers do not support this functionality.")
+      invisible(self)
+    },
+
+    #' @description
+    #' Add Hessian visualization layer (not implemented for ggplot2).
+    #' @param ... Additional arguments (ignored).
+    #' @details This method is only available for surface visualizers (type="surface").
+    add_layer_hessian = function(...) {
+      warning("add_layer_hessian() is only available for VisualizerSurface (type='surface'). ggplot2-based 2D visualizers do not support this functionality.")
+      invisible(self)
     }
   ),
   private = list(

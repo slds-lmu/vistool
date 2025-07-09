@@ -41,10 +41,22 @@ test_that("VisualizerLossFuns with prediction data works", {
 
 test_that("VisualizerLossFuns input validation works", {
   loss1 <- lss("l2_se") # regression
+  
+  # Basic test - single loss function should work
+  vis1 <- VisualizerLossFuns$new(list(loss1))
+  expect_s3_class(vis1, "VisualizerLossFuns")
+  expect_equal(vis1$task_type, "regr")
 
-  # Try to create VisualizerLossFuns with classification loss
-  if ("logistic" %in% dict_loss$keys()) {
-    loss2 <- lss("logistic") # classification
+  # Try to create VisualizerLossFuns with mixed task types if possible
+  classif_keys <- dict_loss$keys()[sapply(dict_loss$keys(), function(k) {
+    tryCatch({
+      loss <- dict_loss$get(k)
+      loss$task_type == "classif"
+    }, error = function(e) FALSE)
+  })]
+  
+  if (length(classif_keys) > 0) {
+    loss2 <- lss(classif_keys[1]) # classification
 
     # Should fail with mixed task types
     expect_error(

@@ -31,11 +31,9 @@ Learner used to train the model.}
 }
 }
 \if{html}{\out{
-<details><summary>Inherited methods</summary>
+<details open><summary>Inherited methods</summary>
 <ul>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href='../../vistool/html/Visualizer.html#method-Visualizer-save'><code>vistool::Visualizer$save()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="add_layer_hessian"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-add_layer_hessian'><code>vistool::Visualizer2D$add_layer_hessian()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="add_layer_taylor"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-add_layer_taylor'><code>vistool::Visualizer2D$add_layer_taylor()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="init_layer_contour"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-init_layer_contour'><code>vistool::Visualizer2D$init_layer_contour()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="init_layer_surface"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-init_layer_surface'><code>vistool::Visualizer2D$init_layer_surface()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="set_layout"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-set_layout'><code>vistool::Visualizer2D$set_layout()</code></a></span></li>
