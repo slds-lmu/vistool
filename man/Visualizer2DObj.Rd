@@ -21,6 +21,8 @@ The objective function.}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-Visualizer2DObj-new}{\code{Visualizer2DObj$new()}}
+\item \href{#method-Visualizer2DObj-add_optimization_trace}{\code{Visualizer2DObj$add_optimization_trace()}}
+\item \href{#method-Visualizer2DObj-plot}{\code{Visualizer2DObj$plot()}}
 \item \href{#method-Visualizer2DObj-clone}{\code{Visualizer2DObj$clone()}}
 }
 }
@@ -30,10 +32,8 @@ The objective function.}
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href='../../vistool/html/Visualizer.html#method-Visualizer-save'><code>vistool::Visualizer$save()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="add_layer_hessian"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-add_layer_hessian'><code>vistool::Visualizer2D$add_layer_hessian()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="add_layer_taylor"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-add_layer_taylor'><code>vistool::Visualizer2D$add_layer_taylor()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="add_optimization_trace"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-add_optimization_trace'><code>vistool::Visualizer2D$add_optimization_trace()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="init_layer_contour"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-init_layer_contour'><code>vistool::Visualizer2D$init_layer_contour()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="init_layer_surface"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-init_layer_surface'><code>vistool::Visualizer2D$init_layer_surface()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="plot"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-plot'><code>vistool::Visualizer2D$plot()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="set_layout"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-set_layout'><code>vistool::Visualizer2D$set_layout()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="set_scene"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-set_scene'><code>vistool::Visualizer2D$set_scene()</code></a></span></li>
 </ul>
@@ -75,6 +75,101 @@ The number of generated point per dimension.
 Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Visualizer2DObj-add_optimization_trace"></a>}}
+\if{latex}{\out{\hypertarget{method-Visualizer2DObj-add_optimization_trace}{}}}
+\subsection{Method \code{add_optimization_trace()}}{
+Add optimization trace to the plot.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer2DObj$add_optimization_trace(
+  optimizer,
+  line_color = NULL,
+  line_width = 1.2,
+  line_type = "solid",
+  npoints = NULL,
+  npmax = NULL,
+  name = NULL,
+  add_marker_at = 1,
+  marker_size = 3,
+  marker_shape = 16,
+  marker_color = NULL,
+  show_start_end = TRUE,
+  alpha = 0.8
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{optimizer}}{(`Optimizer`)\cr
+The optimizer from which the archive is extracted and used to plot the trace.}
+
+\item{\code{line_color}}{(`character(1)`)\cr
+The color of the trace line. If NULL, a random color is generated.}
+
+\item{\code{line_width}}{(`numeric(1)`)\cr
+The width of the trace line. Default is 1.2.}
+
+\item{\code{line_type}}{(`character(1)`)\cr
+The line type for the trace. Default is "solid".}
+
+\item{\code{npoints}}{(`integer(1)`)\cr
+The number of used points from the archive. Default is NULL which means all points are used.}
+
+\item{\code{npmax}}{(`integer(1)`)\cr
+The maximum number of points to use. Default is NULL.}
+
+\item{\code{name}}{(`character(1)`)\cr
+The name of the trace in the legend. Default is NULL which creates a name from optimizer and objective IDs.}
+
+\item{\code{add_marker_at}}{(`integer()`)\cr
+Vector of iterations at which markers are added. Default is first iteration only.}
+
+\item{\code{marker_size}}{(`numeric(1)`)\cr
+Size of the markers. Default is 3.}
+
+\item{\code{marker_shape}}{(`character(1)` or `integer(1)`)\cr
+Shape of the markers. Default is "circle" (16).}
+
+\item{\code{marker_color}}{(`character(1)`)\cr
+Color of the markers. If NULL, uses line_color.}
+
+\item{\code{show_start_end}}{(`logical(1)`)\cr
+Whether to highlight start and end points differently. Default is TRUE.}
+
+\item{\code{alpha}}{(`numeric(1)`)\cr
+Transparency level for the trace. Default is 0.8.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Returns self invisibly for method chaining.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Visualizer2DObj-plot"></a>}}
+\if{latex}{\out{\hypertarget{method-Visualizer2DObj-plot}{}}}
+\subsection{Method \code{plot()}}{
+Create and return the ggplot2 plot with optimization traces.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer2DObj$plot(text_size = 11, theme = "minimal")}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{text_size}}{(`numeric(1)`)\cr
+Base text size for plot elements. Default is 11.}
+
+\item{\code{theme}}{(`character(1)`)\cr
+ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "minimal".}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A ggplot2 object.
 }
 }
 \if{html}{\out{<hr>}}

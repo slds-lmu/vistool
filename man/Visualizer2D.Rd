@@ -42,7 +42,6 @@ y-values of points.}
 \item \href{#method-Visualizer2D-plot}{\code{Visualizer2D$plot()}}
 \item \href{#method-Visualizer2D-init_layer_contour}{\code{Visualizer2D$init_layer_contour()}}
 \item \href{#method-Visualizer2D-init_layer_surface}{\code{Visualizer2D$init_layer_surface()}}
-\item \href{#method-Visualizer2D-add_optimization_trace}{\code{Visualizer2D$add_optimization_trace()}}
 \item \href{#method-Visualizer2D-set_layout}{\code{Visualizer2D$set_layout()}}
 \item \href{#method-Visualizer2D-set_scene}{\code{Visualizer2D$set_scene()}}
 \item \href{#method-Visualizer2D-add_layer_taylor}{\code{Visualizer2D$add_layer_taylor()}}
@@ -129,7 +128,7 @@ A ggplot2 object.
 \if{html}{\out{<a id="method-Visualizer2D-init_layer_contour"></a>}}
 \if{latex}{\out{\hypertarget{method-Visualizer2D-init_layer_contour}{}}}
 \subsection{Method \code{init_layer_contour()}}{
-Initialize contour layer (compatibility method, no-op for ggplot2 version).
+Initialize contour layer (plotly-specific method).
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$init_layer_contour(...)}\if{html}{\out{</div>}}
 }
@@ -137,29 +136,21 @@ Initialize contour layer (compatibility method, no-op for ggplot2 version).
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{\cr
-Additional arguments (ignored for compatibility).}
-
-\item{\code{...}}{\cr
-Additional arguments (ignored for compatibility).}
-
-\item{\code{...}}{\cr
-Additional arguments (ignored for compatibility).}
-
-\item{\code{...}}{\cr
-Additional arguments (ignored for compatibility).}
-
-\item{\code{...}}{\cr
-Additional arguments (ignored for compatibility).}
+\item{\code{...}}{Additional arguments.}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Details}{
+This method is only available for surface visualizers (type="surface").
+For ggplot2-based 2D visualizers, contours are created by default in the plot() method.
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Visualizer2D-init_layer_surface"></a>}}
 \if{latex}{\out{\hypertarget{method-Visualizer2D-init_layer_surface}{}}}
 \subsection{Method \code{init_layer_surface()}}{
-Initialize surface layer (compatibility method, no-op for ggplot2 version).
+Initialize surface layer (plotly-specific method).
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$init_layer_surface(...)}\if{html}{\out{</div>}}
 }
@@ -167,100 +158,21 @@ Initialize surface layer (compatibility method, no-op for ggplot2 version).
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{\cr
-Additional arguments (ignored for compatibility).}
-
-\item{\code{...}}{\cr
-Additional arguments (ignored for compatibility).}
-
-\item{\code{...}}{\cr
-Additional arguments (ignored for compatibility).}
-
-\item{\code{...}}{\cr
-Additional arguments (ignored for compatibility).}
-
-\item{\code{...}}{\cr
-Additional arguments (ignored for compatibility).}
+\item{\code{...}}{Additional arguments.}
 }
 \if{html}{\out{</div>}}
 }
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Visualizer2D-add_optimization_trace"></a>}}
-\if{latex}{\out{\hypertarget{method-Visualizer2D-add_optimization_trace}{}}}
-\subsection{Method \code{add_optimization_trace()}}{
-Add optimization trace to the plot.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$add_optimization_trace(
-  optimizer,
-  line_color = NULL,
-  line_width = 1.2,
-  line_type = "solid",
-  npoints = NULL,
-  npmax = NULL,
-  name = NULL,
-  add_marker_at = 1,
-  marker_size = 3,
-  marker_shape = 16,
-  marker_color = NULL,
-  show_start_end = TRUE,
-  alpha = 0.8
-)}\if{html}{\out{</div>}}
+\subsection{Details}{
+This method is only available for surface visualizers (type="surface").
+ggplot2-based 2D visualizers do not support 3D surfaces.
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{optimizer}}{(`Optimizer`)\cr
-The optimizer from which the archive is extracted and used to plot the trace.}
-
-\item{\code{line_color}}{(`character(1)`)\cr
-The color of the trace line. If NULL, a random color is generated.}
-
-\item{\code{line_width}}{(`numeric(1)`)\cr
-The width of the trace line. Default is 1.2.}
-
-\item{\code{line_type}}{(`character(1)`)\cr
-The line type for the trace. Default is "solid".}
-
-\item{\code{npoints}}{(`integer(1)`)\cr
-The number of used points from the archive. Default is NULL which means all points are used.}
-
-\item{\code{npmax}}{(`integer(1)`)\cr
-The maximum number of points to use. Default is NULL.}
-
-\item{\code{name}}{(`character(1)`)\cr
-The name of the trace in the legend. Default is NULL which creates a name from optimizer and objective IDs.}
-
-\item{\code{add_marker_at}}{(`integer()`)\cr
-Vector of iterations at which markers are added. Default is first iteration only.}
-
-\item{\code{marker_size}}{(`numeric(1)`)\cr
-Size of the markers. Default is 3.}
-
-\item{\code{marker_shape}}{(`character(1)` or `integer(1)`)\cr
-Shape of the markers. Default is "circle" (16).}
-
-\item{\code{marker_color}}{(`character(1)`)\cr
-Color of the markers. If NULL, uses line_color.}
-
-\item{\code{show_start_end}}{(`logical(1)`)\cr
-Whether to highlight start and end points differently. Default is TRUE.}
-
-\item{\code{alpha}}{(`numeric(1)`)\cr
-Transparency level for the trace. Default is 0.8.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Returns self invisibly for method chaining.
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Visualizer2D-set_layout"></a>}}
 \if{latex}{\out{\hypertarget{method-Visualizer2D-set_layout}{}}}
 \subsection{Method \code{set_layout()}}{
-Set layout (compatibility method, no-op for ggplot2 version).
+Set layout (plotly-specific method).
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$set_layout(...)}\if{html}{\out{</div>}}
 }
@@ -268,59 +180,47 @@ Set layout (compatibility method, no-op for ggplot2 version).
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{\cr
-Additional arguments (ignored for compatibility).}
-
-\item{\code{...}}{\cr
-Additional arguments (ignored for compatibility).}
-
-\item{\code{...}}{\cr
-Additional arguments (ignored for compatibility).}
-
-\item{\code{...}}{\cr
-Additional arguments (ignored for compatibility).}
-
-\item{\code{...}}{\cr
-Additional arguments (ignored for compatibility).}
+\item{\code{...}}{Layout options.}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Details}{
+This method is only available for surface visualizers (type="surface").
+For ggplot2-based 2D visualizers, use ggplot2's theming system instead.
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Visualizer2D-set_scene"></a>}}
 \if{latex}{\out{\hypertarget{method-Visualizer2D-set_scene}{}}}
 \subsection{Method \code{set_scene()}}{
-Set scene (compatibility method, no-op for ggplot2 version).
+Set scene (plotly-specific method for 3D plots).
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$set_scene(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$set_scene(x, y, z)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{\cr
-Additional arguments (ignored for compatibility).}
+\item{\code{x}}{(`numeric(1)`) Camera x position.}
 
-\item{\code{...}}{\cr
-Additional arguments (ignored for compatibility).}
+\item{\code{y}}{(`numeric(1)`) Camera y position.}
 
-\item{\code{...}}{\cr
-Additional arguments (ignored for compatibility).}
-
-\item{\code{...}}{\cr
-Additional arguments (ignored for compatibility).}
-
-\item{\code{...}}{\cr
-Additional arguments (ignored for compatibility).}
+\item{\code{z}}{(`numeric(1)`) Camera z position.}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Details}{
+This method is only available for surface visualizers (type="surface").
+ggplot2-based 2D visualizers do not support 3D scene control.
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Visualizer2D-add_layer_taylor"></a>}}
 \if{latex}{\out{\hypertarget{method-Visualizer2D-add_layer_taylor}{}}}
 \subsection{Method \code{add_layer_taylor()}}{
-Add layer taylor (compatibility method, no-op for ggplot2 version).
+Add Taylor approximation layer (not implemented for ggplot2).
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$add_layer_taylor(...)}\if{html}{\out{</div>}}
 }
@@ -328,29 +228,20 @@ Add layer taylor (compatibility method, no-op for ggplot2 version).
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{\cr
-Additional arguments (ignored for compatibility).}
-
-\item{\code{...}}{\cr
-Additional arguments (ignored for compatibility).}
-
-\item{\code{...}}{\cr
-Additional arguments (ignored for compatibility).}
-
-\item{\code{...}}{\cr
-Additional arguments (ignored for compatibility).}
-
-\item{\code{...}}{\cr
-Additional arguments (ignored for compatibility).}
+\item{\code{...}}{Additional arguments (ignored).}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Details}{
+This method is only available for surface visualizers (type="surface").
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Visualizer2D-add_layer_hessian"></a>}}
 \if{latex}{\out{\hypertarget{method-Visualizer2D-add_layer_hessian}{}}}
 \subsection{Method \code{add_layer_hessian()}}{
-Add layer hessian (compatibility method, no-op for ggplot2 version).
+Add Hessian visualization layer (not implemented for ggplot2).
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$add_layer_hessian(...)}\if{html}{\out{</div>}}
 }
@@ -358,10 +249,14 @@ Add layer hessian (compatibility method, no-op for ggplot2 version).
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{Additional arguments (ignored for compatibility).}
+\item{\code{...}}{Additional arguments (ignored).}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Details}{
+This method is only available for surface visualizers (type="surface").
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Visualizer2D-clone"></a>}}

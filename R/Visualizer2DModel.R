@@ -125,18 +125,6 @@ Visualizer2DModel <- R6::R6Class("Visualizer2DModel",
     },
 
     #' @description
-    #' Initialize the contour layer. For ggplot2-based 2D visualizers, this method
-    #' exists for API compatibility but doesn't need to do anything since contours
-    #' are created by default in the plot() method.
-    #'
-    #' @param ... Additional arguments (ignored for ggplot2 compatibility).
-    init_layer_contour = function(...) {
-      # This method exists for API compatibility with 3D visualizers
-      # For 2D ggplot2 visualizers, contours are created by default in plot()
-      return(invisible(self))
-    },
-
-    #' @description
     #' Adds the decision boundary to the plot.
     #'
     #' @param threshold (`numeric(1)`)\cr
@@ -150,6 +138,42 @@ Visualizer2DModel <- R6::R6Class("Visualizer2DModel",
       private$.decision_threshold <- threshold
 
       return(invisible(self))
+    },
+
+    #' @description
+    #' Create and return the ggplot2 plot with model-specific features.
+    #' @param text_size (`numeric(1)`)\cr
+    #'   Base text size for plot elements. Default is 11.
+    #' @param theme (`character(1)`)\cr
+    #'   ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "minimal".
+    #' @return A ggplot2 object.
+    plot = function(text_size = 11, theme = "minimal") {
+      checkmate::assert_number(text_size, lower = 1)
+      checkmate::assert_choice(theme, choices = c("minimal", "bw", "classic", "gray", "light", "dark", "void"))
+      
+      # Call parent plot method
+      p <- super$plot(text_size = text_size, theme = theme)
+      
+      # Add decision boundary if available (for classification)
+      if (!is.null(private$.decision_threshold)) {
+        data <- data.table(
+          fun_x1 = self$fun_x1,
+          fun_x2 = self$fun_x2,
+          fun_y = self$fun_y
+        )
+        
+        p <- p + geom_contour(
+          data = data,
+          aes(x = fun_x1, y = fun_x2, z = fun_y),
+          breaks = private$.decision_threshold,
+          color = "black", 
+          linewidth = 1.5, 
+          alpha = 0.8,
+          inherit.aes = FALSE
+        )
+      }
+      
+      return(p)
     }
   ),
   private = list(

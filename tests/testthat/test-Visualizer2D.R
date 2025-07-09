@@ -84,28 +84,12 @@ test_that("Visualizer2D optimization trace and compatibility methods work", {
     fun_y = z_vals
   )
 
-  # Test that add_optimization_trace now requires an optimizer argument
-  expect_error(
-    vis$add_optimization_trace(),
-    "argument \"optimizer\" is missing"
+  # set_layout should warn that it's only available for surface visualizers
+  expect_warning(
+    vis$set_layout(),
+    "set_layout\\(\\) is only available for VisualizerSurface"
   )
-  
-  # set_layout should still be a no-op for compatibility
-  expect_silent(vis$set_layout())
 
-  # Test with a valid optimizer
-  obj <- Objective$new(
-    id = "test",
-    fun = function(x) sum(x^2),
-    xdim = 2,
-    lower = c(-1, -1),
-    upper = c(1, 1),
-    minimize = TRUE
-  )
-  opt <- OptimizerGD$new(obj, x_start = c(0.5, 0.5), lr = 0.1, print_trace = FALSE)
-  opt$optimize(steps = 2L)
-  
-  # Should return self for chaining
-  result <- vis$add_optimization_trace(opt)
-  expect_identical(result, vis)
+  # add_optimization_trace should no longer be available on base Visualizer2D
+  expect_null(vis$add_optimization_trace)
 })
