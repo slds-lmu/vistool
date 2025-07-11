@@ -32,26 +32,29 @@ The package includes a few predefined loss functions that are used for classific
 as.data.table(dict_loss)
 ```
 
-To get a loss function from the dictionary, use the `lss()` function
-We retrieve the hinge loss function for classification.
+To get a loss function from the dictionary, use the `lss()` function.
+Many loss functions support parameters (e.g., `quantile` for pinball loss, `delta` for Huber loss, `epsilon` for epsilon-insensitive loss).
+You can specify these parameters directly in the `lss()` function call.
+Here we retrieve the pinball loss function for regression with a custom quantile parameter.
 
 ```{r}
-loss_function <- lss("hinge")
+loss_function <- lss("pinball", quantile = 0.3)
 ```
 
 # Visualization
 
 To visualize the loss function, use the `as_visualizer()` function.
-The `y_pred` arguments contains $y * f(x)$ and `y_true` the true value $y$.
+The `y_pred` arguments contains $y - f(x)$ (for regression losses) and `y_true` the true value $y$.
+By default, loss functions are plotted with 1000 points for smooth curves.
 
 ```{r}
-vis <- as_visualizer(loss_function, y_pred = seq(-4, 4), y_true = 1)
+vis <- as_visualizer(loss_function, y_pred = seq(-4, 4), y_true = 0)
 ```
 
 Use the `plot()` method to plot the loss function.
 
 ```{r, out.width='100%'}
-vis$plot(text_size = 6)
+vis$plot(text_size = 4)
 ```
 
 # Regression Loss Functions
@@ -67,14 +70,15 @@ loss_logcosh = lss("log-cosh")
 vis_combined = VisualizerLossFuns$new(
   list(loss_huber, loss_l2, loss_l1, loss_logcosh),
   y_pred = seq(-4, 4),
-  y_true = 0
+  y_true = 0,
+  n_points = 5000L  # higher resolution for smooth curves
 )
 vis_combined$plot(text_size = 4)
 ```
 
 # Classification Loss Functions
 
-Here we visualize classification loss functions:
+Here we visualize classification loss functions, where `y_pred` contains $y * f(x)$:
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
 loss_hinge <- lss("cross-entropy")
@@ -100,6 +104,6 @@ custom_loss <- LossFunction$new(
   fun = function(r) abs(r) * exp(-abs(r) / 3) + 0.5 * sin(2 * r)
 )
 
-vis <- as_visualizer(custom_loss, y_pred = seq(-10, 10), y_true = 0)
+vis <- as_visualizer(custom_loss, y_pred = seq(-10, 10), y_true = 0, n_points = 5000L)
 vis$plot(text_size = 6)
 ```

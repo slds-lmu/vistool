@@ -117,13 +117,17 @@ as_visualizer.Objective <- function(x, type = "auto", x1_limits = NULL, x2_limit
 #' @template param_x2_limits
 #' @template param_padding
 #' @template param_n_points
+#' @param y_pred (`numeric()`)\cr
+#'   Predicted values for the loss function. Optional.
+#' @param y_true (`numeric()`)\cr
+#'   True values for the loss function. Optional.
 #' @rdname as_visualizer
 #' @export
-as_visualizer.LossFunction <- function(x, type = "auto", x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L, ...) {
+as_visualizer.LossFunction <- function(x, type = "auto", x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 1000L, y_pred = NULL, y_true = NULL, ...) {
   checkmate::assert_choice(type, choices = c("auto", "1d"))
   # For loss functions, only 1D visualization is supported
   if (type != "auto" && type != "1d") {
     stop("Only 1D visualization is currently supported for LossFunction.")
   }
-  return(VisualizerLossFuns$new(list(x), ...)) # Pass additional arguments
+  return(VisualizerLossFuns$new(list(x), y_pred = y_pred, y_true = y_true, n_points = n_points, ...)) # Pass additional arguments
 }

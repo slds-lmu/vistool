@@ -56,6 +56,10 @@ VisualizerLossFuns <- R6::R6Class("VisualizerLossFuns",
     #' True values.
     y_true = NULL,
 
+    #' @field n_points (`integer(1)`)\cr
+    #' Number of points to use for plotting the loss functions.
+    n_points = NULL,
+
     # FIXME: better doc the class
 
     #' @description
@@ -67,10 +71,13 @@ VisualizerLossFuns <- R6::R6Class("VisualizerLossFuns",
     #'   Predicted values. Optional.
     #' @param y_true (`numeric()`)\cr
     #'   True values. Optional.
-    initialize = function(losses, y_pred = NULL, y_true = NULL) {
+    #' @param n_points (`integer(1)`)\cr
+    #'   Number of points to use for plotting the loss functions. Default is 1000.
+    initialize = function(losses, y_pred = NULL, y_true = NULL, n_points = 1000L) {
       checkmate::assert_list(losses, "LossFunction")
       checkmate::assert_numeric(y_pred, null.ok = TRUE)
       checkmate::assert_numeric(y_true, null.ok = TRUE)
+      checkmate::assert_integerish(n_points, lower = 10, len = 1)
 
       tts <- unique(sapply(losses, function(x) x$task_type))
       if (length(tts) > 1) {
@@ -90,6 +97,7 @@ VisualizerLossFuns <- R6::R6Class("VisualizerLossFuns",
       self$line_type <- rep("solid", n)
       self$y_pred <- y_pred
       self$y_true <- y_true
+      self$n_points <- as.integer(n_points)
     },
 
     #' @description
@@ -119,14 +127,18 @@ VisualizerLossFuns <- R6::R6Class("VisualizerLossFuns",
       loss_labels <- sapply(self$losses, function(x) x$label)
       # eval losses on defined range, then melt data into long format
       if (!is.null(self$y_pred) && !is.null(self$y_true)) {
-        # calculate residuals based on task type
+        # calculate residuals based on task type and determine range
         if (self$task_type == "classif") {
-          r_seq <- self$y_true * self$y_pred # y * f(x) for classification
+          residuals <- self$y_true * self$y_pred # y * f(x) for classification
         } else {
-          r_seq <- self$y_true - self$y_pred # y - f(x) for regression
+          residuals <- self$y_true - self$y_pred # y - f(x) for regression
         }
+        # create smooth sequence covering the range of residuals using n_points
+        r_min <- min(residuals)
+        r_max <- max(residuals)
+        r_seq <- seq(r_min, r_max, length.out = self$n_points)
       } else {
-        r_seq <- seq(self$x_range[1], self$x_range[2], by = 0.01)
+        r_seq <- seq(self$x_range[1], self$x_range[2], length.out = self$n_points)
       }
       loss_seqs <- data.table::as.data.table(lapply(self$losses, function(ll) ll$fun(r_seq)))
       dd <- cbind(r = r_seq, loss_seqs)

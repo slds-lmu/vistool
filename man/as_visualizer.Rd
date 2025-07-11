@@ -36,7 +36,9 @@ as_visualizer(x, ...)
   x1_limits = NULL,
   x2_limits = NULL,
   padding = 0,
-  n_points = 100L,
+  n_points = 1000L,
+  y_pred = NULL,
+  y_true = NULL,
   ...
 )
 }
@@ -68,6 +70,12 @@ The x1 margin is calculated by `max(x1lmits) - min(x1limits) * padding`.}
 \item{n_points}{(`integer(1)`)\cr
 The number of generated point per dimension.
 Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
+
+\item{y_pred}{(`numeric()`)\cr
+Predicted values for the loss function. Optional.}
+
+\item{y_true}{(`numeric()`)\cr
+True values for the loss function. Optional.}
 }
 \value{
 An object inheriting from a Visualizer class (Visualizer1D, Visualizer2D, VisualizerSurface, etc.)

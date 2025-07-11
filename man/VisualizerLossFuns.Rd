@@ -50,6 +50,9 @@ Predicted values.}
 
 \item{\code{y_true}}{(`numeric()`)\cr
 True values.}
+
+\item{\code{n_points}}{(`integer(1)`)\cr
+Number of points to use for plotting the loss functions.}
 }
 \if{html}{\out{</div>}}
 }
@@ -75,7 +78,7 @@ True values.}
 \subsection{Method \code{new()}}{
 Creates a new instance of this [R6][R6::R6Class] class.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{VisualizerLossFuns$new(losses, y_pred = NULL, y_true = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{VisualizerLossFuns$new(losses, y_pred = NULL, y_true = NULL, n_points = 1000L)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -89,6 +92,9 @@ Predicted values. Optional.}
 
 \item{\code{y_true}}{(`numeric()`)\cr
 True values. Optional.}
+
+\item{\code{n_points}}{(`integer(1)`)\cr
+Number of points to use for plotting the loss functions. Default is 1000.}
 }
 \if{html}{\out{</div>}}
 }

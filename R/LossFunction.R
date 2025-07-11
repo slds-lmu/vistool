@@ -55,7 +55,8 @@ dict_loss <- R6::R6Class("DictionaryLoss", inherit = Dictionary, cloneable = FAL
 #' @title Retrieve Loss Function
 #'
 #' @description
-#' Retrieve a loss function from the dictionary.
+#' Retrieve a loss function from the dictionary. If additional parameters are provided,
+#' they will be used to customize the loss function (e.g., quantile for pinball loss).
 #'
 #' @param .key (`character(1)`)\cr
 #'   Key passed to the respective [dictionary][mlr3misc::Dictionary] to retrieve the object.
@@ -63,7 +64,37 @@ dict_loss <- R6::R6Class("DictionaryLoss", inherit = Dictionary, cloneable = FAL
 #'
 #' @export
 lss <- function(.key, ...) {
-  dict_loss$get(.key, ...)
+  # Get the base loss function from dictionary
+  base_loss <- dict_loss$get(.key)
+  
+  # Check if additional parameters were provided
+  params <- list(...)
+  
+  if (length(params) == 0) {
+    # No additional parameters, return the original loss function
+    return(base_loss)
+  } else {
+    # Additional parameters provided, create a customized loss function
+    # Create a new function that captures the parameters
+    original_fun <- base_loss$fun
+    
+    # Create new function with parameters bound
+    new_fun <- function(r) {
+      do.call(original_fun, c(list(r), params))
+    }
+    
+    # Create parameter string for the label
+    param_str <- paste(names(params), params, sep = "=", collapse = ", ")
+    new_label <- paste0(base_loss$label, " (", param_str, ")")
+    
+    # Create new LossFunction with custom parameters
+    return(LossFunction$new(
+      id = paste0(base_loss$id, "_custom"),
+      label = new_label,
+      task_type = base_loss$task_type,
+      fun = new_fun
+    ))
+  }
 }
 
 dict_loss$add("l2_se", LossFunction$new("l2", "L2 Squared Error", "regr", function(r) {

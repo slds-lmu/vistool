@@ -28,26 +28,6 @@ RECREATE_ALL_2DFIGS <- FALSE
 
 The goal of `vistool` is to visualize optimization traces and aid in teaching optimization-related concepts. 
 
-## Backend Selection with as_visualizer()
-
-The `as_visualizer()` function provides intelligent automatic backend selection between two visualization backends:
-
-### ggplot2 Backend (Default)
-- **When**: Used for `type = "1d"` and `type = "2d"` visualizations
-- **Pros**: Fast rendering, publication-ready static plots, no additional dependencies
-- **Best for**: Quick exploration, static reports, publications
-
-### plotly Backend (Interactive)
-- **When**: Used for `type = "surface"` visualizations (2D functions only)
-- **Pros**: Interactive 3D surface plots, zoom/pan/rotate capabilities, hover information
-- **Cons**: Requires Python dependencies for saving (see installation section)
-- **Best for**: Interactive exploration, presentations, web applications
-
-### Automatic Selection Rules
-- **1D data**: Always uses ggplot2 (`Visualizer1D*`)
-- **2D data**: Defaults to ggplot2 (`Visualizer2D*`), but you can choose plotly with `type = "surface"` (`VisualizerSurface*`)
-- **Manual override**: Specify `type = "2d"` for ggplot2 or `type = "surface"` for plotly on 2D data
-
 ## Installation
 
 You can install the development version of vistool from [GitHub](https://github.com/) with:

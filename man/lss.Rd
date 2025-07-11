@@ -14,5 +14,6 @@ Key passed to the respective [dictionary][mlr3misc::Dictionary] to retrieve the 
 Additional arguments.}
 }
 \description{
-Retrieve a loss function from the dictionary.
+Retrieve a loss function from the dictionary. If additional parameters are provided,
+they will be used to customize the loss function (e.g., quantile for pinball loss).
 }
