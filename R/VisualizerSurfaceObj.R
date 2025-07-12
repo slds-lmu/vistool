@@ -61,6 +61,9 @@ VisualizerSurfaceObj <- R6::R6Class("VisualizerSurfaceObj",
         z_lab = "y"
       )
 
+      # Initialize trace counter for consistent coloring
+      private$.trace_count <- 0
+
       return(invisible(self))
     },
 
@@ -95,11 +98,18 @@ VisualizerSurfaceObj <- R6::R6Class("VisualizerSurfaceObj",
     #' @param marker_color (`character()`)\cr
     #'   The colors for the markers.
     #' @param ... Further arguments passed to `add_trace(...)`.
-    add_optimization_trace = function(opt, line_color = colSampler(), mcolor_out = "black", npoints = NULL, npmax = NULL, name = NULL, offset = NULL, add_marker_at = 1, marker_shape = "circle", marker_color = NULL, ...) {
+    add_optimization_trace = function(opt, line_color = NULL, mcolor_out = "black", npoints = NULL, npmax = NULL, name = NULL, offset = NULL, add_marker_at = 1, marker_shape = "circle", marker_color = NULL, ...) {
       checkmate::assert_r6(opt, "Optimizer")
       checkmate::assert_count(npoints, null.ok = TRUE)
       checkmate::assert_count(npmax, null.ok = TRUE)
-      checkmate::assert_string(line_color)
+      checkmate::assert_string(line_color, null.ok = TRUE)
+      
+      # Generate consistent color if not provided
+      if (is.null(line_color)) {
+        # Increment trace counter and get consistent color
+        private$.trace_count <- private$.trace_count + 1
+        line_color <- get_consistent_color(private$.trace_count)
+      }
       if (is.null(private$.plot)) self$init_layer_surface()
 
       if (nrow(opt$archive) == 0) {
@@ -425,5 +435,8 @@ VisualizerSurfaceObj <- R6::R6Class("VisualizerSurfaceObj",
 
       message(sprintf("Files stored in '%s'. Use, e.g., ImageMagic (http://www.imagemagick.org/) with `convert -delay 20 -loop 0 %s/*.%s myimage.gif` to create gif with 20 ms frames.", dir, dir, fext))
     }
+  ),
+  private = list(
+    .trace_count = 0
   )
 )

@@ -94,20 +94,12 @@ Visualizer2D <- R6::R6Class("Visualizer2D",
         fun_y = self$fun_y
       )
 
-      # adjust y breaks
-      min_y <- min(self$fun_y)
-      max_y <- max(self$fun_y)
-      breaks <- if (!is.null(self$points_y)) {
-        pretty(c(min_y, max_y), n = 10, min.n = 6L)
-      } else {
-        pretty(c(min_y, max_y), n = 10, min.n = 6L)
-      }
-
-      p <- ggplot(data, aes(x = fun_x1, y = fun_x2, z = fun_y)) +
-        geom_contour_filled(breaks = breaks, show.legend = TRUE) +
-        geom_contour(color = "white", alpha = 0.3) +
+      # continuous color gradient with overlaid contours
+      p <- ggplot(data, aes(x = fun_x1, y = fun_x2)) +
+        geom_raster(aes(fill = fun_y), interpolate = TRUE) +
+        geom_contour(aes(z = fun_y), color = "white", alpha = 0.3) +
         labs(title = self$title, x = self$lab_x1, y = self$lab_x2) +
-        scale_fill_viridis_d(name = self$lab_y, drop = FALSE)
+        scale_fill_viridis_c(name = self$lab_y)
 
       # add training points if available
       if (!is.null(self$points_x1) && !is.null(self$points_x2) && !is.null(self$points_y)) {

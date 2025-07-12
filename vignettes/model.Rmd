@@ -25,9 +25,9 @@ library(mlr3learners)
 library(mlr3pipelines)
 ```
 
-The `as_visualizer()` function automatically creates appropriate visualizers for model predictions on tasks with different numbers of features.
-By default (`type = "auto"`), it uses ggplot2 for 1D and 2D visualizations. 
-For 2D tasks, you can optionally specify `type = "surface"` to get interactive plotly surface plots.
+The `as_visualizer()` function automatically creates appropriate visualizers for model predictions on tasks with one or two features.
+By default, it uses `ggplot2` for 1D and 2D visualizations. 
+For 2D tasks, you can optionally specify `type = "surface"` to get interactive `plotly` surface plots.
 
 Let's start with the `boston_housing` data set.
 The goal is to predict the median value of owner-occupied homes in $1000s.
@@ -97,23 +97,16 @@ task$select(c("insulin", "mass"))
 learner <- lrn("classif.svm", predict_type = "prob")
 ```
 
-We create a visualizer object using the default ggplot2 backend.
+We create a visualizer object, using the default `ggplot2` backend, and plot the predictions.
 
 ```{r}
 vis <- as_visualizer(task, learner)
-vis$plot()
-```
-
-For an interactive surface plot, we can use `type = "surface"`.
-
-```{r, out.width='100%', out.height='700px'}
-vis <- as_visualizer(task, learner, type = "surface")
-vis$plot(text_size = 3)
+vis$plot(text_size = 4)
 ```
 
 We can add the decision boundary to the plot.
 
 ```{r, out.width='100%', out.height='700px'}
 vis$add_decision_boundary()
-vis$plot(text_size = 3)
+vis$plot(text_size = 4)
 ```

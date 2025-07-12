@@ -100,7 +100,8 @@ Initialize the plot with contour lines.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{VisualizerSurface$init_layer_contour(
   opacity = 0.8,
-  colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")),
+  colorscale = list(c(0, "#440154"), c(0.25, "#3b528b"), c(0.5, "#21908c"), c(0.75,
+    "#5dc863"), c(1, "#fde725")),
   show_title = TRUE,
   ...
 )}\if{html}{\out{</div>}}
@@ -144,7 +145,8 @@ Initialize the plot as 3D surface.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{VisualizerSurface$init_layer_surface(
   opacity = 0.8,
-  colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")),
+  colorscale = list(c(0, "#440154"), c(0.25, "#3b528b"), c(0.5, "#21908c"), c(0.75,
+    "#5dc863"), c(1, "#fde725")),
   show_contours = FALSE,
   show_title = TRUE,
   ...

@@ -64,7 +64,10 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
     #' @template param_colorscale
     #' @template param_show_title
     #' @template param_dots_trace
-    init_layer_contour = function(opacity = 0.8, colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")), show_title = TRUE, ...) {
+    init_layer_contour = function(opacity = 0.8, colorscale = list(
+      c(0, "#440154"), c(0.25, "#3b528b"), c(0.5, "#21908c"), 
+      c(0.75, "#5dc863"), c(1, "#fde725")
+    ), show_title = TRUE, ...) {
       checkmate::assert_number(opacity, lower = 0, upper = 1)
       checkmate::assert_list(colorscale)
       checkmate::assert_flag(show_title)
@@ -109,7 +112,10 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
     #' @param show_contours (`logical(1)`)\cr
     #'  Indicator whether to show the contours of the surface.
     #' @template param_dots_trace
-    init_layer_surface = function(opacity = 0.8, colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")), show_contours = FALSE, show_title = TRUE, ...) {
+    init_layer_surface = function(opacity = 0.8, colorscale = list(
+      c(0, "#440154"), c(0.25, "#3b528b"), c(0.5, "#21908c"), 
+      c(0.75, "#5dc863"), c(1, "#fde725")
+    ), show_contours = FALSE, show_title = TRUE, ...) {
       checkmate::assert_number(opacity, lower = 0, upper = 1)
       checkmate::assert_list(colorscale)
       checkmate::assert_flag(show_title)
@@ -273,4 +279,21 @@ colSampler <- function(alpha = NULL) {
   }
   clr <- sprintf("%s(%s)", rgb, paste(c(r, g, b, alpha), collapse = ", "))
   return(clr)
+}
+
+#' Get consistent color palette
+#' 
+#' @description
+#' Returns a consistent color palette that matches the ggplot2 implementation.
+#' This ensures visual consistency between ggplot2 and plotly visualizations.
+#' 
+#' @param index (`integer(1)`)\cr
+#'   Index of the color to retrieve from the palette.
+#' @return A character string containing the color in hex format.
+get_consistent_color <- function(index) {
+  # Same color palette as used in Visualizer2DObj
+  colors <- c("#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", 
+             "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf")
+  color_index <- ((index - 1) %% length(colors)) + 1
+  return(colors[color_index])
 }

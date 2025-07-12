@@ -60,19 +60,18 @@ viz <- as_visualizer(obj_branin)
 The objective can be visualized as a 2D contour plot using ggplot2:
 
 ```{r, out.width='100%', out.height='700px'}
-viz$plot(text_size = 3)
+viz$plot()
 ```
 
 For interactive surface visualization with surface and contour plots, specify `type = "surface"`:
 
 ```{r, out.width='100%', out.height='700px'}
-# Use surface visualizer for interactive plotly visualization
 viz_surface <- as_visualizer(obj_branin, type = "surface")
 viz_surface$init_layer_surface()
 viz_surface$plot()
 ```
 
-and contour plot.
+Transformed to a contour plot:
 
 ```{r, out.width='100%', out.height='700px'}
 viz_surface$init_layer_contour()
@@ -115,10 +114,10 @@ Visualize lm `Objective`:
 
 ```{r, out.width='100%', out.height='700px'}
 viz_lm <- as_visualizer(obj_lm, x1_limits = c(-0.5, 5), x2_limits = c(-3.2, 2.8))
-viz_lm$plot(text_size = 4)
+viz_lm$plot()
 ```
 
-We can add also add points to the `ggplot2` object:
+We can add also add points to the `ggplot2` object
 
 ```{r, out.width='100%', out.height='700px'}
 library(ggplot2)
@@ -134,7 +133,8 @@ viz_lm$plot() + ggplot2::geom_point(
 )
 ```
 
-Or, with interactive surface visualization:
+or to the `plotly` object.
+
 ```{r, out.width='100%', out.height='700px'}
 viz_lm <- as_visualizer(obj_lm, x1_limits = c(-0.5, 5), x2_limits = c(-3.2, 2.8), type = "surface")
 viz_lm$plot() %>% add_trace(x = archive_data$x, y = archive_data$y, z = obj_lm$archive$fval, type = "scatter3d", mode = "markers")
@@ -183,8 +183,7 @@ Still not very satisfying.
 A layer of the `Visualizer` class is `$add_optimization_trace()` that gets the optimizer as argument and adds the optimization trace to the plot:
 
 ```{r, out.width='100%', out.height='700px'}
-# Use 2D ggplot2 visualizer for optimization trace visualization
-viz <- as_visualizer(obj_banana)
+viz <- as_visualizer(obj_banana, type = "surface")
 viz$add_optimization_trace(opt)
 viz$plot()
 ```
@@ -253,8 +252,7 @@ Visualizing the traces is done as before by adding optimization trace layer.
 We can do this for all optimizers to add multiple traces to the plot (colors are picked randomly, see the [`Visualizer`](#visualizer) section for more details about plotting):
 
 ```{r, out.width='100%', out.height='700px'}
-# Use 2D ggplot2 visualizer for optimization trace visualization
-viz <- as_visualizer(obj_banana)
+viz <- as_visualizer(obj_banana, type = "surface")
 
 viz$add_optimization_trace(oo1)
 viz$add_optimization_trace(oo2)
@@ -287,49 +285,72 @@ tail(my_oo$archive)
 
 The `Visualizer` class is initialized by calling `as_visualizer(obj)` for a given `Objective`. This function automatically selects the appropriate visualization type:
 
-- **1D objectives**: Uses `Visualizer1DObj` with ggplot2
-- **2D objectives**: Uses `Visualizer2DObj` with ggplot2 by default, or `VisualizerSurfaceObj` with plotly when `type = "surface"` is specified for interactive surface/contour plots
-- **3D+ objectives**: Currently not supported (would require `VisualizerSurfaceObj` with appropriate extensions)
+- **1D objectives**: Uses `Visualizer1DObj` with `ggplot2`
+- **2D objectives**: Uses `Visualizer2DObj` with `ggplot2` by default, or `VisualizerSurfaceObj` with `plotly` when `type = "surface"` is specified for interactive surface/contour plots
 
 Further arguments are `x1_limits` and `x2_limits` as well as `padding` to stretch the limits by a factor and `n_points` to specify the number of generated point per dimension, hence `n_points^2` points are evaluated to create the initial layers.
 
 ## Initial layers
 
-For surface visualizations (plotly-based), an initial layer is always required to which other layers (such as optimization traces) are added step by step.
+For surface visualizations (`plotly`-based), an initial layer is always required to which other layers (such as optimization traces) are added step by step.
 The two available base layers are contour lines `$init_layer_contour()` and `$init_layer_surface()`.
 
 For both, the first argument is the opacity and the second a colorscale:
 
 ```{r, out.width='100%', out.height='700px'}
-# Use surface visualizer for contour layer initialization
-viz <- as_visualizer(obj("TF_franke"), type = "surface")
-viz$init_layer_contour(opacity = 1, colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")))
-viz$plot()
-```
-
-```{r, out.width='100%', out.height='700px'}
-# Use surface visualizer for contour layer initialization
 viz <- as_visualizer(obj("TF_franke"), type = "surface")
 viz$init_layer_contour(colorscale = list(c(0, 1), c("white", "blue")))
 viz$plot()
 ```
 
 ```{r, out.width='100%', out.height='700px'}
-# Use 2D ggplot2 visualizer for simple plotting
-viz <- as_visualizer(obj("TF_franke"), type = "2d")
+viz <- as_visualizer(obj("TF_franke"), type = "surface")
+viz$init_layer_surface(opacity = 1, colorscale = list(c(0, 1), c("white", "black")))
 viz$plot()
 ```
 
-For 2D visualizations, the plotting is now handled by `ggplot2`. Further customization can be done by modifying the returned ggplot object:
+Internally, `add_trace()` from `plotly` is called.
+Further arguments are directly passed to it.
+However, note that the `contours` parameter in `init_layer_surface()` is handled internally based on the `show_contours` flag.
+To add custom contour lines, you need to enable contours and then modify the plot directly:
+
+```{r, out.width='100%', out.height='700px'}
+viz = as_visualizer(obj("TF_franke"), type = "surface")
+
+# First create the surface with contours enabled
+viz$init_layer_surface(opacity = 1, colorscale = list(c(0, 1), c("white", "black")), show_contours = TRUE)
+
+# Add 10 grid lines per dim, limits (sometimes) can be obtained form the objective:
+llower = viz$objective$limits_lower
+lupper = viz$objective$limits_upper
+ssize = (lupper - llower) / 10
+
+# Access the plotly object and modify contours
+# Note: plotly_build() is required to convert the plotly object to a format 
+# where the trace data can be directly accessed and modified
+p <- viz$plot()
+built_p <- plotly_build(p)
+built_p$x$data[[1]]$contours$x <- list(show = TRUE, start = llower[1], end = lupper[1], size = ssize[1], color = "red")
+built_p$x$data[[1]]$contours$y <- list(show = TRUE, start = llower[2], end = lupper[2], size = ssize[2], color = "red")
+built_p
+```
+
+Alternatively, using the `ggplot2` backend:
+
+```{r, out.width='100%', out.height='700px'}
+viz <- as_visualizer(obj("TF_franke"))
+viz$plot()
+```
+
+Further customization can be done by modifying the returned `ggplot` object:
 
 ```{r, out.width='100%', out.height='700px'}
 library(ggplot2)
 
-viz <- as_visualizer(obj("TF_franke"), type = "2d")
+viz <- as_visualizer(obj("TF_franke"))
 p <- viz$plot()
 
-# Add customizations to the ggplot object
-p + theme_minimal() + labs(title = "TF Franke Function")
+p + labs(title = "TF Franke Function")
 ```
 
 ## Optimization traces

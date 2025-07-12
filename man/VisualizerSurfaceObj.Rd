@@ -87,7 +87,7 @@ Add an optimization trace.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{VisualizerSurfaceObj$add_optimization_trace(
   opt,
-  line_color = colSampler(),
+  line_color = NULL,
   mcolor_out = "black",
   npoints = NULL,
   npmax = NULL,
