@@ -101,12 +101,12 @@ We create a visualizer object, using the default `ggplot2` backend, and plot the
 
 ```{r}
 vis <- as_visualizer(task, learner)
-vis$plot(text_size = 4)
+vis$plot()
 ```
 
 We can add the decision boundary to the plot.
 
 ```{r, out.width='100%', out.height='700px'}
 vis$add_decision_boundary()
-vis$plot(text_size = 4)
+vis$plot()
 ```

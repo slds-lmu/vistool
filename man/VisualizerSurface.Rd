@@ -148,6 +148,7 @@ Initialize the plot as 3D surface.
   colorscale = list(c(0, "#440154"), c(0.25, "#3b528b"), c(0.5, "#21908c"), c(0.75,
     "#5dc863"), c(1, "#fde725")),
   show_contours = FALSE,
+  contours = NULL,
   show_title = TRUE,
   ...
 )}\if{html}{\out{</div>}}
@@ -170,6 +171,11 @@ The coloring of the surface/contour.}
 
 \item{\code{show_contours}}{(`logical(1)`)\cr
 Indicator whether to show the contours of the surface.}
+
+\item{\code{contours}}{(`list()`)\cr
+Custom contour configuration for the surface. If provided, this takes precedence over `show_contours`.
+Can specify x, y, and z contours with custom properties like start, end, size, and color.
+See plotly documentation for detailed contour options.}
 
 \item{\code{show_title}}{(`logical(1)`)\cr
 Indicator whether to show the title of the plot.}

@@ -311,28 +311,23 @@ viz$plot()
 
 Internally, `add_trace()` from `plotly` is called.
 Further arguments are directly passed to it.
-However, note that the `contours` parameter in `init_layer_surface()` is handled internally based on the `show_contours` flag.
-To add custom contour lines, you need to enable contours and then modify the plot directly:
+
+The `contours` parameter allows you to specify custom contour lines on the x, y, and z axes:
 
 ```{r, out.width='100%', out.height='700px'}
-viz = as_visualizer(obj("TF_franke"), type = "surface")
-
-# First create the surface with contours enabled
-viz$init_layer_surface(opacity = 1, colorscale = list(c(0, 1), c("white", "black")), show_contours = TRUE)
-
-# Add 10 grid lines per dim, limits (sometimes) can be obtained form the objective:
-llower = viz$objective$limits_lower
-lupper = viz$objective$limits_upper
-ssize = (lupper - llower) / 10
-
-# Access the plotly object and modify contours
-# Note: plotly_build() is required to convert the plotly object to a format 
-# where the trace data can be directly accessed and modified
-p <- viz$plot()
-built_p <- plotly_build(p)
-built_p$x$data[[1]]$contours$x <- list(show = TRUE, start = llower[1], end = lupper[1], size = ssize[1], color = "red")
-built_p$x$data[[1]]$contours$y <- list(show = TRUE, start = llower[2], end = lupper[2], size = ssize[2], color = "red")
-built_p
+viz <- as_visualizer(obj("TF_franke"), type = "surface")
+llower <- viz$objective$limits_lower
+lupper <- viz$objective$limits_upper
+ssize <- (lupper - llower) / 10
+viz$init_layer_surface(
+  opacity = 1,
+  colorscale = list(c(0, 1), c("white", "black")),
+  contours = list(
+    x = list(show = TRUE, start = llower[1], end = lupper[1], size = ssize[1], color = "red"),
+    y = list(show = TRUE, start = llower[2], end = lupper[2], size = ssize[2], color = "red")
+  )
+)
+viz$plot()
 ```
 
 Alternatively, using the `ggplot2` backend:
@@ -444,20 +439,17 @@ viz$plot()
 ## Manual layers (TODO)
 
 ```{r, out.width='100%', out.height='700px'}
-library(ggplot2)
-
-obj <- obj("TF_banana")
-viz <- as_visualizer(obj, type = "2d")
-p <- viz$plot()
+obj = obj("TF_banana")
+viz = as_visualizer(obj, type = "surface")
+viz$init_layer_surface(opacity = 0.5)
+p = viz$plot()
 class(p)
 
-# For 2D visualizations using ggplot2, we can add additional layers
-nsim <- 100
-grid <- data.frame(x1 = runif(nsim), x2 = runif(nsim))
-grid$y <- apply(grid[, c("x1", "x2")], 1, viz$objective$eval) + rnorm(nsim, sd = 0.05)
-
-# Add points to the ggplot
-p + geom_point(data = grid, aes(x = x1, y = x2), color = "red", size = 1, alpha = 0.7, inherit.aes = FALSE)
+nsim = 100
+grid = data.frame(x = runif(nsim), y = runif(nsim))
+grid$z = apply(grid, 1, viz$objective$eval) + rnorm(nsim, sd = 0.05)
+p %>% add_trace(data = grid, x = ~x, y = ~y, z = ~z, mode = "markers",
+  type = "scatter3d", marker = list(symbol = "cross"))
 ```
 
 ## Animations (TODO)

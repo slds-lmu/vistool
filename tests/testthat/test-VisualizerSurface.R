@@ -104,3 +104,76 @@ test_that("VisualizerSurface input validation works", {
   p <- vis$plot()
   expect_s3_class(p, "plotly")
 })
+
+test_that("VisualizerSurface custom contours parameter works", {
+  skip_if_not_installed("plotly")
+  
+  # Create simple data
+  x1 <- seq(-1, 1, length.out = 3)
+  x2 <- seq(-1, 1, length.out = 3)
+  z_matrix <- outer(x1, x2, function(x, y) x^2 + y^2)
+  
+  vis <- VisualizerSurface$new(
+    grid = list(x1 = x1, x2 = x2),
+    zmat = z_matrix
+  )
+  
+  # Test custom contours
+  custom_contours <- list(
+    x = list(show = TRUE, start = -1, end = 1, size = 0.2, color = "red"),
+    y = list(show = TRUE, start = -1, end = 1, size = 0.2, color = "blue")
+  )
+  
+  vis$init_layer_surface(contours = custom_contours)
+  
+  # Should have a plot now
+  p <- vis$plot()
+  expect_s3_class(p, "plotly")
+})
+
+test_that("VisualizerSurface custom contours take precedence over show_contours", {
+  skip_if_not_installed("plotly")
+  
+  # Create simple data
+  x1 <- seq(-1, 1, length.out = 3)
+  x2 <- seq(-1, 1, length.out = 3)
+  z_matrix <- outer(x1, x2, function(x, y) x^2 + y^2)
+  
+  vis <- VisualizerSurface$new(
+    grid = list(x1 = x1, x2 = x2),
+    zmat = z_matrix
+  )
+  
+  # Test that custom contours take precedence
+  custom_contours <- list(
+    z = list(show = TRUE, color = "green")
+  )
+  
+  vis$init_layer_surface(
+    show_contours = TRUE,  # Should be ignored
+    contours = custom_contours
+  )
+  
+  p <- vis$plot()
+  expect_s3_class(p, "plotly")
+})
+
+test_that("VisualizerSurface backward compatibility with show_contours maintained", {
+  skip_if_not_installed("plotly")
+  
+  # Create simple data
+  x1 <- seq(-1, 1, length.out = 3)
+  x2 <- seq(-1, 1, length.out = 3)
+  z_matrix <- outer(x1, x2, function(x, y) x^2 + y^2)
+  
+  vis <- VisualizerSurface$new(
+    grid = list(x1 = x1, x2 = x2),
+    zmat = z_matrix
+  )
+  
+  # Test show_contours still works
+  vis$init_layer_surface(show_contours = TRUE)
+  
+  p <- vis$plot()
+  expect_s3_class(p, "plotly")
+})

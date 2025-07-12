@@ -54,7 +54,7 @@ vis <- as_visualizer(loss_function, y_pred = seq(-4, 4), y_true = 0)
 Use the `plot()` method to plot the loss function.
 
 ```{r, out.width='100%'}
-vis$plot(text_size = 4)
+vis$plot()
 ```
 
 # Regression Loss Functions
@@ -73,7 +73,7 @@ vis_combined = VisualizerLossFuns$new(
   y_true = 0,
   n_points = 5000L  # higher resolution for smooth curves
 )
-vis_combined$plot(text_size = 4)
+vis_combined$plot()
 ```
 
 # Classification Loss Functions
@@ -89,7 +89,7 @@ vis_combined = VisualizerLossFuns$new(
   y_pred = seq(-4, 4),
   y_true = 1
 )
-vis_combined$plot(text_size = 4)
+vis_combined$plot()
 ```
 
 # Custom Loss Functions
@@ -105,5 +105,5 @@ custom_loss <- LossFunction$new(
 )
 
 vis <- as_visualizer(custom_loss, y_pred = seq(-10, 10), y_true = 0, n_points = 5000L)
-vis$plot(text_size = 6)
+vis$plot()
 ```

@@ -111,20 +111,31 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
     #' @template param_show_title
     #' @param show_contours (`logical(1)`)\cr
     #'  Indicator whether to show the contours of the surface.
+    #' @param contours (`list()`)\cr
+    #'  Custom contour configuration for the surface. If provided, this takes precedence over `show_contours`.
+    #'  Can specify x, y, and z contours with custom properties like start, end, size, and color.
+    #'  See plotly documentation for detailed contour options.
     #' @template param_dots_trace
     init_layer_surface = function(opacity = 0.8, colorscale = list(
       c(0, "#440154"), c(0.25, "#3b528b"), c(0.5, "#21908c"), 
       c(0.75, "#5dc863"), c(1, "#fde725")
-    ), show_contours = FALSE, show_title = TRUE, ...) {
+    ), show_contours = FALSE, contours = NULL, show_title = TRUE, ...) {
       checkmate::assert_number(opacity, lower = 0, upper = 1)
       checkmate::assert_list(colorscale)
+      checkmate::assert_flag(show_contours)
+      checkmate::assert_list(contours, null.ok = TRUE)
       checkmate::assert_flag(show_title)
 
       private$.vbase <- c(as.list(environment()), list(...))
       private$.layer_primary <- "surface"
 
-      contours <- if (show_contours) {
-        list(
+      # Handle contours: custom contours take precedence over show_contours
+      if (!is.null(contours)) {
+        # Use provided custom contours
+        contours_final <- contours
+      } else if (show_contours) {
+        # Use default z-projected contours
+        contours_final <- list(
           z = list(
             show = TRUE,
             project = list(z = TRUE),
@@ -132,7 +143,7 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
           )
         )
       } else {
-        NULL
+        contours_final <- NULL
       }
 
       llp <- list(x = self$grid$x1, y = self$grid$x2, z = self$zmat)
@@ -147,7 +158,7 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
           type = "surface",
           opacity = opacity,
           colorscale = colorscale,
-          contours = contours,
+          contours = contours_final,
           ...
         ) %>%
         layout(
