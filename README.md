@@ -1,5 +1,5 @@
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
+<!-- README.md is generated from README.Rmd. Please edit this file -->
 
 # vistool
 
@@ -21,22 +21,18 @@ You can install the development version of vistool from
 pak::pak("slds-lmu/vistool")
 ```
 
-Please note that surface visualization features (plotly backend) rely on
-[`plotly`](https://plotly.com/r/) which in turn relies on certain
-functionality provided by Python packages, accessed via reticulate.
-
-**For basic usage**: The plotly backend works out of the box for
-interactive viewing.
-
-**For saving plots**: The `$save()` functionality for surface plots uses
-`plotly::save_image()` internally, which requires the `kaleido` Python
-package. ggplot2 visualizations can be saved using standard ggplot2
-methods without additional dependencies.
+Please note that surface visualization features (`plotly` backend) rely
+on [`plotly`](https://plotly.com/r/) which in turn relies on certain
+functionality provided by Python packages, accessed via
+[`reticulate`](https://rstudio.github.io/reticulate/).
 
 ### Optional: Setup for Saving Plotly Plots
 
-The following instructions are provided by `?plotly::save_image` and
-assume you do not have `miniconda` installed already:
+In particular, the `$save()` functionality for surface plots uses
+`plotly::save_image()` internally, which requires the `kaleido` Python
+package. The following instructions are provided by
+`?plotly::save_image` and assume you do not have `miniconda` installed
+already:
 
 ``` r
 install.packages('reticulate')
@@ -74,7 +70,7 @@ vis_2d$plot()
 <img src="man/figures/README-example-1.png" width="100%" />
 
 For interactive exploration, you can create surface visualizations with
-plotly:
+`plotly`:
 
 ``` r
 # Create surface visualization for interactive plotly surface plot
@@ -99,7 +95,7 @@ vis_surface$save("man/figures/demo_1.png", width = 500, height = 500)
 
 ## Contributing
 
-For developers interested in contributing to `vistool`, please see the
+For anyone interested in contributing to `vistool`, please see the
 [Developer Reference](DEVELOPMENT.md).
 
 ## Resources

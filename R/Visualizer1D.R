@@ -152,7 +152,7 @@ Visualizer1D <- R6::R6Class("Visualizer1D",
         "dark" = ggplot2::theme_dark,
         "void" = ggplot2::theme_void
       )
-      pl <- pl + theme_fun(base_size = text_size)
+      pl <- pl + theme_fun(base_size = text_size) + theme(plot.title = ggplot2::element_text(hjust = 0.5))
       
       return(pl)
     }
