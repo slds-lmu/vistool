@@ -6,8 +6,8 @@
 \description{
 This class is used to create visualizations of tasks and learners.
 }
-\section{Super class}{
-\code{\link[vistool:Visualizer1D]{vistool::Visualizer1D}} -> \code{Visualizer1DModel}
+\section{Super classes}{
+\code{\link[vistool:Visualizer]{vistool::Visualizer}} -> \code{\link[vistool:Visualizer1D]{vistool::Visualizer1D}} -> \code{Visualizer1DModel}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -17,6 +17,9 @@ Task used to train the model.}
 
 \item{\code{learner}}{(`mlr3::Learner`)\cr
 Learner used to train the model.}
+
+\item{\code{n_points}}{(`integer(1)`)\cr
+Number of points to use for visualization.}
 }
 \if{html}{\out{</div>}}
 }
@@ -30,10 +33,8 @@ Learner used to train the model.}
 \if{html}{\out{
 <details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer1D" data-id="init_layer_lines"><a href='../../vistool/html/Visualizer1D.html#method-Visualizer1D-init_layer_lines'><code>vistool::Visualizer1D$init_layer_lines()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href='../../vistool/html/Visualizer.html#method-Visualizer-save'><code>vistool::Visualizer$save()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer1D" data-id="plot"><a href='../../vistool/html/Visualizer1D.html#method-Visualizer1D-plot'><code>vistool::Visualizer1D$plot()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer1D" data-id="save"><a href='../../vistool/html/Visualizer1D.html#method-Visualizer1D-save'><code>vistool::Visualizer1D$save()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer1D" data-id="setLayout"><a href='../../vistool/html/Visualizer1D.html#method-Visualizer1D-setLayout'><code>vistool::Visualizer1D$setLayout()</code></a></span></li>
 </ul>
 </details>
 }}
@@ -46,9 +47,9 @@ Creates a new instance of this [R6][R6::R6Class] class.
 \if{html}{\out{<div class="r">}}\preformatted{Visualizer1DModel$new(
   task,
   learner,
-  x1_limits = NULL,
-  padding = 0,
-  n_points = 100L
+  xlim = NULL,
+  n_points = 100,
+  training_points = FALSE
 )}\if{html}{\out{</div>}}
 }
 
@@ -58,19 +59,22 @@ Creates a new instance of this [R6][R6::R6Class] class.
 \item{\code{task}}{([mlr3::Task])\cr
 The task to train the model on.}
 
-\item{\code{learner}}{([mlr3::Learner])\cr
+\item{\code{learner}}{(`mlr3::Learner`)\cr
 The learner to train the model with.}
 
-\item{\code{x1_limits}}{(`numeric(2)`)\cr
-The x1 limits.}
-
-\item{\code{padding}}{(`numeric(1)`)\cr
-A margin that is added to x1limits and x2limits.
-The x1 margin is calculated by `max(x1lmits) - min(x1limits) * padding`.}
+\item{\code{xlim}}{(`numeric(2)`)\cr
+Limits for the x-axis. If NULL, will be determined from task data.}
 
 \item{\code{n_points}}{(`integer(1)`)\cr
 The number of generated point per dimension.
 Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
+
+\item{\code{n_points}}{(`integer(1)`)\cr
+The number of generated point per dimension.
+Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
+
+\item{\code{training_points}}{(`logical(1)`)\cr
+Whether to show training points on the plot.}
 }
 \if{html}{\out{</div>}}
 }

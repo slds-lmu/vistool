@@ -1,7 +1,8 @@
-#' @title Visualize Objective
+#' @title Visualize Objective as Interactive Surface
 #'
 #' @description
-#' This class is used to create visualizations and animations of optimization traces.
+#' This class is used to create interactive surface visualizations and animations of optimization traces
+#' for 2D objectives using plotly.
 #'
 #' @template param_x1_limits
 #' @template param_x2_limits
@@ -9,48 +10,45 @@
 #' @template param_n_points
 #'
 #' @export
-Visualizer2DObjective = R6::R6Class("Visualizer2DObjective",
-  inherit = Visualizer2D,
+VisualizerSurfaceObj <- R6::R6Class("VisualizerSurfaceObj",
+  inherit = VisualizerSurface,
   public = list(
 
-    #' @field objective (`Objective`)\cr
-    #' The objective which was optimized.
-    #' This object is used to generate the surface/contour lines.
+    #' @template field_objective
     objective = NULL,
 
     #' @description
     #' Creates a new instance of this [R6][R6::R6Class] class.
     #'
-    #' @param objective (`Objective`)\cr
-    #'   The objective which was optimized.
-    #'   This object is used to generate the surface/contour lines.
+    #' @template param_objective
     initialize = function(objective, x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L) {
-      self$objective = assert_r6(objective, "Objective")
-      assert_numeric(x1_limits, len = 2, null.ok = TRUE)
-      assert_numeric(x2_limits, len = 2, null.ok = TRUE)
-      assert_numeric(padding)
-      assert_count(n_points)
+      self$objective <- checkmate::assert_r6(objective, "Objective")
+      checkmate::assert_numeric(x1_limits, len = 2, null.ok = TRUE)
+      checkmate::assert_numeric(x2_limits, len = 2, null.ok = TRUE)
+      checkmate::assert_numeric(padding)
+      checkmate::assert_count(n_points)
 
       if (objective$xdim != 2) {
-        stopf("`Visualizer2D` requires 2-dimensional inputs, but `objective$xdim = %s`", objective$xdim)
+        mlr3misc::stopf("`VisualizerSurface` requires 2-dimensional inputs, but `objective$xdim = %s`", objective$xdim)
       }
 
-      x1_limits = x1_limits %??% c(objective$limits_lower[1], objective$limits_upper[1])
-      x2_limits = x2_limits %??% c(objective$limits_lower[2], objective$limits_upper[2])
+      x1_limits <- x1_limits %??% c(objective$lower[1], objective$upper[1])
+      x2_limits <- x2_limits %??% c(objective$lower[2], objective$upper[2])
 
       if (any(is.na(x1_limits)) || any(is.na(x2_limits))) {
         stop("Limits could not be extracted from the objective. Please use `x_limits`.")
       }
 
-      x1_pad = (x1_limits[2] - x1_limits[1]) * padding
-      x2_pad = (x2_limits[2] - x2_limits[1]) * padding
+      x1_pad <- (x1_limits[2] - x1_limits[1]) * padding
+      x2_pad <- (x2_limits[2] - x2_limits[1]) * padding
 
-      grid = list(
+      grid <- list(
         x1 = unique(seq(x1_limits[1] - x1_pad, x1_limits[2] + x1_pad, length.out = n_points)),
-        x2 = unique(seq(x2_limits[1] - x2_pad, x2_limits[2] + x2_pad, length.out = n_points)))
+        x2 = unique(seq(x2_limits[1] - x2_pad, x2_limits[2] + x2_pad, length.out = n_points))
+      )
 
-      zmat = outer(grid$x1, grid$x2, function(x, y) {
-        xin = cbind(x, y)
+      zmat <- outer(grid$x1, grid$x2, function(x, y) {
+        xin <- cbind(x, y)
         apply(xin, 1, function(x) self$objective$eval(x))
       })
 
@@ -62,6 +60,9 @@ Visualizer2DObjective = R6::R6Class("Visualizer2DObjective",
         x2_lab = "x2",
         z_lab = "y"
       )
+
+      # Initialize trace counter for consistent coloring
+      private$.trace_count <- 0
 
       return(invisible(self))
     },
@@ -97,11 +98,18 @@ Visualizer2DObjective = R6::R6Class("Visualizer2DObjective",
     #' @param marker_color (`character()`)\cr
     #'   The colors for the markers.
     #' @param ... Further arguments passed to `add_trace(...)`.
-    add_optimization_trace = function(opt, line_color = colSampler(), mcolor_out = "black", npoints = NULL, npmax = NULL, name = NULL, offset = NULL, add_marker_at = 1, marker_shape = "circle", marker_color = NULL, ...) {
-      assert_r6(opt, "Optimizer")
-      assert_count(npoints, null.ok = TRUE)
-      assert_count(npmax, null.ok = TRUE)
-      assert_string(line_color)
+    add_optimization_trace = function(opt, line_color = NULL, mcolor_out = "black", npoints = NULL, npmax = NULL, name = NULL, offset = NULL, add_marker_at = 1, marker_shape = "circle", marker_color = NULL, ...) {
+      checkmate::assert_r6(opt, "Optimizer")
+      checkmate::assert_count(npoints, null.ok = TRUE)
+      checkmate::assert_count(npmax, null.ok = TRUE)
+      checkmate::assert_string(line_color, null.ok = TRUE)
+      
+      # Generate consistent color if not provided
+      if (is.null(line_color)) {
+        # Increment trace counter and get consistent color
+        private$.trace_count <- private$.trace_count + 1
+        line_color <- get_consistent_color(private$.trace_count)
+      }
       if (is.null(private$.plot)) self$init_layer_surface()
 
       if (nrow(opt$archive) == 0) {
@@ -111,112 +119,119 @@ Visualizer2DObjective = R6::R6Class("Visualizer2DObjective",
       if (private$.layer_primary == "contour") {
         checkmate::assertNumeric(offset, len = 2L, null.ok = TRUE)
         if (is.null(offset)) {
-          offset = rep(0, 2)
+          offset <- rep(0, 2)
         }
-        offset[3] = 0
+        offset[3] <- 0
       }
       if (private$.layer_primary == "surface") {
         checkmate::assertNumeric(offset, len = 3L, null.ok = TRUE)
         if (is.null(offset)) {
-          offset = rep(0, 3)
+          offset <- rep(0, 3)
         }
       }
 
       # Catch additional arguments:
-      aargs = list(...)
+      aargs <- list(...)
 
-      if (! private$.freeze_plot) { # Just set by animate to not save the optimizer over and over again for each frame.
-        private$.opts = c(private$.opts, list(c(as.list(environment()), aargs)))
+      if (!private$.freeze_plot) { # Just set by animate to not save the optimizer over and over again for each frame.
+        private$.opts <- c(private$.opts, list(c(as.list(environment()), aargs)))
       }
 
       # Assert marker styling:
       checkmate::assertIntegerish(add_marker_at, lower = 1, upper = nrow(opt$archive))
-      if (is.null(marker_shape)) marker_shape = NA
-      if (length(marker_shape) == 1) marker_shape = rep(marker_shape, length(add_marker_at))
-      mvals = NULL
+      if (is.null(marker_shape)) marker_shape <- NA
+      if (length(marker_shape) == 1) marker_shape <- rep(marker_shape, length(add_marker_at))
+      mvals <- NULL
       if (private$.layer_primary == "contour") {
-        mvals = schema(F)$traces$scatter$attributes$marker$symbol$values
+        mvals <- schema(F)$traces$scatter$attributes$marker$symbol$values
       }
       if (private$.layer_primary == "surface") {
-        mvals = schema(F)$traces$scatter3d$attributes$marker$symbol$values
+        mvals <- schema(F)$traces$scatter3d$attributes$marker$symbol$values
       }
       invisible(lapply(marker_shape, function(marker_shape) checkmate::assertChoice(marker_shape, choices = c(mvals, NA))))
 
-      if (is.null(marker_color)) marker_color = line_color
+      if (is.null(marker_color)) marker_color <- line_color
       if (length(marker_color) == 1) {
-        marker_color = rep(marker_color, length(marker_shape))
+        marker_color <- rep(marker_color, length(marker_shape))
       }
       checkmate::assertCharacter(marker_color, len = length(marker_shape), null.ok = TRUE)
 
       # Define marker coordinates for plotting:
-      xmat = do.call(rbind, c(opt$archive$x_in[1], opt$archive$x_out))
-      xmarkers = data.frame(x = xmat[, 1] + offset[1], y = xmat[, 2] + offset[2],
-        z = c(opt$archive$fval_in[1], opt$archive$fval_out) + offset[3])
+      xmat <- do.call(rbind, c(opt$archive$x_in[1], opt$archive$x_out))
+      xmarkers <- data.frame(
+        x = xmat[, 1] + offset[1], y = xmat[, 2] + offset[2],
+        z = c(opt$archive$fval_in[1], opt$archive$fval_out) + offset[3]
+      )
       if (is.null(npoints)) {
-        npoints = nrow(xmarkers)
+        npoints <- nrow(xmarkers)
       }
       if (is.null(npmax)) {
-        npmax = nrow(xmarkers)
+        npmax <- nrow(xmarkers)
         if (npmax > nrow(xmarkers)) {
-          npmax = nrow(xmarkers)
+          npmax <- nrow(xmarkers)
         }
       }
       # Cut marker after npmax iterations (if specified):
-      xmr = xmarkers[unique(round(seq(1, nrow(xmarkers), length.out = npoints))), ]
-      xmr = xmr[seq_len(npmax), ]
-      add_marker_at = add_marker_at[add_marker_at <= npmax]
+      xmr <- xmarkers[unique(round(seq(1, nrow(xmarkers), length.out = npoints))), ]
+      xmr <- xmr[seq_len(npmax), ]
+      add_marker_at <- add_marker_at[add_marker_at <= npmax]
 
-      ptype = NULL
+      ptype <- NULL
       if (is.null(name)) {
-        name = paste0(opt$id, " on ", opt$objective$id)
+        name <- paste0(opt$id, " on ", opt$objective$id)
       }
 
       # Define the plotting arguments as list, so we can call `do.call` with these arguments. This is
       # more comfortable due to just one call to `add_trace`. Additionally, it is easier to control
       # different default stylings (such as line width) and to recreate the layer with the stored arguments:
       if (private$.layer_primary == "surface") {
-        ptype = "scatter3d"
-        pargs = list(
+        ptype <- "scatter3d"
+        pargs <- list(
           name = name,
           x = xmr$x,
           y = xmr$y,
           z = xmr$z,
           marker = list(color = line_color, line = list(color = mcolor_out, width = 6)),
-          line = list(color = line_color, width = 8))
+          line = list(color = line_color, width = 8)
+        )
       }
       if (private$.layer_primary == "contour") {
-        ptype = "scatter"
-        pargs = list(
+        ptype <- "scatter"
+        pargs <- list(
           name = name,
           x = xmr$x,
           y = xmr$y,
           marker = list(color = line_color, size = 12, line = list(color = mcolor_out, width = 2)),
-          line = list(color = line_color, width = 2))
+          line = list(color = line_color, width = 2)
+        )
       }
       if (is.null(ptype)) {
         stop("No known plot mode")
       }
-      pargs$type = ptype
+      pargs$type <- ptype
 
       # Add optimization traces as lines to the plot:
-      private$.plot = do.call(add_trace, c(list(private$.plot),
+      private$.plot <- do.call(add_trace, c(
+        list(private$.plot),
         mlr3misc::insert_named(mlr3misc::remove_named(pargs, "marker"), aargs),
-        list(mode = "lines")))
+        list(mode = "lines")
+      ))
 
       # Now add marker to the lines. Marker are added at `add_marker_at` iterations
       # and with the specified shape and color:
-      pargs = list(
+      pargs <- list(
         x = xmarkers$x[add_marker_at],
         y = xmarkers$y[add_marker_at],
         z = xmarkers$z[add_marker_at],
         mode = "markers",
         type = ptype,
         marker = insert_named(pargs$marker, list(symbol = marker_shape, color = marker_color)),
-        showlegend = FALSE)
+        showlegend = FALSE
+      )
       if (private$.layer_primary == "contour") {
-        pargs$z = NULL
+        pargs$z <- NULL
       }
-      private$.plot = do.call(add_trace, c(list(private$.plot), pargs))
+      private$.plot <- do.call(add_trace, c(list(private$.plot), pargs))
 
       return(invisible(self))
     },
@@ -247,51 +262,51 @@ Visualizer2DObjective = R6::R6Class("Visualizer2DObjective",
       checkmate::assertNumber(x1margin)
       checkmate::assertNumber(x2margin)
 
-      #checkmate::assertNumeric(x1limits, len = 2L, null.ok = TRUE)
-      #checkmate::assertNumeric(x2limits, len = 2L, null.ok = TRUE)
+      # checkmate::assertNumeric(x1limits, len = 2L, null.ok = TRUE)
+      # checkmate::assertNumeric(x2limits, len = 2L, null.ok = TRUE)
 
-      #if (is.null(x1limits)) x1limits = x0[1] + c(-0.05, 0.05)
-      #if (is.null(x2limits)) x2limits = x0[2] + c(-0.05, 0.05)
+      # if (is.null(x1limits)) x1limits = x0[1] + c(-0.05, 0.05)
+      # if (is.null(x2limits)) x2limits = x0[2] + c(-0.05, 0.05)
 
-      f0 = self$objective$eval(x0)
-      g = self$objective$grad(x0)
-      h = self$objective$hess(x0)
+      f0 <- self$objective$eval(x0)
+      g <- self$objective$grad(x0)
+      h <- self$objective$hess(x0)
 
       # Create box based on the gradient at x0:
       # - Normalize vector to length x1margin / 2
       # - Calculate perpendicular vector
       # - These vectors define the rotation
-      gn = g / l2norm(g)
-      gp = rbind(c(0, -1), c(1, 0)) %*% gn
+      gn <- g / l2norm(g)
+      gp <- rbind(c(0, -1), c(1, 0)) %*% gn
 
-      gn = gn * x1margin / 2
-      gp = gp * x2margin / 2
+      gn <- gn * x1margin / 2
+      gp <- gp * x2margin / 2
 
       # - Create grid in (0,0) x (1,1) and rotate w.r.t. to gn and gp:
-      rotation = cbind(gn, gp)
-      square = as.matrix(expand.grid(x = seq(0, 1, len = npoints_per_dim), y = seq(0, 1, len = npoints_per_dim)))
-      grid = square %*% rotation
-      grid[, 1] = grid[, 1] - max(grid[, 1]) + (max(grid[, 1]) - min(grid[, 1])) / 2 + x0[1]
-      grid[, 2] = grid[, 2] - max(grid[, 2]) + (max(grid[, 2]) - min(grid[, 2])) / 2 + x0[2]
+      rotation <- cbind(gn, gp)
+      square <- as.matrix(expand.grid(x = seq(0, 1, len = npoints_per_dim), y = seq(0, 1, len = npoints_per_dim)))
+      grid <- square %*% rotation
+      grid[, 1] <- grid[, 1] - max(grid[, 1]) + (max(grid[, 1]) - min(grid[, 1])) / 2 + x0[1]
+      grid[, 2] <- grid[, 2] - max(grid[, 2]) + (max(grid[, 2]) - min(grid[, 2])) / 2 + x0[2]
 
-      fapp = function(x) {
-        out = f0 + crossprod(g, x - x0) * f0
+      fapp <- function(x) {
+        out <- f0 + crossprod(g, x - x0) * f0
         if (degree == 2) {
-          out = out + 0.5 * f0 * t(x - x0) %*% h %*% (x - x0)
+          out <- out + 0.5 * f0 * t(x - x0) %*% h %*% (x - x0)
         }
         return(as.numeric(out))
       }
-      fappV = function(x, y) {
-        X = cbind(x = x, y = y)
+      fappV <- function(x, y) {
+        X <- cbind(x = x, y = y)
         apply(X, 1, fapp)
       }
-      z = outer(X = grid[,1], Y = grid[,2], FUN = function(x, y) fappV(x, y))
-      if (! is.null(zlim)) {
+      z <- outer(X = grid[, 1], Y = grid[, 2], FUN = function(x, y) fappV(x, y))
+      if (!is.null(zlim)) {
         checkmate::assertNumeric(zlim, len = 2L)
-        z[! between(z, zlim[1], zlim[2])] = NA
+        z[!between(z, zlim[1], zlim[2])] <- NA
       }
 
-      private$.plot = private$.plot %>% add_surface(x = grid[, 1], y = grid[, 2], z = t(z), showscale = FALSE, ...)
+      private$.plot <- private$.plot %>% add_surface(x = grid[, 1], y = grid[, 2], z = t(z), showscale = FALSE, ...)
     },
 
     #' @description
@@ -311,35 +326,35 @@ Visualizer2DObjective = R6::R6Class("Visualizer2DObjective",
       checkmate::assertNumber(x1length)
       checkmate::assertNumber(x2length)
 
-      f0 = self$objective$eval(x0)
-      h = self$objective$hess(x0)
-      ev = eigen(h)$vectors
+      f0 <- self$objective$eval(x0)
+      h <- self$objective$hess(x0)
+      ev <- eigen(h)$vectors
 
-      v1 = ev[, 1]
-      v2 = ev[, 2]
+      v1 <- ev[, 1]
+      v2 <- ev[, 2]
 
       if (private$.layer_primary == "contour") {
         # Transpose x and y to macht contour:
-        v1 = v1 * x1length + x0
-        v2 = v2 * x2length + x0
+        v1 <- v1 * x1length + x0
+        v2 <- v2 * x2length + x0
 
-        mx = c(v1[1], x0[1], v2[1])
-        my = c(v1[2], x0[2], v2[2])
+        mx <- c(v1[1], x0[1], v2[1])
+        my <- c(v1[2], x0[2], v2[2])
 
-        private$.plot = private$.plot %>% add_trace(x = mx, y = my, mode = "lines", type = "scatter", showlegend = FALSE, ...)
+        private$.plot <- private$.plot %>% add_trace(x = mx, y = my, mode = "lines", type = "scatter", showlegend = FALSE, ...)
       }
       if (private$.layer_primary == "surface") {
-        v1 = v1 * x1length + x0
-        v2 = v2 * x2length + x0
+        v1 <- v1 * x1length + x0
+        v2 <- v2 * x2length + x0
 
-        v0 = c(x0, f0)
-        v1 = c(v1, f0)
-        v2 = c(v2, f0)
+        v0 <- c(x0, f0)
+        v1 <- c(v1, f0)
+        v2 <- c(v2, f0)
 
         # Order is important to have the angle:
-        marker = cbind(v1, v0, v2)
+        marker <- cbind(v1, v0, v2)
 
-        private$.plot = private$.plot %>% add_trace(x = marker[1, ], y = marker[2, ], z = marker[3, ], mode = "lines", type = "scatter3d", showlegend = FALSE, ...)
+        private$.plot <- private$.plot %>% add_trace(x = marker[1, ], y = marker[2, ], z = marker[3, ], mode = "lines", type = "scatter3d", showlegend = FALSE, ...)
       }
     },
 
@@ -363,36 +378,35 @@ Visualizer2DObjective = R6::R6Class("Visualizer2DObjective",
     #' @param ... (`any`)\cr
     #'   Additional arguments passed to `$save(...)`.
     animate = function(dir = "animation", nframes = 10L, view_start = list(x = 1, y = 1, z = 1),
-      view_end = list(x = 1, y = 1, z = 1), fext = "png", stops = NULL, ...) {
-
+                       view_end = list(x = 1, y = 1, z = 1), fext = "png", stops = NULL, ...) {
       checkmate::assertDirectory(dir)
       checkmate::assertCount(nframes)
       checkmate::assertList(view_start)
       checkmate::assertList(view_end)
       checkmate::assertIntegerish(stops, lower = 1, len = nframes, null.ok = TRUE)
 
-      if (! all((names(view_start) == c("x", "y", "z")) | (names(view_end) == c("x", "y", "z")))) {
+      if (!all((names(view_start) == c("x", "y", "z")) | (names(view_end) == c("x", "y", "z")))) {
         stop("View needs `x`, `y`, and `z` coordinates.")
       }
       invisible(lapply(c(view_start, view_end), checkmate::assertNumber))
 
-      views = list(
+      views <- list(
         x = seq(view_start$x, view_end$x, len = nframes),
         y = seq(view_start$y, view_end$y, len = nframes),
-        z = seq(view_start$z, view_end$z, len = nframes))
+        z = seq(view_start$z, view_end$z, len = nframes)
+      )
 
       if (is.null(stops)) {
-        maxcalls = max(vapply(private$.opts, function(oo) nrow(oo$opt$archive), integer(1)))
-        stops = unique(round(seq(1, maxcalls, len = nframes)))
+        maxcalls <- max(vapply(private$.opts, function(oo) nrow(oo$opt$archive), integer(1)))
+        stops <- unique(round(seq(1, maxcalls, len = nframes)))
       }
 
-      plot_temp = private$.plot
-      private$.freeze_plot = TRUE
+      plot_temp <- private$.plot
+      private$.freeze_plot <- TRUE
 
       for (i in seq_len(nframes)) {
-
-        is = stringr::str_pad(i, width = 4, pad = "0")
-        fname = sprintf("%s/frame-%s.%s", dir, is, fext)
+        is <- stringr::str_pad(i, width = 4, pad = "0")
+        fname <- sprintf("%s/frame-%s.%s", dir, is, fext)
 
         if (private$.layer_primary == "surface") {
           do.call(self$initLayerSurface, private$.vbase)
@@ -416,10 +430,13 @@ Visualizer2DObjective = R6::R6Class("Visualizer2DObjective",
         self$save(fname, ...)
       }
 
-      private$.freeze_plot = FALSE
-      private$.plot = plot_temp
+      private$.freeze_plot <- FALSE
+      private$.plot <- plot_temp
 
       message(sprintf("Files stored in '%s'. Use, e.g., ImageMagic (http://www.imagemagick.org/) with `convert -delay 20 -loop 0 %s/*.%s myimage.gif` to create gif with 20 ms frames.", dir, dir, fext))
     }
+  ),
+  private = list(
+    .trace_count = 0
   )
 )

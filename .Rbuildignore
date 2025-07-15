@@ -17,3 +17,6 @@
 ^_pkgdown\.yml$
 ^pkgdown$
 ^LICENSE\.md$
+^doc$
+^Meta$
+^DEVELOPMENT\.md$

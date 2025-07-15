@@ -1,5 +1,5 @@
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
+<!-- README.md is generated from README.Rmd. Please edit this file -->
 
 # vistool
 
@@ -21,15 +21,18 @@ You can install the development version of vistool from
 pak::pak("slds-lmu/vistool")
 ```
 
-Please note that visualization features rely on [`plotly`]() which in
-turns relies on certain functionality provided by Python packages, which
-are accessed via reticulate.  
-Most importantly this affects the `$save()` functionality for plots,
-which uses `plotly::save_image()` internally, and requires the `kaleido`
-Python package.
+Please note that surface visualization features (`plotly` backend) rely
+on [`plotly`](https://plotly.com/r/) which in turn relies on certain
+functionality provided by Python packages, accessed via
+[`reticulate`](https://rstudio.github.io/reticulate/).
 
-The following instructions are provided by `?plotly::save_image` and
-assume you do not have `miniconda` installed already:
+### Optional: Setup for Saving Plotly Plots
+
+In particular, the `$save()` functionality for surface plots uses
+`plotly::save_image()` internally, which requires the `kaleido` Python
+package. The following instructions are provided by
+`?plotly::save_image` and assume you do not have `miniconda` installed
+already:
 
 ``` r
 install.packages('reticulate')
@@ -47,29 +50,37 @@ library(mlr3verse)
 #> Loading required package: mlr3
 ```
 
-This examples shows how to visualize the prediction surface of an SVM on
+This example shows how to visualize the prediction surface of an SVM on
 the `pima` task included in `mlr3`:
 
 ``` r
 # Create an example task, add missing data imputation and select 2 features
-task = tsk("pima")
-task = po("imputemean")$train(list(task))[[1]]
+task <- tsk("pima")
+task <- po("imputemean")$train(list(task))[[1]]
 task$select(c("insulin", "mass"))
 
 # Select example learner
-learner = lrn("classif.svm", predict_type = "prob")
+learner <- lrn("classif.svm", predict_type = "prob")
 
-# Create the Visualizer object from task and learner
-vis = as_visualizer(task, learner)
-
-# Define a 3D scene
-vis$set_scene(x = 1.4, y = 1.4, z = 1.4)
+# Create 2D ggplot2 visualization (default for 2-feature tasks)
+vis_2d <- as_visualizer(task, learner) # or explicitly: type = "2d"
+vis_2d$plot()
 ```
 
-View interactively:
+<img src="man/figures/README-example-1.png" width="100%" />
+
+For interactive exploration, you can create surface visualizations with
+`plotly`:
 
 ``` r
-vis$plot()
+# Create surface visualization for interactive plotly surface plot
+vis_surface <- as_visualizer(task, learner, type = "surface")
+
+# Define a 3D scene
+vis_surface$set_scene(x = 1.4, y = 1.4, z = 1.4)
+
+# View interactively
+vis_surface$plot()
 ```
 
 ![](man/figures/demo_1.png)
@@ -77,8 +88,15 @@ vis$plot()
 Save static version as png:
 
 ``` r
-vis$save("man/figures/demo_1.png", width = 500, height = 500)
+# only works if Python kaleido package is installed
+# see installation instructions above for setting up plotly save functionality
+vis_surface$save("man/figures/demo_1.png", width = 500, height = 500)
 ```
+
+## Contributing
+
+For anyone interested in contributing to `vistool`, please see the
+[Developer Reference](DEVELOPMENT.md).
 
 ## Resources
 

@@ -10,7 +10,11 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  dpi = 150,
+  dev = "png",
+  out.width = "100%",
+  fig.retina = 2
 )
 ```
 
@@ -28,20 +32,23 @@ The package includes a few predefined loss functions that are used for classific
 as.data.table(dict_loss)
 ```
 
-To get a loss function from the dictionary, use the `lss()` function
-We retrieve the hinge loss function for classification.
+To get a loss function from the dictionary, use the `lss()` function.
+Many loss functions support parameters (e.g., `quantile` for pinball loss, `delta` for Huber loss, `epsilon` for epsilon-insensitive loss).
+You can specify these parameters directly in the `lss()` function call.
+Here we retrieve the pinball loss function for regression with a custom quantile parameter.
 
 ```{r}
-loss_function = lss("hinge")
+loss_function <- lss("pinball", quantile = 0.3)
 ```
 
 # Visualization
 
 To visualize the loss function, use the `as_visualizer()` function.
-The `y_pred` arguments contains $y * f(x)$ and `y_true` the true value $y$.
+The `y_pred` arguments contains $y - f(x)$ (for regression losses) and `y_true` the true value $y$.
+By default, loss functions are plotted with 1000 points for smooth curves.
 
 ```{r}
-vis = as_visualizer(loss_function, y_pred = seq(-4, 4), y_true = 1)
+vis <- as_visualizer(loss_function, y_pred = seq(-4, 4), y_true = 0)
 ```
 
 Use the `plot()` method to plot the loss function.
@@ -52,36 +59,51 @@ vis$plot()
 
 # Regression Loss Functions
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, out.width='100%', out.height='1000px'}
-library(mlr3misc)
-library(plotly)
-library(ggsci)
+Here we visualize multiple regression loss functions:
 
-visualizers = pmap(list(c("huber", "l1_ae", "l2_se", "log-cosh"), pal_npg("nrc")(4)), function(key, color) {
-  vis = as_visualizer(lss(key), y_pred = seq(-10, 10), y_true = 0)
-  vis$init_layer_lines(color = color)
-  vis$plot()
-})
+```{r, echo=TRUE, message=FALSE, warning=FALSE, out.width='100%'}
+loss_huber = lss("huber")
+loss_l2 = lss("l2_se")
+loss_l1 = lss("l1_ae")
+loss_logcosh = lss("log-cosh")
 
-subplot(visualizers, nrows = 4, shareX = TRUE, shareY = TRUE) %>%
-  layout(
-    title = "Regression Loss Functions",
-    xaxis = list(title = "y - f(x)"),
-    yaxis = list(title = "Loss"))
+vis_combined = VisualizerLossFuns$new(
+  list(loss_huber, loss_l2, loss_l1, loss_logcosh),
+  y_pred = seq(-4, 4),
+  y_true = 0,
+  n_points = 5000L  # higher resolution for smooth curves
+)
+vis_combined$plot()
 ```
 
 # Classification Loss Functions
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, out.width='100%', out.height='00px'}
-visualizers = pmap(list(c("cross-entropy", "hinge"), pal_npg("nrc")(2)), function(key, color) {
-  vis = as_visualizer(lss(key), y_pred = seq(-4, 4), y_true = 1)
-  vis$init_layer_lines(color = color)
-  vis$plot()
-})
+Here we visualize classification loss functions, where `y_pred` contains $y * f(x)$:
 
-subplot(visualizers, nrows = 2, shareX = TRUE, shareY = TRUE) %>%
-  layout(
-    title = "Regression Loss Functions",
-    xaxis = list(title = "y - f(x)"),
-    yaxis = list(title = "Loss"))
+```{r, echo=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
+loss_hinge <- lss("cross-entropy")
+loss_crossentropy <- lss("hinge")
+
+vis_combined = VisualizerLossFuns$new(
+  list(loss_hinge, loss_crossentropy),
+  y_pred = seq(-4, 4),
+  y_true = 1
+)
+vis_combined$plot()
+```
+
+# Custom Loss Functions
+
+We can also define and visualize custom loss functions:
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, out.width='100%'}
+custom_loss <- LossFunction$new(
+  id = "custom_loss",
+  label = "Sinusoidal-Exponential Loss",
+  task_type = "regr",
+  fun = function(r) abs(r) * exp(-abs(r) / 3) + 0.5 * sin(2 * r)
+)
+
+vis <- as_visualizer(custom_loss, y_pred = seq(-10, 10), y_true = 0, n_points = 5000L)
+vis$plot()
 ```

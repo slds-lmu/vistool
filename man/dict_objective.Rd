@@ -5,7 +5,7 @@
 \alias{dict_objective}
 \title{Dictionary for test functions}
 \format{
-An object of class \code{DictionaryObjective} (inherits from \code{Dictionary}, \code{R6}) of length 13.
+An object of class \code{DictionaryObjective} (inherits from \code{Dictionary}, \code{R6}) of length 12.
 }
 \usage{
 dict_objective

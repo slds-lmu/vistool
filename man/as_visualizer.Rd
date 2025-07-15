@@ -12,6 +12,7 @@ as_visualizer(x, ...)
 \method{as_visualizer}{Task}(
   x,
   learner,
+  type = "auto",
   x1_limits = NULL,
   x2_limits = NULL,
   padding = 0,
@@ -21,6 +22,7 @@ as_visualizer(x, ...)
 
 \method{as_visualizer}{Objective}(
   x,
+  type = "auto",
   x1_limits = NULL,
   x2_limits = NULL,
   padding = 0,
@@ -28,7 +30,17 @@ as_visualizer(x, ...)
   ...
 )
 
-\method{as_visualizer}{LossFunction}(x, y_pred, y_true, ...)
+\method{as_visualizer}{LossFunction}(
+  x,
+  type = "auto",
+  x1_limits = NULL,
+  x2_limits = NULL,
+  padding = 0,
+  n_points = 1000L,
+  y_pred = NULL,
+  y_true = NULL,
+  ...
+)
 }
 \arguments{
 \item{x}{(`any`)\cr
@@ -39,6 +51,11 @@ Additional arguments.}
 
 \item{learner}{(`mlr3::Learner`)\cr
 The learner to train the model with.}
+
+\item{type}{(`character(1)`)\cr
+The type of visualization: "auto" (default), "1d", "2d", or "surface". 
+If "auto", automatically chooses between 1D and 2D ggplot2 visualizations based on the number of features/dimensions.
+Use "surface" for interactive plotly surface plots (2D inputs only, Models and Objectives only).}
 
 \item{x1_limits}{(`numeric(2)`)\cr
 The x1 limits.}
@@ -55,11 +72,24 @@ The number of generated point per dimension.
 Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
 
 \item{y_pred}{(`numeric()`)\cr
-Predicted values.}
+Predicted values for the loss function. Optional.}
 
-\item{y_true}{(`numeric(1)`)\cr
-True value.}
+\item{y_true}{(`numeric()`)\cr
+True values for the loss function. Optional.}
+}
+\value{
+An object inheriting from a Visualizer class (Visualizer1D, Visualizer2D, VisualizerSurface, etc.)
+depending on the input and selected type.
 }
 \description{
-This function converts to a visualizer.
+This function converts to a visualizer. Automatically chooses between 1D and 2D
+visualizations based on the number of features/dimensions using ggplot2 backend.
+For 2D inputs, you can optionally use `type = "surface"` to get interactive plotly
+surface plots (available for Models and Objectives only).
+}
+\details{
+If `type = "auto"` (default), the function will inspect the input and select the appropriate ggplot2 visualizer:
+- 1D: For objects with 1 feature/dimension (uses ggplot2)
+- 2D: For objects with 2 features/dimensions (uses ggplot2)
+You can override this by specifying `type = "1d"`, `type = "2d"`, or for 2D inputs only: `type = "surface"` (uses plotly for interactive surfaces, Models and Objectives only).
 }

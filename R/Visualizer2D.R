@@ -1,7 +1,7 @@
-#' @title Visualize Base Class
+#' @title Visualize 2D Functions
 #'
 #' @description
-#' This class is used to create 2D visualizations.
+#' Visualizes a two-dimensional function \eqn{f: \mathbb{R}^2 \to \mathbb{R}}.
 #'
 #' @template param_x1_limits
 #' @template param_x2_limits
@@ -9,268 +9,176 @@
 #' @template param_n_points
 #'
 #' @export
-Visualizer2D = R6::R6Class("Visualizer2D",
+Visualizer2D <- R6::R6Class("Visualizer2D",
+  inherit = Visualizer,
   public = list(
 
-    #' @field grid (`list()`)\cr
-    #' List with the `x1` and `x2` grid.
-    grid = NULL,
+    #' @field fun_x1 (`numeric(n)`)
+    fun_x1 = NULL,
 
-    #' @field zmat (`matrix()`)\cr
-    #' The result of evaluation at each element of the cross product of `grid$x1` and `grid$x2`.
-    zmat = NULL,
+    #' @field fun_x2 (`numeric(n)`)
+    fun_x2 = NULL,
 
-    #' @field plot_lab (character(1)\cr
-    #' Label of the plot.
-    plot_lab = NULL,
+    #' @field fun_y (`numeric(n)`)
+    fun_y = NULL,
 
-    #' @field x1_lab (character(1)\cr
-    #' Label of the x1 axis.
-    x1_lab = NULL,
+    #' @field title (`character(1)`)
+    title = NULL,
 
-    #' @field x2_lab (character(1)\cr
-    #' Label of the x2 axis.
-    x2_lab = NULL,
+    #' @field lab_x1 (`character(1)`)
+    lab_x1 = NULL,
 
-    #' @field z_lab (character(1)\cr
-    #' Label of the z axis.
-    z_lab = NULL,
+    #' @field lab_x2 (`character(1)`)
+    lab_x2 = NULL,
+
+    #' @field lab_y (`character(1)`)
+    lab_y = NULL,
+
+    #' @field points_x1 (`numeric()`)\cr
+    points_x1 = NULL,
+
+    #' @field points_x2 (`numeric()`)\cr
+    points_x2 = NULL,
+
+    #' @field points_y (`numeric()`)\cr
+    #' y-values of points.
+    points_y = NULL,
 
     #' @description
     #' Creates a new instance of this [R6][R6::R6Class] class.
     #'
-    #' @param grid (`list()`)\cr
-    #'   List with the `x1` and `x2` grid.
-    #' @param zmat (`matrix()`)\cr
-    #'   The result of evaluation at each element of the cross product of `grid$x1` and `grid$x2`.
-    #' @param plot_lab (`character(1)`)\cr
-    #'  Label of the plot.
-    #' @param x1_lab (`character(1)`)\cr
-    #'  Label of the x1 axis.
-    #' @param x2_lab (`character(1)`)\cr
-    #' Label of the x2 axis.
-    #' @param z_lab (`character(1)`)\cr
-    #' Label of the z axis.
-    initialize = function(grid, zmat, plot_lab = NULL, x1_lab = "x1", x2_lab = "x2", z_lab = "z") {
-      self$grid = assert_list(grid)
-      self$zmat = assert_matrix(zmat)
-      self$plot_lab = assert_character(plot_lab, null.ok = TRUE)
-      self$x1_lab = assert_character(x1_lab)
-      self$x2_lab = assert_character(x2_lab)
-      self$z_lab = assert_character(z_lab)
-      return(invisible(self))
+    #' @param fun_x1 (`numeric()`)
+    #'  x-values of function.
+    #' @param fun_x2 (`numeric()`)
+    #' x-values of function.
+    #' @param fun_y (`numeric()`)
+    #' y-values of function.
+    #' @param title (`character(1)`)
+    #' Title of plot.
+    #' @param lab_x1 (`character(1)`)
+    #' Label of x-axis.
+    #' @param lab_x2 (`character(1)`)
+    #' Label of x-axis.
+    #' @param lab_y (`character(1)`)
+    #' Label of y-axis.
+    initialize = function(fun_x1,
+                          fun_x2,
+                          fun_y,
+                          title = NULL,
+                          lab_x1 = "x1",
+                          lab_x2 = "x2",
+                          lab_y = "y") {
+      self$fun_x1 <- checkmate::assert_numeric(fun_x1)
+      self$fun_x2 <- checkmate::assert_numeric(fun_x2)
+      self$fun_y <- checkmate::assert_numeric(fun_y)
+      self$title <- checkmate::assert_character(title, null.ok = TRUE)
+      self$lab_x1 <- checkmate::assert_character(lab_x1)
+      self$lab_x2 <- checkmate::assert_character(lab_x2)
+      self$lab_y <- checkmate::assert_character(lab_y)
     },
 
     #' @description
-    #' Initialize the plot with contour lines.
-    #'
-    #' @param opacity (`numeric(1)`)\cr
-    #'   Opacity of the layer.
-    #' @param colorscale (`list()`)\cr
-    #'   The coloring of the contour.
-    #' @param show_title (`logical(1)`)\cr
-    #'   Indicator whether to show the title of the plot.
-    #' @param ... (`any`)\cr
-    #'   Further arguments passed to `add_trace(...)`.
-    init_layer_contour = function(opacity = 0.8, colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")), show_title = TRUE, ...) {
-      assert_number(opacity, lower = 0, upper = 1)
-      assert_list(colorscale)
-      assert_flag(show_title)
+    #' Create and return the ggplot2 plot.
+    #' @param text_size (`numeric(1)`)\cr
+    #'   Base text size for plot elements. Default is 11.
+    #' @param theme (`character(1)`)\cr
+    #'   ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "minimal".
+    #' @return A ggplot2 object.
+    plot = function(text_size = 11, theme = "minimal") {
+      checkmate::assert_number(text_size, lower = 1)
+      checkmate::assert_choice(theme, choices = c("minimal", "bw", "classic", "gray", "light", "dark", "void"))
+      
+      data <- data.table(
+        fun_x1 = self$fun_x1,
+        fun_x2 = self$fun_x2,
+        fun_y = self$fun_y
+      )
 
-      private$.vbase = c(as.list(environment()), list(...))
-      private$.layer_primary = "contour"
+      # continuous color gradient with overlaid contours
+      p <- ggplot(data, aes(x = fun_x1, y = fun_x2)) +
+        geom_raster(aes(fill = fun_y), interpolate = TRUE) +
+        geom_contour(aes(z = fun_y), color = "white", alpha = 0.3) +
+        labs(title = self$title, x = self$lab_x1, y = self$lab_x2) +
+        scale_fill_viridis_c(name = self$lab_y)
 
-      llp = list(x = self$grid$x1, y = self$grid$x2, z = self$zmat)
-      private$.plot = plot_ly() %>%
-        add_trace(
-          name = self$plot_lab,
-          showlegend = TRUE,
-          showscale = TRUE,
-          x = llp$x,
-          y = llp$y,
-          z = t(llp$z),
-          type = "contour",
-          opacity = opacity,
-          colorscale = colorscale,
-          ...
-        ) %>%
-        layout(
-          title = if (show_title) self$plot_lab else NULL,
-          xaxis = list(title = self$x1_lab),
-          yaxis = list(title = self$x2_lab))
+      # add training points if available
+      if (!is.null(self$points_x1) && !is.null(self$points_x2) && !is.null(self$points_y)) {
+        points_data <- data.table(
+          points_x1 = self$points_x1,
+          points_x2 = self$points_x2,
+          points_y = self$points_y
+        )
 
-      if (! private$.freeze_plot) {    # Used in animate to not overwrite the
-        private$.opts = list()         # plot over and over again when calling
-        private$.layer_arrow = list()  # `$initLayerXXX`.
+        # determine color scale limits based on function values
+        color_limits <- c(min(self$fun_y), max(self$fun_y))
+
+        p <- p + geom_point(aes(x = points_x1, y = points_x2, color = points_y),
+          data = points_data,
+          size = 2,
+          inherit.aes = FALSE,
+          show.legend = FALSE
+        ) +
+          scale_color_viridis_c(name = self$lab_y, limits = color_limits)
       }
 
-      return(invisible(self))
+      # apply theme
+      theme_fun <- switch(theme,
+        "minimal" = ggplot2::theme_minimal,
+        "bw" = ggplot2::theme_bw,
+        "classic" = ggplot2::theme_classic,
+        "gray" = ggplot2::theme_gray,
+        "light" = ggplot2::theme_light,
+        "dark" = ggplot2::theme_dark,
+        "void" = ggplot2::theme_void
+      )
+      p <- p + theme_fun(base_size = text_size) + theme(plot.title = ggplot2::element_text(hjust = 0.5))
+
+      return(p)
     },
 
     #' @description
-    #' Initialize the plot as 3D surface.
-    #'
-    #' @param opacity (`numeric(1)`)\cr
-    #'   Opacity of the layer.
-    #' @param colorscale (`list()`)\cr
-    #'   The coloring of the surface.
-    #' @param show_title (`logical(1)`)\cr
-    #'   Indicator whether to show the title of the plot.
-    #' @param show_contours (`logical(1)`)\cr
-    #'  Indicator whether to show the contours of the surface.
-    #' @param ... (`any`)\cr
-    #'   Further arguments passed to `add_trace(...)`.
-    init_layer_surface = function(opacity = 0.8, colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")), show_contours = FALSE, show_title = TRUE, ...) {
-      assert_number(opacity, lower = 0, upper = 1)
-      assert_list(colorscale)
-      assert_flag(show_title)
-
-      private$.vbase = c(as.list(environment()), list(...))
-      private$.layer_primary = "surface"
-
-      contours = if (show_contours) {
-        list(
-          z = list(
-            show = TRUE,
-            project = list(z = TRUE),
-            usecolormap = TRUE)
-        )
-      } else NULL
-
-      llp = list(x = self$grid$x1, y = self$grid$x2, z = self$zmat)
-      private$.plot = plot_ly() %>%
-        add_trace(
-          name = self$plot_lab,
-          showlegend = FALSE,
-          showscale = FALSE,
-          x = llp$x,
-          y = llp$y,
-          z = t(llp$z),
-          type = "surface",
-          opacity = opacity,
-          colorscale = colorscale,
-          contours = contours,
-          ...
-        ) %>%
-        layout(
-          title = if (show_title) self$plot_lab else NULL,
-          scene = list(
-            xaxis = list(title = self$x1_lab),
-            yaxis = list(title = self$x2_lab),
-            zaxis = list(title = self$z_lab)
-          )
-        )
-
-      if (! private$.freeze_plot) { # Used in animate to not overwrite the plot over and over again.
-        private$.opts = list()
-        private$.layer_arrow = list()
-      }
-
-      return(invisible(self))
+    #' Initialize contour layer (plotly-specific method).
+    #' @param ... Additional arguments.
+    #' @details This method is only available for surface visualizers (type="surface").
+    #' For ggplot2-based 2D visualizers, contours are created by default in the plot() method.
+    init_layer_contour = function(...) {
+      warning("init_layer_contour() is only available for VisualizerSurface (type='surface'). For ggplot2-based 2D visualizers, contours are created by default in the plot() method.")
+      invisible(self)
     },
 
-    #' @description Set the layout of the plotly plot.
-    #' @param ... Layout options directly passed to `layout(...)`.
+    #' @description
+    #' Initialize surface layer (plotly-specific method).
+    #' @param ... Additional arguments.
+    #' @details This method is only available for surface visualizers (type="surface").
+    #' ggplot2-based 2D visualizers do not support 3D surfaces.
+    init_layer_surface = function(...) {
+      warning("init_layer_surface() is only available for VisualizerSurface (type='surface'). ggplot2-based 2D visualizers do not support 3D surfaces.")
+      invisible(self)
+    },
+
+    #' @description
+    #' Set layout (plotly-specific method).
+    #' @param ... Layout options.
+    #' @details This method is only available for surface visualizers (type="surface").
+    #' For ggplot2-based 2D visualizers, use ggplot2's theming system instead.
     set_layout = function(...) {
-      private$.layout = list(...)
-      private$.plot = private$.plot %>% layout(...)
-
-      return(invisible(self))
+      warning("set_layout() is only available for VisualizerSurface (type='surface'). For ggplot2-based 2D visualizers, use ggplot2's theming system instead.")
+      invisible(self)
     },
 
-    #' @description Set the view for a 3D plot.
-    #' @param x (`numeric(1)`) The view from which the "camera looks down" to the plot.
-    #' @param y (`numeric(1)`) The view from which the "camera looks down" to the plot.
-    #' @param z (`numeric(1)`) The view from which the "camera looks down" to the plot.
+    #' @description
+    #' Set scene (plotly-specific method for 3D plots).
+    #' @param x (`numeric(1)`) Camera x position.
+    #' @param y (`numeric(1)`) Camera y position.
+    #' @param z (`numeric(1)`) Camera z position.
+    #' @details This method is only available for surface visualizers (type="surface").
+    #' ggplot2-based 2D visualizers do not support 3D scene control.
     set_scene = function(x, y, z) {
-      if (is.null(private$.plot)) self$init_layer_surface()
-      assert_number(x)
-      assert_number(y)
-      assert_number(z)
-
-      if (private$.layer_primary != "surface") {
-        stop("Scene can only be set for `surface` plots")
-      }
-
-      private$.plot = private$.plot %>%
-        layout(scene = list(camera = list(eye = list(x = x, y = y, z = z))))
-
-      return(invisible(self))
-    },
-
-    #' @description Return the plot and hence plot it or do further processing.
-    plot = function() {
-      if (is.null(private$.plot)) self$init_layer_surface()
-      return(private$.plot)
-    },
-
-
-    #' @description Save the plot by using plotlys `save_image()` function.
-    #' @param ... Further arguments passed to `save_image()`.
-    save = function(...) {
-      if (is.null(private$.plot)) self$init_layer_surface()
-      save_image(private$.plot, ...)
+      warning("set_scene() is only available for VisualizerSurface (type='surface'). ggplot2-based 2D visualizers do not support 3D scene control.")
+      invisible(self)
     }
   ),
   private = list(
-    # @field .layer_primary (`character(1)`) The id of the primary layer. Used to determine
-    # the trace setup.
-    .layer_primary = NULL,
-
-    # @field .layer_arrow (`list()`) Arguments passed to `$addLayerArrow()` to reconstruct the plot for animations.
-    .layer_arrow = list(),
-
-    # @field .plot (`plot_ly()`) The plot.
-    .plot = NULL,
-
-    # @field .opts (`list(Optimizer)`) List of optimizers used to add traces. Each `$initLayerXXX()`
-    # resets this list. An optimizer is added after each call to `$addLayerOptimizationTrace()`.
-    # this private field is exclusively used to create animations with `$animate()`.
-    .opts = list(),
-
-    .vbase = list(),
-
-    .layout = list(),
-
-    # @field .freeze_plot (`logical(1)`) Indicator whether to freeze saving the plot elements.
-    .freeze_plot = FALSE,
-
-    checkInit = function() {
-      if (is.null(private$.plot)) {
-        stop("Initialize plot with `initLayer*`")
-      }
-      return(invisible(TRUE))
-    },
-    checkInput = function(x) {
-      if (private$.layer_primary == "surface") {
-        return(checkmate::assertNumeric(x, len = 3L))
-      }
-      if (private$.layer_primary == "contour") {
-        return(checkmate::assertNumeric(x, len = 3L))
-      }
-      stop("Error in `$checkInput()`")
-    }
+    # Base class for 2D visualizers - no private fields needed
   )
 )
-
-#' Randomly generate colors
-#' @description Helper function to generate RGB colors.
-#' @param alpha (`numeric(1)`) The alpha value. If `!is.null` the used prefix is 'rgba' instead of 'rgb'.
-#' @return A character of length one containing the RGB color.
-#' @import plotly
-#' @import colorspace
-#' @export
-colSampler = function(alpha = NULL) {
-  checkmate::assertNumber(alpha, lower = 0, upper = 1, null.ok = TRUE)
-  r = sample(seq(0, 255), 1)
-  g = sample(seq(0, 255), 1)
-  b = sample(seq(0, 255), 1)
-
-  if (is.null(alpha)) {
-    rgb = "rgb"
-  } else {
-    rgb = "rgba"
-  }
-  clr = sprintf("%s(%s)", rgb, paste(c(r, g, b, alpha), collapse = ", "))
-  return(clr)
-}

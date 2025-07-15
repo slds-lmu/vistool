@@ -52,3 +52,6 @@ po/*~
 rsconnect/
 inst/doc
 docs
+/doc/
+/Meta/
+vignettes/.build.timestamp

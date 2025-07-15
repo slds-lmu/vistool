@@ -2,30 +2,36 @@
 % Please edit documentation in R/Visualizer2D.R
 \name{Visualizer2D}
 \alias{Visualizer2D}
-\title{Visualize Base Class}
+\title{Visualize 2D Functions}
 \description{
-This class is used to create 2D visualizations.
+Visualizes a two-dimensional function \eqn{f: \mathbb{R}^2 \to \mathbb{R}}.
+}
+\section{Super class}{
+\code{\link[vistool:Visualizer]{vistool::Visualizer}} -> \code{Visualizer2D}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{grid}}{(`list()`)\cr
-List with the `x1` and `x2` grid.}
+\item{\code{fun_x1}}{(`numeric(n)`)}
 
-\item{\code{zmat}}{(`matrix()`)\cr
-The result of evaluation at each element of the cross product of `grid$x1` and `grid$x2`.}
+\item{\code{fun_x2}}{(`numeric(n)`)}
 
-\item{\code{plot_lab}}{(character(1)\cr
-Label of the plot.}
+\item{\code{fun_y}}{(`numeric(n)`)}
 
-\item{\code{x1_lab}}{(character(1)\cr
-Label of the x1 axis.}
+\item{\code{title}}{(`character(1)`)}
 
-\item{\code{x2_lab}}{(character(1)\cr
-Label of the x2 axis.}
+\item{\code{lab_x1}}{(`character(1)`)}
 
-\item{\code{z_lab}}{(character(1)\cr
-Label of the z axis.}
+\item{\code{lab_x2}}{(`character(1)`)}
+
+\item{\code{lab_y}}{(`character(1)`)}
+
+\item{\code{points_x1}}{(`numeric()`)\cr}
+
+\item{\code{points_x2}}{(`numeric()`)\cr}
+
+\item{\code{points_y}}{(`numeric()`)\cr
+y-values of points.}
 }
 \if{html}{\out{</div>}}
 }
@@ -33,15 +39,21 @@ Label of the z axis.}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-Visualizer2D-new}{\code{Visualizer2D$new()}}
+\item \href{#method-Visualizer2D-plot}{\code{Visualizer2D$plot()}}
 \item \href{#method-Visualizer2D-init_layer_contour}{\code{Visualizer2D$init_layer_contour()}}
 \item \href{#method-Visualizer2D-init_layer_surface}{\code{Visualizer2D$init_layer_surface()}}
 \item \href{#method-Visualizer2D-set_layout}{\code{Visualizer2D$set_layout()}}
 \item \href{#method-Visualizer2D-set_scene}{\code{Visualizer2D$set_scene()}}
-\item \href{#method-Visualizer2D-plot}{\code{Visualizer2D$plot()}}
-\item \href{#method-Visualizer2D-save}{\code{Visualizer2D$save()}}
 \item \href{#method-Visualizer2D-clone}{\code{Visualizer2D$clone()}}
 }
 }
+\if{html}{\out{
+<details open><summary>Inherited methods</summary>
+<ul>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href='../../vistool/html/Visualizer.html#method-Visualizer-save'><code>vistool::Visualizer$save()</code></a></span></li>
+</ul>
+</details>
+}}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Visualizer2D-new"></a>}}
 \if{latex}{\out{\hypertarget{method-Visualizer2D-new}{}}}
@@ -49,141 +61,39 @@ Label of the z axis.}
 Creates a new instance of this [R6][R6::R6Class] class.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$new(
-  grid,
-  zmat,
-  plot_lab = NULL,
-  x1_lab = "x1",
-  x2_lab = "x2",
-  z_lab = "z"
+  fun_x1,
+  fun_x2,
+  fun_y,
+  title = NULL,
+  lab_x1 = "x1",
+  lab_x2 = "x2",
+  lab_y = "y"
 )}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{grid}}{(`list()`)\cr
-List with the `x1` and `x2` grid.}
+\item{\code{fun_x1}}{(`numeric()`)
+x-values of function.}
 
-\item{\code{zmat}}{(`matrix()`)\cr
-The result of evaluation at each element of the cross product of `grid$x1` and `grid$x2`.}
+\item{\code{fun_x2}}{(`numeric()`)
+x-values of function.}
 
-\item{\code{plot_lab}}{(`character(1)`)\cr
-Label of the plot.}
+\item{\code{fun_y}}{(`numeric()`)
+y-values of function.}
 
-\item{\code{x1_lab}}{(`character(1)`)\cr
-Label of the x1 axis.}
+\item{\code{title}}{(`character(1)`)
+Title of plot.}
 
-\item{\code{x2_lab}}{(`character(1)`)\cr
-Label of the x2 axis.}
+\item{\code{lab_x1}}{(`character(1)`)
+Label of x-axis.}
 
-\item{\code{z_lab}}{(`character(1)`)\cr
-Label of the z axis.}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Visualizer2D-init_layer_contour"></a>}}
-\if{latex}{\out{\hypertarget{method-Visualizer2D-init_layer_contour}{}}}
-\subsection{Method \code{init_layer_contour()}}{
-Initialize the plot with contour lines.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$init_layer_contour(
-  opacity = 0.8,
-  colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")),
-  show_title = TRUE,
-  ...
-)}\if{html}{\out{</div>}}
-}
+\item{\code{lab_x2}}{(`character(1)`)
+Label of x-axis.}
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{opacity}}{(`numeric(1)`)\cr
-Opacity of the layer.}
-
-\item{\code{colorscale}}{(`list()`)\cr
-The coloring of the contour.}
-
-\item{\code{show_title}}{(`logical(1)`)\cr
-Indicator whether to show the title of the plot.}
-
-\item{\code{...}}{(`any`)\cr
-Further arguments passed to `add_trace(...)`.}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Visualizer2D-init_layer_surface"></a>}}
-\if{latex}{\out{\hypertarget{method-Visualizer2D-init_layer_surface}{}}}
-\subsection{Method \code{init_layer_surface()}}{
-Initialize the plot as 3D surface.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$init_layer_surface(
-  opacity = 0.8,
-  colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")),
-  show_contours = FALSE,
-  show_title = TRUE,
-  ...
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{opacity}}{(`numeric(1)`)\cr
-Opacity of the layer.}
-
-\item{\code{colorscale}}{(`list()`)\cr
-The coloring of the surface.}
-
-\item{\code{show_contours}}{(`logical(1)`)\cr
-Indicator whether to show the contours of the surface.}
-
-\item{\code{show_title}}{(`logical(1)`)\cr
-Indicator whether to show the title of the plot.}
-
-\item{\code{...}}{(`any`)\cr
-Further arguments passed to `add_trace(...)`.}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Visualizer2D-set_layout"></a>}}
-\if{latex}{\out{\hypertarget{method-Visualizer2D-set_layout}{}}}
-\subsection{Method \code{set_layout()}}{
-Set the layout of the plotly plot.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$set_layout(...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{Layout options directly passed to `layout(...)`.}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Visualizer2D-set_scene"></a>}}
-\if{latex}{\out{\hypertarget{method-Visualizer2D-set_scene}{}}}
-\subsection{Method \code{set_scene()}}{
-Set the view for a 3D plot.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$set_scene(x, y, z)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{x}}{(`numeric(1)`) The view from which the "camera looks down" to the plot.}
-
-\item{\code{y}}{(`numeric(1)`) The view from which the "camera looks down" to the plot.}
-
-\item{\code{z}}{(`numeric(1)`) The view from which the "camera looks down" to the plot.}
+\item{\code{lab_y}}{(`character(1)`)
+Label of y-axis.}
 }
 \if{html}{\out{</div>}}
 }
@@ -192,28 +102,117 @@ Set the view for a 3D plot.
 \if{html}{\out{<a id="method-Visualizer2D-plot"></a>}}
 \if{latex}{\out{\hypertarget{method-Visualizer2D-plot}{}}}
 \subsection{Method \code{plot()}}{
-Return the plot and hence plot it or do further processing.
+Create and return the ggplot2 plot.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$plot()}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Visualizer2D-save"></a>}}
-\if{latex}{\out{\hypertarget{method-Visualizer2D-save}{}}}
-\subsection{Method \code{save()}}{
-Save the plot by using plotlys `save_image()` function.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$save(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$plot(text_size = 11, theme = "minimal")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{Further arguments passed to `save_image()`.}
+\item{\code{text_size}}{(`numeric(1)`)\cr
+Base text size for plot elements. Default is 11.}
+
+\item{\code{theme}}{(`character(1)`)\cr
+ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "minimal".}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Returns}{
+A ggplot2 object.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Visualizer2D-init_layer_contour"></a>}}
+\if{latex}{\out{\hypertarget{method-Visualizer2D-init_layer_contour}{}}}
+\subsection{Method \code{init_layer_contour()}}{
+Initialize contour layer (plotly-specific method).
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$init_layer_contour(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{Additional arguments.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+This method is only available for surface visualizers (type="surface").
+For ggplot2-based 2D visualizers, contours are created by default in the plot() method.
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Visualizer2D-init_layer_surface"></a>}}
+\if{latex}{\out{\hypertarget{method-Visualizer2D-init_layer_surface}{}}}
+\subsection{Method \code{init_layer_surface()}}{
+Initialize surface layer (plotly-specific method).
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$init_layer_surface(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{Additional arguments.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+This method is only available for surface visualizers (type="surface").
+ggplot2-based 2D visualizers do not support 3D surfaces.
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Visualizer2D-set_layout"></a>}}
+\if{latex}{\out{\hypertarget{method-Visualizer2D-set_layout}{}}}
+\subsection{Method \code{set_layout()}}{
+Set layout (plotly-specific method).
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$set_layout(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{Layout options.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+This method is only available for surface visualizers (type="surface").
+For ggplot2-based 2D visualizers, use ggplot2's theming system instead.
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Visualizer2D-set_scene"></a>}}
+\if{latex}{\out{\hypertarget{method-Visualizer2D-set_scene}{}}}
+\subsection{Method \code{set_scene()}}{
+Set scene (plotly-specific method for 3D plots).
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$set_scene(x, y, z)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{x}}{(`numeric(1)`) Camera x position.}
+
+\item{\code{y}}{(`numeric(1)`) Camera y position.}
+
+\item{\code{z}}{(`numeric(1)`) Camera z position.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+This method is only available for surface visualizers (type="surface").
+ggplot2-based 2D visualizers do not support 3D scene control.
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Visualizer2D-clone"></a>}}
