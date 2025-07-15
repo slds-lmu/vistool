@@ -8,8 +8,8 @@
 <title>Visualization of Loss Functions • vistool</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Visualization of Loss Functions">
 </head>
 <body>
@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">vistool</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,10 +53,8 @@
 
 
 
-<link href="loss_functions_files/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet">
-<script src="loss_functions_files/htmlwidgets-1.6.4/htmlwidgets.js"></script><script src="loss_functions_files/plotly-binding-4.10.4/plotly.js"></script><script src="loss_functions_files/typedarray-0.1/typedarray.min.js"></script><link href="loss_functions_files/crosstalk-1.2.1/css/crosstalk.min.css" rel="stylesheet">
-<script src="loss_functions_files/crosstalk-1.2.1/js/crosstalk.min.js"></script><link href="loss_functions_files/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css" rel="stylesheet">
-<script src="loss_functions_files/plotly-main-2.11.1/plotly-latest.min.js"></script><div class="row">
+
+<div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Visualization of Loss Functions</h1>
@@ -80,47 +78,87 @@ used for classification and regression.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/as.data.table.html" class="external-link">as.data.table</a></span><span class="op">(</span><span class="va">dict_loss</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Key: &lt;key&gt;</span></span>
-<span><span class="co">#&gt;              key             label properties</span></span>
-<span><span class="co">#&gt;           &lt;char&gt;            &lt;char&gt;     &lt;list&gt;</span></span>
-<span><span class="co">#&gt; 1: cross-entropy     Cross-Entropy    classif</span></span>
-<span><span class="co">#&gt; 2:         hinge        Hinge Loss    classif</span></span>
-<span><span class="co">#&gt; 3:         huber        Huber Loss       regr</span></span>
-<span><span class="co">#&gt; 4:         l1_ae L1 Absolute Error       regr</span></span>
-<span><span class="co">#&gt; 5:         l2_se  L2 Squared Error       regr</span></span>
-<span><span class="co">#&gt; 6:      log-cosh     Log-Cosh Loss       regr</span></span></code></pre></div>
+<span><span class="co">#&gt;                     key                    label task_type</span></span>
+<span><span class="co">#&gt;                  &lt;char&gt;                   &lt;char&gt;    &lt;char&gt;</span></span>
+<span><span class="co">#&gt;  1:              cauchy              Cauchy Loss      regr</span></span>
+<span><span class="co">#&gt;  2:       cross-entropy                 Log Loss   classif</span></span>
+<span><span class="co">#&gt;  3: epsilon-insensitive Epsilon-Insensitive Loss      regr</span></span>
+<span><span class="co">#&gt;  4:               hinge               Hinge Loss   classif</span></span>
+<span><span class="co">#&gt;  5:               huber               Huber Loss      regr</span></span>
+<span><span class="co">#&gt;  6:               l1_ae        L1 Absolute Error      regr</span></span>
+<span><span class="co">#&gt;  7:               l2_se         L2 Squared Error      regr</span></span>
+<span><span class="co">#&gt;  8:         log-barrier         Log-Barrier Loss      regr</span></span>
+<span><span class="co">#&gt;  9:            log-cosh            Log-Cosh Loss      regr</span></span>
+<span><span class="co">#&gt; 10:             pinball             Pinball Loss      regr</span></span></code></pre></div>
 <p>To get a loss function from the dictionary, use the
-<code><a href="../reference/lss.html">lss()</a></code> function We retrieve the hinge loss function for
-classification.</p>
+<code><a href="../reference/lss.html">lss()</a></code> function. Many loss functions support parameters
+(e.g., <code>quantile</code> for pinball loss, <code>delta</code> for
+Huber loss, <code>epsilon</code> for epsilon-insensitive loss). You can
+specify these parameters directly in the <code><a href="../reference/lss.html">lss()</a></code> function
+call. Here we retrieve the pinball loss function for regression with a
+custom quantile parameter.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">loss_function</span> <span class="op">=</span> <span class="fu"><a href="../reference/lss.html">lss</a></span><span class="op">(</span><span class="st">"hinge"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">loss_function</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lss.html">lss</a></span><span class="op">(</span><span class="st">"pinball"</span>, quantile <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="visualization">Visualization<a class="anchor" aria-label="anchor" href="#visualization"></a>
 </h2>
 <p>To visualize the loss function, use the <code><a href="../reference/as_visualizer.html">as_visualizer()</a></code>
 function. The <code>y_pred</code> arguments contains
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi><mo>*</mo><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">y * f(x)</annotation></semantics></math>
-and <code>y_true</code> the true value
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>.</p>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi><mo>−</mo><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">y - f(x)</annotation></semantics></math>
+(for regression losses) and <code>y_true</code> the true value
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>.
+By default, loss functions are plotted with 1000 points for smooth
+curves.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">vis</span> <span class="op">=</span> <span class="fu"><a href="../reference/as_visualizer.html">as_visualizer</a></span><span class="op">(</span><span class="va">loss_function</span>, y_pred <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">4</span>, <span class="fl">4</span><span class="op">)</span>, y_true <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">vis</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_visualizer.html">as_visualizer</a></span><span class="op">(</span><span class="va">loss_function</span>, y_pred <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">4</span>, <span class="fl">4</span><span class="op">)</span>, y_true <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p>Use the <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method to plot the loss function.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">vis</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<div class="plotly html-widget html-fill-item" id="htmlwidget-ac96cb3ee4656e2e9ec3" style="width:100%;height:432.632880098888px;"></div>
-<script type="application/json" data-for="htmlwidget-ac96cb3ee4656e2e9ec3">{"x":{"visdat":{"18c84f526e1c":["function () ","plotlyVisDat"]},"cur_data":"18c84f526e1c","attrs":{"18c84f526e1c":{"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"name":"Hinge Loss","showlegend":true,"x":[-4,-3,-2,-1,0,1,2,3,4],"y":[5,4,3,2,1,0,0,0,0],"type":"scatter","mode":"lines","line":{"width":2,"color":"rgb(160,82,45)"},"inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"xaxis":{"domain":[0,1],"automargin":true,"title":"Margin y * f(x)"},"yaxis":{"domain":[0,1],"automargin":true,"title":"Loss"},"hovermode":"closest","showlegend":false},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"name":"Hinge Loss","showlegend":true,"x":[-4,-3,-2,-1,0,1,2,3,4],"y":[5,4,3,2,1,0,0,0,0],"type":"scatter","mode":"lines","line":{"color":"rgb(160,82,45)","width":2},"marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<p><img src="loss_functions_files/figure-html/unnamed-chunk-6-1.png" width="100%"></p>
 </div>
 <div class="section level2">
 <h2 id="regression-loss-functions">Regression Loss Functions<a class="anchor" aria-label="anchor" href="#regression-loss-functions"></a>
 </h2>
-<div class="plotly html-widget html-fill-item" id="htmlwidget-e5c8c404fe174e4c81bd" style="width:100%;height:1000px;"></div>
-<script type="application/json" data-for="htmlwidget-e5c8c404fe174e4c81bd">{"x":{"data":[{"name":"Huber Loss","showlegend":true,"x":[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8,9,10],"y":[9.5,8.5,7.5,6.5,5.5,4.5,3.5,2.5,1.5,0.5,0,0.5,1.5,2.5,3.5,4.5,5.5,6.5,7.5,8.5,9.5],"type":"scatter","mode":"lines","line":{"color":"#E64B35FF","width":2},"marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null},{"name":"L1 Absolute Error","showlegend":true,"x":[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8,9,10],"y":[10,9,8,7,6,5,4,3,2,1,0,1,2,3,4,5,6,7,8,9,10],"type":"scatter","mode":"lines","line":{"color":"#4DBBD5FF","width":2},"marker":{"color":"rgba(255,127,14,1)","line":{"color":"rgba(255,127,14,1)"}},"error_y":{"color":"rgba(255,127,14,1)"},"error_x":{"color":"rgba(255,127,14,1)"},"xaxis":"x","yaxis":"y2","frame":null},{"name":"L2 Squared Error","showlegend":true,"x":[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8,9,10],"y":[100,81,64,49,36,25,16,9,4,1,0,1,4,9,16,25,36,49,64,81,100],"type":"scatter","mode":"lines","line":{"color":"#00A087FF","width":2},"marker":{"color":"rgba(44,160,44,1)","line":{"color":"rgba(44,160,44,1)"}},"error_y":{"color":"rgba(44,160,44,1)"},"error_x":{"color":"rgba(44,160,44,1)"},"xaxis":"x","yaxis":"y3","frame":null},{"name":"Log-Cosh Loss","showlegend":true,"x":[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8,9,10],"y":[9.3068528215012076,8.3068528346700337,7.3068529319752233,6.3068536509684279,5.3068589636335322,4.3068982183392714,3.3071882258129506,2.3093285045777852,1.3250027473578645,0.43378083048302712,0,0.43378083048302712,1.3250027473578645,2.3093285045777852,3.3071882258129506,4.3068982183392714,5.3068589636335322,6.3068536509684279,7.3068529319752233,8.3068528346700337,9.3068528215012076],"type":"scatter","mode":"lines","line":{"color":"#3C5488FF","width":2},"marker":{"color":"rgba(214,39,40,1)","line":{"color":"rgba(214,39,40,1)"}},"error_y":{"color":"rgba(214,39,40,1)"},"error_x":{"color":"rgba(214,39,40,1)"},"xaxis":"x","yaxis":"y4","frame":null}],"layout":{"xaxis":{"domain":[0,1],"automargin":true,"title":"y - f(x)","anchor":"y4"},"yaxis4":{"domain":[0,0.23000000000000001],"automargin":true,"title":"Loss","anchor":"x"},"yaxis3":{"domain":[0.27000000000000002,0.47999999999999998],"automargin":true,"title":"Loss","anchor":"x"},"yaxis2":{"domain":[0.52000000000000002,0.72999999999999998],"automargin":true,"title":"Loss","anchor":"x"},"yaxis":{"domain":[0.77000000000000002,1],"automargin":true,"title":"Loss","anchor":"x"},"annotations":[],"shapes":[],"images":[],"margin":{"b":40,"l":60,"t":25,"r":10},"hovermode":"closest","showlegend":true,"title":"Regression Loss Functions"},"attrs":{"18c83200c0e5":{"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"name":"Huber Loss","showlegend":true,"x":[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8,9,10],"y":[9.5,8.5,7.5,6.5,5.5,4.5,3.5,2.5,1.5,0.5,0,0.5,1.5,2.5,3.5,4.5,5.5,6.5,7.5,8.5,9.5],"type":"scatter","mode":"lines","line":{"width":2,"color":"#E64B35FF"},"inherit":true},"18c87903f824":{"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"name":"L1 Absolute Error","showlegend":true,"x":[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8,9,10],"y":[10,9,8,7,6,5,4,3,2,1,0,1,2,3,4,5,6,7,8,9,10],"type":"scatter","mode":"lines","line":{"width":2,"color":"#4DBBD5FF"},"inherit":true},"18c8689828b5":{"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"name":"L2 Squared Error","showlegend":true,"x":[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8,9,10],"y":[100,81,64,49,36,25,16,9,4,1,0,1,4,9,16,25,36,49,64,81,100],"type":"scatter","mode":"lines","line":{"width":2,"color":"#00A087FF"},"inherit":true},"18c8315d1150":{"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"name":"Log-Cosh Loss","showlegend":true,"x":[-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8,9,10],"y":[9.3068528215012076,8.3068528346700337,7.3068529319752233,6.3068536509684279,5.3068589636335322,4.3068982183392714,3.3071882258129506,2.3093285045777852,1.3250027473578645,0.43378083048302712,0,0.43378083048302712,1.3250027473578645,2.3093285045777852,3.3071882258129506,4.3068982183392714,5.3068589636335322,6.3068536509684279,7.3068529319752233,8.3068528346700337,9.3068528215012076],"type":"scatter","mode":"lines","line":{"width":2,"color":"#3C5488FF"},"inherit":true}},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"subplot":true,"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<p>Here we visualize multiple regression loss functions:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">loss_huber</span> <span class="op">=</span> <span class="fu"><a href="../reference/lss.html">lss</a></span><span class="op">(</span><span class="st">"huber"</span><span class="op">)</span></span>
+<span><span class="va">loss_l2</span> <span class="op">=</span> <span class="fu"><a href="../reference/lss.html">lss</a></span><span class="op">(</span><span class="st">"l2_se"</span><span class="op">)</span></span>
+<span><span class="va">loss_l1</span> <span class="op">=</span> <span class="fu"><a href="../reference/lss.html">lss</a></span><span class="op">(</span><span class="st">"l1_ae"</span><span class="op">)</span></span>
+<span><span class="va">loss_logcosh</span> <span class="op">=</span> <span class="fu"><a href="../reference/lss.html">lss</a></span><span class="op">(</span><span class="st">"log-cosh"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">vis_combined</span> <span class="op">=</span> <span class="va"><a href="../reference/VisualizerLossFuns.html">VisualizerLossFuns</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">loss_huber</span>, <span class="va">loss_l2</span>, <span class="va">loss_l1</span>, <span class="va">loss_logcosh</span><span class="op">)</span>,</span>
+<span>  y_pred <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">4</span>, <span class="fl">4</span><span class="op">)</span>,</span>
+<span>  y_true <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  n_points <span class="op">=</span> <span class="fl">5000L</span>  <span class="co"># higher resolution for smooth curves</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">vis_combined</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><img src="loss_functions_files/figure-html/unnamed-chunk-7-1.png" width="100%"></p>
 </div>
 <div class="section level2">
 <h2 id="classification-loss-functions">Classification Loss Functions<a class="anchor" aria-label="anchor" href="#classification-loss-functions"></a>
 </h2>
-<div class="plotly html-widget html-fill-item" id="htmlwidget-36aa3d2a04d42bbc2145" style="width:100%;height:00px;"></div>
-<script type="application/json" data-for="htmlwidget-36aa3d2a04d42bbc2145">{"x":{"data":[{"name":"Cross-Entropy","showlegend":true,"x":[-4,-3,-2,-1,0,1,2,3,4],"y":[4.0181499279178094,3.0485873515737421,2.1269280110429727,1.3132616875182228,0.69314718055994529,0.31326168751822286,0.1269280110429726,0.048587351573741958,0.018149927917809779],"type":"scatter","mode":"lines","line":{"color":"#E64B35FF","width":2},"marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null},{"name":"Hinge Loss","showlegend":true,"x":[-4,-3,-2,-1,0,1,2,3,4],"y":[5,4,3,2,1,0,0,0,0],"type":"scatter","mode":"lines","line":{"color":"#4DBBD5FF","width":2},"marker":{"color":"rgba(255,127,14,1)","line":{"color":"rgba(255,127,14,1)"}},"error_y":{"color":"rgba(255,127,14,1)"},"error_x":{"color":"rgba(255,127,14,1)"},"xaxis":"x","yaxis":"y2","frame":null}],"layout":{"xaxis":{"domain":[0,1],"automargin":true,"title":"y - f(x)","anchor":"y2"},"yaxis2":{"domain":[0,0.47999999999999998],"automargin":true,"title":"Loss","anchor":"x"},"yaxis":{"domain":[0.52000000000000002,1],"automargin":true,"title":"Loss","anchor":"x"},"annotations":[],"shapes":[],"images":[],"margin":{"b":40,"l":60,"t":25,"r":10},"hovermode":"closest","showlegend":true,"title":"Regression Loss Functions"},"attrs":{"18c83597c19":{"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"name":"Cross-Entropy","showlegend":true,"x":[-4,-3,-2,-1,0,1,2,3,4],"y":[4.0181499279178094,3.0485873515737421,2.1269280110429727,1.3132616875182228,0.69314718055994529,0.31326168751822286,0.1269280110429726,0.048587351573741958,0.018149927917809779],"type":"scatter","mode":"lines","line":{"width":2,"color":"#E64B35FF"},"inherit":true},"18c8258fe266":{"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"name":"Hinge Loss","showlegend":true,"x":[-4,-3,-2,-1,0,1,2,3,4],"y":[5,4,3,2,1,0,0,0,0],"type":"scatter","mode":"lines","line":{"width":2,"color":"#4DBBD5FF"},"inherit":true}},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"subplot":true,"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<p>Here we visualize classification loss functions, where
+<code>y_pred</code> contains
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi><mo>*</mo><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">y * f(x)</annotation></semantics></math>:</p>
+<p><img src="loss_functions_files/figure-html/unnamed-chunk-8-1.png" width="100%"></p>
+</div>
+<div class="section level2">
+<h2 id="custom-loss-functions">Custom Loss Functions<a class="anchor" aria-label="anchor" href="#custom-loss-functions"></a>
+</h2>
+<p>We can also define and visualize custom loss functions:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">custom_loss</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/LossFunction.html">LossFunction</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
+<span>  id <span class="op">=</span> <span class="st">"custom_loss"</span>,</span>
+<span>  label <span class="op">=</span> <span class="st">"Sinusoidal-Exponential Loss"</span>,</span>
+<span>  task_type <span class="op">=</span> <span class="st">"regr"</span>,</span>
+<span>  fun <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">r</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span> <span class="op">/</span> <span class="fl">3</span><span class="op">)</span> <span class="op">+</span> <span class="fl">0.5</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="fl">2</span> <span class="op">*</span> <span class="va">r</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">vis</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_visualizer.html">as_visualizer</a></span><span class="op">(</span><span class="va">custom_loss</span>, y_pred <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, y_true <span class="op">=</span> <span class="fl">0</span>, n_points <span class="op">=</span> <span class="fl">5000L</span><span class="op">)</span></span>
+<span><span class="va">vis</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><img src="loss_functions_files/figure-html/unnamed-chunk-9-1.png" width="100%"></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
@@ -129,11 +167,11 @@ and <code>y_true</code> the true value
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Marc Becker, Daniel Schalk, Lukas Burk.</p>
+  <p>Developed by Marc Becker, Daniel Schalk, Lukas Burk, Manuel Helmerichs.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer>

@@ -1,5 +1,6 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://slds-lmu.github.io/vistool/404.html</loc></url>
+<url><loc>https://slds-lmu.github.io/vistool/DEVELOPMENT.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/LICENSE.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/articles/index.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/articles/loss_functions.html</loc></url>
@@ -14,18 +15,24 @@
 <url><loc>https://slds-lmu.github.io/vistool/reference/OptimizerGD.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/OptimizerMomentum.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/OptimizerNAG.html</loc></url>
+<url><loc>https://slds-lmu.github.io/vistool/reference/Visualizer.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/Visualizer1D.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/Visualizer1DModel.html</loc></url>
-<url><loc>https://slds-lmu.github.io/vistool/reference/Visualizer1DObjective.html</loc></url>
+<url><loc>https://slds-lmu.github.io/vistool/reference/Visualizer1DObj.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/Visualizer2D.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/Visualizer2DModel.html</loc></url>
-<url><loc>https://slds-lmu.github.io/vistool/reference/Visualizer2DObjective.html</loc></url>
-<url><loc>https://slds-lmu.github.io/vistool/reference/VisualizerLossFunction.html</loc></url>
+<url><loc>https://slds-lmu.github.io/vistool/reference/Visualizer2DObj.html</loc></url>
+<url><loc>https://slds-lmu.github.io/vistool/reference/VisualizerLossFuns.html</loc></url>
+<url><loc>https://slds-lmu.github.io/vistool/reference/VisualizerSurface.html</loc></url>
+<url><loc>https://slds-lmu.github.io/vistool/reference/VisualizerSurfaceModel.html</loc></url>
+<url><loc>https://slds-lmu.github.io/vistool/reference/VisualizerSurfaceObj.html</loc></url>
+<url><loc>https://slds-lmu.github.io/vistool/reference/as.data.table.DictionaryLoss.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/as_visualizer.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/assertStepSizeControl.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/colSampler.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/dict_loss.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/dict_objective.html</loc></url>
+<url><loc>https://slds-lmu.github.io/vistool/reference/get_consistent_color.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/index.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/lss.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/mergeOptimArchives.html</loc></url>

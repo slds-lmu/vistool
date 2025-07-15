@@ -1,11 +1,11 @@
 pandoc: 3.1.11
-pkgdown: 2.1.1
+pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
   loss_functions: loss_functions.html
   model: model.html
   objective: objective.html
-last_built: 2024-10-25T11:10Z
+last_built: 2025-07-15T11:28Z
 urls:
   reference: https://slds-lmu.github.io/vistool/reference
   article: https://slds-lmu.github.io/vistool/articles
