@@ -1,3 +1,9 @@
+
+# vistool 0.2.1
+
+* `as_visualizer(..., type = "surface")`, initializes a surface plot directly (similar to the other types).
+
+
 # vistool 0.2.0
 
 * Switched to `ggplot2` for the visualization of loss functions, model predictions and objectives (all 2D, non-interactive); the `plotly` implementation remains intact for interactive surface visualizations (in 3D, `type = "surface"` in `as_visualizer()`). The `as_visualizer()` interface, `save` functions and various other things were reworked to match this.

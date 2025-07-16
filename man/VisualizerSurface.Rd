@@ -30,6 +30,21 @@ Label of the x2 axis.}
 
 \item{\code{z_lab}}{(character(1)\cr
 Label of the z axis.}
+
+\item{\code{opacity}}{(`numeric(1)`)\cr
+Opacity of the surface plot.}
+
+\item{\code{colorscale}}{(`list()`)\cr
+Color scale for the surface plot.}
+
+\item{\code{show_contours}}{(`logical(1)`)\cr
+Whether to show contours on the surface plot.}
+
+\item{\code{contours}}{(`list()`)\cr
+Custom contour configuration for the surface plot.}
+
+\item{\code{show_title}}{(`logical(1)`)\cr
+Whether to show the plot title.}
 }
 \if{html}{\out{</div>}}
 }
@@ -37,7 +52,7 @@ Label of the z axis.}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-VisualizerSurface-new}{\code{VisualizerSurface$new()}}
-\item \href{#method-VisualizerSurface-init_layer_contour}{\code{VisualizerSurface$init_layer_contour()}}
+\item \href{#method-VisualizerSurface-view_as_contour}{\code{VisualizerSurface$view_as_contour()}}
 \item \href{#method-VisualizerSurface-init_layer_surface}{\code{VisualizerSurface$init_layer_surface()}}
 \item \href{#method-VisualizerSurface-set_layout}{\code{VisualizerSurface$set_layout()}}
 \item \href{#method-VisualizerSurface-set_scene}{\code{VisualizerSurface$set_scene()}}
@@ -64,7 +79,13 @@ Creates a new instance of this [R6][R6::R6Class] class.
   plot_lab = NULL,
   x1_lab = "x1",
   x2_lab = "x2",
-  z_lab = "z"
+  z_lab = "z",
+  opacity = 0.8,
+  colorscale = list(c(0, "#440154"), c(0.25, "#3b528b"), c(0.5, "#21908c"), c(0.75,
+    "#5dc863"), c(1, "#fde725")),
+  show_contours = FALSE,
+  contours = NULL,
+  show_title = TRUE
 )}\if{html}{\out{</div>}}
 }
 
@@ -88,21 +109,54 @@ Label of the x2 axis.}
 
 \item{\code{z_lab}}{(`character(1)`)\cr
 Label of the z axis.}
+
+\item{\code{opacity}}{(`numeric(1)`)\cr
+Opacity of the layer.}
+
+\item{\code{opacity}}{(`numeric(1)`)\cr
+Opacity of the layer.}
+
+\item{\code{opacity}}{(`numeric(1)`)\cr
+Opacity of the layer.}
+
+\item{\code{colorscale}}{(`list()`)\cr
+The coloring of the surface/contour.}
+
+\item{\code{colorscale}}{(`list()`)\cr
+The coloring of the surface/contour.}
+
+\item{\code{colorscale}}{(`list()`)\cr
+The coloring of the surface/contour.}
+
+\item{\code{show_contours}}{(`logical(1)`)\cr
+Whether to show contours on the surface plot. Default is FALSE.}
+
+\item{\code{contours}}{(`list()`)\cr
+Custom contour configuration for the surface plot. If provided, this takes precedence over `show_contours`.}
+
+\item{\code{show_title}}{(`logical(1)`)\cr
+Indicator whether to show the title of the plot.}
+
+\item{\code{show_title}}{(`logical(1)`)\cr
+Indicator whether to show the title of the plot.}
+
+\item{\code{show_title}}{(`logical(1)`)\cr
+Indicator whether to show the title of the plot.}
 }
 \if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-VisualizerSurface-init_layer_contour"></a>}}
-\if{latex}{\out{\hypertarget{method-VisualizerSurface-init_layer_contour}{}}}
-\subsection{Method \code{init_layer_contour()}}{
-Initialize the plot with contour lines.
+\if{html}{\out{<a id="method-VisualizerSurface-view_as_contour"></a>}}
+\if{latex}{\out{\hypertarget{method-VisualizerSurface-view_as_contour}{}}}
+\subsection{Method \code{view_as_contour()}}{
+Switch to 2D contour plot view.
+This reduces the 3D surface to a 2D contour representation.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{VisualizerSurface$init_layer_contour(
-  opacity = 0.8,
-  colorscale = list(c(0, "#440154"), c(0.25, "#3b528b"), c(0.5, "#21908c"), c(0.75,
-    "#5dc863"), c(1, "#fde725")),
-  show_title = TRUE,
+\if{html}{\out{<div class="r">}}\preformatted{VisualizerSurface$view_as_contour(
+  opacity = self$opacity,
+  colorscale = self$colorscale,
+  show_title = self$show_title,
   ...
 )}\if{html}{\out{</div>}}
 }
@@ -116,11 +170,20 @@ Opacity of the layer.}
 \item{\code{opacity}}{(`numeric(1)`)\cr
 Opacity of the layer.}
 
+\item{\code{opacity}}{(`numeric(1)`)\cr
+Opacity of the layer.}
+
 \item{\code{colorscale}}{(`list()`)\cr
 The coloring of the surface/contour.}
 
 \item{\code{colorscale}}{(`list()`)\cr
 The coloring of the surface/contour.}
+
+\item{\code{colorscale}}{(`list()`)\cr
+The coloring of the surface/contour.}
+
+\item{\code{show_title}}{(`logical(1)`)\cr
+Indicator whether to show the title of the plot.}
 
 \item{\code{show_title}}{(`logical(1)`)\cr
 Indicator whether to show the title of the plot.}
@@ -142,14 +205,14 @@ Further arguments passed to `add_trace(...)`.}
 \if{latex}{\out{\hypertarget{method-VisualizerSurface-init_layer_surface}{}}}
 \subsection{Method \code{init_layer_surface()}}{
 Initialize the plot as 3D surface.
+This method is called automatically by plot() and typically doesn't need to be called directly.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{VisualizerSurface$init_layer_surface(
-  opacity = 0.8,
-  colorscale = list(c(0, "#440154"), c(0.25, "#3b528b"), c(0.5, "#21908c"), c(0.75,
-    "#5dc863"), c(1, "#fde725")),
-  show_contours = FALSE,
-  contours = NULL,
-  show_title = TRUE,
+  opacity = self$opacity,
+  colorscale = self$colorscale,
+  show_contours = self$show_contours,
+  contours = self$contours,
+  show_title = self$show_title,
   ...
 )}\if{html}{\out{</div>}}
 }
@@ -162,6 +225,12 @@ Opacity of the layer.}
 
 \item{\code{opacity}}{(`numeric(1)`)\cr
 Opacity of the layer.}
+
+\item{\code{opacity}}{(`numeric(1)`)\cr
+Opacity of the layer.}
+
+\item{\code{colorscale}}{(`list()`)\cr
+The coloring of the surface/contour.}
 
 \item{\code{colorscale}}{(`list()`)\cr
 The coloring of the surface/contour.}
@@ -176,6 +245,9 @@ Indicator whether to show the contours of the surface.}
 Custom contour configuration for the surface. If provided, this takes precedence over `show_contours`.
 Can specify x, y, and z contours with custom properties like start, end, size, and color.
 See plotly documentation for detailed contour options.}
+
+\item{\code{show_title}}{(`logical(1)`)\cr
+Indicator whether to show the title of the plot.}
 
 \item{\code{show_title}}{(`logical(1)`)\cr
 Indicator whether to show the title of the plot.}

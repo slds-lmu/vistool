@@ -36,8 +36,8 @@ test_that("VisualizerSurfaceObj contour initialization works", {
   obj <- obj("TF_branin")
   vis <- VisualizerSurfaceObj$new(obj, n_points = 10L)
 
-  # Initialize contour layer
-  vis$init_layer_contour()
+  # Switch to contour view
+  vis$view_as_contour()
 
   # Should have a plot now
   expect_true(!is.null(vis$plot()))
@@ -165,7 +165,7 @@ test_that("VisualizerSurfaceObj save functionality works", {
 test_that("VisualizerSurfaceObj multiple optimization traces work", {
   obj <- obj("TF_branin")
   vis <- VisualizerSurfaceObj$new(obj, n_points = 10L)
-  vis$init_layer_contour()
+  vis$view_as_contour()
 
   # Create multiple optimizers
   opt1 <- OptimizerGD$new(obj$clone(deep = TRUE), x_start = c(0, 0), lr = 0.01, print_trace = FALSE)
@@ -223,4 +223,27 @@ test_that("VisualizerSurfaceObj contours parameter validation", {
   
   # Test that empty list contours works
   expect_silent(vis$init_layer_surface(contours = list()))
+})
+
+test_that("VisualizerSurfaceObj layer methods auto-initialize plot", {
+  obj <- obj("TF_branin")
+  vis <- VisualizerSurfaceObj$new(obj, n_points = 10L)
+
+  # Test that add_layer_taylor works without explicit initialization
+  x0 <- c(2.5, 7.5)
+  expect_silent(vis$add_layer_taylor(x0, degree = 1))
+  
+  # Verify plot was automatically initialized
+  expect_true(!is.null(vis$plot()))
+  expect_equal(vis$.__enclos_env__$private$.layer_primary, "surface")
+  
+  # Reset for next test
+  vis2 <- VisualizerSurfaceObj$new(obj, n_points = 10L)
+  
+  # Test that add_layer_hessian works without explicit initialization
+  expect_silent(vis2$add_layer_hessian(x0))
+  
+  # Verify plot was automatically initialized
+  expect_true(!is.null(vis2$plot()))
+  expect_equal(vis2$.__enclos_env__$private$.layer_primary, "surface")
 })

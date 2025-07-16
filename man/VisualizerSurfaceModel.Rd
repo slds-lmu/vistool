@@ -34,11 +34,11 @@ Learner used to train the model.}
 <details><summary>Inherited methods</summary>
 <ul>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href='../../vistool/html/Visualizer.html#method-Visualizer-save'><code>vistool::Visualizer$save()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="init_layer_contour"><a href='../../vistool/html/VisualizerSurface.html#method-VisualizerSurface-init_layer_contour'><code>vistool::VisualizerSurface$init_layer_contour()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="init_layer_surface"><a href='../../vistool/html/VisualizerSurface.html#method-VisualizerSurface-init_layer_surface'><code>vistool::VisualizerSurface$init_layer_surface()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="plot"><a href='../../vistool/html/VisualizerSurface.html#method-VisualizerSurface-plot'><code>vistool::VisualizerSurface$plot()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="set_layout"><a href='../../vistool/html/VisualizerSurface.html#method-VisualizerSurface-set_layout'><code>vistool::VisualizerSurface$set_layout()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="set_scene"><a href='../../vistool/html/VisualizerSurface.html#method-VisualizerSurface-set_scene'><code>vistool::VisualizerSurface$set_scene()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="view_as_contour"><a href='../../vistool/html/VisualizerSurface.html#method-VisualizerSurface-view_as_contour'><code>vistool::VisualizerSurface$view_as_contour()</code></a></span></li>
 </ul>
 </details>
 }}
@@ -54,7 +54,13 @@ Creates a new instance of this [R6][R6::R6Class] class.
   x1_limits = NULL,
   x2_limits = NULL,
   padding = 0,
-  n_points = 100L
+  n_points = 100L,
+  opacity = 0.8,
+  colorscale = list(c(0, "#440154"), c(0.25, "#3b528b"), c(0.5, "#21908c"), c(0.75,
+    "#5dc863"), c(1, "#fde725")),
+  show_contours = FALSE,
+  contours = NULL,
+  show_title = TRUE
 )}\if{html}{\out{</div>}}
 }
 
@@ -70,8 +76,18 @@ The learner to train the model with.}
 \item{\code{x1_limits}}{(`numeric(2)`)\cr
 The x1 limits.}
 
+\item{\code{x1_limits}}{(`numeric(2)`)\cr
+The x1 limits.}
+
 \item{\code{x2_limits}}{(`numeric(2)`)\cr
 The x2 limits.}
+
+\item{\code{x2_limits}}{(`numeric(2)`)\cr
+The x2 limits.}
+
+\item{\code{padding}}{(`numeric(1)`)\cr
+A margin that is added to x1limits and x2limits.
+The x1 margin is calculated by `max(x1lmits) - min(x1limits) * padding`.}
 
 \item{\code{padding}}{(`numeric(1)`)\cr
 A margin that is added to x1limits and x2limits.
@@ -80,6 +96,25 @@ The x1 margin is calculated by `max(x1lmits) - min(x1limits) * padding`.}
 \item{\code{n_points}}{(`integer(1)`)\cr
 The number of generated point per dimension.
 Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
+
+\item{\code{n_points}}{(`integer(1)`)\cr
+The number of generated point per dimension.
+Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
+
+\item{\code{opacity}}{(`numeric(1)`)\cr
+Opacity of the layer.}
+
+\item{\code{colorscale}}{(`list()`)\cr
+The coloring of the surface/contour.}
+
+\item{\code{show_contours}}{(`logical(1)`)\cr
+Whether to show contours on the surface plot. Default is FALSE.}
+
+\item{\code{contours}}{(`list()`)\cr
+Custom contour configuration for the surface plot. If provided, this takes precedence over `show_contours`.}
+
+\item{\code{show_title}}{(`logical(1)`)\cr
+Indicator whether to show the title of the plot.}
 }
 \if{html}{\out{</div>}}
 }

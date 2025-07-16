@@ -62,20 +62,21 @@ vis$plot()
 We can also create a 2D contour plot for the predictions.
 
 ```{r, out.width='100%', out.height='700px'}
-vis$init_layer_contour()
+vis$view_as_contour()
 vis$plot()
 ```
 
-To switch back to the surface plot initialize the surface layer again.
+To switch back to the surface plot, we can create a new visualizer or explicitly initialize the surface layer again.
 
 ```{r}
-vis$init_layer_surface()
+# Create a new visualizer for surface view
+vis <- as_visualizer(task, learner, type = "surface")
 ```
 
 Draw with contour lines above z dimension.
 
 ```{r, out.width='100%', out.height='700px'}
-vis$init_layer_surface(show_contours = TRUE)
+vis <- as_visualizer(task, learner, type = "surface", show_contours = TRUE)
 vis$plot()
 ```
 

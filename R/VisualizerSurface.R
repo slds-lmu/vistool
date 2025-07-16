@@ -36,6 +36,26 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
     #' Label of the z axis.
     z_lab = NULL,
 
+    #' @field opacity (`numeric(1)`)\cr
+    #' Opacity of the surface plot.
+    opacity = 0.8,
+
+    #' @field colorscale (`list()`)\cr
+    #' Color scale for the surface plot.
+    colorscale = NULL,
+
+    #' @field show_contours (`logical(1)`)\cr
+    #' Whether to show contours on the surface plot.
+    show_contours = FALSE,
+
+    #' @field contours (`list()`)\cr
+    #' Custom contour configuration for the surface plot.
+    contours = NULL,
+
+    #' @field show_title (`logical(1)`)\cr
+    #' Whether to show the plot title.
+    show_title = TRUE,
+
     #' @description
     #' Creates a new instance of this [R6][R6::R6Class] class.
     #'
@@ -47,27 +67,41 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
     #' @template param_x1_lab
     #' @template param_x2_lab
     #' @template param_z_lab
-    initialize = function(grid, zmat, plot_lab = NULL, x1_lab = "x1", x2_lab = "x2", z_lab = "z") {
+    #' @template param_opacity
+    #' @template param_colorscale
+    #' @param show_contours (`logical(1)`)\cr
+    #'   Whether to show contours on the surface plot. Default is FALSE.
+    #' @param contours (`list()`)\cr
+    #'   Custom contour configuration for the surface plot. If provided, this takes precedence over `show_contours`.
+    #' @template param_show_title
+    initialize = function(grid, zmat, plot_lab = NULL, x1_lab = "x1", x2_lab = "x2", z_lab = "z", 
+                          opacity = 0.8, colorscale = list(
+                            c(0, "#440154"), c(0.25, "#3b528b"), c(0.5, "#21908c"), 
+                            c(0.75, "#5dc863"), c(1, "#fde725")
+                          ), show_contours = FALSE, contours = NULL, show_title = TRUE) {
       self$grid <- checkmate::assert_list(grid)
       self$zmat <- checkmate::assert_matrix(zmat)
       self$plot_lab <- checkmate::assert_character(plot_lab, null.ok = TRUE)
       self$x1_lab <- checkmate::assert_character(x1_lab)
       self$x2_lab <- checkmate::assert_character(x2_lab)
       self$z_lab <- checkmate::assert_character(z_lab)
+      self$opacity <- checkmate::assert_number(opacity, lower = 0, upper = 1)
+      self$colorscale <- checkmate::assert_list(colorscale)
+      self$show_contours <- checkmate::assert_flag(show_contours)
+      self$contours <- checkmate::assert_list(contours, null.ok = TRUE)
+      self$show_title <- checkmate::assert_flag(show_title)
       return(invisible(self))
     },
 
     #' @description
-    #' Initialize the plot with contour lines.
+    #' Switch to 2D contour plot view.
+    #' This reduces the 3D surface to a 2D contour representation.
     #'
     #' @template param_opacity
     #' @template param_colorscale
     #' @template param_show_title
     #' @template param_dots_trace
-    init_layer_contour = function(opacity = 0.8, colorscale = list(
-      c(0, "#440154"), c(0.25, "#3b528b"), c(0.5, "#21908c"), 
-      c(0.75, "#5dc863"), c(1, "#fde725")
-    ), show_title = TRUE, ...) {
+    view_as_contour = function(opacity = self$opacity, colorscale = self$colorscale, show_title = self$show_title, ...) {
       checkmate::assert_number(opacity, lower = 0, upper = 1)
       checkmate::assert_list(colorscale)
       checkmate::assert_flag(show_title)
@@ -105,6 +139,7 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
 
     #' @description
     #' Initialize the plot as 3D surface.
+    #' This method is called automatically by plot() and typically doesn't need to be called directly.
     #'
     #' @template param_opacity
     #' @template param_colorscale
@@ -116,10 +151,9 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
     #'  Can specify x, y, and z contours with custom properties like start, end, size, and color.
     #'  See plotly documentation for detailed contour options.
     #' @template param_dots_trace
-    init_layer_surface = function(opacity = 0.8, colorscale = list(
-      c(0, "#440154"), c(0.25, "#3b528b"), c(0.5, "#21908c"), 
-      c(0.75, "#5dc863"), c(1, "#fde725")
-    ), show_contours = FALSE, contours = NULL, show_title = TRUE, ...) {
+    init_layer_surface = function(opacity = self$opacity, colorscale = self$colorscale, 
+                                  show_contours = self$show_contours, contours = self$contours, 
+                                  show_title = self$show_title, ...) {
       checkmate::assert_number(opacity, lower = 0, upper = 1)
       checkmate::assert_list(colorscale)
       checkmate::assert_flag(show_contours)
@@ -192,7 +226,7 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
     #' @param y (`numeric(1)`) The view from which the "camera looks down" to the plot.
     #' @param z (`numeric(1)`) The view from which the "camera looks down" to the plot.
     set_scene = function(x, y, z) {
-      if (is.null(private$.plot)) self$init_layer_surface()
+      if (is.null(private$.plot)) private$.init_default_plot()
       checkmate::assert_number(x)
       checkmate::assert_number(y)
       checkmate::assert_number(z)
@@ -216,19 +250,33 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
       checkmate::assert_number(text_size, lower = 1)
       checkmate::assert_choice(theme, choices = c("minimal", "bw", "classic", "gray", "light", "dark", "void"))
       
-      if (is.null(private$.plot)) self$init_layer_surface()
+      # Initialize surface plot if no plot exists yet
+      if (is.null(private$.plot)) {
+        private$.init_default_plot()
+      }
       
       # apply text size to plotly layout
       if (!is.null(private$.plot)) {
-        private$.plot <- private$.plot %>%
-          layout(
-            title = list(text = self$plot_lab, font = list(size = text_size + 2)),
-            scene = list(
-              xaxis = list(title = list(text = self$x1_lab, font = list(size = text_size))),
-              yaxis = list(title = list(text = self$x2_lab, font = list(size = text_size))),
-              zaxis = list(title = list(text = self$z_lab, font = list(size = text_size)))
+        if (private$.layer_primary == "surface") {
+          # For 3D surface plots
+          private$.plot <- private$.plot %>%
+            layout(
+              title = list(text = self$plot_lab, font = list(size = text_size + 2)),
+              scene = list(
+                xaxis = list(title = list(text = self$x1_lab, font = list(size = text_size))),
+                yaxis = list(title = list(text = self$x2_lab, font = list(size = text_size))),
+                zaxis = list(title = list(text = self$z_lab, font = list(size = text_size)))
+              )
             )
-          )
+        } else {
+          # For 2D contour plots
+          private$.plot <- private$.plot %>%
+            layout(
+              title = list(text = self$plot_lab, font = list(size = text_size + 2)),
+              xaxis = list(title = list(text = self$x1_lab, font = list(size = text_size))),
+              yaxis = list(title = list(text = self$x2_lab, font = list(size = text_size)))
+            )
+        }
       }
       
       return(private$.plot)
@@ -254,9 +302,15 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
 
     # @field .freeze_plot (`logical(1)`) Indicator whether to freeze saving the plot elements.
     .freeze_plot = FALSE,
+    
+    # Initialize default surface plot (called automatically by plot())
+    .init_default_plot = function() {
+      self$init_layer_surface()
+    },
+    
     checkInit = function() {
       if (is.null(private$.plot)) {
-        stop("Initialize plot with `initLayer*`")
+        private$.init_default_plot()
       }
       return(invisible(TRUE))
     },

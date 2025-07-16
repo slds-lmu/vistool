@@ -21,7 +21,22 @@ VisualizerSurfaceObj <- R6::R6Class("VisualizerSurfaceObj",
     #' Creates a new instance of this [R6][R6::R6Class] class.
     #'
     #' @template param_objective
-    initialize = function(objective, x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L) {
+    #' @template param_x1_limits
+    #' @template param_x2_limits
+    #' @template param_padding
+    #' @template param_n_points
+    #' @template param_opacity
+    #' @template param_colorscale
+    #' @param show_contours (`logical(1)`)\cr
+    #'   Whether to show contours on the surface plot. Default is FALSE.
+    #' @param contours (`list()`)\cr
+    #'   Custom contour configuration for the surface plot. If provided, this takes precedence over `show_contours`.
+    #' @template param_show_title
+    initialize = function(objective, x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L,
+                          opacity = 0.8, colorscale = list(
+                            c(0, "#440154"), c(0.25, "#3b528b"), c(0.5, "#21908c"), 
+                            c(0.75, "#5dc863"), c(1, "#fde725")
+                          ), show_contours = FALSE, contours = NULL, show_title = TRUE) {
       self$objective <- checkmate::assert_r6(objective, "Objective")
       checkmate::assert_numeric(x1_limits, len = 2, null.ok = TRUE)
       checkmate::assert_numeric(x2_limits, len = 2, null.ok = TRUE)
@@ -58,7 +73,12 @@ VisualizerSurfaceObj <- R6::R6Class("VisualizerSurfaceObj",
         plot_lab = self$objective$label,
         x1_lab = "x1",
         x2_lab = "x2",
-        z_lab = "y"
+        z_lab = "y",
+        opacity = opacity,
+        colorscale = colorscale,
+        show_contours = show_contours,
+        contours = contours,
+        show_title = show_title
       )
 
       # Initialize trace counter for consistent coloring
@@ -110,7 +130,7 @@ VisualizerSurfaceObj <- R6::R6Class("VisualizerSurfaceObj",
         private$.trace_count <- private$.trace_count + 1
         line_color <- get_consistent_color(private$.trace_count)
       }
-      if (is.null(private$.plot)) self$init_layer_surface()
+      if (is.null(private$.plot)) private$.init_default_plot()
 
       if (nrow(opt$archive) == 0) {
         stop("No optimization trace in `opt$archive`. Did you forget to call `opt$optimize(steps)`?")
