@@ -112,22 +112,34 @@ as_visualizer.Objective <- function(x, type = "auto", x1_limits = NULL, x2_limit
   }
 }
 
+#' @template param_x
 #' @template param_type
 #' @template param_x1_limits
 #' @template param_x2_limits
 #' @template param_padding
 #' @template param_n_points
 #' @param y_pred (`numeric()`)\cr
-#'   Predicted values for the loss function. Optional.
+#'   Predicted values.
 #' @param y_true (`numeric()`)\cr
-#'   True values for the loss function. Optional.
+#'   True values.
+#' @param input_type (`character(1)`)\cr
+#'   `"auto"` (default), `"score"` or `"probability"`. Passed through to
+#'   the loss visualiser.
+#' @param y_curves (`character(1)`)\cr
+#'   Which response curve(s) to draw when `input_type = "probability"`.
+#'   One of `"both"`, `"y1"`, or `"y0"`.
+#' @param ... Additional arguments.
 #' @rdname as_visualizer
 #' @export
-as_visualizer.LossFunction <- function(x, type = "auto", x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 1000L, y_pred = NULL, y_true = NULL, ...) {
+as_visualizer.LossFunction <- function(x, type = "auto", x1_limits = NULL, x2_limits = NULL,
+                                       padding = 0, n_points = 1000L,
+                                       y_pred = NULL, y_true = NULL,
+                                       input_type = "auto", y_curves = "both", ...) {
   checkmate::assert_choice(type, choices = c("auto", "1d"))
-  # For loss functions, only 1D visualization is supported
+  checkmate::assert_choice(input_type, choices = c("auto", "score", "probability"))
   if (type != "auto" && type != "1d") {
-    stop("Only 1D visualization is currently supported for LossFunction.")
+    stop("Only 1D visualization is currently supported for loss functions")
   }
-  return(VisualizerLossFuns$new(list(x), y_pred = y_pred, y_true = y_true, n_points = n_points, ...)) # Pass additional arguments
+  return(VisualizerLossFuns$new(losses = list(x), y_pred = y_pred, y_true = y_true,
+           n_points = n_points, input_type = input_type, y_curves = y_curves, ...))
 }

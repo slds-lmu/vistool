@@ -2,6 +2,7 @@
 # vistool 0.2.1
 
 * `as_visualizer(..., type = "surface")`, initializes a surface plot directly (similar to the other types).
+* Split classification loss functions into probability and score-based losses; probability-based losses can display curves for either the positive, negative or both classes.
 
 
 # vistool 0.2.0

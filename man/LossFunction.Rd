@@ -4,22 +4,30 @@
 \alias{LossFunction}
 \title{Loss Function}
 \description{
-This class is used to create loss functions.
+Represents a loss function for regression or classification tasks.
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
 \item{\code{id}}{(`character(1)`)\cr
-The id of the object.}
+Identifier for the loss function.}
 
-\item{\code{fun}}{`function(y_true, y_pred, ...)`\cr
-Loss function.}
+\item{\code{label}}{(`character(1)`)\cr
+Label for the loss function.}
 
-\item{\code{label}}{`character(1)`\cr
-Label of the loss function.}
+\item{\code{task_type}}{(`character(1)`)\cr
+Task type: `"regr"` or `"classif"`.}
 
-\item{\code{task_type}}{`character(1)`\cr
-Task type for which the loss function is designed.}
+\item{\code{input_default}}{(`character(1)`)\cr
+The natural input scale for the loss: `"score"` or `"probability"`.}
+
+\item{\code{input_supported}}{(`character()`)\cr
+All input scales this loss can be expressed on (subset of
+`c("score", "probability")`).}
+
+\item{\code{fun}}{(`function` or `list`)\cr
+The loss function itself. Can be a single function (for single input type)
+or a named list of functions for different input types.}
 }
 \if{html}{\out{</div>}}
 }
@@ -27,6 +35,7 @@ Task type for which the loss function is designed.}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-LossFunction-new}{\code{LossFunction$new()}}
+\item \href{#method-LossFunction-get_fun}{\code{LossFunction$get_fun()}}
 \item \href{#method-LossFunction-clone}{\code{LossFunction$clone()}}
 }
 }
@@ -36,25 +45,61 @@ Task type for which the loss function is designed.}
 \subsection{Method \code{new()}}{
 Creates a new instance of this [R6][R6::R6Class] class.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LossFunction$new(id, label, task_type, fun)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{LossFunction$new(
+  id,
+  label,
+  task_type,
+  fun,
+  input_default = "score",
+  input_supported = c("score")
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{id}}{(`character(1)`)\cr
-Id of the object.}
+Identifier for the loss function.}
 
 \item{\code{label}}{(`character(1)`)\cr
-Label of the loss function.}
+Label for the loss function.}
 
 \item{\code{task_type}}{(`character(1)`)\cr
-Task type for which the loss function is designed.}
+Task type: `"regr"` or `"classif"`.}
 
-\item{\code{fun}}{(`function(y_true, y_pred, ...)`)\cr
-Loss function.}
+\item{\code{fun}}{(`function` or `list`)\cr
+The loss function. Can be a single function or a named list of functions
+for different input types (e.g., list(score = function(r) ..., probability = function(pi) ...)).}
+
+\item{\code{input_default}}{(`character(1)`)\cr
+Default input scale (`"score"` or `"probability"`).}
+
+\item{\code{input_supported}}{(`character()`)\cr
+Character vector of supported input scales. Must contain
+`input_default`.}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-LossFunction-get_fun"></a>}}
+\if{latex}{\out{\hypertarget{method-LossFunction-get_fun}{}}}
+\subsection{Method \code{get_fun()}}{
+Get the loss function for a specific input type.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{LossFunction$get_fun(input_type = self$input_default)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{input_type}}{(`character(1)`)\cr
+The input type: `"score"` or `"probability"`.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A function for the specified input type.
 }
 }
 \if{html}{\out{<hr>}}

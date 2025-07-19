@@ -88,17 +88,17 @@ test_that("VisualizerLossFuns single loss function works", {
   expect_s3_class(p, "ggplot")
 
   # Check labels
-  expect_equal(vis$lab_x, "y - f") # Regression
+  expect_equal(vis$lab_x, expression(y - f)) # Regression
   expect_equal(vis$lab_y, "Loss")
 })
 
 test_that("VisualizerLossFuns with classification task works", {
   # Try to find a classification loss function
   if (any(grepl("logistic|hinge", dict_loss$keys()))) {
-    # Get first available classification loss
+    # Get classification losses with score input (not probability)
     classif_keys <- dict_loss$keys()[sapply(dict_loss$keys(), function(k) {
       loss <- dict_loss$get(k)
-      loss$task_type == "classif"
+      loss$task_type == "classif" && loss$input_default == "score"
     })]
 
     if (length(classif_keys) > 0) {
@@ -109,10 +109,32 @@ test_that("VisualizerLossFuns with classification task works", {
       p <- vis$plot()
       expect_s3_class(p, "ggplot")
 
-      # Check labels for classification
-      expect_equal(vis$lab_x, "y * f") # Classification
+      # Check labels for classification with score input
+      expect_equal(vis$lab_x, expression(y * f)) # Classification with score input
       expect_equal(vis$lab_y, "Loss")
     }
+  }
+})
+
+test_that("VisualizerLossFuns with classification probability-based task works", {
+  # Get classification losses with probability input
+  classif_prob_keys <- dict_loss$keys()[sapply(dict_loss$keys(), function(k) {
+    loss <- dict_loss$get(k)
+    loss$task_type == "classif" && loss$input_default == "probability"
+  })]
+
+  if (length(classif_prob_keys) > 0) {
+    loss <- lss(classif_prob_keys[1])
+
+    vis <- VisualizerLossFuns$new(list(loss))
+
+    p <- vis$plot()
+    expect_s3_class(p, "ggplot")
+
+    # Check labels for classification with probability input
+    expect_equal(vis$lab_x, expression(pi)) # Classification with probability input
+    expect_equal(vis$lab_y, "Loss")
+    expect_equal(vis$x_range, c(0, 1))
   }
 })
 

@@ -39,6 +39,8 @@ as_visualizer(x, ...)
   n_points = 1000L,
   y_pred = NULL,
   y_true = NULL,
+  input_type = "auto",
+  y_curves = "both",
   ...
 )
 }
@@ -46,8 +48,7 @@ as_visualizer(x, ...)
 \item{x}{(`any`)\cr
 Object to convert to a visualizer.}
 
-\item{...}{(`any`)\cr
-Additional arguments.}
+\item{...}{Additional arguments.}
 
 \item{learner}{(`mlr3::Learner`)\cr
 The learner to train the model with.}
@@ -72,10 +73,18 @@ The number of generated point per dimension.
 Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
 
 \item{y_pred}{(`numeric()`)\cr
-Predicted values for the loss function. Optional.}
+Predicted values.}
 
 \item{y_true}{(`numeric()`)\cr
-True values for the loss function. Optional.}
+True values.}
+
+\item{input_type}{(`character(1)`)\cr
+`"auto"` (default), `"score"` or `"probability"`. Passed through to
+the loss visualiser.}
+
+\item{y_curves}{(`character(1)`)\cr
+Which response curve(s) to draw when `input_type = "probability"`.
+One of `"both"`, `"y1"`, or `"y0"`.}
 }
 \value{
 An object inheriting from a Visualizer class (Visualizer1D, Visualizer2D, VisualizerSurface, etc.)

@@ -4,42 +4,106 @@
 #' @title Loss Function
 #'
 #' @description
-#' This class is used to create loss functions.
+#' Represents a loss function for regression or classification tasks.
 #'
 #' @export
 LossFunction <- R6::R6Class("LossFunction",
   public = list(
 
-    #' @template field_id
+    #' @field id (`character(1)`)\cr
+    #' Identifier for the loss function.
     id = NULL,
 
-    #' @field fun `function(y_true, y_pred, ...)`\cr
-    #' Loss function.
-    fun = NULL,
-
-    #' @field label `character(1)`\cr
-    #' Label of the loss function.
+    #' @field label (`character(1)`)\cr
+    #' Label for the loss function.
     label = NULL,
 
-    #' @field task_type `character(1)`\cr
-    #' Task type for which the loss function is designed.
+    #' @field task_type (`character(1)`)\cr
+    #' Task type: `"regr"` or `"classif"`.
     task_type = NULL,
+
+    #' @field input_default (`character(1)`)\cr
+    #'   The natural input scale for the loss: `"score"` or `"probability"`.
+    input_default = NULL,
+
+    #' @field input_supported (`character()`)\cr
+    #'   All input scales this loss can be expressed on (subset of
+    #'   `c("score", "probability")`).
+    input_supported = NULL,
+
+    #' @field fun (`function` or `list`)\cr
+    #' The loss function itself. Can be a single function (for single input type)
+    #' or a named list of functions for different input types.
+    fun = NULL,
 
     #' @description
     #' Creates a new instance of this [R6][R6::R6Class] class.
     #'
-    #' @template param_id
+    #' @param id (`character(1)`)\cr
+    #'   Identifier for the loss function.
     #' @param label (`character(1)`)\cr
-    #'   Label of the loss function.
+    #'   Label for the loss function.
     #' @param task_type (`character(1)`)\cr
-    #'   Task type for which the loss function is designed.
-    #' @param fun (`function(y_true, y_pred, ...)`)\cr
-    #'   Loss function.
-    initialize = function(id, label, task_type, fun) {
-      self$id <- checkmate::assert_character(id)
+    #'   Task type: `"regr"` or `"classif"`.
+    #' @param fun (`function` or `list`)\cr
+    #'   The loss function. Can be a single function or a named list of functions
+    #'   for different input types (e.g., list(score = function(r) ..., probability = function(pi) ...)).
+    #' @param input_default (`character(1)`)\cr
+    #'   Default input scale (`"score"` or `"probability"`).
+    #' @param input_supported (`character()`)\cr
+    #'   Character vector of supported input scales. Must contain
+    #'   `input_default`.
+    initialize = function(id, label, task_type, fun,
+                          input_default = "score",
+                          input_supported = c("score")) {
+      self$id   <- checkmate::assert_character(id)
       self$label <- checkmate::assert_character(label)
       self$task_type <- checkmate::assert_choice(task_type, c("regr", "classif"))
-      self$fun <- checkmate::assert_function(fun)
+
+      checkmate::assert_choice(input_default, choices = c("score", "probability"))
+      checkmate::assert_character(input_supported, min.len = 1, any.missing = FALSE)
+      if (!input_default %in% input_supported) {
+        stop("'input_default' must be included in 'input_supported'.")
+      }
+      if (!all(input_supported %in% c("score", "probability"))) {
+        stop("'input_supported' may only contain 'score' and/or 'probability'.")
+      }
+
+      self$input_default   <- input_default
+      self$input_supported <- unique(input_supported)
+
+      # Handle function input - can be single function or named list
+      if (is.function(fun)) {
+        # Single function - use for all supported input types
+        self$fun <- fun
+      } else if (is.list(fun)) {
+        # Named list of functions for different input types
+        if (!all(names(fun) %in% c("score", "probability"))) {
+          stop("Named function list may only contain 'score' and/or 'probability' entries.")
+        }
+        if (!all(input_supported %in% names(fun))) {
+          stop("All input_supported types must have corresponding functions in the named list.")
+        }
+        self$fun <- fun
+      } else {
+        stop("'fun' must be either a function or a named list of functions.")
+      }
+    },
+
+    #' @description
+    #' Get the loss function for a specific input type.
+    #'
+    #' @param input_type (`character(1)`)\cr
+    #'   The input type: `"score"` or `"probability"`.
+    #' @return A function for the specified input type.
+    get_fun = function(input_type = self$input_default) {
+      checkmate::assert_choice(input_type, choices = self$input_supported)
+      
+      if (is.function(self$fun)) {
+        return(self$fun)
+      } else {
+        return(self$fun[[input_type]])
+      }
     }
   )
 )
@@ -75,12 +139,19 @@ lss <- function(.key, ...) {
     return(base_loss)
   } else {
     # Additional parameters provided, create a customized loss function
-    # Create a new function that captures the parameters
-    original_fun <- base_loss$fun
-    
-    # Create new function with parameters bound
-    new_fun <- function(r) {
-      do.call(original_fun, c(list(r), params))
+    # Handle both single function and multi-function cases
+    if (is.function(base_loss$fun)) {
+      original_fun <- base_loss$fun
+      new_fun <- function(r) {
+        do.call(original_fun, c(list(r), params))
+      }
+    } else {
+      # Multiple functions - apply parameters to each
+      new_fun <- lapply(base_loss$fun, function(original_fun) {
+        function(r) {
+          do.call(original_fun, c(list(r), params))
+        }
+      })
     }
     
     # Create parameter string for the label
@@ -92,54 +163,111 @@ lss <- function(.key, ...) {
       id = paste0(base_loss$id, "_custom"),
       label = new_label,
       task_type = base_loss$task_type,
-      fun = new_fun
+      fun = new_fun,
+      input_default = base_loss$input_default,
+      input_supported = base_loss$input_supported
     ))
   }
 }
 
-dict_loss$add("l2_se", LossFunction$new("l2", "L2 Squared Error", "regr", function(r) {
-  (r)^2
-}))
+dict_loss$add("l2_se",
+  LossFunction$new("l2", "L2 Squared Error", "regr",
+    function(r) (r)^2,
+    input_default   = "score",
+    input_supported = "score"
+  )
+)
 
-dict_loss$add("l1_ae", LossFunction$new("l1", "L1 Absolute Error", "regr", function(r) {
-  abs(r)
-}))
+dict_loss$add("l1_ae",
+  LossFunction$new("l1", "L1 Absolute Error", "regr",
+    function(r) abs(r),
+    input_default   = "score",
+    input_supported = "score"
+  )
+)
 
-dict_loss$add("huber", LossFunction$new("huber", "Huber Loss", "regr", function(r, delta = 1) {
-  a <- abs(r)
-  ifelse(a <= delta, 0.5 * a^2, delta * a - delta^2 / 2)
-}))
+dict_loss$add("huber",
+  LossFunction$new("huber", "Huber Loss", "regr",
+    function(r, delta = 1) {
+      a <- abs(r)
+      ifelse(a <= delta, 0.5 * a^2, delta * a - delta^2 / 2)
+    },
+    input_default   = "score",
+    input_supported = "score"
+  )
+)
 
-dict_loss$add("log-cosh", LossFunction$new("logcosh", "Log-Cosh Loss", "regr", function(r) {
-  log(cosh(r))
-}))
+dict_loss$add("log-cosh",
+  LossFunction$new("logcosh", "Log-Cosh Loss", "regr",
+    function(r) log(cosh(r)),
+    input_default   = "score",
+    input_supported = "score"
+  )
+)
 
-dict_loss$add("cross-entropy", LossFunction$new("logloss", "Log Loss", "classif", function(r) {
-  log(1 + exp(-r))
-}))
+dict_loss$add("cross-entropy",
+  LossFunction$new("logloss", "Logistic Loss", "classif",
+    fun = list(
+      score = function(r) log(1 + exp(-r)),
+      probability = function(pi) -log(pi)
+    ),
+    input_default   = "score",
+    input_supported = c("score", "probability")
+  )
+)
 
-dict_loss$add("hinge", LossFunction$new("hinge", "Hinge Loss", "classif", function(r) {
-  pmax(1 - r, 0)
-}))
+dict_loss$add("hinge",
+  LossFunction$new("hinge", "Hinge Loss", "classif",
+    function(r) pmax(1 - r, 0),
+    input_default   = "score",
+    input_supported = "score"
+  )
+)
 
-dict_loss$add("log-barrier", LossFunction$new("log-barrier", "Log-Barrier Loss", "regr", function(r, epsilon = 1) {
-  abs_res <- abs(r)
-  abs_res[abs_res > epsilon] <- Inf
-  abs_res[abs_res <= epsilon] <- -epsilon^2 * log(1 - (abs_res[abs_res <= epsilon] / epsilon)^2)
-  abs_res
-}))
+dict_loss$add("log-barrier",
+  LossFunction$new("log-barrier", "Log-Barrier Loss", "regr",
+    function(r, epsilon = 1) {
+      abs_res <- abs(r)
+      abs_res[abs_res > epsilon] <- Inf
+      abs_res[abs_res <= epsilon] <- -epsilon^2 * log(1 - (abs_res[abs_res <= epsilon] / epsilon)^2)
+      abs_res
+    },
+    input_default   = "score",
+    input_supported = "score"
+  )
+)
 
-dict_loss$add("epsilon-insensitive", LossFunction$new("epsilon-insensitive", "Epsilon-Insensitive Loss", "regr", function(r, epsilon = 1) {
-  ifelse(abs(r) > epsilon, abs(r) - epsilon, 0)
-}))
+dict_loss$add("epsilon-insensitive",
+  LossFunction$new("epsilon-insensitive", "Epsilon-Insensitive Loss", "regr",
+    function(r, epsilon = 1) ifelse(abs(r) > epsilon, abs(r) - epsilon, 0),
+    input_default   = "score",
+    input_supported = "score"
+  )
+)
 
-dict_loss$add("pinball", LossFunction$new("pinball", "Pinball Loss", "regr", function(r, quantile = 0.5) {
-  ifelse(r < 0, (1 - quantile) * (-r), quantile * r)
-}))
+dict_loss$add("pinball",
+  LossFunction$new("pinball", "Pinball Loss", "regr",
+    function(r, quantile = 0.5) ifelse(r < 0, (1 - quantile) * (-r), quantile * r),
+    input_default   = "score",
+    input_supported = "score"
+  )
+)
 
-dict_loss$add("cauchy", LossFunction$new("cauchy", "Cauchy Loss", "regr", function(r, epsilon = 1) {
-  0.5 * epsilon^2 * log(1 + (r / epsilon)^2)
-}))
+dict_loss$add("cauchy",
+  LossFunction$new("cauchy", "Cauchy Loss", "regr",
+    function(r, epsilon = 1) 0.5 * epsilon^2 * log(1 + (r / epsilon)^2),
+    input_default   = "score",
+    input_supported = "score"
+  )
+)
+
+dict_loss$add("brier",
+  LossFunction$new("brier", "Brier Score", "classif",
+    function(pi) (1 - pi)^2,
+    input_default   = "probability",
+    input_supported = "probability"
+  )
+)
 
 
 #' @title Convert Dictionary to Data Table
