@@ -26,7 +26,7 @@ Learner used to train the model.}
 \itemize{
 \item \href{#method-VisualizerSurfaceModel-new}{\code{VisualizerSurfaceModel$new()}}
 \item \href{#method-VisualizerSurfaceModel-add_training_data}{\code{VisualizerSurfaceModel$add_training_data()}}
-\item \href{#method-VisualizerSurfaceModel-add_decision_boundary}{\code{VisualizerSurfaceModel$add_decision_boundary()}}
+\item \href{#method-VisualizerSurfaceModel-add_boundary}{\code{VisualizerSurfaceModel$add_boundary()}}
 \item \href{#method-VisualizerSurfaceModel-clone}{\code{VisualizerSurfaceModel$clone()}}
 }
 }
@@ -144,22 +144,26 @@ Further arguments passed to `add_trace(...)`.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-VisualizerSurfaceModel-add_decision_boundary"></a>}}
-\if{latex}{\out{\hypertarget{method-VisualizerSurfaceModel-add_decision_boundary}{}}}
-\subsection{Method \code{add_decision_boundary()}}{
-Adds the decision boundary to the plot.
+\if{html}{\out{<a id="method-VisualizerSurfaceModel-add_boundary"></a>}}
+\if{latex}{\out{\hypertarget{method-VisualizerSurfaceModel-add_boundary}{}}}
+\subsection{Method \code{add_boundary()}}{
+Adds boundary surface(s) to the plot at specified values.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{VisualizerSurfaceModel$add_decision_boundary(threshold = 0.5, ...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{VisualizerSurfaceModel$add_boundary(values = NULL, color = NULL, ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{threshold}}{(`numeric(1)`)\cr
-Threshold for the decision boundary.}
+\item{\code{values}}{(`numeric()`)\cr
+Vector of z-values where to draw boundary surfaces. For classification with probability predictions,
+defaults to 0.5. For regression or response predictions, defaults to quantiles of predictions.}
+
+\item{\code{color}}{(`character(1)` or `list()`)\cr
+Color specification for boundary surfaces. Default uses a neutral colorscale.}
 
 \item{\code{...}}{(`any`)\cr
-Further arguments passed to `add_trace(...)`.}
+Further arguments passed to `add_trace(...)` or `add_surface(...)`.}
 }
 \if{html}{\out{</div>}}
 }

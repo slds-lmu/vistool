@@ -125,17 +125,38 @@ Visualizer2DModel <- R6::R6Class("Visualizer2DModel",
     },
 
     #' @description
-    #' Adds the decision boundary to the plot.
+    #' Adds boundary line(s) to the plot at specified values.
     #'
-    #' @param threshold (`numeric(1)`)\cr
-    #'  Threshold for the decision boundary.
-    add_decision_boundary = function(threshold = 0.5) {
-      if (self$learner$predict_type != "prob") {
-        stop("Decision boundary can only be added for probability predictions")
+    #' @param values (`numeric()`)\cr
+    #'   Vector of values where to draw boundary contours. For classification with probability predictions,
+    #'   defaults to 0.5. For regression or response predictions, defaults to quantiles of predictions.
+    #' @param color (`character(1)`)\cr
+    #'   Color of the boundary lines. Default is "black".
+    #' @param linewidth (`numeric(1)`)\cr
+    #'   Width of boundary lines. Default is 1.5.
+    #' @param alpha (`numeric(1)`)\cr
+    #'   Transparency of boundary lines. Default is 0.8.
+    add_boundary = function(values = NULL, color = "black", linewidth = 1.5, alpha = 0.8) {
+      checkmate::assert_numeric(values, null.ok = TRUE)
+      checkmate::assert_string(color)
+      checkmate::assert_number(linewidth, lower = 0)
+      checkmate::assert_number(alpha, lower = 0, upper = 1)
+      
+      # Determine default values based on prediction type
+      if (is.null(values)) {
+        if (self$learner$predict_type == "prob") {
+          values <- 0.5
+        } else {
+          # For regression or response predictions, use quantiles
+          values <- quantile(self$fun_y, c(0.25, 0.5, 0.75), na.rm = TRUE)
+        }
       }
-
-      # Store the threshold for use in plotting
-      private$.decision_threshold <- threshold
+      
+      # Store boundary information for plotting
+      private$.boundary_values <- values
+      private$.boundary_color <- color
+      private$.boundary_linewidth <- linewidth
+      private$.boundary_alpha <- alpha
 
       return(invisible(self))
     },
@@ -154,21 +175,21 @@ Visualizer2DModel <- R6::R6Class("Visualizer2DModel",
       # Call parent plot method
       p <- super$plot(text_size = text_size, theme = theme)
       
-      # Add decision boundary if available (for classification)
-      if (!is.null(private$.decision_threshold)) {
+      # Add boundary lines if available
+      if (!is.null(private$.boundary_values)) {
         data <- data.table(
           fun_x1 = self$fun_x1,
           fun_x2 = self$fun_x2,
           fun_y = self$fun_y
         )
         
-        p <- p + geom_contour(
+        p <- p + ggplot2::geom_contour(
           data = data,
           aes(x = fun_x1, y = fun_x2, z = fun_y),
-          breaks = private$.decision_threshold,
-          color = "black", 
-          linewidth = 1.5, 
-          alpha = 0.8,
+          breaks = private$.boundary_values,
+          color = private$.boundary_color, 
+          linewidth = private$.boundary_linewidth, 
+          alpha = private$.boundary_alpha,
           inherit.aes = FALSE
         )
       }
@@ -177,6 +198,9 @@ Visualizer2DModel <- R6::R6Class("Visualizer2DModel",
     }
   ),
   private = list(
-    .decision_threshold = NULL
+    .boundary_values = NULL,
+    .boundary_color = NULL,
+    .boundary_linewidth = NULL,
+    .boundary_alpha = NULL
   )
 )

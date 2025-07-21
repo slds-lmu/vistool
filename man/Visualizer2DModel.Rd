@@ -25,7 +25,7 @@ Learner used to train the model.}
 \itemize{
 \item \href{#method-Visualizer2DModel-new}{\code{Visualizer2DModel$new()}}
 \item \href{#method-Visualizer2DModel-add_training_data}{\code{Visualizer2DModel$add_training_data()}}
-\item \href{#method-Visualizer2DModel-add_decision_boundary}{\code{Visualizer2DModel$add_decision_boundary()}}
+\item \href{#method-Visualizer2DModel-add_boundary}{\code{Visualizer2DModel$add_boundary()}}
 \item \href{#method-Visualizer2DModel-plot}{\code{Visualizer2DModel$plot()}}
 \item \href{#method-Visualizer2DModel-clone}{\code{Visualizer2DModel$clone()}}
 }
@@ -123,19 +123,34 @@ Color of the points.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Visualizer2DModel-add_decision_boundary"></a>}}
-\if{latex}{\out{\hypertarget{method-Visualizer2DModel-add_decision_boundary}{}}}
-\subsection{Method \code{add_decision_boundary()}}{
-Adds the decision boundary to the plot.
+\if{html}{\out{<a id="method-Visualizer2DModel-add_boundary"></a>}}
+\if{latex}{\out{\hypertarget{method-Visualizer2DModel-add_boundary}{}}}
+\subsection{Method \code{add_boundary()}}{
+Adds boundary line(s) to the plot at specified values.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer2DModel$add_decision_boundary(threshold = 0.5)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer2DModel$add_boundary(
+  values = NULL,
+  color = "black",
+  linewidth = 1.5,
+  alpha = 0.8
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{threshold}}{(`numeric(1)`)\cr
-Threshold for the decision boundary.}
+\item{\code{values}}{(`numeric()`)\cr
+Vector of values where to draw boundary contours. For classification with probability predictions,
+defaults to 0.5. For regression or response predictions, defaults to quantiles of predictions.}
+
+\item{\code{color}}{(`character(1)`)\cr
+Color of the boundary lines. Default is "black".}
+
+\item{\code{linewidth}}{(`numeric(1)`)\cr
+Width of boundary lines. Default is 1.5.}
+
+\item{\code{alpha}}{(`numeric(1)`)\cr
+Transparency of boundary lines. Default is 0.8.}
 }
 \if{html}{\out{</div>}}
 }

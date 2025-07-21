@@ -161,52 +161,78 @@ VisualizerSurfaceModel <- R6::R6Class("VisualizerSurfaceModel",
     },
 
     #' @description
-    #' Adds the decision boundary to the plot.
+    #' Adds boundary surface(s) to the plot at specified values.
     #'
-    #' @param threshold (`numeric(1)`)\cr
-    #'  Threshold for the decision boundary.
+    #' @param values (`numeric()`)\cr
+    #'   Vector of z-values where to draw boundary surfaces. For classification with probability predictions,
+    #'   defaults to 0.5. For regression or response predictions, defaults to quantiles of predictions.
+    #' @param color (`character(1)` or `list()`)\cr
+    #'   Color specification for boundary surfaces. Default uses a neutral colorscale.
     #' @param ... (`any`)\cr
-    #'   Further arguments passed to `add_trace(...)`.
-    add_decision_boundary = function(threshold = 0.5, ...) {
-      if (is.null(private$.plot)) self$init_layer_surface()
-      z <- matrix(threshold, nrow = nrow(self$zmat), ncol = ncol(self$zmat), byrow = TRUE)
-
-      if (private$.layer_primary == "contour") {
-        llp <- list(x = self$grid$x1, y = self$grid$x2, z = self$zmat)
-        private$.plot <- private$.plot %>%
-          add_trace(
-            name = "decision boundary",
-            autocontour = FALSE,
-            showlegend = FALSE,
-            showscale = FALSE,
-            x = llp$x,
-            y = llp$y,
-            z = t(llp$z),
-            type = "contour",
-            colorscale = list(c(0, 1), c("rgb(0,0,0)", "rgb(0,0,0)")),
-            ncontours = 1,
-            contours = list(
-              start = threshold,
-              end = threshold,
-              coloring = "lines"
-            ),
-            line = list(
-              color = "black",
-              width = 3
-            ),
-            ...
-          )
-      } else {
-        private$.plot <- private$.plot %>%
-          add_surface(
-            x = self$grid$x1,
-            y = self$grid$x2,
-            z = z,
-            colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")),
-            showscale = FALSE,
-            ...
-          )
+    #'   Further arguments passed to `add_trace(...)` or `add_surface(...)`.
+    add_boundary = function(values = NULL, color = NULL, ...) {
+      checkmate::assert_numeric(values, null.ok = TRUE)
+      
+      if (is.null(private$.plot)) private$.init_default_plot()
+      
+      # Determine default values based on prediction type
+      if (is.null(values)) {
+        if (self$learner$predict_type == "prob") {
+          values <- 0.5
+        } else {
+          # For regression or response predictions, use quantiles
+          values <- quantile(self$zmat, c(0.25, 0.5, 0.75), na.rm = TRUE)
+        }
       }
+      
+      # Default color scheme
+      if (is.null(color)) {
+        color <- list(c(0, "rgba(176,196,222,0.5)"), c(1, "rgba(160,82,45,0.5)"))
+      }
+
+      for (value in values) {
+        z <- matrix(value, nrow = nrow(self$zmat), ncol = ncol(self$zmat), byrow = TRUE)
+
+        if (private$.layer_primary == "contour") {
+          llp <- list(x = self$grid$x1, y = self$grid$x2, z = self$zmat)
+          private$.plot <- private$.plot %>%
+            add_trace(
+              name = paste("boundary", value),
+              autocontour = FALSE,
+              showlegend = FALSE,
+              showscale = FALSE,
+              x = llp$x,
+              y = llp$y,
+              z = t(llp$z),
+              type = "contour",
+              colorscale = list(c(0, 1), c("rgb(0,0,0)", "rgb(0,0,0)")),
+              ncontours = 1,
+              contours = list(
+                start = value,
+                end = value,
+                coloring = "lines"
+              ),
+              line = list(
+                color = "black",
+                width = 3
+              ),
+              ...
+            )
+        } else {
+          private$.plot <- private$.plot %>%
+            add_surface(
+              x = self$grid$x1,
+              y = self$grid$x2,
+              z = z,
+              colorscale = color,
+              showscale = FALSE,
+              name = paste("boundary", value),
+              ...
+            )
+        }
+      }
+      
+      return(invisible(self))
     }
   )
 )

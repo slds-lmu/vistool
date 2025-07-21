@@ -105,9 +105,9 @@ vis <- as_visualizer(task, learner)
 vis$plot()
 ```
 
-We can add the decision boundary to the plot.
+We can add decision boundaries to the plot.
 
 ```{r, out.width='100%', out.height='700px'}
-vis$add_decision_boundary()
+vis$add_boundary(values = c(0.4, 0.6, 0.8))
 vis$plot()
 ```
