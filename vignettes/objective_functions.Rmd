@@ -1,0 +1,167 @@
+---
+title: "Visualization of Objective Functions"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Visualization of Objective Functions}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  dpi = 150,
+  dev = "png",
+  out.width = "100%",
+  fig.retina = 2
+)
+```
+
+```{r, message=FALSE}
+library(vistool)
+library(plotly)
+library(purrr)
+```
+
+This vignette covers the basic usage of objective functions in `vistool`, including predefined objectives and how to define custom objectives.
+
+## Predefined Objectives
+
+The package provides a dictionary of objective functions:
+
+```{r}
+as.data.table(dict_objective)
+```
+
+To retrieve an objective function:
+
+```{r}
+obj_branin <- obj("TF_branin")
+```
+
+You can evaluate the objective, gradient, and Hessian at a point:
+
+```{r}
+x <- c(0.9, 1)
+obj_branin$eval(x)
+obj_branin$grad(x)
+obj_branin$hess(x)
+```
+
+## Visualizing Objectives
+
+Use `as_visualizer()` to create a visualizer for an objective. For 1D and 2D objectives, the appropriate visualizer is selected automatically.
+
+```{r, out.width='100%', out.height='700px'}
+viz <- as_visualizer(obj_branin)
+viz$plot()
+```
+
+For interactive surface visualization (2D objectives):
+
+```{r, out.width='100%', out.height='700px'}
+viz_surface <- as_visualizer(obj_branin, type = "surface")
+viz_surface$plot()
+```
+
+Transformed to a contour plot:
+
+```{r, out.width='100%', out.height='700px'}
+viz_surface$view_as_contour()
+viz_surface$plot()
+```
+
+## Custom Objectives
+
+You can define your own objective function.
+Let's define a loss for a linear model on the iris data with target `Sepal.Width` and feature `Petal.Width`. First, an `Objective` requires a function for evaluation:
+
+```{r}
+# Define the linear model loss function as SSE:
+l2norm <- function(x) sqrt(sum(crossprod(x)))
+
+mylm <- function(x, Xmat, y) {
+  l2norm(y - Xmat %*% x)
+}
+```
+
+To fix the loss for the data, the `Ojbective$new()` call allows to pass custom arguments that are stored and reused in every call to `$eval()` to evaluate `fun`.
+So, calling `$eval(x)` internally calls `fun(x, ...)`.
+These arguments must be specified just once:
+
+```{r}
+# Use the iris dataset with response `Sepal.Width` and feature `Petal.Width`:
+Xmat <- model.matrix(~Petal.Width, data = iris)
+y <- iris$Sepal.Width
+
+# Create a new object:
+obj_lm <- Objective$new(id = "iris LM", fun = mylm, xdim = 2, Xmat = Xmat, y = y, minimize = TRUE)
+
+obj_lm$evalStore(c(1, 2))
+obj_lm$evalStore(c(2, 3))
+obj_lm$evalStore(coef(lm(Sepal.Width ~ Petal.Width, data = iris)))
+
+obj_lm$archive
+```
+
+Visualize the custom objective:
+
+```{r, out.width='100%', out.height='700px'}
+viz_lm <- as_visualizer(obj_lm, x1_limits = c(-0.5, 5), x2_limits = c(-3.2, 2.8))
+viz_lm$plot()
+```
+
+You can add also add points to the `ggplot2` object
+
+```{r, out.width='100%', out.height='700px'}
+library(ggplot2)
+
+archive_data <- data.frame(
+  x = sapply(obj_lm$archive$x, function(x) x[1]),
+  y = sapply(obj_lm$archive$x, function(x) x[2])
+)
+
+viz_lm$plot() + ggplot2::geom_point(
+  data = archive_data, aes(x = x, y = y),
+  color = "red", size = 2, inherit.aes = FALSE
+)
+```
+
+or to the `plotly` object.
+
+```{r, out.width='100%', out.height='700px'}
+viz_lm <- as_visualizer(obj_lm, x1_limits = c(-0.5, 5), x2_limits = c(-3.2, 2.8), type = "surface")
+viz_lm$plot() %>% add_trace(x = archive_data$x, y = archive_data$y, z = obj_lm$archive$fval, type = "scatter3d", mode = "markers")
+```
+
+## All 2D Objectives
+
+```{r, out.width='100%', out.height='4000px', echo=FALSE}
+library(mlr3misc)
+library(plotly)
+library(ggsci)
+
+tab <- as.data.table(dict_objective)
+keys <- tab[list(2), key, on = "xdim"]
+
+visualizers <- map(keys, function(key) {
+  objective <- obj(key)
+  vis <- as_visualizer(objective, type = "surface", show_title = FALSE)
+  vis$view_as_contour()
+  vis$plot() %>%
+    add_annotations(
+      text = objective$label,
+      x = 0.5,
+      y = 1,
+      yref = "paper",
+      xref = "paper",
+      xanchor = "center",
+      yanchor = "top",
+      showarrow = FALSE,
+      font = list(size = 15)
+    )
+})
+
+subplot(visualizers, nrows = 8)
+```
