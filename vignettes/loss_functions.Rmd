@@ -119,7 +119,7 @@ When visualizing probability-based losses, you can control whether to show curve
 vis_y1 <- VisualizerLossFuns$new(
   list(crossentropy_loss, brier_loss),
   input_type = "probability",
-  y_curves = "y0"  # Only show y = 0 curve
+  y_curves = "y1"  # Only show y = 1 curve
 )
 vis_y1$plot()
 ```

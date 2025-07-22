@@ -296,7 +296,11 @@ VisualizerLossFuns <- R6::R6Class("VisualizerLossFuns",
         if (length(unique(dd$y_val)) == 1L) {
           pl <- pl + ggplot2::scale_linetype_manual(values = "solid", labels = unique(dd$y_val))
         } else {
-          pl <- pl + ggplot2::scale_linetype_manual(values = c("solid", "dashed"), labels = c("y = 1", "y = 0"))
+          # Get the unique y_val levels in the order they will appear as factor levels
+          y_levels <- sort(unique(dd$y_val))  # This gives alphabetical order like factor()
+          # Create corresponding line types: solid for y=1, dashed for y=0
+          line_types <- ifelse(y_levels == "y = 1", "solid", "dashed")
+          pl <- pl + ggplot2::scale_linetype_manual(values = line_types, labels = y_levels)
         }
       }
 

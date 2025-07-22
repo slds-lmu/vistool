@@ -38,8 +38,8 @@ Available optimizer are:
 Creating an optimizer is done by (let's use an x value that works well):
 
 ```{r}
-obj_banana <- obj("TF_banana")
-opt <- OptimizerGD$new(obj_banana, x_start = c(0.8, 0.6), lr = 0.01)
+obj <- obj("TF_GoldsteinPriceLog")
+opt <- OptimizerGD$new(obj, x_start = c(0.22, 0.77), lr = 0.01)
 ```
 
 With these value set, optimization is done by calling `$optimize()` with the number of steps as argument:
@@ -56,20 +56,12 @@ opt$archive
 opt$objective$archive
 ```
 
-We can let the algorithm run for another 10 iterations in a second batch:
-
-```{r}
-opt$optimize(10L)
-```
-
-Still not very satisfying.
-
 ## Visualize Optimization Traces
 
 A layer of the `Visualizer` class is `$add_optimization_trace()` that gets the optimizer as argument and adds the optimization trace to the plot:
 
 ```{r, out.width='100%', out.height='700px'}
-viz <- as_visualizer(obj_banana, type = "surface")
+viz <- as_visualizer(obj, type = "surface")
 viz$add_optimization_trace(opt)
 viz$plot()
 ```
@@ -92,26 +84,25 @@ Note that these functions return a function that contains a function with the re
 stepSizeControlDecayTime()
 ```
 
-Let's define multiple gradient descent optimizers and optimize 100 steps with a step size control:
+Let's define multiple gradient descent optimizers and optimize 10 steps with a step size control:
 
 ```{r}
-x0 <- c(0.8, 0.6)
+x0 <- c(0.22, 0.77)
 lr <- 0.01
-obj_banana <- obj("TF_banana")
 
-oo1 <- OptimizerGD$new(obj_banana, x_start = x0, lr = lr, id = "GD without LR Control", print_trace = FALSE)
-oo2 <- OptimizerGD$new(obj_banana, x_start = x0, lr = lr, id = "GD with Line Search", print_trace = FALSE)
-oo3 <- OptimizerGD$new(obj_banana, x_start = x0, lr = lr, id = "GD with Time Decay", print_trace = FALSE)
-oo4 <- OptimizerGD$new(obj_banana, x_start = x0, lr = lr, id = "GD with Exp Decay", print_trace = FALSE)
-oo5 <- OptimizerGD$new(obj_banana, x_start = x0, lr = lr, id = "GD with Linear Decay", print_trace = FALSE)
-oo6 <- OptimizerGD$new(obj_banana, x_start = x0, lr = lr, id = "GD with Step Decay", print_trace = FALSE)
+oo1 <- OptimizerGD$new(obj, x_start = x0, lr = lr, id = "GD without LR Control", print_trace = FALSE)
+oo2 <- OptimizerGD$new(obj, x_start = x0, lr = lr, id = "GD with Line Search", print_trace = FALSE)
+oo3 <- OptimizerGD$new(obj, x_start = x0, lr = lr, id = "GD with Time Decay", print_trace = FALSE)
+oo4 <- OptimizerGD$new(obj, x_start = x0, lr = lr, id = "GD with Exp Decay", print_trace = FALSE)
+oo5 <- OptimizerGD$new(obj, x_start = x0, lr = lr, id = "GD with Linear Decay", print_trace = FALSE)
+oo6 <- OptimizerGD$new(obj, x_start = x0, lr = lr, id = "GD with Step Decay", print_trace = FALSE)
 
-oo1$optimize(steps = 100)
-oo2$optimize(steps = 100, stepSizeControlLineSearch())
-oo3$optimize(steps = 100, stepSizeControlDecayTime())
-oo4$optimize(steps = 100, stepSizeControlDecayExp())
-oo5$optimize(steps = 100, stepSizeControlDecayLinear())
-oo6$optimize(steps = 100, stepSizeControlDecaySteps())
+oo1$optimize(steps = 10)
+oo2$optimize(steps = 10, stepSizeControlLineSearch())
+oo3$optimize(steps = 10, stepSizeControlDecayTime())
+oo4$optimize(steps = 10, stepSizeControlDecayExp())
+oo5$optimize(steps = 10, stepSizeControlDecayLinear())
+oo6$optimize(steps = 10, stepSizeControlDecaySteps())
 ```
 
 For now we don't know how well it worked. Let's collect all archives with `mergeOptimArchives()` and visualize the step sizes and function values with `patchwork` magic:
@@ -135,10 +126,10 @@ gg2 <- ggplot(arx, aes(x = iteration, y = fval_out, color = optim_id))
 ```
 
 Visualizing the traces is done as before by adding optimization trace layer.
-We can do this for all optimizers to add multiple traces to the plot (colors are picked randomly, see the [`Visualizer`](#visualizer) section for more details about plotting):
+We can do this for all optimizers to add multiple traces to the plot:
 
 ```{r, out.width='100%', out.height='700px'}
-viz <- as_visualizer(obj_banana, type = "surface")
+viz <- as_visualizer(obj, type = "surface")
 
 viz$add_optimization_trace(oo1)
 viz$add_optimization_trace(oo2)
@@ -160,7 +151,7 @@ myStepSizeControl <- function(x, u, obj, opt) {
   return(sc1(x, u, obj, opt) * sc2(x, u, obj, opt))
 }
 
-my_oo <- OptimizerGD$new(obj_banana, x_start = x0, lr = lr, id = "GD without LR Control", print_trace = FALSE)
+my_oo <- OptimizerGD$new(obj, x_start = x0, lr = lr, id = "GD without LR Control", print_trace = FALSE)
 my_oo$optimize(100, myStepSizeControl)
 tail(my_oo$archive)
 ```

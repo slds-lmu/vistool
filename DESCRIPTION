@@ -1,7 +1,7 @@
 Type: Package
 Package: vistool
 Title: Visualize optimization methods
-Version: 0.2.0
+Version: 0.2.1
 Authors@R: c(
     person("Marc", "Becker", , "marcbecker@posteo.de", role = "aut",
            comment = c(ORCID = "0000-0002-8115-0400")),

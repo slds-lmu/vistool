@@ -137,8 +137,9 @@ viz_lm$plot() %>% add_trace(x = archive_data$x, y = archive_data$y, z = obj_lm$a
 
 ## All 2D Objectives
 
+From the package `mlr3misc`.
+
 ```{r, out.width='100%', out.height='4000px', echo=FALSE}
-library(mlr3misc)
 library(plotly)
 library(ggsci)
 

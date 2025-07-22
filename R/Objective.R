@@ -291,7 +291,7 @@ for (i in seq_along(tfuns)) {
     id, Objective$new(
       fun = cl_fun,
       id = id, label = tf$name, xdim = tf$xdim, lower = tf$lower,
-      upper = tf$upper
+      upper = tf$upper, minimize = tf$minimize
     )
   ))
 }

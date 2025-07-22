@@ -3,7 +3,8 @@
 
 * `as_visualizer(..., type = "surface")`, initializes a surface plot directly (similar to the other types).
 * Split classification loss functions into probability and score-based losses; probability-based losses can display curves for either the positive, negative or both classes.
-* Reworked boundary functionality (`add_boundary()`): Now accepts vectors for multiple boundaries; works for 1D model visualizations (horizontal lines at y-values)
+* Reworked boundary functionality (`add_boundary()`): Now accepts vectors for multiple boundaries; works for 1D model visualizations (horizontal lines at y-values).
+* Fixed bugs (optimization & traces).
 
 
 # vistool 0.2.0
