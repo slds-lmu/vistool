@@ -36,6 +36,9 @@ devtools::build_readme()
 # Build all vignettes
 devtools::build_vignettes()
 
+# Build a specific vignette
+R -e "devtools::load_all(); rmarkdown::render('vignettes/loss_functions.Rmd')"
+
 # Build package website
 pkgdown::build_site()
 
@@ -161,7 +164,7 @@ devtools::test()    # Run tests
 devtools::check()   # Full package check
 ```
 
-### 6. Build Documentation Site
+You can also check the rendered website:
 
 ```r
 pkgdown::build_site()

@@ -1,11 +1,11 @@
-#' @title Visualizer for Losses
+#' @title Visualizer for 1D Loss Functions
 #'
 #' @description
-#' Visualize one or multiple loss functions.
+#' Visualize one or multiple one-dimensional loss functions.
 #'
 #' @export
-VisualizerLossFuns <- R6::R6Class("VisualizerLossFuns",
-  inherit = Visualizer,
+Visualizer1DLossFuns <- R6::R6Class("Visualizer1DLossFuns",
+  inherit = Visualizer1D,
   public = list(
 
     #' @field losses (`list`)\cr
@@ -15,18 +15,6 @@ VisualizerLossFuns <- R6::R6Class("VisualizerLossFuns",
     #' @field task_type (`character(1)`)\cr
     #' Task type (regr or classif).
     task_type = NULL,
-
-    #' @field lab_x (`character(1)`)\cr
-    #' Label for x-axis.
-    lab_x = NULL,
-
-    #' @field lab_y (`character(1)`)\cr
-    #' Label for y-axis.
-    lab_y = NULL,
-
-    #' @field title (`character(1)`)\cr
-    #' Title of the plot.
-    title = NULL,
 
     #' @field x_range (`numeric(2)`)\cr
     #' Range for x-axis values.

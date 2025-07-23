@@ -140,6 +140,25 @@ as_visualizer.LossFunction <- function(x, type = "auto", x1_limits = NULL, x2_li
   if (type != "auto" && type != "1d") {
     stop("Only 1D visualization is currently supported for loss functions")
   }
-  return(VisualizerLossFuns$new(losses = list(x), y_pred = y_pred, y_true = y_true,
+  return(Visualizer1DLossFuns$new(losses = list(x), y_pred = y_pred, y_true = y_true,
+           n_points = n_points, input_type = input_type, y_curves = y_curves, ...))
+}
+
+#' @rdname as_visualizer
+#' @export
+as_visualizer.list <- function(x, type = "auto", x1_limits = NULL, x2_limits = NULL,
+                                padding = 0, n_points = 1000L,
+                                y_pred = NULL, y_true = NULL,
+                                input_type = "auto", y_curves = "both", ...) {
+  # Check all elements are LossFunction objects
+  if (!all(vapply(x, function(obj) inherits(obj, "LossFunction"), logical(1)))) {
+    stop("All elements of the list must be LossFunction objects.")
+  }
+  checkmate::assert_choice(type, choices = c("auto", "1d"))
+  checkmate::assert_choice(input_type, choices = c("auto", "score", "probability"))
+  if (type != "auto" && type != "1d") {
+    stop("Only 1D visualization is currently supported for loss functions")
+  }
+  return(Visualizer1DLossFuns$new(losses = x, y_pred = y_pred, y_true = y_true,
            n_points = n_points, input_type = input_type, y_curves = y_curves, ...))
 }

@@ -33,11 +33,11 @@ test_that("plot() methods accept text_size and theme parameters", {
   p3 <- vis2d$plot(text_size = 10, theme = "classic")
   expect_s3_class(p3, "ggplot")
 
-  # Test VisualizerLossFuns
+  # Test Visualizer1DLossFuns
   loss1 <- lss("l2_se")
   loss2 <- lss("l1_ae")
 
-  vis_loss <- VisualizerLossFuns$new(list(loss1, loss2))
+  vis_loss <- Visualizer1DLossFuns$new(list(loss1, loss2))
   p4 <- vis_loss$plot(text_size = 12, theme = "bw")
   expect_s3_class(p4, "ggplot")
 })
@@ -74,9 +74,9 @@ test_that("backward compatibility: plot() methods work without parameters", {
   p1 <- vis1d$plot()
   expect_s3_class(p1, "ggplot")
 
-  # Test VisualizerLossFuns backward compatibility
+  # Test Visualizer1DLossFuns backward compatibility
   loss <- lss("l2_se")
-  vis_loss <- VisualizerLossFuns$new(list(loss))
+  vis_loss <- Visualizer1DLossFuns$new(list(loss))
   p2 <- vis_loss$plot()
   expect_s3_class(p2, "ggplot")
 })

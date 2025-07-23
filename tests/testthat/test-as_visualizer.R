@@ -77,7 +77,7 @@ test_that("as_visualizer works for LossFunction", {
   y_true <- 1
 
   vis <- as_visualizer(loss_func, y_pred = y_pred, y_true = y_true)
-  expect_s3_class(vis, "VisualizerLossFuns")
+  expect_s3_class(vis, "Visualizer1DLossFuns")
 })
 
 test_that("as_visualizer parameter passing works correctly", {
@@ -235,8 +235,8 @@ test_that("as_visualizer LossFunction type validation works", {
 
   # Test that "auto" and "1d" work
   vis_auto <- as_visualizer(loss_func, type = "auto", y_pred = y_pred, y_true = y_true)
-  expect_s3_class(vis_auto, "VisualizerLossFuns")
+  expect_s3_class(vis_auto, "Visualizer1DLossFuns")
 
   vis_1d <- as_visualizer(loss_func, type = "1d", y_pred = y_pred, y_true = y_true)
-  expect_s3_class(vis_1d, "VisualizerLossFuns")
+  expect_s3_class(vis_1d, "Visualizer1DLossFuns")
 })

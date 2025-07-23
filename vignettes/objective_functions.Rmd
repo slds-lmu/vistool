@@ -86,7 +86,7 @@ mylm <- function(x, Xmat, y) {
 }
 ```
 
-To fix the loss for the data, the `Ojbective$new()` call allows to pass custom arguments that are stored and reused in every call to `$eval()` to evaluate `fun`.
+To fix the loss for the data, the `Objective$new()` call allows to pass custom arguments that are stored and reused in every call to `$eval()` to evaluate `fun`.
 So, calling `$eval(x)` internally calls `fun(x, ...)`.
 These arguments must be specified just once:
 

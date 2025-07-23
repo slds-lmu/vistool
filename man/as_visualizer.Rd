@@ -5,6 +5,7 @@
 \alias{as_visualizer.Task}
 \alias{as_visualizer.Objective}
 \alias{as_visualizer.LossFunction}
+\alias{as_visualizer.list}
 \title{Convert to visualizer}
 \usage{
 as_visualizer(x, ...)
@@ -31,6 +32,20 @@ as_visualizer(x, ...)
 )
 
 \method{as_visualizer}{LossFunction}(
+  x,
+  type = "auto",
+  x1_limits = NULL,
+  x2_limits = NULL,
+  padding = 0,
+  n_points = 1000L,
+  y_pred = NULL,
+  y_true = NULL,
+  input_type = "auto",
+  y_curves = "both",
+  ...
+)
+
+\method{as_visualizer}{list}(
   x,
   type = "auto",
   x1_limits = NULL,
