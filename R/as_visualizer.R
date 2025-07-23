@@ -151,8 +151,9 @@ as_visualizer.list <- function(x, type = "auto", x1_limits = NULL, x2_limits = N
                                 y_pred = NULL, y_true = NULL,
                                 input_type = "auto", y_curves = "both", ...) {
   # Check all elements are LossFunction objects
-  if (!all(vapply(x, function(obj) inherits(obj, "LossFunction"), logical(1)))) {
-    stop("All elements of the list must be LossFunction objects.")
+  invalid_indices <- which(!vapply(x, function(obj) inherits(obj, "LossFunction"), logical(1)))
+  if (length(invalid_indices) > 0) {
+    stop(sprintf("The following elements of the list are not LossFunction objects: %s", paste(invalid_indices, collapse = ", ")))
   }
   checkmate::assert_choice(type, choices = c("auto", "1d"))
   checkmate::assert_choice(input_type, choices = c("auto", "score", "probability"))
