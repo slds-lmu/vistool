@@ -92,7 +92,7 @@ Visualizer1DLossFuns <- R6::R6Class("Visualizer1DLossFuns",
 
       # resolve input_type = "auto"
       if (input_type == "auto") {
-        defs <- sapply(losses, function(x) x$input_default)
+        defs <- vapply(losses, function(x) x$input_default, character(1))
         if (length(unique(defs)) != 1L) {
           stop("input_type = 'auto' cannot resolve because supplied losses have differing 'input_default'.")
         }
