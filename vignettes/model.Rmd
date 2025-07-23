@@ -59,18 +59,16 @@ The predictions are then visualized using an interactive surface plot.
 vis$plot()
 ```
 
-We can also create a 2D contour plot for the predictions.
+We can also create a 2D contour plot for the predictions by using the `flatten = TRUE` parameter.
 
 ```{r, out.width='100%', out.height='700px'}
-vis$view_as_contour()
-vis$plot()
+vis$plot(flatten = TRUE)
 ```
 
-To switch back to the surface plot, we can create a new visualizer or explicitly initialize the surface layer again.
+To switch back to the surface plot, simply use `flatten = FALSE` (or omit the parameter since it's the default).
 
-```{r}
-# Create a new visualizer for surface view
-vis <- as_visualizer(task, learner, type = "surface")
+```{r, out.width='100%', out.height='700px'}
+vis$plot(flatten = FALSE)
 ```
 
 Draw with contour lines above z dimension.
@@ -80,11 +78,10 @@ vis <- as_visualizer(task, learner, type = "surface", show_contours = TRUE)
 vis$plot()
 ```
 
-We can add the training points to the plot.
+We can add the training points to the plot using method chaining.
 
 ```{r, out.width='100%', out.height='700px'}
-vis$add_training_data()
-vis$plot()
+vis$add_training_data()$plot()
 ```
 
 It is also possible to visualize classification tasks.
@@ -105,9 +102,8 @@ vis <- as_visualizer(task, learner)
 vis$plot()
 ```
 
-We can add decision boundaries to the plot.
+We can add decision boundaries to the plot using method chaining.
 
 ```{r, out.width='100%', out.height='700px'}
-vis$add_boundary(values = c(0.4, 0.6, 0.8))
-vis$plot()
+vis$add_boundary(values = c(0.4, 0.6, 0.8))$plot()
 ```

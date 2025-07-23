@@ -102,11 +102,11 @@ as_visualizer.Objective <- function(x, type = "auto", x1_limits = NULL, x2_limit
   
   # Create appropriate visualizer
   if (vis_type == "1d") {
-    return(Visualizer1DObj$new(x, xlim = x1_limits, n_points = n_points))
+    return(Visualizer1DObj$new(x, xlim = x1_limits, n_points = n_points, ...))
   } else if (vis_type == "2d") {
-    return(Visualizer2DObj$new(x, x1_limits = x1_limits, x2_limits = x2_limits, padding = padding, n_points = n_points))
+    return(Visualizer2DObj$new(x, x1_limits = x1_limits, x2_limits = x2_limits, padding = padding, n_points = n_points, ...))
   } else if (vis_type == "surface") {
-    return(VisualizerSurfaceObj$new(x, x1_limits = x1_limits, x2_limits = x2_limits, padding = padding, n_points = n_points))
+    return(VisualizerSurfaceObj$new(x, x1_limits = x1_limits, x2_limits = x2_limits, padding = padding, n_points = n_points, ...))
   } else {
     stop("Unknown visualization type.")
   }

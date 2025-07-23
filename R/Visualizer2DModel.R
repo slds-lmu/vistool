@@ -31,21 +31,17 @@ Visualizer2DModel <- R6::R6Class("Visualizer2DModel",
     #' @template param_x2_limits
     #' @template param_padding
     #' @template param_n_points
-    #' @param training_points (`logical(1)`)\cr
-    #'   Whether to show training points on the plot.
     initialize = function(task,
                           learner,
                           x1_limits = NULL,
                           x2_limits = NULL,
                           padding = 0,
-                          n_points = 100L,
-                          training_points = FALSE) {
+                          n_points = 100L) {
       self$task <- mlr3::assert_task(task)
       self$learner <- mlr3::assert_learner(learner, task = self$task)
       checkmate::assert_numeric(x1_limits, len = 2, null.ok = TRUE)
       checkmate::assert_numeric(x2_limits, len = 2, null.ok = TRUE)
       checkmate::assert_count(n_points)
-      checkmate::assert_flag(training_points)
       lab_x1 <- self$task$feature_names[1]
       lab_x2 <- self$task$feature_names[2]
       data <- task$data()
@@ -90,13 +86,6 @@ Visualizer2DModel <- R6::R6Class("Visualizer2DModel",
         lab_x2 = lab_x2,
         lab_y = task$target_names
       )
-
-      if (training_points) {
-        data <- task$data()
-        self$points_x1 <- data[[lab_x1]]
-        self$points_x2 <- data[[lab_x2]]
-        self$points_y <- data[[task$target_names]]
-      }
 
       return(invisible(self))
     },

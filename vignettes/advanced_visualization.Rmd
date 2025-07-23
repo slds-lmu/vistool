@@ -40,8 +40,7 @@ viz$plot()
 To switch to a contour view:
 
 ```{r, out.width='100%', out.height='700px'}
-viz$view_as_contour(colorscale = list(c(0, 1), c("white", "blue")))
-viz$plot()
+viz$plot(flatten = TRUE)
 ```
 
 The `contours` parameter allows you to specify custom contour lines on the x, y, and z axes:

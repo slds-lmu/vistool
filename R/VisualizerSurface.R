@@ -93,15 +93,115 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
       return(invisible(self))
     },
 
-    #' @description
-    #' Switch to 2D contour plot view.
-    #' This reduces the 3D surface to a 2D contour representation.
-    #'
-    #' @template param_opacity
-    #' @template param_colorscale
-    #' @template param_show_title
-    #' @template param_dots_trace
-    view_as_contour = function(opacity = self$opacity, colorscale = self$colorscale, show_title = self$show_title, ...) {
+    #' @description Set the layout of the plotly plot.
+    #' @param ... Layout options directly passed to `layout(...)`.
+    set_layout = function(...) {
+      private$.layout <- list(...)
+      private$.plot <- private$.plot %>% layout(...)
+
+      return(invisible(self))
+    },
+
+    #' @description Set the view for a 3D plot.
+    #' @param x (`numeric(1)`) The view from which the "camera looks down" to the plot.
+    #' @param y (`numeric(1)`) The view from which the "camera looks down" to the plot.
+    #' @param z (`numeric(1)`) The view from which the "camera looks down" to the plot.
+    set_scene = function(x, y, z) {
+      if (is.null(private$.plot)) private$.init_default_plot()
+      checkmate::assert_number(x)
+      checkmate::assert_number(y)
+      checkmate::assert_number(z)
+
+      if (private$.layer_primary != "surface") {
+        stop("Scene can only be set for `surface` plots")
+      }
+
+      private$.plot <- private$.plot %>%
+        layout(scene = list(camera = list(eye = list(x = x, y = y, z = z))))
+
+      return(invisible(self))
+    },
+
+    #' @description Return the plot and hence plot it or do further processing.
+    #' @param text_size (`numeric(1)`)\cr
+    #'   Base text size for plot elements. Default is 12. For 3D plotly plots, this controls axis labels and title sizes.
+    #' @param theme (`character(1)`)\cr
+    #'   Theme parameter for compatibility with ggplot2-based visualizers. Ignored for 3D plotly plots.
+    #' @param flatten (`logical(1)`)\cr
+    #'   If TRUE, display as 2D contour plot. If FALSE (default), display as 3D surface plot.
+    #' @return A plotly object.
+    plot = function(text_size = 12, theme = "minimal", flatten = FALSE) {
+      checkmate::assert_number(text_size, lower = 1)
+      checkmate::assert_choice(theme, choices = c("minimal", "bw", "classic", "gray", "light", "dark", "void"))
+      checkmate::assert_flag(flatten)
+      
+      # Initialize appropriate plot type based on flatten parameter
+      if (is.null(private$.plot) || 
+          (flatten && private$.layer_primary != "contour") ||
+          (!flatten && private$.layer_primary != "surface")) {
+        if (flatten) {
+          private$.init_layer_contour()
+        } else {
+          private$.init_default_plot()  # This calls init_layer_surface
+        }
+      }
+      
+      # apply text size to plotly layout
+      if (!is.null(private$.plot)) {
+        if (private$.layer_primary == "surface") {
+          # For 3D surface plots
+          private$.plot <- private$.plot %>%
+            layout(
+              title = list(text = self$plot_lab, font = list(size = text_size + 2)),
+              scene = list(
+                xaxis = list(title = list(text = self$x1_lab, font = list(size = text_size))),
+                yaxis = list(title = list(text = self$x2_lab, font = list(size = text_size))),
+                zaxis = list(title = list(text = self$z_lab, font = list(size = text_size)))
+              )
+            )
+        } else {
+          # For 2D contour plots
+          private$.plot <- private$.plot %>%
+            layout(
+              title = list(text = self$plot_lab, font = list(size = text_size + 2)),
+              xaxis = list(title = list(text = self$x1_lab, font = list(size = text_size))),
+              yaxis = list(title = list(text = self$x2_lab, font = list(size = text_size)))
+            )
+        }
+      }
+      
+      return(private$.plot)
+    }
+  ),
+  private = list(
+    # @field .layer_primary (`character(1)`) The id of the primary layer. Used to determine
+    # the trace setup.
+    .layer_primary = NULL,
+
+    # @field .layer_arrow (`list()`) Arguments passed to `$addLayerArrow()` to reconstruct the plot for animations.
+    .layer_arrow = list(),
+
+    # @field .plot (`plot_ly()`) The plot.
+    .plot = NULL,
+
+    # @field .opts (`list(Optimizer)`) List of optimizers used to add traces. Each `$initLayerXXX()`
+    # resets this list. An optimizer is added after each call to `$addLayerOptimizationTrace()`.
+    # this private field is exclusively used to create animations with `$animate()`.
+    .opts = list(),
+    .vbase = list(),
+    .layout = list(),
+
+    # @field .freeze_plot (`logical(1)`) Indicator whether to freeze saving the plot elements.
+    .freeze_plot = FALSE,
+    
+    # Initialize default surface plot (called automatically by plot())
+    .init_default_plot = function() {
+      private$.init_layer_surface()
+    },
+    
+    # Initialize the plot as 2D contour.
+    # This method is called automatically by plot() and typically doesn't need to be called directly.
+    .init_layer_contour = function(opacity = self$opacity, colorscale = self$colorscale, show_title = self$show_title, ...) {
       checkmate::assert_number(opacity, lower = 0, upper = 1)
       checkmate::assert_list(colorscale)
       checkmate::assert_flag(show_title)
@@ -137,21 +237,9 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
       return(invisible(self))
     },
 
-    #' @description
-    #' Initialize the plot as 3D surface.
-    #' This method is called automatically by plot() and typically doesn't need to be called directly.
-    #'
-    #' @template param_opacity
-    #' @template param_colorscale
-    #' @template param_show_title
-    #' @param show_contours (`logical(1)`)\cr
-    #'  Indicator whether to show the contours of the surface.
-    #' @param contours (`list()`)\cr
-    #'  Custom contour configuration for the surface. If provided, this takes precedence over `show_contours`.
-    #'  Can specify x, y, and z contours with custom properties like start, end, size, and color.
-    #'  See plotly documentation for detailed contour options.
-    #' @template param_dots_trace
-    init_layer_surface = function(opacity = self$opacity, colorscale = self$colorscale, 
+    # Initialize the plot as 3D surface.
+    # This method is called automatically by plot() and typically doesn't need to be called directly.
+    .init_layer_surface = function(opacity = self$opacity, colorscale = self$colorscale, 
                                   show_contours = self$show_contours, contours = self$contours, 
                                   show_title = self$show_title, ...) {
       checkmate::assert_number(opacity, lower = 0, upper = 1)
@@ -211,102 +299,6 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
 
       return(invisible(self))
     },
-
-    #' @description Set the layout of the plotly plot.
-    #' @param ... Layout options directly passed to `layout(...)`.
-    set_layout = function(...) {
-      private$.layout <- list(...)
-      private$.plot <- private$.plot %>% layout(...)
-
-      return(invisible(self))
-    },
-
-    #' @description Set the view for a 3D plot.
-    #' @param x (`numeric(1)`) The view from which the "camera looks down" to the plot.
-    #' @param y (`numeric(1)`) The view from which the "camera looks down" to the plot.
-    #' @param z (`numeric(1)`) The view from which the "camera looks down" to the plot.
-    set_scene = function(x, y, z) {
-      if (is.null(private$.plot)) private$.init_default_plot()
-      checkmate::assert_number(x)
-      checkmate::assert_number(y)
-      checkmate::assert_number(z)
-
-      if (private$.layer_primary != "surface") {
-        stop("Scene can only be set for `surface` plots")
-      }
-
-      private$.plot <- private$.plot %>%
-        layout(scene = list(camera = list(eye = list(x = x, y = y, z = z))))
-
-      return(invisible(self))
-    },
-
-    #' @description Return the plot and hence plot it or do further processing.
-    #' @param text_size (`numeric(1)`)\cr
-    #'   Base text size for plot elements. Default is 12. For 3D plotly plots, this controls axis labels and title sizes.
-    #' @param theme (`character(1)`)\cr
-    #'   Theme parameter for compatibility with ggplot2-based visualizers. Ignored for 3D plotly plots.
-    plot = function(text_size = 12, theme = "minimal") {
-      checkmate::assert_number(text_size, lower = 1)
-      checkmate::assert_choice(theme, choices = c("minimal", "bw", "classic", "gray", "light", "dark", "void"))
-      
-      # Initialize surface plot if no plot exists yet
-      if (is.null(private$.plot)) {
-        private$.init_default_plot()
-      }
-      
-      # apply text size to plotly layout
-      if (!is.null(private$.plot)) {
-        if (private$.layer_primary == "surface") {
-          # For 3D surface plots
-          private$.plot <- private$.plot %>%
-            layout(
-              title = list(text = self$plot_lab, font = list(size = text_size + 2)),
-              scene = list(
-                xaxis = list(title = list(text = self$x1_lab, font = list(size = text_size))),
-                yaxis = list(title = list(text = self$x2_lab, font = list(size = text_size))),
-                zaxis = list(title = list(text = self$z_lab, font = list(size = text_size)))
-              )
-            )
-        } else {
-          # For 2D contour plots
-          private$.plot <- private$.plot %>%
-            layout(
-              title = list(text = self$plot_lab, font = list(size = text_size + 2)),
-              xaxis = list(title = list(text = self$x1_lab, font = list(size = text_size))),
-              yaxis = list(title = list(text = self$x2_lab, font = list(size = text_size)))
-            )
-        }
-      }
-      
-      return(private$.plot)
-    }
-  ),
-  private = list(
-    # @field .layer_primary (`character(1)`) The id of the primary layer. Used to determine
-    # the trace setup.
-    .layer_primary = NULL,
-
-    # @field .layer_arrow (`list()`) Arguments passed to `$addLayerArrow()` to reconstruct the plot for animations.
-    .layer_arrow = list(),
-
-    # @field .plot (`plot_ly()`) The plot.
-    .plot = NULL,
-
-    # @field .opts (`list(Optimizer)`) List of optimizers used to add traces. Each `$initLayerXXX()`
-    # resets this list. An optimizer is added after each call to `$addLayerOptimizationTrace()`.
-    # this private field is exclusively used to create animations with `$animate()`.
-    .opts = list(),
-    .vbase = list(),
-    .layout = list(),
-
-    # @field .freeze_plot (`logical(1)`) Indicator whether to freeze saving the plot elements.
-    .freeze_plot = FALSE,
-    
-    # Initialize default surface plot (called automatically by plot())
-    .init_default_plot = function() {
-      self$init_layer_surface()
-    },
     
     checkInit = function() {
       if (is.null(private$.plot)) {
@@ -314,6 +306,7 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
       }
       return(invisible(TRUE))
     },
+    
     checkInput = function(x) {
       if (private$.layer_primary == "surface") {
         return(checkmate::assertNumeric(x, len = 3L))

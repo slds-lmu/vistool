@@ -34,13 +34,10 @@ Visualizer1DModel <- R6::R6Class("Visualizer1DModel",
     #' @param xlim (`numeric(2)`)\cr
     #'   Limits for the x-axis. If NULL, will be determined from task data.
     #' @template param_n_points
-    #' @param training_points (`logical(1)`)\cr
-    #'   Whether to show training points on the plot.
     initialize = function(task,
                           learner,
                           xlim = NULL,
-                          n_points = 100,
-                          training_points = FALSE) {
+                          n_points = 100) {
       # FIXME: doc complete class, not all args are doced here
       self$task <- mlr3::assert_task(task)
       fnames <- task$feature_names
@@ -49,7 +46,6 @@ Visualizer1DModel <- R6::R6Class("Visualizer1DModel",
       }
       self$learner <- mlr3::assert_learner(learner, task = self$task)
       checkmate::assert_count(n_points)
-      checkmate::assert_flag(training_points)
 
       # train learner on task
       self$learner$train(task)
@@ -98,12 +94,16 @@ Visualizer1DModel <- R6::R6Class("Visualizer1DModel",
         lab_x = fnames[1],
         lab_y = task$target_names
       )
+    },
 
-      if (training_points) {
-        data <- task$data()
-        self$points_x <- data[[self$lab_x]]
-        self$points_y <- data[[task$target_names]]
-      }
+    #' @description
+    #' Add training data points to the plot.
+    #' @return Returns the visualizer object invisibly for method chaining.
+    add_training_data = function() {
+      data <- self$task$data()
+      self$points_x <- data[[self$lab_x]]
+      self$points_y <- data[[self$task$target_names]]
+      return(invisible(self))
     },
 
     #' @description

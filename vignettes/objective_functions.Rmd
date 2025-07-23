@@ -68,8 +68,7 @@ viz_surface$plot()
 Transformed to a contour plot:
 
 ```{r, out.width='100%', out.height='700px'}
-viz_surface$view_as_contour()
-viz_surface$plot()
+viz_surface$plot(flatten = TRUE)
 ```
 
 ## Custom Objectives
@@ -149,8 +148,7 @@ keys <- tab[list(2), key, on = "xdim"]
 visualizers <- map(keys, function(key) {
   objective <- obj(key)
   vis <- as_visualizer(objective, type = "surface", show_title = FALSE)
-  vis$view_as_contour()
-  vis$plot() %>%
+  vis$plot(flatten = TRUE) %>%
     add_annotations(
       text = objective$label,
       x = 0.5,

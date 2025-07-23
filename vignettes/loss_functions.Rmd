@@ -138,16 +138,3 @@ custom_loss <- LossFunction$new(
 vis <- as_visualizer(custom_loss, y_pred = seq(-10, 10), y_true = 0, n_points = 5000L)
 vis$plot()
 ```
-
-Internally, `as_visualizer()` constructs a `Visualizer1DLossFuns` object for loss functions. 
-You can also instantiate it directly:
-
-```{r, echo=TRUE, message=FALSE, warning=FALSE, out.width='100%'}
-vis_manual <- Visualizer1DLossFuns$new(
-  list(loss_huber, loss_l2),
-  y_pred = seq(-4, 4),
-  y_true = 0,
-  n_points = 1000L
-)
-vis_manual$plot()
-```
