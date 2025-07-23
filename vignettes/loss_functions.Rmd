@@ -22,7 +22,6 @@ knitr::opts_chunk$set(
 library(vistool)
 ```
 
-The `Visualizer1DLossFuns` class visualizes loss functions.
 Loss functions are wrapped in `LossFunction` objects.
 The package includes predefined loss functions for both regression and classification tasks.
 Classification loss functions can work with different input scales (scores vs. probabilities).
