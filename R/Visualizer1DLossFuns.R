@@ -106,7 +106,7 @@ Visualizer1DLossFuns <- R6::R6Class("Visualizer1DLossFuns",
         stop(sprintf("The following losses do not support input_type = '%s': %s", input_type, bad))
       }
 
-      ids <- sapply(losses, function(x) x$id)
+      ids <- vapply(losses, function(x) x$id, character(1))
       names(losses) <- ids
       self$losses <- losses
       self$task_type <- unique(tts)
