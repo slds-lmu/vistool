@@ -303,15 +303,7 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
     # @field .freeze_plot (`logical(1)`) Indicator whether to freeze saving the plot elements.
     .freeze_plot = FALSE,
     
-    #' @description
-    #' Initializes the default surface plot. This method is called automatically
-    #' by the `plot()` function to set up the initial surface layer.
-    #' 
-    #' @details
-    #' This method invokes the `init_layer_surface()` function to create the
-    #' default surface plot. It is intended for internal use only.
-    #' 
-    #' @noRd
+    # Initialize default surface plot (called automatically by plot())
     .init_default_plot = function() {
       self$init_layer_surface()
     },
