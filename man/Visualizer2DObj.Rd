@@ -23,8 +23,6 @@ The objective function.}
 \item \href{#method-Visualizer2DObj-new}{\code{Visualizer2DObj$new()}}
 \item \href{#method-Visualizer2DObj-add_optimization_trace}{\code{Visualizer2DObj$add_optimization_trace()}}
 \item \href{#method-Visualizer2DObj-plot}{\code{Visualizer2DObj$plot()}}
-\item \href{#method-Visualizer2DObj-add_layer_taylor}{\code{Visualizer2DObj$add_layer_taylor()}}
-\item \href{#method-Visualizer2DObj-add_layer_hessian}{\code{Visualizer2DObj$add_layer_hessian()}}
 \item \href{#method-Visualizer2DObj-clone}{\code{Visualizer2DObj$clone()}}
 }
 }
@@ -32,10 +30,6 @@ The objective function.}
 <details open><summary>Inherited methods</summary>
 <ul>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href='../../vistool/html/Visualizer.html#method-Visualizer-save'><code>vistool::Visualizer$save()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="init_layer_contour"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-init_layer_contour'><code>vistool::Visualizer2D$init_layer_contour()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="init_layer_surface"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-init_layer_surface'><code>vistool::Visualizer2D$init_layer_surface()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="set_layout"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-set_layout'><code>vistool::Visualizer2D$set_layout()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="set_scene"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-set_scene'><code>vistool::Visualizer2D$set_scene()</code></a></span></li>
 </ul>
 </details>
 }}
@@ -171,48 +165,6 @@ ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark"
 \subsection{Returns}{
 A ggplot2 object.
 }
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Visualizer2DObj-add_layer_taylor"></a>}}
-\if{latex}{\out{\hypertarget{method-Visualizer2DObj-add_layer_taylor}{}}}
-\subsection{Method \code{add_layer_taylor()}}{
-Add Taylor approximation layer (not implemented for ggplot2).
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer2DObj$add_layer_taylor(...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{Additional arguments (ignored).}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-This method is only available for surface visualizers (type="surface").
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Visualizer2DObj-add_layer_hessian"></a>}}
-\if{latex}{\out{\hypertarget{method-Visualizer2DObj-add_layer_hessian}{}}}
-\subsection{Method \code{add_layer_hessian()}}{
-Add Hessian visualization layer (not implemented for ggplot2).
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer2DObj$add_layer_hessian(...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{Additional arguments (ignored).}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-This method is only available for surface visualizers (type="surface").
-}
-
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Visualizer2DObj-clone"></a>}}

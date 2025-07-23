@@ -40,10 +40,6 @@ y-values of points.}
 \itemize{
 \item \href{#method-Visualizer2D-new}{\code{Visualizer2D$new()}}
 \item \href{#method-Visualizer2D-plot}{\code{Visualizer2D$plot()}}
-\item \href{#method-Visualizer2D-init_layer_contour}{\code{Visualizer2D$init_layer_contour()}}
-\item \href{#method-Visualizer2D-init_layer_surface}{\code{Visualizer2D$init_layer_surface()}}
-\item \href{#method-Visualizer2D-set_layout}{\code{Visualizer2D$set_layout()}}
-\item \href{#method-Visualizer2D-set_scene}{\code{Visualizer2D$set_scene()}}
 \item \href{#method-Visualizer2D-clone}{\code{Visualizer2D$clone()}}
 }
 }
@@ -121,98 +117,6 @@ ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark"
 \subsection{Returns}{
 A ggplot2 object.
 }
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Visualizer2D-init_layer_contour"></a>}}
-\if{latex}{\out{\hypertarget{method-Visualizer2D-init_layer_contour}{}}}
-\subsection{Method \code{init_layer_contour()}}{
-Initialize contour layer (plotly-specific method).
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$init_layer_contour(...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{Additional arguments.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-This method is only available for surface visualizers (type="surface").
-For ggplot2-based 2D visualizers, contours are created by default in the plot() method.
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Visualizer2D-init_layer_surface"></a>}}
-\if{latex}{\out{\hypertarget{method-Visualizer2D-init_layer_surface}{}}}
-\subsection{Method \code{init_layer_surface()}}{
-Initialize surface layer (plotly-specific method).
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$init_layer_surface(...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{Additional arguments.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-This method is only available for surface visualizers (type="surface").
-ggplot2-based 2D visualizers do not support 3D surfaces.
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Visualizer2D-set_layout"></a>}}
-\if{latex}{\out{\hypertarget{method-Visualizer2D-set_layout}{}}}
-\subsection{Method \code{set_layout()}}{
-Set layout (plotly-specific method).
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$set_layout(...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{Layout options.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-This method is only available for surface visualizers (type="surface").
-For ggplot2-based 2D visualizers, use ggplot2's theming system instead.
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Visualizer2D-set_scene"></a>}}
-\if{latex}{\out{\hypertarget{method-Visualizer2D-set_scene}{}}}
-\subsection{Method \code{set_scene()}}{
-Set scene (plotly-specific method for 3D plots).
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$set_scene(x, y, z)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{x}}{(`numeric(1)`) Camera x position.}
-
-\item{\code{y}}{(`numeric(1)`) Camera y position.}
-
-\item{\code{z}}{(`numeric(1)`) Camera z position.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-This method is only available for surface visualizers (type="surface").
-ggplot2-based 2D visualizers do not support 3D scene control.
-}
-
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Visualizer2D-clone"></a>}}

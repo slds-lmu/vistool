@@ -72,11 +72,14 @@ test_that("Visualizer1DLossFuns customization works", {
 
   vis <- Visualizer1DLossFuns$new(list(loss1, loss2))
 
-  # Initialize with custom styling
-  vis$init_layer_lines(color = c("red", "blue"))
-
+  # Test direct color assignment and plot generation
+  vis$line_col <- c("red", "blue")
+  
   p <- vis$plot()
   expect_s3_class(p, "ggplot")
+  
+  # Test that line_col field is properly set
+  expect_equal(vis$line_col, c("red", "blue"))
 })
 
 test_that("Visualizer1DLossFuns single loss function works", {

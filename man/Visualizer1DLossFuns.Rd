@@ -3,9 +3,6 @@
 \name{Visualizer1DLossFuns}
 \alias{Visualizer1DLossFuns}
 \title{Visualizer for 1D Loss Functions}
-\value{
-Returns self invisibly.
-}
 \description{
 Visualize one or multiple one-dimensional loss functions.
 }
@@ -58,7 +55,6 @@ One of `"both"`, `"y1"`, or `"y0"`.}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-Visualizer1DLossFuns-new}{\code{Visualizer1DLossFuns$new()}}
-\item \href{#method-Visualizer1DLossFuns-init_layer_lines}{\code{Visualizer1DLossFuns$init_layer_lines()}}
 \item \href{#method-Visualizer1DLossFuns-plot}{\code{Visualizer1DLossFuns$plot()}}
 \item \href{#method-Visualizer1DLossFuns-clone}{\code{Visualizer1DLossFuns$clone()}}
 }
@@ -108,24 +104,6 @@ losses.}
 
 \item{\code{y_curves}}{(`character(1)`)\cr
 When `input_type = "probability"`, choose which curves to display: `"both"`, `"y1"`, or `"y0"`.}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Visualizer1DLossFuns-init_layer_lines"></a>}}
-\if{latex}{\out{\hypertarget{method-Visualizer1DLossFuns-init_layer_lines}{}}}
-\subsection{Method \code{init_layer_lines()}}{
-Initialize line layer for the plot.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer1DLossFuns$init_layer_lines(color = NULL)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{color}}{(`character()`)\cr
-Colors to use for the lines. If NULL, default colors will be used.}
 }
 \if{html}{\out{</div>}}
 }

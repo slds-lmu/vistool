@@ -134,48 +134,6 @@ Visualizer2D <- R6::R6Class("Visualizer2D",
       p <- p + theme_fun(base_size = text_size) + theme(plot.title = ggplot2::element_text(hjust = 0.5))
 
       return(p)
-    },
-
-    #' @description
-    #' Initialize contour layer (plotly-specific method).
-    #' @param ... Additional arguments.
-    #' @details This method is only available for surface visualizers (type="surface").
-    #' For ggplot2-based 2D visualizers, contours are created by default in the plot() method.
-    init_layer_contour = function(...) {
-      warning("init_layer_contour() is only available for VisualizerSurface (type='surface'). For ggplot2-based 2D visualizers, contours are created by default in the plot() method.")
-      invisible(self)
-    },
-
-    #' @description
-    #' Initialize surface layer (plotly-specific method).
-    #' @param ... Additional arguments.
-    #' @details This method is only available for surface visualizers (type="surface").
-    #' ggplot2-based 2D visualizers do not support 3D surfaces.
-    init_layer_surface = function(...) {
-      warning("init_layer_surface() is only available for VisualizerSurface (type='surface'). ggplot2-based 2D visualizers do not support 3D surfaces.")
-      invisible(self)
-    },
-
-    #' @description
-    #' Set layout (plotly-specific method).
-    #' @param ... Layout options.
-    #' @details This method is only available for surface visualizers (type="surface").
-    #' For ggplot2-based 2D visualizers, use ggplot2's theming system instead.
-    set_layout = function(...) {
-      warning("set_layout() is only available for VisualizerSurface (type='surface'). For ggplot2-based 2D visualizers, use ggplot2's theming system instead.")
-      invisible(self)
-    },
-
-    #' @description
-    #' Set scene (plotly-specific method for 3D plots).
-    #' @param x (`numeric(1)`) Camera x position.
-    #' @param y (`numeric(1)`) Camera y position.
-    #' @param z (`numeric(1)`) Camera z position.
-    #' @details This method is only available for surface visualizers (type="surface").
-    #' ggplot2-based 2D visualizers do not support 3D scene control.
-    set_scene = function(x, y, z) {
-      warning("set_scene() is only available for VisualizerSurface (type='surface'). ggplot2-based 2D visualizers do not support 3D scene control.")
-      invisible(self)
     }
   ),
   private = list(

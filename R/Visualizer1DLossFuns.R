@@ -136,18 +136,6 @@ Visualizer1DLossFuns <- R6::R6Class("Visualizer1DLossFuns",
     },
 
     #' @description
-    #' Initialize line layer for the plot.
-    #' @param color (`character()`)\cr
-    #'   Colors to use for the lines. If NULL, default colors will be used.
-    #' @template return_self_invisible
-    init_layer_lines = function(color = NULL) {
-      if (!is.null(color)) {
-        self$line_col <- color
-      }
-      invisible(self)
-    },
-
-    #' @description
     #' Create and return a ggplot2 visualisation of the loss functions.
     #' For classification you can switch between **margin/score** and
     #' **probability** representations via `input_type`.  When

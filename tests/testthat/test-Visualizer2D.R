@@ -84,12 +84,10 @@ test_that("Visualizer2D optimization trace and compatibility methods work", {
     fun_y = z_vals
   )
 
-  # set_layout should warn that it's only available for surface visualizers
-  expect_warning(
-    vis$set_layout(),
-    "set_layout\\(\\) is only available for VisualizerSurface"
-  )
-
   # add_optimization_trace should no longer be available on base Visualizer2D
   expect_null(vis$add_optimization_trace)
+  
+  # Test that basic plotting works
+  p <- vis$plot()
+  expect_s3_class(p, "ggplot")
 })
