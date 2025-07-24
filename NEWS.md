@@ -4,6 +4,7 @@
 * `as_visualizer(..., type = "surface")`, initializes a surface plot directly (similar to the other types); `as_visualizer` can now be used on lists of loss functions (as expected).
 * Split classification loss functions into probability and score-based losses; probability-based losses can display curves for either the positive, negative or both classes.
 * Reworked boundary functionality (`add_boundary()`): Now accepts vectors for multiple boundaries; works for 1D model visualizations (horizontal lines at y-values).
+* `add_*` methods are now chainable; unified custom contour functionality (surface plots) in separate `add_contours()` method.
 * Split objective vignette into objective_functions, optimization_traces and advanced visualization; swapped `banana` objective for `GoldsteinPriceLog`.
 * Renamed `VisualizerLossFuns` to `Visualizer1DLossFuns` to make hierarchy clearer.
 * Fixed bugs (optimization & traces).

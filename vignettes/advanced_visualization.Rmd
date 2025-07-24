@@ -37,26 +37,16 @@ viz <- as_visualizer(obj("TF_franke"), type = "surface", opacity = 1,
 viz$plot()
 ```
 
-To switch to a contour view:
+The `add_contours()` method allows you to add custom contour lines to the surface:
 
 ```{r, out.width='100%', out.height='700px'}
-viz$plot(flatten = TRUE)
-```
-
-The `contours` parameter allows you to specify custom contour lines on the x, y, and z axes:
-
-```{r, out.width='100%', out.height='700px'}
-viz <- as_visualizer(obj("TF_franke"), type = "surface")
 llower <- viz$objective$limits_lower
 lupper <- viz$objective$limits_upper
 ssize <- (lupper - llower) / 10
 
-viz <- as_visualizer(obj("TF_franke"), type = "surface", opacity = 1,
-                     colorscale = list(c(0, 1), c("white", "black")),
-                     contours = list(
-                       y = list(show = TRUE, start = llower[2], end = lupper[2], size = ssize[2], color = "red")
-                     ))
-viz$plot()
+viz$add_contours(contours = list(
+  y = list(show = TRUE, start = llower[2], end = lupper[2], size = ssize[2], color = "red")
+))$plot()
 ```
 
 ## Setting the layout and scene

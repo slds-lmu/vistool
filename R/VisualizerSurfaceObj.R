@@ -27,16 +27,14 @@ VisualizerSurfaceObj <- R6::R6Class("VisualizerSurfaceObj",
     #' @template param_n_points
     #' @template param_opacity
     #' @template param_colorscale
-    #' @param show_contours (`logical(1)`)\cr
-    #'   Whether to show contours on the surface plot. Default is FALSE.
-    #' @param contours (`list()`)\cr
-    #'   Custom contour configuration for the surface plot. If provided, this takes precedence over `show_contours`.
+    #' @template param_opacity
+    #' @template param_colorscale
     #' @template param_show_title
     initialize = function(objective, x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L,
                           opacity = 0.8, colorscale = list(
                             c(0, "#440154"), c(0.25, "#3b528b"), c(0.5, "#21908c"), 
                             c(0.75, "#5dc863"), c(1, "#fde725")
-                          ), show_contours = FALSE, contours = NULL, show_title = TRUE) {
+                          ), show_title = TRUE) {
       self$objective <- checkmate::assert_r6(objective, "Objective")
       checkmate::assert_numeric(x1_limits, len = 2, null.ok = TRUE)
       checkmate::assert_numeric(x2_limits, len = 2, null.ok = TRUE)
@@ -76,8 +74,6 @@ VisualizerSurfaceObj <- R6::R6Class("VisualizerSurfaceObj",
         z_lab = "y",
         opacity = opacity,
         colorscale = colorscale,
-        show_contours = show_contours,
-        contours = contours,
         show_title = show_title
       )
 

@@ -44,13 +44,7 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
     #' Color scale for the surface plot.
     colorscale = NULL,
 
-    #' @field show_contours (`logical(1)`)\cr
-    #' Whether to show contours on the surface plot.
-    show_contours = FALSE,
 
-    #' @field contours (`list()`)\cr
-    #' Custom contour configuration for the surface plot.
-    contours = NULL,
 
     #' @field show_title (`logical(1)`)\cr
     #' Whether to show the plot title.
@@ -69,16 +63,12 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
     #' @template param_z_lab
     #' @template param_opacity
     #' @template param_colorscale
-    #' @param show_contours (`logical(1)`)\cr
-    #'   Whether to show contours on the surface plot. Default is FALSE.
-    #' @param contours (`list()`)\cr
-    #'   Custom contour configuration for the surface plot. If provided, this takes precedence over `show_contours`.
     #' @template param_show_title
     initialize = function(grid, zmat, plot_lab = NULL, x1_lab = "x1", x2_lab = "x2", z_lab = "z", 
                           opacity = 0.8, colorscale = list(
                             c(0, "#440154"), c(0.25, "#3b528b"), c(0.5, "#21908c"), 
                             c(0.75, "#5dc863"), c(1, "#fde725")
-                          ), show_contours = FALSE, contours = NULL, show_title = TRUE) {
+                          ), show_title = TRUE) {
       self$grid <- checkmate::assert_list(grid)
       self$zmat <- checkmate::assert_matrix(zmat)
       self$plot_lab <- checkmate::assert_character(plot_lab, null.ok = TRUE)
@@ -87,8 +77,6 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
       self$z_lab <- checkmate::assert_character(z_lab)
       self$opacity <- checkmate::assert_number(opacity, lower = 0, upper = 1)
       self$colorscale <- checkmate::assert_list(colorscale)
-      self$show_contours <- checkmate::assert_flag(show_contours)
-      self$contours <- checkmate::assert_list(contours, null.ok = TRUE)
       self$show_title <- checkmate::assert_flag(show_title)
       return(invisible(self))
     },
@@ -144,41 +132,15 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
     #' @template param_opacity
     #' @template param_colorscale
     #' @template param_show_title
-    #' @param show_contours (`logical(1)`)\cr
-    #'  Indicator whether to show the contours of the surface.
-    #' @param contours (`list()`)\cr
-    #'  Custom contour configuration for the surface. If provided, this takes precedence over `show_contours`.
-    #'  Can specify x, y, and z contours with custom properties like start, end, size, and color.
-    #'  See plotly documentation for detailed contour options.
     #' @template param_dots_trace
     init_layer_surface = function(opacity = self$opacity, colorscale = self$colorscale, 
-                                  show_contours = self$show_contours, contours = self$contours, 
                                   show_title = self$show_title, ...) {
       checkmate::assert_number(opacity, lower = 0, upper = 1)
       checkmate::assert_list(colorscale)
-      checkmate::assert_flag(show_contours)
-      checkmate::assert_list(contours, null.ok = TRUE)
       checkmate::assert_flag(show_title)
 
       private$.vbase <- c(as.list(environment()), list(...))
       private$.layer_primary <- "surface"
-
-      # Handle contours: custom contours take precedence over show_contours
-      if (!is.null(contours)) {
-        # Use provided custom contours
-        contours_final <- contours
-      } else if (show_contours) {
-        # Use default z-projected contours
-        contours_final <- list(
-          z = list(
-            show = TRUE,
-            project = list(z = TRUE),
-            usecolormap = TRUE
-          )
-        )
-      } else {
-        contours_final <- NULL
-      }
 
       llp <- list(x = self$grid$x1, y = self$grid$x2, z = self$zmat)
       private$.plot <- plot_ly() %>%
@@ -192,7 +154,6 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
           type = "surface",
           opacity = opacity,
           colorscale = colorscale,
-          contours = contours_final,
           ...
         ) %>%
         layout(
@@ -237,6 +198,74 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
 
       private$.plot <- private$.plot %>%
         layout(scene = list(camera = list(eye = list(x = x, y = y, z = z))))
+
+      return(invisible(self))
+    },
+
+    #' @description
+    #' Add contours to the surface plot.
+    #'
+    #' @param contours (`list()` or `NULL`)\cr
+    #'   Custom contour configuration. If `NULL` (default), adds default z-projected contours.
+    #'   Can specify x, y, and z contours with custom properties like start, end, size, and color.
+    #'   See plotly documentation for detailed contour options.
+    #' @param ... Additional arguments passed to the contour trace.
+    #' @return Self (invisibly) for method chaining.
+    add_contours = function(contours = NULL, ...) {
+      if (is.null(private$.plot)) private$.init_default_plot()
+      checkmate::assert_list(contours, null.ok = TRUE)
+      
+      if (private$.layer_primary != "surface") {
+        stop("Contours can only be added to surface plots")
+      }
+      
+      # Handle contours: custom contours or default z-projected contours
+      if (is.null(contours)) {
+        # Use default z-projected contours
+        contours_final <- list(
+          z = list(
+            show = TRUE,
+            project = list(z = TRUE),
+            usecolormap = TRUE
+          )
+        )
+      } else {
+        # Use provided custom contours
+        contours_final <- contours
+      }
+      
+      # Update the existing surface trace to include contours
+      # We need to reconstruct the surface with contours
+      llp <- list(x = self$grid$x1, y = self$grid$x2, z = self$zmat)
+      
+      # Get the current opacity and colorscale from the existing plot or defaults
+      current_opacity <- if(!is.null(private$.vbase$opacity)) private$.vbase$opacity else self$opacity
+      current_colorscale <- if(!is.null(private$.vbase$colorscale)) private$.vbase$colorscale else self$colorscale
+      current_show_title <- if(!is.null(private$.vbase$show_title)) private$.vbase$show_title else self$show_title
+      
+      # Recreate the plot with contours
+      private$.plot <- plot_ly() %>%
+        add_trace(
+          name = self$plot_lab,
+          showlegend = FALSE,
+          showscale = FALSE,
+          x = llp$x,
+          y = llp$y,
+          z = t(llp$z),
+          type = "surface",
+          opacity = current_opacity,
+          colorscale = current_colorscale,
+          contours = contours_final,
+          ...
+        ) %>%
+        layout(
+          title = if (current_show_title) self$plot_lab else NULL,
+          scene = list(
+            xaxis = list(title = self$x1_lab),
+            yaxis = list(title = self$x2_lab),
+            zaxis = list(title = self$z_lab)
+          )
+        )
 
       return(invisible(self))
     },

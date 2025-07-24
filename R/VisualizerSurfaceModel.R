@@ -34,16 +34,14 @@ VisualizerSurfaceModel <- R6::R6Class("VisualizerSurfaceModel",
     #' @template param_n_points
     #' @template param_opacity
     #' @template param_colorscale
-    #' @param show_contours (`logical(1)`)\cr
-    #'   Whether to show contours on the surface plot. Default is FALSE.
-    #' @param contours (`list()`)\cr
-    #'   Custom contour configuration for the surface plot. If provided, this takes precedence over `show_contours`.
+    #' @template param_opacity
+    #' @template param_colorscale
     #' @template param_show_title
     initialize = function(task, learner, x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L,
                           opacity = 0.8, colorscale = list(
                             c(0, "#440154"), c(0.25, "#3b528b"), c(0.5, "#21908c"), 
                             c(0.75, "#5dc863"), c(1, "#fde725")
-                          ), show_contours = FALSE, contours = NULL, show_title = TRUE) {
+                          ), show_title = TRUE) {
       self$task <- mlr3::assert_task(task)
       self$learner <- mlr3::assert_learner(learner, task = self$task)
       checkmate::assert_numeric(x1_limits, len = 2, null.ok = TRUE)
@@ -87,17 +85,15 @@ VisualizerSurfaceModel <- R6::R6Class("VisualizerSurfaceModel",
       }
       zmat <- matrix(z, nrow = n_points, ncol = n_points, byrow = TRUE)
 
-      super$initialize(
+            super$initialize(
         grid = grid,
         zmat = zmat,
-        plot_lab = sprintf("%s on %s", self$learner$id, self$task$id),
-        x1_lab = x1,
-        x2_lab = x2,
-        z_lab = task$target_names,
+        plot_lab = paste(self$learner$id, "on", self$task$id),
+        x1_lab = self$task$feature_names[1],
+        x2_lab = self$task$feature_names[2],
+        z_lab = self$task$target_names,
         opacity = opacity,
         colorscale = colorscale,
-        show_contours = show_contours,
-        contours = contours,
         show_title = show_title
       )
 

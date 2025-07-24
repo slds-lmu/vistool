@@ -142,7 +142,7 @@ test_that("VisualizerSurface custom contours parameter works", {
   expect_s3_class(p, "plotly")
 })
 
-test_that("VisualizerSurface custom contours take precedence over show_contours", {
+test_that("VisualizerSurface custom contours work with add_contours", {
   skip_if_not_installed("plotly")
   
   # Create simple data
@@ -155,21 +155,18 @@ test_that("VisualizerSurface custom contours take precedence over show_contours"
     zmat = z_matrix
   )
   
-  # Test that custom contours take precedence
+  # Test that custom contours work
   custom_contours <- list(
     z = list(show = TRUE, color = "green")
   )
   
-  vis$init_layer_surface(
-    show_contours = TRUE,  # Should be ignored
-    contours = custom_contours
-  )
+  vis$add_contours(contours = custom_contours)
   
   p <- vis$plot()
   expect_s3_class(p, "plotly")
 })
 
-test_that("VisualizerSurface backward compatibility with show_contours maintained", {
+test_that("VisualizerSurface add_contours method works", {
   skip_if_not_installed("plotly")
   
   # Create simple data
@@ -182,12 +179,8 @@ test_that("VisualizerSurface backward compatibility with show_contours maintaine
     zmat = z_matrix
   )
   
-  # Test show_contours still works
-  vis <- VisualizerSurface$new(
-    grid = list(x1 = x1, x2 = x2),
-    zmat = z_matrix,
-    show_contours = TRUE
-  )
+  # Test add_contours method works
+  vis$add_contours()
   
   p <- vis$plot()
   expect_s3_class(p, "plotly")
@@ -238,9 +231,11 @@ test_that("VisualizerSurface new workflow - direct plotting like ggplot2", {
   vis2 <- VisualizerSurface$new(
     grid = list(x1 = x1, x2 = x2),
     zmat = z_matrix,
-    opacity = 0.5,
-    show_contours = TRUE
+    opacity = 0.5
   )
+  
+  # Add contours using new method
+  vis2$add_contours()
   
   p3 <- vis2$plot()
   expect_s3_class(p3, "plotly")

@@ -206,20 +206,20 @@ test_that("VisualizerSurfaceObj custom contours parameter works", {
   expect_s3_class(p, "plotly")
 })
 
-test_that("VisualizerSurfaceObj contours parameter validation", {
+test_that("VisualizerSurfaceObj add_contours parameter validation", {
   skip_if_not_installed("plotly")
   
   obj <- obj("TF_branin")
   vis <- VisualizerSurfaceObj$new(obj, n_points = 5L)
   
   # Test that invalid contours parameter is caught
-  expect_error(vis$init_layer_surface(contours = "invalid"), class = "simpleError")
+  expect_error(vis$add_contours(contours = "invalid"), class = "simpleError")
   
-  # Test that NULL contours works
-  expect_silent(vis$init_layer_surface(contours = NULL))
+  # Test that NULL contours works (default behavior)
+  expect_silent(vis$add_contours(contours = NULL))
   
   # Test that empty list contours works
-  expect_silent(vis$init_layer_surface(contours = list()))
+  expect_silent(vis$add_contours(contours = list()))
 })
 
 test_that("VisualizerSurfaceObj layer methods auto-initialize plot", {
