@@ -59,11 +59,33 @@ viz <- as_visualizer(obj("TF_franke"), type = "surface", opacity = 1,
 viz$plot()
 ```
 
-## Setting the layout and scene (TODO)
+## Setting the layout and scene
+
+You can customize layout and scene directly in the `plot()` method:
 
 ```{r, out.width='100%', out.height='700px'}
-viz$set_layout(legend = list(orientation = "h", xanchor = "center", x = 0.5))
-viz$plot()
+viz <- as_visualizer(obj("TF_franke"), type = "surface")
+viz$plot(layout = list(
+  title = list(text = "Custom Title", font = list(size = 20)),
+  showlegend = TRUE
+))
+```
+
+```{r, out.width='100%', out.height='700px'}
+viz$plot(scene = list(camera = list(eye = list(x = 1.5, y = 1.5, z = 1.5))))
+```
+
+```{r, out.width='100%', out.height='700px'}
+viz$plot(
+  layout = list(
+    title = list(text = "Custom Title", font = list(size = 20))
+    ),
+  scene = list(
+    xaxis = list(backgroundcolor = "red"),
+    yaxis = list(backgroundcolor = "red"),
+    zaxis = list(backgroundcolor = "red")
+  )
+)
 ```
 
 ## Overlaying layers (TODO)

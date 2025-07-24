@@ -27,6 +27,7 @@ Number of points to use for visualization.}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-Visualizer1DModel-new}{\code{Visualizer1DModel$new()}}
+\item \href{#method-Visualizer1DModel-add_training_data}{\code{Visualizer1DModel$add_training_data()}}
 \item \href{#method-Visualizer1DModel-add_boundary}{\code{Visualizer1DModel$add_boundary()}}
 \item \href{#method-Visualizer1DModel-plot}{\code{Visualizer1DModel$plot()}}
 \item \href{#method-Visualizer1DModel-clone}{\code{Visualizer1DModel$clone()}}
@@ -45,13 +46,7 @@ Number of points to use for visualization.}
 \subsection{Method \code{new()}}{
 Creates a new instance of this [R6][R6::R6Class] class.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer1DModel$new(
-  task,
-  learner,
-  xlim = NULL,
-  n_points = 100,
-  training_points = FALSE
-)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer1DModel$new(task, learner, xlim = NULL, n_points = 100)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -73,11 +68,21 @@ Note that a grid of `npoints^2` values is generated and evaluated by `objective$
 \item{\code{n_points}}{(`integer(1)`)\cr
 The number of generated point per dimension.
 Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
-
-\item{\code{training_points}}{(`logical(1)`)\cr
-Whether to show training points on the plot.}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Visualizer1DModel-add_training_data"></a>}}
+\if{latex}{\out{\hypertarget{method-Visualizer1DModel-add_training_data}{}}}
+\subsection{Method \code{add_training_data()}}{
+Add training data points to the plot.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer1DModel$add_training_data()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Returns the visualizer object invisibly for method chaining.
 }
 }
 \if{html}{\out{<hr>}}

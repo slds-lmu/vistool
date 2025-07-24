@@ -49,8 +49,7 @@ Creates a new instance of this [R6][R6::R6Class] class.
   x1_limits = NULL,
   x2_limits = NULL,
   padding = 0,
-  n_points = 100L,
-  training_points = FALSE
+  n_points = 100L
 )}\if{html}{\out{</div>}}
 }
 
@@ -90,9 +89,6 @@ Note that a grid of `npoints^2` values is generated and evaluated by `objective$
 \item{\code{n_points}}{(`integer(1)`)\cr
 The number of generated point per dimension.
 Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
-
-\item{\code{training_points}}{(`logical(1)`)\cr
-Whether to show training points on the plot.}
 }
 \if{html}{\out{</div>}}
 }

@@ -52,7 +52,7 @@ Whether to show the plot title.}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-VisualizerSurface-new}{\code{VisualizerSurface$new()}}
-\item \href{#method-VisualizerSurface-view_as_contour}{\code{VisualizerSurface$view_as_contour()}}
+\item \href{#method-VisualizerSurface-init_layer_contour}{\code{VisualizerSurface$init_layer_contour()}}
 \item \href{#method-VisualizerSurface-init_layer_surface}{\code{VisualizerSurface$init_layer_surface()}}
 \item \href{#method-VisualizerSurface-set_layout}{\code{VisualizerSurface$set_layout()}}
 \item \href{#method-VisualizerSurface-set_scene}{\code{VisualizerSurface$set_scene()}}
@@ -147,13 +147,13 @@ Indicator whether to show the title of the plot.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-VisualizerSurface-view_as_contour"></a>}}
-\if{latex}{\out{\hypertarget{method-VisualizerSurface-view_as_contour}{}}}
-\subsection{Method \code{view_as_contour()}}{
-Switch to 2D contour plot view.
-This reduces the 3D surface to a 2D contour representation.
+\if{html}{\out{<a id="method-VisualizerSurface-init_layer_contour"></a>}}
+\if{latex}{\out{\hypertarget{method-VisualizerSurface-init_layer_contour}{}}}
+\subsection{Method \code{init_layer_contour()}}{
+Initialize the plot as 2D contour.
+This method is called automatically by plot() and typically doesn't need to be called directly.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{VisualizerSurface$view_as_contour(
+\if{html}{\out{<div class="r">}}\preformatted{VisualizerSurface$init_layer_contour(
   opacity = self$opacity,
   colorscale = self$colorscale,
   show_title = self$show_title,
@@ -308,19 +308,38 @@ Set the view for a 3D plot.
 \subsection{Method \code{plot()}}{
 Return the plot and hence plot it or do further processing.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{VisualizerSurface$plot(text_size = 12, theme = "minimal")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{VisualizerSurface$plot(
+  text_size = 12,
+  theme = "minimal",
+  flatten = FALSE,
+  layout = NULL,
+  scene = NULL
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{text_size}}{(`numeric(1)`)\cr
-Base text size for plot elements. Default is 12. For 3D plotly plots, this controls axis labels and title sizes.}
+Base text size for plot elements. Default is 12. For 3D plotly calls, this controls axis labels and title sizes.}
 
 \item{\code{theme}}{(`character(1)`)\cr
 Theme parameter for compatibility with ggplot2-based visualizers. Ignored for 3D plotly plots.}
+
+\item{\code{flatten}}{(`logical(1)`)\cr
+If TRUE, display as 2D contour plot. If FALSE (default), display as 3D surface plot.}
+
+\item{\code{layout}}{(`list()`)\cr
+Layout options passed directly to `plotly::layout()`. If NULL, no additional layout modifications are applied.}
+
+\item{\code{scene}}{(`list()`)\cr
+Scene options for 3D surface plots. Should contain camera settings like `list(camera = list(eye = list(x = 1.1, y = 1.2, z = 1.3)))`. 
+Only applies to surface plots, ignored for contour plots. If NULL, no scene modifications are applied.}
 }
 \if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A plotly object.
 }
 }
 \if{html}{\out{<hr>}}

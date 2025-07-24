@@ -36,11 +36,9 @@ test_that("VisualizerSurfaceObj contour initialization works", {
   obj <- obj("TF_branin")
   vis <- VisualizerSurfaceObj$new(obj, n_points = 10L)
 
-  # Switch to contour view
-  vis$view_as_contour()
-
-  # Should have a plot now
-  expect_true(!is.null(vis$plot()))
+  # Should be able to plot as contour
+  p <- vis$plot(flatten = TRUE)
+  expect_true(!is.null(p))
 })
 
 test_that("VisualizerSurfaceObj optimization trace works", {
@@ -165,7 +163,6 @@ test_that("VisualizerSurfaceObj save functionality works", {
 test_that("VisualizerSurfaceObj multiple optimization traces work", {
   obj <- obj("TF_branin")
   vis <- VisualizerSurfaceObj$new(obj, n_points = 10L)
-  vis$view_as_contour()
 
   # Create multiple optimizers
   opt1 <- OptimizerGD$new(obj$clone(deep = TRUE), x_start = c(0, 0), lr = 0.01, print_trace = FALSE)
@@ -178,7 +175,7 @@ test_that("VisualizerSurfaceObj multiple optimization traces work", {
   vis$add_optimization_trace(opt1, line_color = "red")
   vis$add_optimization_trace(opt2, line_color = "blue")
 
-  p <- vis$plot()
+  p <- vis$plot(flatten = TRUE)
   expect_s3_class(p, "plotly")
 })
 

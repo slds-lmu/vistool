@@ -51,11 +51,8 @@ test_that("VisualizerSurface view_as_contour() works", {
     zmat = z_matrix
   )
 
-  # Switch to contour view
-  vis$view_as_contour()
-
-  # Should have a plot now
-  p <- vis$plot()
+  # Should be able to plot as contour
+  p <- vis$plot(flatten = TRUE)
   expect_s3_class(p, "plotly")
 })
 
@@ -233,9 +230,8 @@ test_that("VisualizerSurface new workflow - direct plotting like ggplot2", {
   p1 <- vis$plot()
   expect_s3_class(p1, "plotly")
   
-  # Should be able to switch to contour
-  vis$view_as_contour()
-  p2 <- vis$plot()
+  # Should be able to plot as contour
+  p2 <- vis$plot(flatten = TRUE)
   expect_s3_class(p2, "plotly")
   
   # Test with initial parameters

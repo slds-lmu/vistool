@@ -25,7 +25,8 @@ test_that("1D Model with regression task and training data works", {
 
   learner <- lrn("regr.svm")
 
-  vis <- Visualizer1DModel$new(task, learner, training_points = TRUE)
+  vis <- Visualizer1DModel$new(task, learner)
+  vis$add_training_data()
 
   expect_s3_class(vis, "Visualizer1DModel")
   expect_true(!is.null(vis$points_x))
