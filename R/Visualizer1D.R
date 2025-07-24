@@ -142,6 +142,9 @@ Visualizer1D <- R6::R6Class("Visualizer1D",
         )
       }
       
+      # Add points from add_points() method
+      pl <- private$add_points_to_ggplot(pl, "1D")
+      
       # apply theme
       theme_fun <- switch(theme,
         "minimal" = ggplot2::theme_minimal,
@@ -155,6 +158,29 @@ Visualizer1D <- R6::R6Class("Visualizer1D",
       pl <- pl + theme_fun(base_size = text_size) + theme(plot.title = ggplot2::element_text(hjust = 0.5))
       
       return(pl)
+    }
+  ),
+  private = list(
+    # Override infer_z_values for 1D - not needed, but handle y values
+    infer_z_values = function(points_data) {
+      # For 1D visualizers, we might need to infer y values from the function
+      if (all(is.na(points_data$y)) && "x" %in% names(points_data)) {
+        # Try to interpolate y values from the existing function data
+        points_data$y <- stats::approx(self$fun_x, self$fun_y, points_data$x, rule = 2)$y
+      }
+      return(points_data$y)
+    },
+
+    # Override prepare_points_data to handle 1D-specific y value inference
+    prepare_points_data = function(points, visualizer_type) {
+      points_data <- super$prepare_points_data(points, visualizer_type)
+      
+      # For 1D visualizers, try to infer y values if not provided
+      if (visualizer_type == "1D" && all(is.na(points_data$y))) {
+        points_data$y <- private$infer_z_values(points_data)
+      }
+      
+      return(points_data)
     }
   )
 )

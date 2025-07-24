@@ -12,6 +12,7 @@ and saving plots across different plotting backends (ggplot2 for 1D/2D, plotly f
 \itemize{
 \item \href{#method-Visualizer-plot}{\code{Visualizer$plot()}}
 \item \href{#method-Visualizer-save}{\code{Visualizer$save()}}
+\item \href{#method-Visualizer-add_points}{\code{Visualizer$add_points()}}
 \item \href{#method-Visualizer-clone}{\code{Visualizer$clone()}}
 }
 }
@@ -64,6 +65,55 @@ Height of the plot in pixels (for plotly) or inches (for ggplot2).}
 Resolution for ggplot2 plots (ignored for plotly plots).}
 
 \item{\code{...}}{Additional arguments passed to the underlying save function.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Visualizer-add_points"></a>}}
+\if{latex}{\out{\hypertarget{method-Visualizer-add_points}{}}}
+\subsection{Method \code{add_points()}}{
+Add points to the plot. This method can be called multiple times to add different sets of points.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer$add_points(
+  points,
+  color = "black",
+  size = 2,
+  shape = 19,
+  alpha = 1,
+  annotations = NULL,
+  ordered = FALSE,
+  ...
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{points}}{(`data.frame` or `matrix` or `list`)\cr
+The points to add.
+- For 1D: A `data.frame` or `matrix` with one column for x-values, or a numeric vector of x-values. If y-values are not provided, they will be inferred if possible (e.g., for objective functions).
+- For 2D/Surface: A `data.frame` or `matrix` with two columns (x1, x2), or a list of 2-element vectors.}
+
+\item{\code{color}}{(`character(1)`)\cr
+Color of the points. Default is "black".}
+
+\item{\code{size}}{(`numeric(1)`)\cr
+Size of the points. Default is 2.}
+
+\item{\code{shape}}{(`integer(1)`)\cr
+Shape of the points (e.g., 19 for solid circle). Default is 19.}
+
+\item{\code{alpha}}{(`numeric(1)`)\cr
+Alpha transparency of the points. Default is 1.}
+
+\item{\code{annotations}}{(`character`)\cr
+Optional text labels for each point. If provided, must be the same length as the number of points.}
+
+\item{\code{ordered}}{(`logical(1)`)\cr
+If `TRUE`, draws arrows between consecutive points to indicate order. Default is `FALSE`.}
+
+\item{\code{...}}{Additional arguments passed to the plotting layers (e.g., `arrow` for `geom_path`).}
 }
 \if{html}{\out{</div>}}
 }

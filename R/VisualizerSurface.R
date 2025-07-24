@@ -340,6 +340,13 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
         private$.plot <- private$.plot %>% plotly::layout(scene = scene)
       }
       
+      # Add points from add_points() method
+      if (private$.layer_primary == "surface") {
+        private$.plot <- private$add_points_to_plotly(private$.plot, "surface")
+      } else {
+        private$.plot <- private$add_points_to_plotly(private$.plot, "contour")
+      }
+      
       return(private$.plot)
     }
   ),
@@ -383,6 +390,37 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
         return(checkmate::assertNumeric(x, len = 3L))
       }
       stop("Error in `$checkInput()`")
+    },
+    
+    # Override infer_z_values to use the surface's zmat
+    infer_z_values = function(points_data) {
+      # Use bilinear interpolation to estimate z values from the surface
+      x_vals <- points_data$x
+      y_vals <- points_data$y
+      
+      # Get grid ranges
+      x1_range <- self$grid$x1
+      x2_range <- self$grid$x2
+      
+      z_vals <- numeric(length(x_vals))
+      
+      for (i in seq_along(x_vals)) {
+        x <- x_vals[i]
+        y <- y_vals[i]
+        
+        # Find closest grid points
+        x1_idx <- which.min(abs(x1_range - x))
+        x2_idx <- which.min(abs(x2_range - y))
+        
+        # Clamp to grid boundaries
+        x1_idx <- max(1, min(length(x1_range), x1_idx))
+        x2_idx <- max(1, min(length(x2_range), x2_idx))
+        
+        # Use the closest grid point value
+        z_vals[i] <- self$zmat[x1_idx, x2_idx]
+      }
+      
+      return(z_vals)
     }
   )
 )

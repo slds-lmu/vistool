@@ -132,6 +132,9 @@ Visualizer2D <- R6::R6Class("Visualizer2D",
         "void" = ggplot2::theme_void
       )
       p <- p + theme_fun(base_size = text_size) + theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      
+      # Add points from add_points() method
+      p <- private$add_points_to_ggplot(p, "2D")
 
       return(p)
     }
