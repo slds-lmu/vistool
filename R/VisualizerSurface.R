@@ -83,7 +83,7 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
 
     #' @description
     #' Initialize the plot as 2D contour.
-    #' This method is called automatically by plot() and typically doesn't need to be called directly.
+    #' This method is called automatically by plot() and should not be called directly.
     #'
     #' @template param_opacity
     #' @template param_colorscale
@@ -127,7 +127,7 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
 
     #' @description
     #' Initialize the plot as 3D surface.
-    #' This method is called automatically by plot() and typically doesn't need to be called directly.
+    #' This method is called automatically by plot() and should not be called directly.
     #'
     #' @template param_opacity
     #' @template param_colorscale
@@ -174,6 +174,7 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
     },
 
     #' @description Set the layout of the plotly plot.
+    #' This method is used internally by plot(layout = ...) and should not be called directly.
     #' @param ... Layout options directly passed to `layout(...)`.
     set_layout = function(...) {
       private$.layout <- list(...)
@@ -183,6 +184,7 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
     },
 
     #' @description Set the view for a 3D plot.
+    #' This method is used internally by plot(scene = ...) and should not be called directly.
     #' @param x (`numeric(1)`) The view from which the "camera looks down" to the plot.
     #' @param y (`numeric(1)`) The view from which the "camera looks down" to the plot.
     #' @param z (`numeric(1)`) The view from which the "camera looks down" to the plot.

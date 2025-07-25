@@ -139,7 +139,7 @@ Indicator whether to show the title of the plot.}
 \if{latex}{\out{\hypertarget{method-VisualizerSurface-init_layer_contour}{}}}
 \subsection{Method \code{init_layer_contour()}}{
 Initialize the plot as 2D contour.
-This method is called automatically by plot() and typically doesn't need to be called directly.
+This method is called automatically by plot() and should not be called directly.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{VisualizerSurface$init_layer_contour(
   opacity = self$opacity,
@@ -193,7 +193,7 @@ Further arguments passed to `add_trace(...)`.}
 \if{latex}{\out{\hypertarget{method-VisualizerSurface-init_layer_surface}{}}}
 \subsection{Method \code{init_layer_surface()}}{
 Initialize the plot as 3D surface.
-This method is called automatically by plot() and typically doesn't need to be called directly.
+This method is called automatically by plot() and should not be called directly.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{VisualizerSurface$init_layer_surface(
   opacity = self$opacity,
@@ -247,6 +247,7 @@ Further arguments passed to `add_trace(...)`.}
 \if{latex}{\out{\hypertarget{method-VisualizerSurface-set_layout}{}}}
 \subsection{Method \code{set_layout()}}{
 Set the layout of the plotly plot.
+This method is used internally by plot(layout = ...) and should not be called directly.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{VisualizerSurface$set_layout(...)}\if{html}{\out{</div>}}
 }
@@ -264,6 +265,7 @@ Set the layout of the plotly plot.
 \if{latex}{\out{\hypertarget{method-VisualizerSurface-set_scene}{}}}
 \subsection{Method \code{set_scene()}}{
 Set the view for a 3D plot.
+This method is used internally by plot(scene = ...) and should not be called directly.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{VisualizerSurface$set_scene(x, y, z)}\if{html}{\out{</div>}}
 }

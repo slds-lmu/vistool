@@ -195,6 +195,8 @@ viz$add_optimization_trace(oo3, add_marker_at = 100, marker_shape = "diamond-ope
 viz$plot()
 ```
 
+#TODO: add_points()
+
 Using the alternative `ggplot2` backend makes sense when further customization is desired (TODO see advanced_visualization vignette):
 
 ```{r, out.width='100%', out.height='700px'}
@@ -230,3 +232,5 @@ viz_2d$add_optimization_trace(oo3,
 
 viz_2d$plot()
 ```
+
+#TODO: add_points(), show with annotation and arrows

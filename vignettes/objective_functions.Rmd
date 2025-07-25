@@ -111,28 +111,24 @@ viz_lm <- as_visualizer(obj_lm, x1_limits = c(-0.5, 5), x2_limits = c(-3.2, 2.8)
 viz_lm$plot()
 ```
 
-You can add also add points to the `ggplot2` object
+You can also add custom points directly to the visualizer using `$add_points()`, which supports many customization options (see below).
+For adding actual optimization traces, see the [Optimization & Traces vignette](optimization_traces.html).
 
 ```{r, out.width='100%', out.height='700px'}
-library(ggplot2)
-
 archive_data <- data.frame(
   x = sapply(obj_lm$archive$x, function(x) x[1]),
   y = sapply(obj_lm$archive$x, function(x) x[2])
 )
-
-viz_lm$plot() + ggplot2::geom_point(
-  data = archive_data, aes(x = x, y = y),
-  color = "red", size = 2, inherit.aes = FALSE
-)
+viz_lm$add_points(archive_data, color = "orange", size = 3, shape = 17, alpha = 0.8, ordered = TRUE)$plot()
 ```
-
-or to the `plotly` object.
 
 ```{r, out.width='100%', out.height='700px'}
-viz_lm <- as_visualizer(obj_lm, x1_limits = c(-0.5, 5), x2_limits = c(-3.2, 2.8), type = "surface")
-viz_lm$plot() %>% add_trace(x = archive_data$x, y = archive_data$y, z = obj_lm$archive$fval, type = "scatter3d", mode = "markers")
+# Add a labeled point to the surface (plotly) visualizer
+viz_lm_surface <- as_visualizer(obj_lm, x1_limits = c(-0.5, 5), x2_limits = c(-3.2, 2.8), type = "surface")
+viz_lm_surface$add_points(base::data.frame(x = 2, y = 0), color = "orange", size = 8, shape = "diamond", alpha = 0.9, annotations = "The z values are inferred!")$plot()
 ```
+
+*Customization options include: `points` (as data.frame/matrix/list), `color`, `size`, `shape`, `alpha`, `annotations`, `ordered`, and more. See the documentation for all arguments.*
 
 ## All 2D Objectives
 

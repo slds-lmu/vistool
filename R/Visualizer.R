@@ -70,12 +70,14 @@ Visualizer <- R6::R6Class("Visualizer",
     #'   Optional text labels for each point. If provided, must be the same length as the number of points.
     #' @param ordered (`logical(1)`)\cr
     #'   If `TRUE`, draws arrows between consecutive points to indicate order. Default is `FALSE`.
+    #' @param arrow_length (`numeric(1)`)\cr
+    #'   Length of arrows when `ordered = TRUE`. Default is 0.3 units in the coordinate system.
     #' @param ... Additional arguments passed to the plotting layers (e.g., `arrow` for `geom_path`).
-    add_points = function(points, color = "black", size = 2, shape = 19, alpha = 1, annotations = NULL, ordered = FALSE, ...) {
+    add_points = function(points, color = "black", size = 2, shape = 19, alpha = 1, annotations = NULL, ordered = FALSE, arrow_length = 0.3, ...) {
       private$.points_to_add <- c(private$.points_to_add,
         list(list(
           points = points, color = color, size = size, shape = shape, alpha = alpha,
-          annotations = annotations, ordered = ordered, args = list(...)
+          annotations = annotations, ordered = ordered, arrow_length = arrow_length, args = list(...)
         ))
       )
       invisible(self)
@@ -149,14 +151,47 @@ Visualizer <- R6::R6Class("Visualizer",
         
         # Add ordered path with arrows if requested
         if (point_set$ordered && nrow(points_data) > 1) {
-          plot_obj <- plot_obj + ggplot2::geom_path(
-            data = points_data,
-            ggplot2::aes(x = x, y = y),
-            color = point_set$color,
-            alpha = point_set$alpha * 0.7,
-            arrow = ggplot2::arrow(length = ggplot2::unit(0.2, "cm"), type = "closed"),
-            inherit.aes = FALSE
-          )
+          # Calculate direction vectors and create shorter arrows
+          for (i in 1:(nrow(points_data) - 1)) {
+            x1 <- points_data$x[i]
+            y1 <- points_data$y[i]
+            x2 <- points_data$x[i + 1]
+            y2 <- points_data$y[i + 1]
+            
+            # Calculate direction vector and normalize it
+            dx <- x2 - x1
+            dy <- y2 - y1
+            dist <- sqrt(dx^2 + dy^2)
+            
+            if (dist > 0) {
+              # Normalize direction vector
+              dx_norm <- dx / dist
+              dy_norm <- dy / dist
+              
+              # Calculate arrow endpoints based on arrow_length
+              arrow_length <- point_set$arrow_length
+              arrow_x2 <- x1 + dx_norm * arrow_length
+              arrow_y2 <- y1 + dy_norm * arrow_length
+              
+              # Create arrow data frame
+              arrow_data <- data.frame(
+                x = x1,
+                y = y1,
+                xend = arrow_x2,
+                yend = arrow_y2
+              )
+              
+              # Add arrow segment
+              plot_obj <- plot_obj + ggplot2::geom_segment(
+                data = arrow_data,
+                ggplot2::aes(x = x, y = y, xend = xend, yend = yend),
+                color = point_set$color,
+                alpha = point_set$alpha * 0.7,
+                arrow = ggplot2::arrow(length = ggplot2::unit(0.15, "cm"), type = "closed"),
+                inherit.aes = FALSE
+              )
+            }
+          }
         }
       }
       
@@ -213,19 +248,49 @@ Visualizer <- R6::R6Class("Visualizer",
           
           # Add ordered path if requested
           if (point_set$ordered && nrow(points_data) > 1) {
-            plot_obj <- plot_obj %>% plotly::add_trace(
-              x = points_data$x,
-              y = points_data$y,
-              z = points_data$z,
-              type = "scatter3d",
-              mode = "lines",
-              line = list(
-                color = point_set$color,
-                width = 4
-              ),
-              name = "Path",
-              showlegend = FALSE
-            )
+            # For 3D plots, we'll use lines but with shorter segments
+            for (i in 1:(nrow(points_data) - 1)) {
+              x1 <- points_data$x[i]
+              y1 <- points_data$y[i]
+              z1 <- points_data$z[i]
+              x2 <- points_data$x[i + 1]
+              y2 <- points_data$y[i + 1]
+              z2 <- points_data$z[i + 1]
+              
+              # Calculate direction vector and normalize it
+              dx <- x2 - x1
+              dy <- y2 - y1
+              dz <- z2 - z1
+              dist <- sqrt(dx^2 + dy^2 + dz^2)
+              
+              if (dist > 0) {
+                # Normalize direction vector
+                dx_norm <- dx / dist
+                dy_norm <- dy / dist
+                dz_norm <- dz / dist
+                
+                # Calculate arrow endpoints based on arrow_length
+                arrow_length <- point_set$arrow_length
+                arrow_x2 <- x1 + dx_norm * arrow_length
+                arrow_y2 <- y1 + dy_norm * arrow_length
+                arrow_z2 <- z1 + dz_norm * arrow_length
+                
+                # Add arrow segment
+                plot_obj <- plot_obj %>% plotly::add_trace(
+                  x = c(x1, arrow_x2),
+                  y = c(y1, arrow_y2),
+                  z = c(z1, arrow_z2),
+                  type = "scatter3d",
+                  mode = "lines",
+                  line = list(
+                    color = point_set$color,
+                    width = 6
+                  ),
+                  name = "Arrow",
+                  showlegend = FALSE
+                )
+              }
+            }
           }
         } else {
           # For 2D contour plots
@@ -256,18 +321,43 @@ Visualizer <- R6::R6Class("Visualizer",
           
           # Add ordered path if requested
           if (point_set$ordered && nrow(points_data) > 1) {
-            plot_obj <- plot_obj %>% plotly::add_trace(
-              x = points_data$x,
-              y = points_data$y,
-              type = "scatter",
-              mode = "lines",
-              line = list(
-                color = point_set$color,
-                width = 3
-              ),
-              name = "Path",
-              showlegend = FALSE
-            )
+            # For 2D plots, use shorter line segments
+            for (i in 1:(nrow(points_data) - 1)) {
+              x1 <- points_data$x[i]
+              y1 <- points_data$y[i]
+              x2 <- points_data$x[i + 1]
+              y2 <- points_data$y[i + 1]
+              
+              # Calculate direction vector and normalize it
+              dx <- x2 - x1
+              dy <- y2 - y1
+              dist <- sqrt(dx^2 + dy^2)
+              
+              if (dist > 0) {
+                # Normalize direction vector
+                dx_norm <- dx / dist
+                dy_norm <- dy / dist
+                
+                # Calculate arrow endpoints based on arrow_length
+                arrow_length <- point_set$arrow_length
+                arrow_x2 <- x1 + dx_norm * arrow_length
+                arrow_y2 <- y1 + dy_norm * arrow_length
+                
+                # Add arrow segment  
+                plot_obj <- plot_obj %>% plotly::add_trace(
+                  x = c(x1, arrow_x2),
+                  y = c(y1, arrow_y2),
+                  type = "scatter",
+                  mode = "lines",
+                  line = list(
+                    color = point_set$color,
+                    width = 4
+                  ),
+                  name = "Arrow",
+                  showlegend = FALSE
+                )
+              }
+            }
           }
         }
       }

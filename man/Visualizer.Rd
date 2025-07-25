@@ -83,6 +83,7 @@ Add points to the plot. This method can be called multiple times to add differen
   alpha = 1,
   annotations = NULL,
   ordered = FALSE,
+  arrow_length = 0.3,
   ...
 )}\if{html}{\out{</div>}}
 }
@@ -112,6 +113,9 @@ Optional text labels for each point. If provided, must be the same length as the
 
 \item{\code{ordered}}{(`logical(1)`)\cr
 If `TRUE`, draws arrows between consecutive points to indicate order. Default is `FALSE`.}
+
+\item{\code{arrow_length}}{(`numeric(1)`)\cr
+Length of arrows when `ordered = TRUE`. Default is 0.3 units in the coordinate system.}
 
 \item{\code{...}}{Additional arguments passed to the plotting layers (e.g., `arrow` for `geom_path`).}
 }

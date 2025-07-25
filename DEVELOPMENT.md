@@ -170,7 +170,9 @@ You can also check the rendered website:
 pkgdown::build_site()
 ```
 
-## Testing Guidelines
+## Guidelines
+
+### Testing
 
 - Each R file should have corresponding test file
 - Use descriptive test names: `test_that("objective evaluation works", ...)`
@@ -185,26 +187,10 @@ skip_on_ci()
 skip_if_not_installed("plotly")
 ```
 
-## Documentation Guidelines
-
-### `roxygen2`
+### Documentation with `roxygen2`
 
 - Use `roxygen2` tags (`@title`, `@description`, `@param`, `@return`, `@examples`)
 - Include working examples
 - Document all parameters
 - Use consistent style with existing code
 - For reusable documentation blocks, use templates in `man-roxygen/` directory.
-
-### Vignettes (long form documentation)
-
-- `objective.Rmd`: Objective function visualization
-- `model.Rmd`: Model prediction visualization
-- `loss_functions.Rmd`: Loss function visualization
-
-```r
-# Build all vignettes
-devtools::build_vignettes()
-
-# Build specific vignette
-rmarkdown::render("vignettes/objective.Rmd")
-```
