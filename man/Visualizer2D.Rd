@@ -25,13 +25,6 @@ Visualizes a two-dimensional function \eqn{f: \mathbb{R}^2 \to \mathbb{R}}.
 \item{\code{lab_x2}}{(`character(1)`)}
 
 \item{\code{lab_y}}{(`character(1)`)}
-
-\item{\code{points_x1}}{(`numeric()`)\cr}
-
-\item{\code{points_x2}}{(`numeric()`)\cr}
-
-\item{\code{points_y}}{(`numeric()`)\cr
-y-values of points.}
 }
 \if{html}{\out{</div>}}
 }
@@ -47,6 +40,7 @@ y-values of points.}
 <details open><summary>Inherited methods</summary>
 <ul>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="add_points"><a href='../../vistool/html/Visualizer.html#method-Visualizer-add_points'><code>vistool::Visualizer$add_points()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="initialize_defaults"><a href='../../vistool/html/Visualizer.html#method-Visualizer-initialize_defaults'><code>vistool::Visualizer$initialize_defaults()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href='../../vistool/html/Visualizer.html#method-Visualizer-save'><code>vistool::Visualizer$save()</code></a></span></li>
 </ul>
 </details>
@@ -101,7 +95,13 @@ Label of y-axis.}
 \subsection{Method \code{plot()}}{
 Create and return the ggplot2 plot.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$plot(text_size = 11, theme = "minimal")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$plot(
+  text_size = 11,
+  title_size = NULL,
+  theme = "minimal",
+  background = "white",
+  color_palette = "viridis"
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -110,8 +110,17 @@ Create and return the ggplot2 plot.
 \item{\code{text_size}}{(`numeric(1)`)\cr
 Base text size for plot elements. Default is 11.}
 
+\item{\code{title_size}}{(`numeric(1)`)\cr
+Title text size. If NULL, defaults to text_size + 2.}
+
 \item{\code{theme}}{(`character(1)`)\cr
 ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "minimal".}
+
+\item{\code{background}}{(`character(1)`)\cr
+Background color for the plot. Default is "white".}
+
+\item{\code{color_palette}}{(`character(1)`)\cr
+Color palette for the fill scale. One of "viridis", "plasma", "grayscale". Default is "viridis".}
 }
 \if{html}{\out{</div>}}
 }

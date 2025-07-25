@@ -139,7 +139,7 @@ Visualizer1DModel <- R6::R6Class("Visualizer1DModel",
       
       # Store boundary information for plotting
       private$.boundary_values <- values
-      private$.boundary_color <- color
+      private$.boundary_color <- process_color(color, self)
       private$.boundary_linetype <- linetype
       private$.boundary_linewidth <- linewidth
       private$.boundary_alpha <- alpha

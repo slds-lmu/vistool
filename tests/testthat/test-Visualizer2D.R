@@ -37,17 +37,23 @@ test_that("Visualizer2D with training points works", {
     fun_y = z_vals
   )
 
-  # Add training points
-  vis$points_x1 <- c(-0.5, 0, 0.5)
-  vis$points_x2 <- c(0.5, 0, -0.5)
-  vis$points_y <- c(1, 2, 3)
+  # Add training points using the new unified system
+  training_points <- data.frame(
+    x = c(-0.5, 0, 0.5),
+    y = c(0.5, 0, -0.5)
+  )
+  vis$add_points(training_points, color = "red")
 
-  expect_length(vis$points_x1, 3)
-  expect_length(vis$points_x2, 3)
-  expect_length(vis$points_y, 3)
+  # Check that points were added
+  expect_length(vis$.__enclos_env__$private$.points_to_add, 1)
+  point_set <- vis$.__enclos_env__$private$.points_to_add[[1]]
+  expect_equal(nrow(point_set$points), 3)
+  expect_equal(point_set$color, "red")
 
   p <- vis$plot()
   expect_s3_class(p, "ggplot")
+  # Should have 3 layers: raster + contour (white) + points (from add_points)
+  expect_length(p$layers, 3)
 })
 
 test_that("Visualizer2D basic functionality works", {

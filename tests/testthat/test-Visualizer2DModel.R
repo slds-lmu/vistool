@@ -9,9 +9,13 @@ test_that("2D Model with training data works", {
   vis <- Visualizer2DModel$new(task, learner)
   vis$add_training_data()
 
-  expect_true(!is.null(vis$points_x1))
-  expect_true(!is.null(vis$points_x2))
-  expect_true(!is.null(vis$points_y))
+  # Check that training data styling information is stored
+  expect_true(!is.null(vis$.__enclos_env__$private$.training_data))
+  expect_true(!is.null(vis$.__enclos_env__$private$.training_data_style))
+  
+  # Check that the data has the correct structure
+  expect_true(all(c("x1", "x2", "y") %in% names(vis$.__enclos_env__$private$.training_data)))
+  expect_true(all(c("color", "size", "shape", "alpha") %in% names(vis$.__enclos_env__$private$.training_data_style)))
 
   p <- vis$plot()
   expect_s3_class(p, "gg")

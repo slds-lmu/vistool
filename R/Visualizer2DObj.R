@@ -118,17 +118,13 @@ Visualizer2DObj <- R6::R6Class("Visualizer2DObj",
         stop("No optimization trace in `optimizer$archive`. Did you forget to call `optimizer$optimize(steps)`?")
       }
 
-      # Generate random color if not provided - convert from RGB format to R hex format
+      # Generate color if not provided using unified color system
       if (is.null(line_color)) {
-        # Use a different approach for ggplot2 - we'll use a predefined palette
-        trace_num <- length(private$.optimization_traces) + 1
-        # Use colorbrewer-style colors that are distinguishable
-        colors <- c("#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", 
-                   "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf")
-        line_color <- colors[((trace_num - 1) %% length(colors)) + 1]
+        line_color <- "auto"
       }
+      processed_line_color <- process_color(line_color, self)
 
-      if (is.null(marker_color)) marker_color <- line_color
+      if (is.null(marker_color)) marker_color <- processed_line_color
       if (is.null(name)) {
         name <- paste0(optimizer$id, " on ", optimizer$objective$id)
       }
@@ -162,7 +158,7 @@ Visualizer2DObj <- R6::R6Class("Visualizer2DObj",
       # Store trace information
       trace_info <- list(
         data = trace_data,
-        line_color = line_color,
+        line_color = processed_line_color,
         line_width = line_width,
         line_type = line_type,
         name = name,

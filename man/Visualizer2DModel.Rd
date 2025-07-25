@@ -34,6 +34,7 @@ Learner used to train the model.}
 <details open><summary>Inherited methods</summary>
 <ul>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="add_points"><a href='../../vistool/html/Visualizer.html#method-Visualizer-add_points'><code>vistool::Visualizer$add_points()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="initialize_defaults"><a href='../../vistool/html/Visualizer.html#method-Visualizer-initialize_defaults'><code>vistool::Visualizer$initialize_defaults()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href='../../vistool/html/Visualizer.html#method-Visualizer-save'><code>vistool::Visualizer$save()</code></a></span></li>
 </ul>
 </details>
@@ -100,17 +101,36 @@ Note that a grid of `npoints^2` values is generated and evaluated by `objective$
 \subsection{Method \code{add_training_data()}}{
 Adds the training data to the plot.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer2DModel$add_training_data(size = 2, color = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer2DModel$add_training_data(
+  color = "auto",
+  size = 2,
+  shape = 19,
+  alpha = 1,
+  show_labels = FALSE,
+  label_size = NULL
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{size}}{(`numeric(1)`)\cr
-Size of the points.}
-
 \item{\code{color}}{(`character(1)`)\cr
-Color of the points.}
+Color of the points. Use "auto" for automatic color assignment. Default is "auto".}
+
+\item{\code{size}}{(`numeric(1)`)\cr
+Size of the points. Default is 2.}
+
+\item{\code{shape}}{(`integer(1)`)\cr
+Shape of the points. Default is 19.}
+
+\item{\code{alpha}}{(`numeric(1)`)\cr
+Alpha transparency of the points. Default is 1.}
+
+\item{\code{show_labels}}{(`logical(1)`)\cr
+Whether to show data point labels. Default is FALSE.}
+
+\item{\code{label_size}}{(`numeric(1)`)\cr
+Size of data point labels. If NULL, defaults to smaller text.}
 }
 \if{html}{\out{</div>}}
 }
@@ -124,7 +144,8 @@ Adds boundary line(s) to the plot at specified values.
 \if{html}{\out{<div class="r">}}\preformatted{Visualizer2DModel$add_boundary(
   values = NULL,
   color = "black",
-  linewidth = 1.5,
+  line_width = 1.5,
+  line_type = "solid",
   alpha = 0.8
 )}\if{html}{\out{</div>}}
 }
@@ -139,8 +160,11 @@ defaults to 0.5. For regression or response predictions, defaults to quantiles o
 \item{\code{color}}{(`character(1)`)\cr
 Color of the boundary lines. Default is "black".}
 
-\item{\code{linewidth}}{(`numeric(1)`)\cr
+\item{\code{line_width}}{(`numeric(1)`)\cr
 Width of boundary lines. Default is 1.5.}
+
+\item{\code{line_type}}{(`character(1)`)\cr
+Type of boundary lines. One of "solid", "dashed", "dotted". Default is "solid".}
 
 \item{\code{alpha}}{(`numeric(1)`)\cr
 Transparency of boundary lines. Default is 0.8.}
@@ -154,7 +178,13 @@ Transparency of boundary lines. Default is 0.8.}
 \subsection{Method \code{plot()}}{
 Create and return the ggplot2 plot with model-specific features.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer2DModel$plot(text_size = 11, theme = "minimal")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer2DModel$plot(
+  text_size = 11,
+  title_size = NULL,
+  theme = "minimal",
+  background = "white",
+  color_palette = "viridis"
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -163,8 +193,17 @@ Create and return the ggplot2 plot with model-specific features.
 \item{\code{text_size}}{(`numeric(1)`)\cr
 Base text size for plot elements. Default is 11.}
 
+\item{\code{title_size}}{(`numeric(1)`)\cr
+Title text size. If NULL, defaults to text_size + 2.}
+
 \item{\code{theme}}{(`character(1)`)\cr
 ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "minimal".}
+
+\item{\code{background}}{(`character(1)`)\cr
+Background color for the plot. Default is "white".}
+
+\item{\code{color_palette}}{(`character(1)`)\cr
+Color palette for the fill scale. One of "viridis", "plasma", "grayscale". Default is "viridis".}
 }
 \if{html}{\out{</div>}}
 }

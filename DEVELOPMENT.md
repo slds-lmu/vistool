@@ -106,6 +106,8 @@ vistool/
   - `VisualizerSurface*`: Interactive surface plotting with plotly for 2D functions
 - **`as_visualizer()`**: Smart constructor that selects appropriate visualizer
 
+Global settings that affect the entire plot belong in `plot()`. Settings for specific visual elements belong in the `add_*()` methods that create them. Defaults are set (at initialization) in `as_visualizer()`.
+
 ## Development Workflow
 
 ### 1. Setup Development Environment

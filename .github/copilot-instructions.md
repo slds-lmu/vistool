@@ -4,6 +4,7 @@
 - **vistool** is an R package for visualizing optimization traces and teaching optimization concepts.
 - Core visualizations: 1D/2D (ggplot2), 2D surface (plotly, interactive), and loss/model/objective visualizations.
 - Main entry point: `as_visualizer()` (see `R/as_visualizer.R`) auto-selects the appropriate visualizer class based on input.
+- Core workflow: (1) Initialize with `as_visualizer()`, (2) add layers using `add_*` methods, (3) `plot()`; optionally `save()` or `animate()`
 
 ## Architecture & Key Components
 - **R6 OOP**: All visualizers and core objects (e.g., `Visualizer`, `Visualizer1D`, `Visualizer2D`, `VisualizerSurface`, `LossFunction`, `Objective`, `Optimizer`) are R6 classes in `R/`.
@@ -11,6 +12,7 @@
   - `Visualizer1D*`, `Visualizer2D*`: ggplot2-based
   - `VisualizerSurface*`: plotly-based, for interactive 3D/2D
   - Suffixes `Model`, `Obj`, `LossFuns` indicate specialization for models, objectives, or loss functions
+- **Customization options**: Global settings that affect the entire plot belong in `plot()`. Settings for specific visual elements belong in the `add_*()` methods that create them. Defaults are set (at initialization) in `as_visualizer()`.
 - **Templates**: Common roxygen2 doc blocks are in `man-roxygen/` and referenced via `@template`.
 - **Tests**: All public R6 methods and S3 generics should have corresponding tests in `tests/testthat/`.
 

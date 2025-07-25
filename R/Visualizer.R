@@ -8,14 +8,52 @@
 Visualizer <- R6::R6Class("Visualizer",
   public = list(
 
+    #' @field defaults (`list`)\cr
+    #' Default settings for plotting and visual elements.
+    defaults = list(),
+
+    #' @description
+    #' Initialize default settings for the visualizer.
+    #' @param default_color_palette (`character(1)`)\cr
+    #'   Default color palette. Default is "viridis".
+    #' @param default_text_size (`numeric(1)`)\cr
+    #'   Default text size. Default is 11.
+    #' @param default_theme (`character(1)`)\cr
+    #'   Default theme. Default is "minimal".
+    #' @param default_alpha (`numeric(1)`)\cr
+    #'   Default alpha transparency. Default is 0.8.
+    #' @param default_line_width (`numeric(1)`)\cr
+    #'   Default line width. Default is 1.2.
+    #' @param default_point_size (`numeric(1)`)\cr
+    #'   Default point size. Default is 2.
+    initialize_defaults = function(default_color_palette = "viridis", default_text_size = 11,
+                                  default_theme = "minimal", default_alpha = 0.8,
+                                  default_line_width = 1.2, default_point_size = 2) {
+      self$defaults <- list(
+        color_palette = default_color_palette,
+        text_size = default_text_size,
+        theme = default_theme,
+        alpha = default_alpha,
+        line_width = default_line_width,
+        point_size = default_point_size
+      )
+      invisible(self)
+    },
+
     #' @description
     #' Abstract method to be implemented by subclasses.
     #' @param text_size (`numeric(1)`)\cr
     #'   Base text size for plot elements. Default is 11.
+    #' @param title_size (`numeric(1)`)\cr
+    #'   Title text size. If NULL, defaults to text_size + 2.
     #' @param theme (`character(1)`)\cr
     #'   ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "minimal".
+    #' @param background (`character(1)`)\cr
+    #'   Background color for the plot. Default is "white".
+    #' @param color_palette (`character(1)`)\cr
+    #'   Default color palette to use. One of "viridis", "plasma", "grayscale". Default is "viridis".
     #' @return The plot object.
-    plot = function(text_size = 11, theme = "minimal") {
+    plot = function(text_size = 11, title_size = NULL, theme = "minimal", background = "white", color_palette = "viridis") {
       stop("Abstract method 'plot' must be implemented by subclass")
     },
 
@@ -59,25 +97,38 @@ Visualizer <- R6::R6Class("Visualizer",
     #'   - For 1D: A `data.frame` or `matrix` with one column for x-values, or a numeric vector of x-values. If y-values are not provided, they will be inferred if possible (e.g., for objective functions).
     #'   - For 2D/Surface: A `data.frame` or `matrix` with two columns (x1, x2), or a list of 2-element vectors.
     #' @param color (`character(1)`)\cr
-    #'   Color of the points. Default is "black".
+    #'   Color of the points. Use "auto" for automatic color assignment from palette. Default is "auto".
     #' @param size (`numeric(1)`)\cr
     #'   Size of the points. Default is 2.
-    #' @param shape (`integer(1)`)\cr
-    #'   Shape of the points (e.g., 19 for solid circle). Default is 19.
+    #' @param shape (`integer(1)` or `character(1)`)\cr
+    #'   Shape of the points. For ggplot2: integer codes (e.g., 19 for solid circle). For plotly: shape names. Default is 19/"circle".
     #' @param alpha (`numeric(1)`)\cr
     #'   Alpha transparency of the points. Default is 1.
     #' @param annotations (`character`)\cr
     #'   Optional text labels for each point. If provided, must be the same length as the number of points.
+    #' @param annotation_size (`numeric(1)`)\cr
+    #'   Size of annotation text. If NULL, defaults to text_size - 2 from plot().
     #' @param ordered (`logical(1)`)\cr
     #'   If `TRUE`, draws arrows between consecutive points to indicate order. Default is `FALSE`.
-    #' @param arrow_length (`numeric(1)`)\cr
-    #'   Length of arrows when `ordered = TRUE`. Default is 0.3 units in the coordinate system.
-    #' @param ... Additional arguments passed to the plotting layers (e.g., `arrow` for `geom_path`).
-    add_points = function(points, color = "black", size = 2, shape = 19, alpha = 1, annotations = NULL, ordered = FALSE, arrow_length = 0.3, ...) {
+    #' @param arrow_color (`character(1)`)\cr
+    #'   Color of arrows when ordered = TRUE. If NULL, uses point color.
+    #' @param arrow_size (`numeric(1)`)\cr
+    #'   Length/size of arrows when `ordered = TRUE`. Default is 0.3 units in the coordinate system.
+    #' @param ... Additional arguments passed to the plotting layers.
+    add_points = function(points, color = "auto", size = 2, shape = 19, alpha = 1, 
+                         annotations = NULL, annotation_size = NULL, ordered = FALSE, 
+                         arrow_color = NULL, arrow_size = 0.3, ...) {
+      # Process color (handle "auto" assignment)
+      processed_color <- process_color(color, self)
+      
+      # Use processed color for arrows if not specified
+      if (is.null(arrow_color)) arrow_color <- processed_color
+      
       private$.points_to_add <- c(private$.points_to_add,
         list(list(
-          points = points, color = color, size = size, shape = shape, alpha = alpha,
-          annotations = annotations, ordered = ordered, arrow_length = arrow_length, args = list(...)
+          points = points, color = processed_color, size = size, shape = shape, alpha = alpha,
+          annotations = annotations, annotation_size = annotation_size, ordered = ordered, 
+          arrow_color = arrow_color, arrow_size = arrow_size, args = list(...)
         ))
       )
       invisible(self)
@@ -86,6 +137,7 @@ Visualizer <- R6::R6Class("Visualizer",
   private = list(
 
     .points_to_add = list(),
+    .color_index = 1,  # Track next color index for auto assignment
 
     # save a ggplot2 object
     save_ggplot = function(plot_obj, filename, width, height, dpi, ...) {
@@ -140,10 +192,14 @@ Visualizer <- R6::R6Class("Visualizer",
         
         # Add annotations if provided
         if (!is.null(point_set$annotations)) {
+          # Use annotation_size if provided, otherwise default to smaller text
+          ann_size <- if (!is.null(point_set$annotation_size)) point_set$annotation_size else 3
+          
           plot_obj <- plot_obj + ggplot2::geom_text(
             data = cbind(points_data, label = point_set$annotations),
             ggplot2::aes(x = x, y = y, label = label),
             color = point_set$color,
+            size = ann_size,
             vjust = -0.5,
             inherit.aes = FALSE
           )
@@ -168,10 +224,10 @@ Visualizer <- R6::R6Class("Visualizer",
               dx_norm <- dx / dist
               dy_norm <- dy / dist
               
-              # Calculate arrow endpoints based on arrow_length
-              arrow_length <- point_set$arrow_length
-              arrow_x2 <- x1 + dx_norm * arrow_length
-              arrow_y2 <- y1 + dy_norm * arrow_length
+              # Calculate arrow endpoints based on arrow_size
+              arrow_size <- point_set$arrow_size
+              arrow_x2 <- x1 + dx_norm * arrow_size
+              arrow_y2 <- y1 + dy_norm * arrow_size
               
               # Create arrow data frame
               arrow_data <- data.frame(
@@ -185,7 +241,7 @@ Visualizer <- R6::R6Class("Visualizer",
               plot_obj <- plot_obj + ggplot2::geom_segment(
                 data = arrow_data,
                 ggplot2::aes(x = x, y = y, xend = xend, yend = yend),
-                color = point_set$color,
+                color = point_set$arrow_color,
                 alpha = point_set$alpha * 0.7,
                 arrow = ggplot2::arrow(length = ggplot2::unit(0.15, "cm"), type = "closed"),
                 inherit.aes = FALSE
@@ -240,7 +296,10 @@ Visualizer <- R6::R6Class("Visualizer",
                 type = "scatter3d",
                 mode = "text",
                 text = point_set$annotations[i],
-                textfont = list(color = point_set$color),
+                textfont = list(
+                  color = point_set$color,
+                  size = if (!is.null(point_set$annotation_size)) point_set$annotation_size else 12
+                ),
                 showlegend = FALSE
               )
             }
@@ -269,11 +328,11 @@ Visualizer <- R6::R6Class("Visualizer",
                 dy_norm <- dy / dist
                 dz_norm <- dz / dist
                 
-                # Calculate arrow endpoints based on arrow_length
-                arrow_length <- point_set$arrow_length
-                arrow_x2 <- x1 + dx_norm * arrow_length
-                arrow_y2 <- y1 + dy_norm * arrow_length
-                arrow_z2 <- z1 + dz_norm * arrow_length
+                # Calculate arrow endpoints based on arrow_size
+                arrow_size <- point_set$arrow_size
+                arrow_x2 <- x1 + dx_norm * arrow_size
+                arrow_y2 <- y1 + dy_norm * arrow_size
+                arrow_z2 <- z1 + dz_norm * arrow_size
                 
                 # Add arrow segment
                 plot_obj <- plot_obj %>% plotly::add_trace(
@@ -283,7 +342,7 @@ Visualizer <- R6::R6Class("Visualizer",
                   type = "scatter3d",
                   mode = "lines",
                   line = list(
-                    color = point_set$color,
+                    color = point_set$arrow_color,
                     width = 6
                   ),
                   name = "Arrow",
@@ -315,7 +374,10 @@ Visualizer <- R6::R6Class("Visualizer",
               y = points_data$y,
               text = point_set$annotations,
               showarrow = FALSE,
-              font = list(color = point_set$color)
+              font = list(
+                color = point_set$color,
+                size = if (!is.null(point_set$annotation_size)) point_set$annotation_size else 12
+              )
             )
           }
           
@@ -338,10 +400,10 @@ Visualizer <- R6::R6Class("Visualizer",
                 dx_norm <- dx / dist
                 dy_norm <- dy / dist
                 
-                # Calculate arrow endpoints based on arrow_length
-                arrow_length <- point_set$arrow_length
-                arrow_x2 <- x1 + dx_norm * arrow_length
-                arrow_y2 <- y1 + dy_norm * arrow_length
+                # Calculate arrow endpoints based on arrow_size
+                arrow_size <- point_set$arrow_size
+                arrow_x2 <- x1 + dx_norm * arrow_size
+                arrow_y2 <- y1 + dy_norm * arrow_size
                 
                 # Add arrow segment  
                 plot_obj <- plot_obj %>% plotly::add_trace(
@@ -350,7 +412,7 @@ Visualizer <- R6::R6Class("Visualizer",
                   type = "scatter",
                   mode = "lines",
                   line = list(
-                    color = point_set$color,
+                    color = point_set$arrow_color,
                     width = 4
                   ),
                   name = "Arrow",

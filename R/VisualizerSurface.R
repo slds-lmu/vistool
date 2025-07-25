@@ -275,8 +275,14 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
     #' @description Return the plot and hence plot it or do further processing.
     #' @param text_size (`numeric(1)`)\cr
     #'   Base text size for plot elements. Default is 12. For 3D plotly calls, this controls axis labels and title sizes.
+    #' @param title_size (`numeric(1)`)\cr
+    #'   Title text size. If NULL, defaults to text_size + 2.
     #' @param theme (`character(1)`)\cr
     #'   Theme parameter for compatibility with ggplot2-based visualizers. Ignored for 3D plotly plots.
+    #' @param background (`character(1)`)\cr
+    #'   Background color parameter for compatibility. Ignored for 3D plotly plots.
+    #' @param color_palette (`character(1)`)\cr
+    #'   Color palette for the surface. One of "viridis", "plasma", "grayscale". Default is "viridis".
     #' @param flatten (`logical(1)`)\cr
     #'   If TRUE, display as 2D contour plot. If FALSE (default), display as 3D surface plot.
     #' @param layout (`list()`)\cr
@@ -285,26 +291,36 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
     #'   Scene options for 3D surface plots. Should contain camera settings like `list(camera = list(eye = list(x = 1.1, y = 1.2, z = 1.3)))`. 
     #'   Only applies to surface plots, ignored for contour plots. If NULL, no scene modifications are applied.
     #' @return A plotly object.
-    plot = function(text_size = 12, theme = "minimal", flatten = FALSE, layout = NULL, scene = NULL) {
+    plot = function(text_size = 12, title_size = NULL, theme = "minimal", background = "white", 
+                    color_palette = "viridis", flatten = FALSE, layout = NULL, scene = NULL) {
       checkmate::assert_number(text_size, lower = 1)
+      checkmate::assert_number(title_size, lower = 1, null.ok = TRUE)
       checkmate::assert_choice(theme, choices = c("minimal", "bw", "classic", "gray", "light", "dark", "void"))
+      checkmate::assert_string(background)
+      checkmate::assert_choice(color_palette, choices = c("viridis", "plasma", "grayscale"))
       checkmate::assert_flag(flatten)
       checkmate::assert_list(layout, null.ok = TRUE)
       checkmate::assert_list(scene, null.ok = TRUE)
+      
+      # Set default title size
+      if (is.null(title_size)) title_size <- text_size + 2
       
       # Validate scene parameter is only used for surface plots
       if (!is.null(scene) && flatten) {
         stop("Scene parameter can only be used for surface plots (flatten = FALSE)")
       }
       
+      # Get the appropriate colorscale based on palette choice
+      plot_colorscale <- get_vistool_color(1, color_palette)
+      
       # Initialize appropriate plot type based on flatten parameter
       if (is.null(private$.plot) || 
           (flatten && private$.layer_primary != "contour") ||
           (!flatten && private$.layer_primary != "surface")) {
         if (flatten) {
-          self$init_layer_contour()
+          self$init_layer_contour(colorscale = plot_colorscale)
         } else {
-          private$.init_default_plot()  # This calls init_layer_surface
+          self$init_layer_surface(colorscale = plot_colorscale)
         }
       }
       
@@ -314,7 +330,7 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
           # For 3D surface plots
           private$.plot <- private$.plot %>%
             layout(
-              title = list(text = self$plot_lab, font = list(size = text_size + 2)),
+              title = list(text = self$plot_lab, font = list(size = title_size)),
               scene = list(
                 xaxis = list(title = list(text = self$x1_lab, font = list(size = text_size))),
                 yaxis = list(title = list(text = self$x2_lab, font = list(size = text_size))),
@@ -325,7 +341,7 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
           # For 2D contour plots
           private$.plot <- private$.plot %>%
             layout(
-              title = list(text = self$plot_lab, font = list(size = text_size + 2)),
+              title = list(text = self$plot_lab, font = list(size = title_size)),
               xaxis = list(title = list(text = self$x1_lab, font = list(size = text_size))),
               yaxis = list(title = list(text = self$x2_lab, font = list(size = text_size)))
             )

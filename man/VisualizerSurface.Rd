@@ -59,6 +59,7 @@ Whether to show the plot title.}
 <details open><summary>Inherited methods</summary>
 <ul>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="add_points"><a href='../../vistool/html/Visualizer.html#method-Visualizer-add_points'><code>vistool::Visualizer$add_points()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="initialize_defaults"><a href='../../vistool/html/Visualizer.html#method-Visualizer-initialize_defaults'><code>vistool::Visualizer$initialize_defaults()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href='../../vistool/html/Visualizer.html#method-Visualizer-save'><code>vistool::Visualizer$save()</code></a></span></li>
 </ul>
 </details>
@@ -315,7 +316,10 @@ Return the plot and hence plot it or do further processing.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{VisualizerSurface$plot(
   text_size = 12,
+  title_size = NULL,
   theme = "minimal",
+  background = "white",
+  color_palette = "viridis",
   flatten = FALSE,
   layout = NULL,
   scene = NULL
@@ -328,8 +332,17 @@ Return the plot and hence plot it or do further processing.
 \item{\code{text_size}}{(`numeric(1)`)\cr
 Base text size for plot elements. Default is 12. For 3D plotly calls, this controls axis labels and title sizes.}
 
+\item{\code{title_size}}{(`numeric(1)`)\cr
+Title text size. If NULL, defaults to text_size + 2.}
+
 \item{\code{theme}}{(`character(1)`)\cr
 Theme parameter for compatibility with ggplot2-based visualizers. Ignored for 3D plotly plots.}
+
+\item{\code{background}}{(`character(1)`)\cr
+Background color parameter for compatibility. Ignored for 3D plotly plots.}
+
+\item{\code{color_palette}}{(`character(1)`)\cr
+Color palette for the surface. One of "viridis", "plasma", "grayscale". Default is "viridis".}
 
 \item{\code{flatten}}{(`logical(1)`)\cr
 If TRUE, display as 2D contour plot. If FALSE (default), display as 3D surface plot.}

@@ -29,12 +29,11 @@ Most of this section is a placeholder and will be expanded in future versions.
 
 ## Surface Visualization Options
 
-For surface visualizations (`plotly`-based), you can customize the appearance directly when creating the visualizer or switch between surface and contour views.
+You can customize the appearance directly when running `plot()`:
 
 ```{r, out.width='100%', out.height='700px'}
-viz <- as_visualizer(obj("TF_franke"), type = "surface", opacity = 1, 
-                     colorscale = list(c(0, 1), c("white", "black")))
-viz$plot()
+viz <- as_visualizer(obj("TF_franke"), type = "surface")
+viz$plot(color_palette = "grayscale")
 ```
 
 The `add_contours()` method allows you to add custom contour lines to the surface:
@@ -63,19 +62,6 @@ viz$plot(layout = list(
 
 ```{r, out.width='100%', out.height='700px'}
 viz$plot(scene = list(camera = list(eye = list(x = 1.5, y = 1.5, z = 1.5))))
-```
-
-```{r, out.width='100%', out.height='700px'}
-viz$plot(
-  layout = list(
-    title = list(text = "Custom Title", font = list(size = 20))
-    ),
-  scene = list(
-    xaxis = list(backgroundcolor = "red"),
-    yaxis = list(backgroundcolor = "red"),
-    zaxis = list(backgroundcolor = "red")
-  )
-)
 ```
 
 ## Overlaying layers (TODO)

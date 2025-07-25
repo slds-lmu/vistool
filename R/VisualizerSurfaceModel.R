@@ -117,6 +117,9 @@ VisualizerSurfaceModel <- R6::R6Class("VisualizerSurfaceModel",
       z <- data[, self$task$target_names, with = FALSE][[1]]
       if (self$learner$predict_type == "prob") z <- as.integer(z) - 1
 
+      # Process color for auto assignment
+      processed_color <- process_color(color, self)
+
 
       if (private$.layer_primary == "contour") {
         private$.plot <- private$.plot %>%
@@ -146,7 +149,7 @@ VisualizerSurfaceModel <- R6::R6Class("VisualizerSurfaceModel",
             z = z,
             type = "scatter3d",
             mode = "markers",
-            marker = list(size = 5, color = grey),
+            marker = list(size = 5, color = processed_color),
             ...
           )
       }

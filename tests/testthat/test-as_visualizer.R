@@ -37,21 +37,21 @@ test_that("as_visualizer works for Task with auto type selection", {
   task_1d$select("gear")
   learner <- lrn("regr.lm")
 
-  vis_1d <- as_visualizer(task_1d, learner)
+  vis_1d <- as_visualizer(task_1d, learner = learner)
   expect_s3_class(vis_1d, "Visualizer1DModel")
 
   # Test 2D task (auto should default to ggplot2)
   task_2d <- tsk("mtcars")
   task_2d$select(c("gear", "cyl"))
 
-  vis_2d <- as_visualizer(task_2d, learner)
+  vis_2d <- as_visualizer(task_2d, learner = learner)
   expect_s3_class(vis_2d, "Visualizer2DModel")
 
   # Test task with >2 features (auto should error)
   task_3d <- tsk("mtcars")
   task_3d$select(c("gear", "cyl", "hp"))
 
-  expect_error(as_visualizer(task_3d, learner), "Auto visualization only supports 1D and 2D tasks")
+  expect_error(as_visualizer(task_3d, learner = learner), "Auto visualization only supports 1D and 2D tasks")
 })
 
 test_that("as_visualizer works for Task with explicit type selection", {
@@ -62,11 +62,11 @@ test_that("as_visualizer works for Task with explicit type selection", {
   learner <- lrn("regr.lm")
 
   # Test explicit 2D (ggplot2)
-  vis_2d <- as_visualizer(task_2d, learner, type = "2d")
+  vis_2d <- as_visualizer(task_2d, learner = learner, type = "2d")
   expect_s3_class(vis_2d, "Visualizer2DModel")
 
   # Test explicit surface for 2D task (plotly)
-  vis_surface <- as_visualizer(task_2d, learner, type = "surface")
+  vis_surface <- as_visualizer(task_2d, learner = learner, type = "surface")
   expect_s3_class(vis_surface, "VisualizerSurfaceModel")
 })
 
@@ -193,17 +193,17 @@ test_that("as_visualizer Task dimension validation works", {
 
   # Test dimension validation for tasks
   expect_error(
-    as_visualizer(task_1d, learner, type = "2d"),
+    as_visualizer(task_1d, learner = learner, type = "2d"),
     "2D and surface visualizations require a task with exactly 2 features"
   )
 
   expect_error(
-    as_visualizer(task_2d, learner, type = "1d"),
+    as_visualizer(task_2d, learner = learner, type = "1d"),
     "1D visualization requires a task with exactly 1 feature"
   )
 
   expect_error(
-    as_visualizer(task_1d, learner, type = "surface"),
+    as_visualizer(task_1d, learner = learner, type = "surface"),
     "2D and surface visualizations require a task with exactly 2 features"
   )
 
@@ -212,7 +212,7 @@ test_that("as_visualizer Task dimension validation works", {
   task_multi$select(c("gear", "cyl", "hp"))
 
   expect_error(
-    as_visualizer(task_multi, learner),
+    as_visualizer(task_multi, learner = learner),
     "Auto visualization only supports 1D and 2D tasks"
   )
 })

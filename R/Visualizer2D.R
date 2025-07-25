@@ -34,16 +34,6 @@ Visualizer2D <- R6::R6Class("Visualizer2D",
     #' @field lab_y (`character(1)`)
     lab_y = NULL,
 
-    #' @field points_x1 (`numeric()`)\cr
-    points_x1 = NULL,
-
-    #' @field points_x2 (`numeric()`)\cr
-    points_x2 = NULL,
-
-    #' @field points_y (`numeric()`)\cr
-    #' y-values of points.
-    points_y = NULL,
-
     #' @description
     #' Creates a new instance of this [R6][R6::R6Class] class.
     #'
@@ -81,12 +71,24 @@ Visualizer2D <- R6::R6Class("Visualizer2D",
     #' Create and return the ggplot2 plot.
     #' @param text_size (`numeric(1)`)\cr
     #'   Base text size for plot elements. Default is 11.
+    #' @param title_size (`numeric(1)`)\cr
+    #'   Title text size. If NULL, defaults to text_size + 2.
     #' @param theme (`character(1)`)\cr
     #'   ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "minimal".
+    #' @param background (`character(1)`)\cr
+    #'   Background color for the plot. Default is "white".
+    #' @param color_palette (`character(1)`)\cr
+    #'   Color palette for the fill scale. One of "viridis", "plasma", "grayscale". Default is "viridis".
     #' @return A ggplot2 object.
-    plot = function(text_size = 11, theme = "minimal") {
+    plot = function(text_size = 11, title_size = NULL, theme = "minimal", background = "white", color_palette = "viridis") {
       checkmate::assert_number(text_size, lower = 1)
+      checkmate::assert_number(title_size, lower = 1, null.ok = TRUE)
       checkmate::assert_choice(theme, choices = c("minimal", "bw", "classic", "gray", "light", "dark", "void"))
+      checkmate::assert_string(background)
+      checkmate::assert_choice(color_palette, choices = c("viridis", "plasma", "grayscale"))
+      
+      # Set default title size
+      if (is.null(title_size)) title_size <- text_size + 2
       
       data <- data.table(
         fun_x1 = self$fun_x1,
@@ -94,31 +96,19 @@ Visualizer2D <- R6::R6Class("Visualizer2D",
         fun_y = self$fun_y
       )
 
-      # continuous color gradient with overlaid contours
+      # Create base plot with continuous color gradient and overlaid contours
       p <- ggplot(data, aes(x = fun_x1, y = fun_x2)) +
         geom_raster(aes(fill = fun_y), interpolate = TRUE) +
         geom_contour(aes(z = fun_y), color = "white", alpha = 0.3) +
-        labs(title = self$title, x = self$lab_x1, y = self$lab_x2) +
-        scale_fill_viridis_c(name = self$lab_y)
-
-      # add training points if available
-      if (!is.null(self$points_x1) && !is.null(self$points_x2) && !is.null(self$points_y)) {
-        points_data <- data.table(
-          points_x1 = self$points_x1,
-          points_x2 = self$points_x2,
-          points_y = self$points_y
-        )
-
-        # determine color scale limits based on function values
-        color_limits <- c(min(self$fun_y), max(self$fun_y))
-
-        p <- p + geom_point(aes(x = points_x1, y = points_x2, color = points_y),
-          data = points_data,
-          size = 2,
-          inherit.aes = FALSE,
-          show.legend = FALSE
-        ) +
-          scale_color_viridis_c(name = self$lab_y, limits = color_limits)
+        labs(title = self$title, x = self$lab_x1, y = self$lab_x2)
+      
+      # Apply color scale based on palette choice
+      if (color_palette == "viridis") {
+        p <- p + scale_fill_viridis_c(name = self$lab_y)
+      } else if (color_palette == "plasma") {
+        p <- p + scale_fill_viridis_c(name = self$lab_y, option = "plasma")
+      } else if (color_palette == "grayscale") {
+        p <- p + scale_fill_gradient(name = self$lab_y, low = "black", high = "white")
       }
 
       # apply theme
@@ -131,7 +121,11 @@ Visualizer2D <- R6::R6Class("Visualizer2D",
         "dark" = ggplot2::theme_dark,
         "void" = ggplot2::theme_void
       )
-      p <- p + theme_fun(base_size = text_size) + theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      p <- p + theme_fun(base_size = text_size) + 
+           theme(
+             plot.title = ggplot2::element_text(hjust = 0.5, size = title_size),
+             panel.background = ggplot2::element_rect(fill = background, color = NA)
+           )
       
       # Add points from add_points() method
       p <- private$add_points_to_ggplot(p, "2D")
