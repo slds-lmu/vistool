@@ -44,9 +44,9 @@ VisualizerLossFuns <- R6::R6Class("VisualizerLossFuns",
     #' Line types for different loss functions.
     line_type = NULL,
 
-    #' @field legend_title (`element`)\cr
-    #' Legend title element.
-    legend_title = ggplot2::element_blank(),
+    #' @field legend_title (`character(1)`)\cr
+    #' Legend title.
+    legend_title = "Loss Function",
 
     #' @field y_pred (`numeric()`)\cr
     #' Predicted values.
@@ -223,6 +223,12 @@ VisualizerLossFuns <- R6::R6Class("VisualizerLossFuns",
       checkmate::assert_choice(legend_position, choices = c("top", "right", "bottom", "left", "none"))
       checkmate::assert_string(legend_title, null.ok = TRUE)
 
+      # Determine final labels
+      final_title <- if (!is.null(plot_title)) plot_title else self$title
+      final_x_lab <- if (!is.null(x_lab)) x_lab else self$lab_x
+      final_y_lab <- if (!is.null(y_lab)) y_lab else self$lab_y
+      final_legend_title <- if (!is.null(legend_title)) legend_title else self$legend_title
+
       loss_labels <- sapply(self$losses, function(x) x$label)
 
       if (self$task_type == "classif" && self$input_type == "probability") {
@@ -326,27 +332,27 @@ VisualizerLossFuns <- R6::R6Class("VisualizerLossFuns",
           }
         }
       }
-      pl <- pl + ggplot2::scale_color_manual(values = color_values, labels = loss_labels)
+      pl <- pl + ggplot2::scale_color_manual(values = color_values, labels = loss_labels, name = final_legend_title)
 
       if (!is.null(self$line_width)) {
-        pl <- pl + ggplot2::scale_linewidth_manual(values = self$line_width, labels = loss_labels)
+        pl <- pl + ggplot2::scale_linewidth_manual(values = self$line_width, labels = loss_labels, name = final_legend_title)
       } else {
-        pl <- pl + ggplot2::scale_linewidth_manual(values = rep(1.2, length(unique(dd$loss_fun))), labels = loss_labels)
+        pl <- pl + ggplot2::scale_linewidth_manual(values = rep(1.2, length(unique(dd$loss_fun))), labels = loss_labels, name = final_legend_title)
       }
 
       if (!(self$task_type == "classif" && self$input_type == "probability")) {
         if (!is.null(self$line_type)) {
-          pl <- pl + ggplot2::scale_linetype_manual(values = self$line_type, labels = loss_labels)
+          pl <- pl + ggplot2::scale_linetype_manual(values = self$line_type, labels = loss_labels, name = final_legend_title)
         }
       } else {
         if (length(unique(dd$y_val)) == 1L) {
-          pl <- pl + ggplot2::scale_linetype_manual(values = "solid", labels = unique(dd$y_val))
+          pl <- pl + ggplot2::scale_linetype_manual(values = "solid", labels = unique(dd$y_val), name = "Class")
         } else {
           # Get the unique y_val levels in the order they will appear as factor levels
           y_levels <- sort(unique(dd$y_val))  # This gives alphabetical order like factor()
           # Create corresponding line types: solid for y=1, dashed for y=0
           line_types <- ifelse(y_levels == "y = 1", "solid", "dashed")
-          pl <- pl + ggplot2::scale_linetype_manual(values = line_types, labels = y_levels)
+          pl <- pl + ggplot2::scale_linetype_manual(values = line_types, labels = y_levels, name = "Class")
         }
       }
 
@@ -366,18 +372,7 @@ VisualizerLossFuns <- R6::R6Class("VisualizerLossFuns",
           panel.grid = if (show_grid) ggplot2::element_line(color = grid_color) else ggplot2::element_blank()
         )
 
-      # Determine final labels
-      final_title <- if (!is.null(plot_title)) plot_title else self$title
-      final_x_lab <- if (!is.null(x_lab)) x_lab else self$lab_x
-      final_y_lab <- if (!is.null(y_lab)) y_lab else self$lab_y
-      final_legend_title <- if (!is.null(legend_title)) legend_title else self$legend_title
-
       pl <- pl + ggplot2::labs(title = final_title, subtitle = plot_subtitle, x = final_x_lab, y = final_y_lab)
-      
-      # Only set legend title if we have one
-      if (!is.null(final_legend_title)) {
-        pl <- pl + ggplot2::theme(legend.title = ggplot2::element_text(final_legend_title))
-      }
       
       # Apply axis limits if specified
       if (!is.null(x_limits)) {

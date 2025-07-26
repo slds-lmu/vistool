@@ -39,8 +39,8 @@ Line colors for different loss functions.}
 \item{\code{line_type}}{(`character()`)\cr
 Line types for different loss functions.}
 
-\item{\code{legend_title}}{(`element`)\cr
-Legend title element.}
+\item{\code{legend_title}}{(`character(1)`)\cr
+Legend title.}
 
 \item{\code{y_pred}}{(`numeric()`)\cr
 Predicted values.}
