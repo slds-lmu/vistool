@@ -183,7 +183,8 @@ Create and return the ggplot2 plot with model-specific features.
   title_size = NULL,
   theme = "minimal",
   background = "white",
-  color_palette = "viridis"
+  color_palette = "viridis",
+  ...
 )}\if{html}{\out{</div>}}
 }
 
@@ -204,6 +205,8 @@ Background color for the plot. Default is "white".}
 
 \item{\code{color_palette}}{(`character(1)`)\cr
 Color palette for the fill scale. One of "viridis", "plasma", "grayscale". Default is "viridis".}
+
+\item{\code{...}}{Additional arguments passed to the parent plot method.}
 }
 \if{html}{\out{</div>}}
 }

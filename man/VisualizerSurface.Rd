@@ -105,6 +105,9 @@ Label of the x2 axis.}
 \item{\code{z_lab}}{(`character(1)`)\cr
 Label of the z axis.}
 
+\item{\code{z_lab}}{(`character(1)`)\cr
+Z-axis label (for surface plots). If NULL, uses the visualizer's default label. Default is NULL.}
+
 \item{\code{opacity}}{(`numeric(1)`)\cr
 Opacity of the layer.}
 
@@ -322,7 +325,17 @@ Return the plot and hence plot it or do further processing.
   color_palette = "viridis",
   flatten = FALSE,
   layout = NULL,
-  scene = NULL
+  scene = NULL,
+  plot_title = NULL,
+  plot_subtitle = NULL,
+  x_lab = NULL,
+  y_lab = NULL,
+  z_lab = NULL,
+  x_limits = NULL,
+  y_limits = NULL,
+  z_limits = NULL,
+  show_legend = TRUE,
+  legend_title = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -353,6 +366,39 @@ Layout options passed directly to `plotly::layout()`. If NULL, no additional lay
 \item{\code{scene}}{(`list()`)\cr
 Scene options for 3D surface plots. Should contain camera settings like `list(camera = list(eye = list(x = 1.1, y = 1.2, z = 1.3)))`. 
 Only applies to surface plots, ignored for contour plots. If NULL, no scene modifications are applied.}
+
+\item{\code{plot_title}}{(`character(1)`)\cr
+Main plot title. If NULL, uses the visualizer's default title. Default is NULL.}
+
+\item{\code{plot_subtitle}}{(`character(1)`)\cr
+Plot subtitle. If NULL, no subtitle is shown. Default is NULL.}
+
+\item{\code{x_lab}}{(`character(1)`)\cr
+X-axis label. If NULL, uses the visualizer's default label. Default is NULL.}
+
+\item{\code{y_lab}}{(`character(1)`)\cr
+Y-axis label. If NULL, uses the visualizer's default label. Default is NULL.}
+
+\item{\code{z_lab}}{(`character(1)`)\cr
+Label of the z axis.}
+
+\item{\code{z_lab}}{(`character(1)`)\cr
+Z-axis label (for surface plots). If NULL, uses the visualizer's default label. Default is NULL.}
+
+\item{\code{x_limits}}{(`numeric(2)`)\cr
+X-axis limits as c(min, max). If NULL, uses automatic limits. Default is NULL.}
+
+\item{\code{y_limits}}{(`numeric(2)`)\cr
+Y-axis limits as c(min, max). If NULL, uses automatic limits. Default is NULL.}
+
+\item{\code{z_limits}}{(`numeric(2)`)\cr
+Z-axis limits as c(min, max) (for surface plots). If NULL, uses automatic limits. Default is NULL.}
+
+\item{\code{show_legend}}{(`logical(1)`)\cr
+Whether to show the legend. Default is TRUE.}
+
+\item{\code{legend_title}}{(`character(1)`)\cr
+Title for the legend. If NULL, uses default based on visualizer type. Default is NULL.}
 }
 \if{html}{\out{</div>}}
 }

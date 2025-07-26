@@ -8,7 +8,6 @@
 * `add_points()` for adding (ordered) points; with the possibility of annotating them for all `Visualizer` types.
 * Unified custom contour functionality (surface plots) in separate `add_contours()` method.
 * Split objective vignette into `objective_functions`, `optimization_traces` and `advanced_visualization`; swapped out the `banana` objective for `GoldsteinPriceLog` and `boston_housing` for `california_housing`.
-* Renamed `VisualizerLossFuns` to `Visualizer1DLossFuns` to make hierarchy clearer.
 * Fixed bugs (optimization & traces).
 
 

@@ -52,8 +52,24 @@ Visualizer <- R6::R6Class("Visualizer",
     #'   Background color for the plot. Default is "white".
     #' @param color_palette (`character(1)`)\cr
     #'   Default color palette to use. One of "viridis", "plasma", "grayscale". Default is "viridis".
+    #' @template param_plot_title
+    #' @template param_plot_subtitle
+    #' @template param_x_lab
+    #' @template param_y_lab
+    #' @template param_z_lab_custom
+    #' @template param_x_limits
+    #' @template param_y_limits
+    #' @template param_z_limits
+    #' @template param_show_grid
+    #' @template param_grid_color
+    #' @template param_show_legend
+    #' @template param_legend_position
+    #' @template param_legend_title
     #' @return The plot object.
-    plot = function(text_size = 11, title_size = NULL, theme = "minimal", background = "white", color_palette = "viridis") {
+    plot = function(text_size = 11, title_size = NULL, theme = "minimal", background = "white", color_palette = "viridis", 
+                    plot_title = NULL, plot_subtitle = NULL, x_lab = NULL, y_lab = NULL, z_lab = NULL,
+                    x_limits = NULL, y_limits = NULL, z_limits = NULL, show_grid = TRUE, grid_color = "gray90",
+                    show_legend = TRUE, legend_position = "right", legend_title = NULL) {
       stop("Abstract method 'plot' must be implemented by subclass")
     },
 

@@ -198,17 +198,18 @@ Visualizer2DModel <- R6::R6Class("Visualizer2DModel",
     #'   Background color for the plot. Default is "white".
     #' @param color_palette (`character(1)`)\cr
     #'   Color palette for the fill scale. One of "viridis", "plasma", "grayscale". Default is "viridis".
+    #' @param ... Additional arguments passed to the parent plot method.
     #' @return A ggplot2 object.
-    plot = function(text_size = 11, title_size = NULL, theme = "minimal", background = "white", color_palette = "viridis") {
+    plot = function(text_size = 11, title_size = NULL, theme = "minimal", background = "white", color_palette = "viridis", ...) {
       checkmate::assert_number(text_size, lower = 1)
       checkmate::assert_number(title_size, lower = 1, null.ok = TRUE)
       checkmate::assert_choice(theme, choices = c("minimal", "bw", "classic", "gray", "light", "dark", "void"))
       checkmate::assert_string(background)
       checkmate::assert_choice(color_palette, choices = c("viridis", "plasma", "grayscale"))
       
-      # Call parent plot method
+      # Call parent plot method with all arguments
       p <- super$plot(text_size = text_size, title_size = title_size, theme = theme, 
-                      background = background, color_palette = color_palette)
+                      background = background, color_palette = color_palette, ...)
       
       # Add boundary lines if available
       if (!is.null(private$.boundary_values)) {

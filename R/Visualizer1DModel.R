@@ -153,13 +153,14 @@ Visualizer1DModel <- R6::R6Class("Visualizer1DModel",
     #'   Base text size for plot elements. Default is 11.
     #' @param theme (`character(1)`)\cr
     #'   ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "minimal".
+    #' @param ... Additional arguments passed to the parent plot method.
     #' @return A ggplot2 object.
-    plot = function(text_size = 11, theme = "minimal") {
+    plot = function(text_size = 11, theme = "minimal", ...) {
       checkmate::assert_number(text_size, lower = 1)
       checkmate::assert_choice(theme, choices = c("minimal", "bw", "classic", "gray", "light", "dark", "void"))
       
-      # Call parent plot method
-      p <- super$plot(text_size = text_size, theme = theme)
+      # Call parent plot method with all arguments
+      p <- super$plot(text_size = text_size, theme = theme, ...)
       
       # Add boundary lines if available
       if (!is.null(private$.boundary_values)) {

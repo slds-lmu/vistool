@@ -48,7 +48,7 @@ as_visualizer <- function(x, type = "auto", x1_limits = NULL, x2_limits = NULL,
                          padding = 0, n_points = 100L, y_pred = NULL, y_true = NULL,
                          input_type = "auto", y_curves = "both", learner = NULL,
                          default_color_palette = "viridis", default_text_size = 11, 
-                         default_theme = "minimal", default_alpha = 0.8, 
+                         default_theme = "bw", default_alpha = 0.8, 
                          default_line_width = 1.2, default_point_size = 2, ...) {
   UseMethod("as_visualizer")
 }
@@ -59,7 +59,7 @@ as_visualizer.Task <- function(x, type = "auto", x1_limits = NULL, x2_limits = N
                               padding = 0, n_points = 100L, y_pred = NULL, y_true = NULL,
                               input_type = "auto", y_curves = "both", learner = NULL,
                               default_color_palette = "viridis", default_text_size = 11, 
-                              default_theme = "minimal", default_alpha = 0.8, 
+                              default_theme = "bw", default_alpha = 0.8, 
                               default_line_width = 1.2, default_point_size = 2, ...) {
   if (is.null(learner)) {
     stop("Argument 'learner' is required for Task visualizations")
@@ -159,14 +159,14 @@ as_visualizer.LossFunction <- function(x, type = "auto", x1_limits = NULL, x2_li
                                        y_pred = NULL, y_true = NULL,
                                        input_type = "auto", y_curves = "both", learner = NULL,
                                        default_color_palette = "viridis", default_text_size = 11, 
-                                       default_theme = "minimal", default_alpha = 0.8, 
+                                       default_theme = "bw", default_alpha = 0.8, 
                                        default_line_width = 1.2, default_point_size = 2, ...) {
   checkmate::assert_choice(type, choices = c("auto", "1d"))
   checkmate::assert_choice(input_type, choices = c("auto", "score", "probability"))
   if (type != "auto" && type != "1d") {
     stop("Only 1D visualization is currently supported for loss functions")
   }
-  return(Visualizer1DLossFuns$new(losses = list(x), y_pred = y_pred, y_true = y_true,
+  return(VisualizerLossFuns$new(losses = list(x), y_pred = y_pred, y_true = y_true,
            n_points = n_points, input_type = input_type, y_curves = y_curves, ...))
 }
 
@@ -189,6 +189,6 @@ as_visualizer.list <- function(x, type = "auto", x1_limits = NULL, x2_limits = N
   if (type != "auto" && type != "1d") {
     stop("Only 1D visualization is currently supported for loss functions")
   }
-  return(Visualizer1DLossFuns$new(losses = x, y_pred = y_pred, y_true = y_true,
+  return(VisualizerLossFuns$new(losses = x, y_pred = y_pred, y_true = y_true,
            n_points = n_points, input_type = input_type, y_curves = y_curves, ...))
 }

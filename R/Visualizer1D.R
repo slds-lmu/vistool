@@ -124,16 +124,55 @@ Visualizer1D <- R6::R6Class("Visualizer1D",
     #'   Base text size for plot elements. Default is 11.
     #' @param theme (`character(1)`)\cr
     #'   ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "minimal".
+    #' @template param_plot_title
+    #' @template param_plot_subtitle
+    #' @template param_x_lab
+    #' @template param_y_lab
+    #' @template param_x_limits
+    #' @template param_y_limits
+    #' @template param_show_grid
+    #' @template param_grid_color
+    #' @template param_show_legend
+    #' @template param_legend_position
+    #' @template param_legend_title
     #' @return A ggplot2 object.
-    plot = function(text_size = 11, theme = "minimal") {
+    plot = function(text_size = 11, theme = "minimal", plot_title = NULL, plot_subtitle = NULL, 
+                    x_lab = NULL, y_lab = NULL, x_limits = NULL, y_limits = NULL, 
+                    show_grid = TRUE, grid_color = "gray90", show_legend = TRUE, 
+                    legend_position = "right", legend_title = NULL) {
       checkmate::assert_number(text_size, lower = 1)
       checkmate::assert_choice(theme, choices = c("minimal", "bw", "classic", "gray", "light", "dark", "void"))
+      checkmate::assert_string(plot_title, null.ok = TRUE)
+      checkmate::assert_string(plot_subtitle, null.ok = TRUE)
+      checkmate::assert_string(x_lab, null.ok = TRUE)
+      checkmate::assert_string(y_lab, null.ok = TRUE)
+      checkmate::assert_numeric(x_limits, len = 2, null.ok = TRUE)
+      checkmate::assert_numeric(y_limits, len = 2, null.ok = TRUE)
+      checkmate::assert_flag(show_grid)
+      checkmate::assert_string(grid_color)
+      checkmate::assert_flag(show_legend)
+      checkmate::assert_choice(legend_position, choices = c("top", "right", "bottom", "left", "none"))
+      checkmate::assert_string(legend_title, null.ok = TRUE)
       
       dd <- data.frame(x = self$fun_x, y = self$fun_y)
       pl <- ggplot(data = dd, aes(x = x, y = y))
       pl <- pl + geom_line(linewidth = self$line_width, col = self$line_col, linetype = self$line_type)
+      
       # use specified axis labels and legend title
-      pl <- pl + labs(title = self$title, x = self$lab_x, y = self$lab_y)
+      final_title <- if (!is.null(plot_title)) plot_title else self$title
+      final_x_lab <- if (!is.null(x_lab)) x_lab else self$lab_x
+      final_y_lab <- if (!is.null(y_lab)) y_lab else self$lab_y
+      
+      pl <- pl + labs(title = final_title, subtitle = plot_subtitle, x = final_x_lab, y = final_y_lab)
+      
+      # Apply axis limits if specified
+      if (!is.null(x_limits)) {
+        pl <- pl + ggplot2::xlim(x_limits[1], x_limits[2])
+      }
+      if (!is.null(y_limits)) {
+        pl <- pl + ggplot2::ylim(y_limits[1], y_limits[2])
+      }
+      
       if (!is.null(self$points_x)) {
         dd2 <- data.frame(x = self$points_x, y = self$points_y)
         pl <- pl + geom_point(
@@ -155,7 +194,12 @@ Visualizer1D <- R6::R6Class("Visualizer1D",
         "dark" = ggplot2::theme_dark,
         "void" = ggplot2::theme_void
       )
-      pl <- pl + theme_fun(base_size = text_size) + theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      pl <- pl + theme_fun(base_size = text_size) + 
+            theme(
+              plot.title = ggplot2::element_text(hjust = 0.5),
+              legend.position = if (show_legend && legend_position != "none") legend_position else "none",
+              panel.grid = if (show_grid) ggplot2::element_line(color = grid_color) else ggplot2::element_blank()
+            )
       
       return(pl)
     }

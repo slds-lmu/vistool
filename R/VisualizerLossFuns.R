@@ -1,11 +1,11 @@
-#' @title Visualizer for 1D Loss Functions
+#' @title Visualizer for Loss Functions
 #'
 #' @description
-#' Visualize one or multiple one-dimensional loss functions.
+#' Visualize one or multiple loss functions.
 #'
 #' @export
-Visualizer1DLossFuns <- R6::R6Class("Visualizer1DLossFuns",
-  inherit = Visualizer1D,
+VisualizerLossFuns <- R6::R6Class("VisualizerLossFuns",
+  inherit = Visualizer,
   public = list(
 
     #' @field losses (`list`)\cr
@@ -15,6 +15,18 @@ Visualizer1DLossFuns <- R6::R6Class("Visualizer1DLossFuns",
     #' @field task_type (`character(1)`)\cr
     #' Task type (regr or classif).
     task_type = NULL,
+
+    #' @field title (`character(1)`)\cr
+    #' Title of plot.
+    title = NULL,
+
+    #' @field lab_x (`character(1)`)\cr
+    #' Label of x-axis.
+    lab_x = NULL,
+
+    #' @field lab_y (`character(1)`)\cr
+    #' Label of y-axis.
+    lab_y = NULL,
 
     #' @field x_range (`numeric(2)`)\cr
     #' Range for x-axis values.
@@ -34,7 +46,7 @@ Visualizer1DLossFuns <- R6::R6Class("Visualizer1DLossFuns",
 
     #' @field legend_title (`element`)\cr
     #' Legend title element.
-    legend_title = element_blank(),
+    legend_title = ggplot2::element_blank(),
 
     #' @field y_pred (`numeric()`)\cr
     #' Predicted values.
@@ -76,14 +88,37 @@ Visualizer1DLossFuns <- R6::R6Class("Visualizer1DLossFuns",
     #'   losses.
     #' @param y_curves (`character(1)`)\cr
     #'   When `input_type = "probability"`, choose which curves to display: `"both"`, `"y1"`, or `"y0"`.
+    #' @template param_default_color_palette
+    #' @template param_default_text_size
+    #' @template param_default_theme
+    #' @param default_alpha (`numeric(1)`)\cr
+    #'   Default alpha transparency. Default is 0.8.
+    #' @param default_line_width (`numeric(1)`)\cr
+    #'   Default line width. Default is 1.2.
+    #' @param default_point_size (`numeric(1)`)\cr
+    #'   Default point size. Default is 2.
+    #' @param ... Additional arguments (currently unused).
     initialize = function(losses, y_pred = NULL, y_true = NULL, n_points = 1000L,
-                          input_type = "auto", y_curves = "both") {
+                          input_type = "auto", y_curves = "both", 
+                          default_color_palette = "viridis", default_text_size = 11, 
+                          default_theme = "bw", default_alpha = 0.8, 
+                          default_line_width = 1.2, default_point_size = 2, ...) {
       checkmate::assert_list(losses, "LossFunction")
       checkmate::assert_numeric(y_pred, null.ok = TRUE)
       checkmate::assert_numeric(y_true, null.ok = TRUE)
       checkmate::assert_integerish(n_points, lower = 10, len = 1)
       checkmate::assert_choice(input_type, choices = c("auto", "score", "probability"))
       checkmate::assert_choice(y_curves, choices = c("both", "y1", "y0"))
+
+      # Initialize parent defaults
+      self$initialize_defaults(
+        default_color_palette = default_color_palette,
+        default_text_size = default_text_size,
+        default_theme = default_theme,
+        default_alpha = default_alpha,
+        default_line_width = default_line_width,
+        default_point_size = default_point_size
+      )
 
       tts <- unique(sapply(losses, function(x) x$task_type))
       if (length(tts) > 1) {
@@ -110,8 +145,8 @@ Visualizer1DLossFuns <- R6::R6Class("Visualizer1DLossFuns",
       names(losses) <- ids
       self$losses <- losses
       self$task_type <- unique(tts)
-      self$title <- ""
-      self$lab_y <- "Loss"
+      
+      # Set up labels and ranges based on task type and input type
       if (self$task_type == "classif") {
         if (input_type == "score") {
           self$lab_x <- expression(y * f)
@@ -124,6 +159,7 @@ Visualizer1DLossFuns <- R6::R6Class("Visualizer1DLossFuns",
         self$lab_x <- expression(y - f)
         self$x_range <- c(-5, 5)
       }
+      
       self$input_type <- input_type
       self$y_curves  <- y_curves
       n <- length(losses)
@@ -133,6 +169,10 @@ Visualizer1DLossFuns <- R6::R6Class("Visualizer1DLossFuns",
       self$y_pred <- y_pred
       self$y_true <- y_true
       self$n_points <- as.integer(n_points)
+      
+      # Set up basic plot labels
+      self$title <- ""
+      self$lab_y <- "Loss"
     },
 
     #' @description
@@ -148,10 +188,40 @@ Visualizer1DLossFuns <- R6::R6Class("Visualizer1DLossFuns",
     #' @param theme (`character(1)`)\cr
     #'   ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light",
     #'   "dark", "void". Default is "bw".
+    #' @template param_plot_title
+    #' @template param_plot_subtitle
+    #' @template param_x_lab
+    #' @template param_y_lab
+    #' @template param_x_limits
+    #' @template param_y_limits
+    #' @template param_show_grid
+    #' @template param_grid_color
+    #' @template param_show_legend
+    #' @template param_legend_position
+    #' @template param_legend_title
     #' @return A ggplot2 object.
-    plot = function(text_size = 11, theme = "bw") {
+    plot = function(text_size = NULL, theme = NULL, plot_title = NULL, plot_subtitle = NULL, 
+                    x_lab = NULL, y_lab = NULL, x_limits = NULL, y_limits = NULL, 
+                    show_grid = TRUE, grid_color = "gray90", show_legend = TRUE, 
+                    legend_position = "right", legend_title = NULL) {
+      
+      # Use stored defaults if parameters are not provided
+      if (is.null(text_size)) text_size <- if (is.null(self$defaults$text_size)) 11 else self$defaults$text_size
+      if (is.null(theme)) theme <- if (is.null(self$defaults$theme)) "bw" else self$defaults$theme
+      
       checkmate::assert_number(text_size, lower = 1)
       checkmate::assert_choice(theme, choices = c("minimal", "bw", "classic", "gray", "light", "dark", "void"))
+      checkmate::assert_string(plot_title, null.ok = TRUE)
+      checkmate::assert_string(plot_subtitle, null.ok = TRUE)
+      checkmate::assert_string(x_lab, null.ok = TRUE)
+      checkmate::assert_string(y_lab, null.ok = TRUE)
+      checkmate::assert_numeric(x_limits, len = 2, null.ok = TRUE)
+      checkmate::assert_numeric(y_limits, len = 2, null.ok = TRUE)
+      checkmate::assert_flag(show_grid)
+      checkmate::assert_string(grid_color)
+      checkmate::assert_flag(show_legend)
+      checkmate::assert_choice(legend_position, choices = c("top", "right", "bottom", "left", "none"))
+      checkmate::assert_string(legend_title, null.ok = TRUE)
 
       loss_labels <- sapply(self$losses, function(x) x$label)
 
@@ -290,12 +360,68 @@ Visualizer1DLossFuns <- R6::R6Class("Visualizer1DLossFuns",
         "void"    = ggplot2::theme_void
       )
       pl <- pl + theme_fun(base_size = text_size) +
-        ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+        ggplot2::theme(
+          plot.title = ggplot2::element_text(hjust = 0.5),
+          legend.position = if (show_legend && legend_position != "none") legend_position else "none",
+          panel.grid = if (show_grid) ggplot2::element_line(color = grid_color) else ggplot2::element_blank()
+        )
 
-      pl <- pl + ggplot2::labs(x = self$lab_x, y = self$lab_y) +
-        ggplot2::theme(legend.title = self$legend_title)
+      # Determine final labels
+      final_title <- if (!is.null(plot_title)) plot_title else self$title
+      final_x_lab <- if (!is.null(x_lab)) x_lab else self$lab_x
+      final_y_lab <- if (!is.null(y_lab)) y_lab else self$lab_y
+      final_legend_title <- if (!is.null(legend_title)) legend_title else self$legend_title
+
+      pl <- pl + ggplot2::labs(title = final_title, subtitle = plot_subtitle, x = final_x_lab, y = final_y_lab)
+      
+      # Only set legend title if we have one
+      if (!is.null(final_legend_title)) {
+        pl <- pl + ggplot2::theme(legend.title = ggplot2::element_text(final_legend_title))
+      }
+      
+      # Apply axis limits if specified
+      if (!is.null(x_limits)) {
+        pl <- pl + ggplot2::xlim(x_limits[1], x_limits[2])
+      }
+      if (!is.null(y_limits)) {
+        pl <- pl + ggplot2::ylim(y_limits[1], y_limits[2])
+      }
+
+      # Add points from add_points() method
+      pl <- private$add_points_to_ggplot(pl, "1D")
 
       return(pl)
+    }
+  ),
+  private = list(
+    # Override infer_z_values to handle loss function evaluation
+    infer_z_values = function(points_data) {
+      # For loss function visualizers, we can evaluate the loss at given points
+      # if we have the necessary data
+      if (all(is.na(points_data$y)) && "x" %in% names(points_data)) {
+        # Try to evaluate the first loss function at the given x values
+        if (length(self$losses) > 0) {
+          first_loss <- self$losses[[1]]
+          loss_fun <- first_loss$get_fun(self$input_type)
+          points_data$y <- loss_fun(points_data$x)
+        } else {
+          # Fallback to zeros if no loss functions available
+          points_data$y <- rep(0, nrow(points_data))
+        }
+      }
+      return(points_data$y)
+    },
+
+    # Override prepare_points_data to handle loss function-specific point preparation
+    prepare_points_data = function(points, visualizer_type) {
+      points_data <- super$prepare_points_data(points, visualizer_type)
+      
+      # For loss function visualizers, try to infer y values if not provided
+      if (visualizer_type == "1D" && all(is.na(points_data$y))) {
+        points_data$y <- private$infer_z_values(points_data)
+      }
+      
+      return(points_data)
     }
   )
 )

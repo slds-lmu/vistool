@@ -290,14 +290,39 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
     #' @param scene (`list()`)\cr
     #'   Scene options for 3D surface plots. Should contain camera settings like `list(camera = list(eye = list(x = 1.1, y = 1.2, z = 1.3)))`. 
     #'   Only applies to surface plots, ignored for contour plots. If NULL, no scene modifications are applied.
+    #' @template param_plot_title
+    #' @template param_plot_subtitle
+    #' @template param_x_lab
+    #' @template param_y_lab
+    #' @template param_z_lab_custom
+    #' @template param_x_limits
+    #' @template param_y_limits
+    #' @template param_z_limits
+    #' @template param_show_legend
+    #' @template param_legend_title
     #' @return A plotly object.
     plot = function(text_size = 12, title_size = NULL, theme = "minimal", background = "white", 
-                    color_palette = "viridis", flatten = FALSE, layout = NULL, scene = NULL) {
+                    color_palette = "viridis", flatten = FALSE, layout = NULL, scene = NULL,
+                    plot_title = NULL, plot_subtitle = NULL, x_lab = NULL, y_lab = NULL, z_lab = NULL,
+                    x_limits = NULL, y_limits = NULL, z_limits = NULL, show_legend = TRUE, legend_title = NULL) {
       checkmate::assert_number(text_size, lower = 1)
       checkmate::assert_number(title_size, lower = 1, null.ok = TRUE)
       checkmate::assert_choice(theme, choices = c("minimal", "bw", "classic", "gray", "light", "dark", "void"))
       checkmate::assert_string(background)
       checkmate::assert_choice(color_palette, choices = c("viridis", "plasma", "grayscale"))
+      checkmate::assert_flag(flatten)
+      checkmate::assert_list(layout, null.ok = TRUE)
+      checkmate::assert_list(scene, null.ok = TRUE)
+      checkmate::assert_string(plot_title, null.ok = TRUE)
+      checkmate::assert_string(plot_subtitle, null.ok = TRUE)
+      checkmate::assert_string(x_lab, null.ok = TRUE)
+      checkmate::assert_string(y_lab, null.ok = TRUE)
+      checkmate::assert_string(z_lab, null.ok = TRUE)
+      checkmate::assert_numeric(x_limits, len = 2, null.ok = TRUE)
+      checkmate::assert_numeric(y_limits, len = 2, null.ok = TRUE)
+      checkmate::assert_numeric(z_limits, len = 2, null.ok = TRUE)
+      checkmate::assert_flag(show_legend)
+      checkmate::assert_string(legend_title, null.ok = TRUE)
       checkmate::assert_flag(flatten)
       checkmate::assert_list(layout, null.ok = TRUE)
       checkmate::assert_list(scene, null.ok = TRUE)
@@ -326,24 +351,47 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
       
       # apply text size to plotly layout
       if (!is.null(private$.plot)) {
+        # Determine final labels
+        final_title <- if (!is.null(plot_title)) plot_title else self$plot_lab
+        final_x_lab <- if (!is.null(x_lab)) x_lab else self$x1_lab
+        final_y_lab <- if (!is.null(y_lab)) y_lab else self$x2_lab
+        final_z_lab <- if (!is.null(z_lab)) z_lab else self$z_lab
+        
         if (private$.layer_primary == "surface") {
           # For 3D surface plots
           private$.plot <- private$.plot %>%
             layout(
-              title = list(text = self$plot_lab, font = list(size = title_size)),
+              title = list(text = final_title, font = list(size = title_size)),
               scene = list(
-                xaxis = list(title = list(text = self$x1_lab, font = list(size = text_size))),
-                yaxis = list(title = list(text = self$x2_lab, font = list(size = text_size))),
-                zaxis = list(title = list(text = self$z_lab, font = list(size = text_size)))
-              )
+                xaxis = list(
+                  title = list(text = final_x_lab, font = list(size = text_size)),
+                  range = x_limits
+                ),
+                yaxis = list(
+                  title = list(text = final_y_lab, font = list(size = text_size)),
+                  range = y_limits
+                ),
+                zaxis = list(
+                  title = list(text = final_z_lab, font = list(size = text_size)),
+                  range = z_limits
+                )
+              ),
+              showlegend = show_legend
             )
         } else {
           # For 2D contour plots
           private$.plot <- private$.plot %>%
             layout(
-              title = list(text = self$plot_lab, font = list(size = title_size)),
-              xaxis = list(title = list(text = self$x1_lab, font = list(size = text_size))),
-              yaxis = list(title = list(text = self$x2_lab, font = list(size = text_size)))
+              title = list(text = final_title, font = list(size = title_size)),
+              xaxis = list(
+                title = list(text = final_x_lab, font = list(size = text_size)),
+                range = x_limits
+              ),
+              yaxis = list(
+                title = list(text = final_y_lab, font = list(size = text_size)),
+                range = y_limits
+              ),
+              showlegend = show_legend
             )
         }
       }

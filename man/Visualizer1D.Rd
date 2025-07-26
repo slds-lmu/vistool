@@ -127,7 +127,21 @@ Use NULL if no points should be plotted.}
 \subsection{Method \code{plot()}}{
 Create and return the ggplot2 plot.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer1D$plot(text_size = 11, theme = "minimal")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer1D$plot(
+  text_size = 11,
+  theme = "minimal",
+  plot_title = NULL,
+  plot_subtitle = NULL,
+  x_lab = NULL,
+  y_lab = NULL,
+  x_limits = NULL,
+  y_limits = NULL,
+  show_grid = TRUE,
+  grid_color = "gray90",
+  show_legend = TRUE,
+  legend_position = "right",
+  legend_title = NULL
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -138,6 +152,39 @@ Base text size for plot elements. Default is 11.}
 
 \item{\code{theme}}{(`character(1)`)\cr
 ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "minimal".}
+
+\item{\code{plot_title}}{(`character(1)`)\cr
+Main plot title. If NULL, uses the visualizer's default title. Default is NULL.}
+
+\item{\code{plot_subtitle}}{(`character(1)`)\cr
+Plot subtitle. If NULL, no subtitle is shown. Default is NULL.}
+
+\item{\code{x_lab}}{(`character(1)`)\cr
+X-axis label. If NULL, uses the visualizer's default label. Default is NULL.}
+
+\item{\code{y_lab}}{(`character(1)`)\cr
+Y-axis label. If NULL, uses the visualizer's default label. Default is NULL.}
+
+\item{\code{x_limits}}{(`numeric(2)`)\cr
+X-axis limits as c(min, max). If NULL, uses automatic limits. Default is NULL.}
+
+\item{\code{y_limits}}{(`numeric(2)`)\cr
+Y-axis limits as c(min, max). If NULL, uses automatic limits. Default is NULL.}
+
+\item{\code{show_grid}}{(`logical(1)`)\cr
+Whether to show axis grid lines. Default is TRUE.}
+
+\item{\code{grid_color}}{(`character(1)`)\cr
+Color of grid lines. Default is "gray90".}
+
+\item{\code{show_legend}}{(`logical(1)`)\cr
+Whether to show the legend. Default is TRUE.}
+
+\item{\code{legend_position}}{(`character(1)`)\cr
+Position of the legend. One of "top", "right", "bottom", "left", "none". Default is "right".}
+
+\item{\code{legend_title}}{(`character(1)`)\cr
+Title for the legend. If NULL, uses default based on visualizer type. Default is NULL.}
 }
 \if{html}{\out{</div>}}
 }

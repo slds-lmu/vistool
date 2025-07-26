@@ -79,13 +79,38 @@ Visualizer2D <- R6::R6Class("Visualizer2D",
     #'   Background color for the plot. Default is "white".
     #' @param color_palette (`character(1)`)\cr
     #'   Color palette for the fill scale. One of "viridis", "plasma", "grayscale". Default is "viridis".
+    #' @template param_plot_title
+    #' @template param_plot_subtitle
+    #' @template param_x_lab
+    #' @template param_y_lab
+    #' @template param_x_limits
+    #' @template param_y_limits
+    #' @template param_show_grid
+    #' @template param_grid_color
+    #' @template param_show_legend
+    #' @template param_legend_position
+    #' @template param_legend_title
     #' @return A ggplot2 object.
-    plot = function(text_size = 11, title_size = NULL, theme = "minimal", background = "white", color_palette = "viridis") {
+    plot = function(text_size = 11, title_size = NULL, theme = "minimal", background = "white", color_palette = "viridis",
+                    plot_title = NULL, plot_subtitle = NULL, x_lab = NULL, y_lab = NULL, 
+                    x_limits = NULL, y_limits = NULL, show_grid = TRUE, grid_color = "gray90",
+                    show_legend = TRUE, legend_position = "right", legend_title = NULL) {
       checkmate::assert_number(text_size, lower = 1)
       checkmate::assert_number(title_size, lower = 1, null.ok = TRUE)
       checkmate::assert_choice(theme, choices = c("minimal", "bw", "classic", "gray", "light", "dark", "void"))
       checkmate::assert_string(background)
       checkmate::assert_choice(color_palette, choices = c("viridis", "plasma", "grayscale"))
+      checkmate::assert_string(plot_title, null.ok = TRUE)
+      checkmate::assert_string(plot_subtitle, null.ok = TRUE)
+      checkmate::assert_string(x_lab, null.ok = TRUE)
+      checkmate::assert_string(y_lab, null.ok = TRUE)
+      checkmate::assert_numeric(x_limits, len = 2, null.ok = TRUE)
+      checkmate::assert_numeric(y_limits, len = 2, null.ok = TRUE)
+      checkmate::assert_flag(show_grid)
+      checkmate::assert_string(grid_color)
+      checkmate::assert_flag(show_legend)
+      checkmate::assert_choice(legend_position, choices = c("top", "right", "bottom", "left", "none"))
+      checkmate::assert_string(legend_title, null.ok = TRUE)
       
       # Set default title size
       if (is.null(title_size)) title_size <- text_size + 2
@@ -96,19 +121,33 @@ Visualizer2D <- R6::R6Class("Visualizer2D",
         fun_y = self$fun_y
       )
 
+      # Determine final labels
+      final_title <- if (!is.null(plot_title)) plot_title else self$title
+      final_x_lab <- if (!is.null(x_lab)) x_lab else self$lab_x1
+      final_y_lab <- if (!is.null(y_lab)) y_lab else self$lab_x2
+      final_legend_title <- if (!is.null(legend_title)) legend_title else self$lab_y
+
       # Create base plot with continuous color gradient and overlaid contours
       p <- ggplot(data, aes(x = fun_x1, y = fun_x2)) +
         geom_raster(aes(fill = fun_y), interpolate = TRUE) +
         geom_contour(aes(z = fun_y), color = "white", alpha = 0.3) +
-        labs(title = self$title, x = self$lab_x1, y = self$lab_x2)
+        labs(title = final_title, subtitle = plot_subtitle, x = final_x_lab, y = final_y_lab)
+      
+      # Apply axis limits if specified
+      if (!is.null(x_limits)) {
+        p <- p + ggplot2::xlim(x_limits[1], x_limits[2])
+      }
+      if (!is.null(y_limits)) {
+        p <- p + ggplot2::ylim(y_limits[1], y_limits[2])
+      }
       
       # Apply color scale based on palette choice
       if (color_palette == "viridis") {
-        p <- p + scale_fill_viridis_c(name = self$lab_y)
+        p <- p + scale_fill_viridis_c(name = final_legend_title)
       } else if (color_palette == "plasma") {
-        p <- p + scale_fill_viridis_c(name = self$lab_y, option = "plasma")
+        p <- p + scale_fill_viridis_c(name = final_legend_title, option = "plasma")
       } else if (color_palette == "grayscale") {
-        p <- p + scale_fill_gradient(name = self$lab_y, low = "black", high = "white")
+        p <- p + scale_fill_gradient(name = final_legend_title, low = "black", high = "white")
       }
 
       # apply theme
@@ -124,7 +163,9 @@ Visualizer2D <- R6::R6Class("Visualizer2D",
       p <- p + theme_fun(base_size = text_size) + 
            theme(
              plot.title = ggplot2::element_text(hjust = 0.5, size = title_size),
-             panel.background = ggplot2::element_rect(fill = background, color = NA)
+             panel.background = ggplot2::element_rect(fill = background, color = NA),
+             legend.position = if (show_legend && legend_position != "none") legend_position else "none",
+             panel.grid = if (show_grid) ggplot2::element_line(color = grid_color) else ggplot2::element_blank()
            )
       
       # Add points from add_points() method
