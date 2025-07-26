@@ -65,11 +65,12 @@ Visualizer <- R6::R6Class("Visualizer",
     #' @template param_show_legend
     #' @template param_legend_position
     #' @template param_legend_title
+    #' @template param_show_title
     #' @return The plot object.
     plot = function(text_size = 11, title_size = NULL, theme = "minimal", background = "white", color_palette = "viridis", 
                     plot_title = NULL, plot_subtitle = NULL, x_lab = NULL, y_lab = NULL, z_lab = NULL,
                     x_limits = NULL, y_limits = NULL, z_limits = NULL, show_grid = TRUE, grid_color = "gray90",
-                    show_legend = TRUE, legend_position = "right", legend_title = NULL) {
+                    show_legend = TRUE, legend_position = "right", legend_title = NULL, show_title = TRUE) {
       stop("Abstract method 'plot' must be implemented by subclass")
     },
 

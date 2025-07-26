@@ -300,11 +300,12 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
     #' @template param_z_limits
     #' @template param_show_legend
     #' @template param_legend_title
+    #' @template param_show_title
     #' @return A plotly object.
     plot = function(text_size = 12, title_size = NULL, theme = "minimal", background = "white", 
                     color_palette = "viridis", flatten = FALSE, layout = NULL, scene = NULL,
                     plot_title = NULL, plot_subtitle = NULL, x_lab = NULL, y_lab = NULL, z_lab = NULL,
-                    x_limits = NULL, y_limits = NULL, z_limits = NULL, show_legend = TRUE, legend_title = NULL) {
+                    x_limits = NULL, y_limits = NULL, z_limits = NULL, show_legend = TRUE, legend_title = NULL, show_title = TRUE) {
       checkmate::assert_number(text_size, lower = 1)
       checkmate::assert_number(title_size, lower = 1, null.ok = TRUE)
       checkmate::assert_choice(theme, choices = c("minimal", "bw", "classic", "gray", "light", "dark", "void"))
@@ -323,6 +324,7 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
       checkmate::assert_numeric(z_limits, len = 2, null.ok = TRUE)
       checkmate::assert_flag(show_legend)
       checkmate::assert_string(legend_title, null.ok = TRUE)
+      checkmate::assert_flag(show_title)
       checkmate::assert_flag(flatten)
       checkmate::assert_list(layout, null.ok = TRUE)
       checkmate::assert_list(scene, null.ok = TRUE)
@@ -352,7 +354,11 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
       # apply text size to plotly layout
       if (!is.null(private$.plot)) {
         # Determine final labels
-        final_title <- if (!is.null(plot_title)) plot_title else self$plot_lab
+        final_title <- if (show_title) {
+          if (!is.null(plot_title)) plot_title else self$plot_lab
+        } else {
+          ""  # Empty string instead of NULL for plotly
+        }
         final_x_lab <- if (!is.null(x_lab)) x_lab else self$x1_lab
         final_y_lab <- if (!is.null(y_lab)) y_lab else self$x2_lab
         final_z_lab <- if (!is.null(z_lab)) z_lab else self$z_lab
@@ -360,7 +366,7 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
         if (private$.layer_primary == "surface") {
           # For 3D surface plots
           private$.plot <- private$.plot %>%
-            layout(
+            plotly::layout(
               title = list(text = final_title, font = list(size = title_size)),
               scene = list(
                 xaxis = list(
@@ -381,7 +387,7 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
         } else {
           # For 2D contour plots
           private$.plot <- private$.plot %>%
-            layout(
+            plotly::layout(
               title = list(text = final_title, font = list(size = title_size)),
               xaxis = list(
                 title = list(text = final_x_lab, font = list(size = text_size)),

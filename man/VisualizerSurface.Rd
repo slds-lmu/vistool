@@ -134,6 +134,9 @@ Indicator whether to show the title of the plot.}
 
 \item{\code{show_title}}{(`logical(1)`)\cr
 Indicator whether to show the title of the plot.}
+
+\item{\code{show_title}}{(`logical(1)`)\cr
+Indicator whether to show the title of the plot.}
 }
 \if{html}{\out{</div>}}
 }
@@ -173,6 +176,9 @@ The coloring of the surface/contour.}
 
 \item{\code{colorscale}}{(`list()`)\cr
 The coloring of the surface/contour.}
+
+\item{\code{show_title}}{(`logical(1)`)\cr
+Indicator whether to show the title of the plot.}
 
 \item{\code{show_title}}{(`logical(1)`)\cr
 Indicator whether to show the title of the plot.}
@@ -227,6 +233,9 @@ The coloring of the surface/contour.}
 
 \item{\code{colorscale}}{(`list()`)\cr
 The coloring of the surface/contour.}
+
+\item{\code{show_title}}{(`logical(1)`)\cr
+Indicator whether to show the title of the plot.}
 
 \item{\code{show_title}}{(`logical(1)`)\cr
 Indicator whether to show the title of the plot.}
@@ -335,7 +344,8 @@ Return the plot and hence plot it or do further processing.
   y_limits = NULL,
   z_limits = NULL,
   show_legend = TRUE,
-  legend_title = NULL
+  legend_title = NULL,
+  show_title = TRUE
 )}\if{html}{\out{</div>}}
 }
 
@@ -399,6 +409,18 @@ Whether to show the legend. Default is TRUE.}
 
 \item{\code{legend_title}}{(`character(1)`)\cr
 Title for the legend. If NULL, uses default based on visualizer type. Default is NULL.}
+
+\item{\code{show_title}}{(`logical(1)`)\cr
+Indicator whether to show the title of the plot.}
+
+\item{\code{show_title}}{(`logical(1)`)\cr
+Indicator whether to show the title of the plot.}
+
+\item{\code{show_title}}{(`logical(1)`)\cr
+Indicator whether to show the title of the plot.}
+
+\item{\code{show_title}}{(`logical(1)`)\cr
+Indicator whether to show the title of the plot.}
 }
 \if{html}{\out{</div>}}
 }

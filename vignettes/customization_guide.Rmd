@@ -1,8 +1,8 @@
 ---
-title: "Customization Options"
+title: "Customization Guide"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Customization Options}
+  %\VignetteIndexEntry{Customization Guide}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -18,11 +18,11 @@ knitr::opts_chunk$set(
 )
 ```
 
-The three-step workflow 
+The three-step workflow,
 
-1. **Initialize** the Visualizer using `as_visualizer()`
-2. **Add** visualization layers (e.g., contours, training_data, boundaries, optimization traces)
-3. **Plot** using `plot()` and optionally `save()` or `animate()`
+1. **Initialize** the Visualizer using `as_visualizer()`,
+2. **Add** visualization layers (e.g., contours, training_data, boundaries, optimization traces),
+3. **Plot** using `plot()` and optionally `save()` or `animate()`,
 
 offers consistent customization options across all visualization types.
 In particular, all visual elements support automatic color assignment using `color = "auto"`:
@@ -55,6 +55,7 @@ plot(
   # Title and Subtitle Customization
   plot_title = NULL,         # Override plot title
   plot_subtitle = NULL,      # Add subtitle to plot
+  show_title = TRUE,         # Show/hide plot title completely
   
   # Axis Customization
   x_lab = NULL,              # Custom x-axis label
@@ -134,90 +135,7 @@ add_optimization_trace(
 )
 ```
 
-## Title and Axis Customization Examples
-
-### Custom Titles and Subtitles
-```r
-# Override default title and add subtitle
-vis$plot(
-  plot_title = "Custom Model Performance",
-  plot_subtitle = "Trained on dataset XYZ"
-)
-```
-
-### Custom Axis Labels and Limits
-```r
-# 1D plots
-vis$plot(
-  x_lab = "Feature Value",
-  y_lab = "Prediction", 
-  x_limits = c(-2, 2),
-  y_limits = c(0, 1)
-)
-
-# 2D plots  
-vis$plot(
-  x_lab = "Temperature (°C)",
-  y_lab = "Pressure (Pa)",
-  x_limits = c(0, 100),
-  y_limits = c(0, 1000)
-)
-
-# Surface plots (3D)
-vis$plot(
-  x_lab = "X coordinate", 
-  y_lab = "Y coordinate",
-  z_lab = "Objective value",
-  z_limits = c(-10, 10)
-)
-```
-
-### Grid Customization
-```r
-# Hide grid lines
-vis$plot(show_grid = FALSE)
-
-# Custom grid color
-vis$plot(grid_color = "lightblue")
-```
-
-## Legend Customization Examples
-
-### Legend Position and Visibility
-```r
-# Hide legend completely
-vis$plot(show_legend = FALSE)
-
-# Position legend at top
-vis$plot(legend_position = "top")
-
-# Position legend at bottom with custom title
-vis$plot(
-  legend_position = "bottom",
-  legend_title = "Classification Score"
-)
-```
-
-### Complete Customization Example
-```r
-# Fully customized plot
-vis$plot(
-  plot_title = "SVM Decision Boundary",
-  plot_subtitle = "RBF kernel with C=1.0",
-  x_lab = "Feature 1 (standardized)",
-  y_lab = "Feature 2 (standardized)", 
-  x_limits = c(-3, 3),
-  y_limits = c(-3, 3),
-  show_grid = TRUE,
-  grid_color = "gray95",
-  legend_position = "top",
-  legend_title = "Probability",
-  text_size = 12,
-  theme = "bw"
-)
-```
-
-## Setting Defaults at Initialization
+## (Setting) Defaults at Initialization
 ```r
 as_visualizer(
   x,                       # Task, Objective, or LossFunction

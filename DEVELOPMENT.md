@@ -18,7 +18,7 @@ devtools::check()
 devtools::test()
 
 # Run specific test file
-testthat::test_file("tests/testthat/test-Objective.R")
+devtools::test_active_file('tests/testthat/test-plot-customization.R')
 
 # Install package locally
 devtools::install()

@@ -111,7 +111,8 @@ Create and return the ggplot2 plot.
   grid_color = "gray90",
   show_legend = TRUE,
   legend_position = "right",
-  legend_title = NULL
+  legend_title = NULL,
+  show_title = TRUE
 )}\if{html}{\out{</div>}}
 }
 
@@ -165,6 +166,9 @@ Position of the legend. One of "top", "right", "bottom", "left", "none". Default
 
 \item{\code{legend_title}}{(`character(1)`)\cr
 Title for the legend. If NULL, uses default based on visualizer type. Default is NULL.}
+
+\item{\code{show_title}}{(`logical(1)`)\cr
+Indicator whether to show the title of the plot.}
 }
 \if{html}{\out{</div>}}
 }

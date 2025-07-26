@@ -167,3 +167,134 @@ test_that("parameter inheritance works in specialized visualizer classes", {
   expect_s3_class(p2, "ggplot")
   expect_true(grepl("2D Model", p2$labels$title))
 })
+
+test_that("show_title parameter works for all visualizer types", {
+  # Test Visualizer1D
+  obj_1d <- Objective$new(id = "test_1d", fun = function(x) x^2, xdim = 1, lower = -5, upper = 5)
+  vis_1d <- as_visualizer(obj_1d, type = "1d", n_points = 50)
+  
+  # Test with title shown (default)
+  p1 <- vis_1d$plot(show_title = TRUE)
+  expect_s3_class(p1, "ggplot")
+  expect_false(is.null(p1$labels$title))
+  
+  # Test with title hidden
+  p2 <- vis_1d$plot(show_title = FALSE)
+  expect_s3_class(p2, "ggplot")
+  expect_true(is.null(p2$labels$title))
+  
+  # Test with custom title and show_title = FALSE (should still hide title)
+  p3 <- vis_1d$plot(plot_title = "Custom Title", show_title = FALSE)
+  expect_s3_class(p3, "ggplot")
+  expect_true(is.null(p3$labels$title))
+  
+  # Test with custom title and show_title = TRUE (should show custom title)
+  p4 <- vis_1d$plot(plot_title = "Custom Title", show_title = TRUE)
+  expect_s3_class(p4, "ggplot")
+  expect_equal(p4$labels$title, "Custom Title")
+  
+  # Test Visualizer2D
+  obj_2d <- Objective$new(id = "test_2d", fun = function(x) x[1]^2 + x[2]^2, xdim = 2, lower = c(-3, -3), upper = c(3, 3))
+  vis_2d <- as_visualizer(obj_2d, type = "2d", n_points = 30)
+  
+  # Test with title shown (default)
+  p5 <- vis_2d$plot(show_title = TRUE)
+  expect_s3_class(p5, "ggplot")
+  expect_false(is.null(p5$labels$title))
+  
+  # Test with title hidden
+  p6 <- vis_2d$plot(show_title = FALSE)
+  expect_s3_class(p6, "ggplot")
+  expect_true(is.null(p6$labels$title))
+  
+  # Test VisualizerSurface
+  vis_surface <- as_visualizer(obj_2d, type = "surface", n_points = 20)
+  
+  # Test with title shown (default) - just check it returns plotly object
+  p7 <- vis_surface$plot(show_title = TRUE)
+  expect_true(inherits(p7, "plotly"))
+  
+  # Test with title hidden - just check it returns plotly object  
+  p8 <- vis_surface$plot(show_title = FALSE)
+  expect_true(inherits(p8, "plotly"))
+  
+  # Test flattened surface (contour plot)
+  p9 <- vis_surface$plot(flatten = TRUE, show_title = TRUE)
+  expect_true(inherits(p9, "plotly"))
+  
+  p10 <- vis_surface$plot(flatten = TRUE, show_title = FALSE)
+  expect_true(inherits(p10, "plotly"))
+})
+
+test_that("show_title parameter works for model visualizers", {
+  skip_if_not_installed("mlr3learners")
+  skip_if_not_installed("rpart")
+  # Test Visualizer1DModel via inherited functionality
+  task_1d <- tsk("mtcars")$select("wt")  # 1D regression task
+  learner <- lrn("regr.rpart")  # Using rpart instead of lm
+  learner$train(task_1d)
+  
+  vis_model_1d <- as_visualizer(task_1d, learner = learner, type = "1d")
+  
+  # Test with title shown
+  p1 <- vis_model_1d$plot(show_title = TRUE)
+  expect_s3_class(p1, "ggplot")
+  expect_false(is.null(p1$labels$title))
+  
+  # Test with title hidden
+  p2 <- vis_model_1d$plot(show_title = FALSE)
+  expect_s3_class(p2, "ggplot")
+  expect_true(is.null(p2$labels$title))
+  
+  # Test Visualizer2DModel
+  task_2d <- tsk("mtcars")$select(c("wt", "hp"))  # 2D regression task
+  learner$train(task_2d)
+  vis_model_2d <- as_visualizer(task_2d, learner = learner, type = "2d")
+  
+  # Test with title shown
+  p3 <- vis_model_2d$plot(show_title = TRUE)
+  expect_s3_class(p3, "ggplot")
+  expect_false(is.null(p3$labels$title))
+  
+  # Test with title hidden
+  p4 <- vis_model_2d$plot(show_title = FALSE)
+  expect_s3_class(p4, "ggplot")
+  expect_true(is.null(p4$labels$title))
+})
+
+test_that("show_title parameter works for loss function visualizers", {
+  skip_if_not_installed("mlr3")
+  # Create a simple binary classification task for loss function visualization
+  task_classif <- tsk("sonar")
+  # Use a single loss function to avoid compatibility issues
+  losses <- list(lss("cross-entropy"))
+  
+  vis_loss <- as_visualizer(losses, task = task_classif)
+  
+  # Test with title shown (default)
+  p1 <- vis_loss$plot(show_title = TRUE)
+  expect_s3_class(p1, "ggplot")
+  expect_false(is.null(p1$labels$title))
+  
+  # Test with title hidden
+  p2 <- vis_loss$plot(show_title = FALSE)
+  expect_s3_class(p2, "ggplot")
+  expect_true(is.null(p2$labels$title))
+})
+
+test_that("show_title default behavior works correctly", {
+  # Test that default is TRUE (title shown)
+  obj <- Objective$new(id = "test", fun = function(x) x^2, xdim = 1, lower = -5, upper = 5)
+  vis <- as_visualizer(obj, type = "1d", n_points = 50)
+  
+  # When show_title is not specified, should default to TRUE
+  p1 <- vis$plot()
+  expect_s3_class(p1, "ggplot")
+  expect_false(is.null(p1$labels$title))
+  
+  # Explicitly setting show_title = TRUE should work the same
+  p2 <- vis$plot(show_title = TRUE)
+  expect_s3_class(p2, "ggplot")
+  expect_false(is.null(p2$labels$title))
+  expect_equal(p1$labels$title, p2$labels$title)
+})

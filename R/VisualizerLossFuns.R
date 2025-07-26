@@ -199,11 +199,12 @@ VisualizerLossFuns <- R6::R6Class("VisualizerLossFuns",
     #' @template param_show_legend
     #' @template param_legend_position
     #' @template param_legend_title
+    #' @template param_show_title
     #' @return A ggplot2 object.
     plot = function(text_size = NULL, theme = NULL, plot_title = NULL, plot_subtitle = NULL, 
                     x_lab = NULL, y_lab = NULL, x_limits = NULL, y_limits = NULL, 
                     show_grid = TRUE, grid_color = "gray90", show_legend = TRUE, 
-                    legend_position = "right", legend_title = NULL) {
+                    legend_position = "right", legend_title = NULL, show_title = TRUE) {
       
       # Use stored defaults if parameters are not provided
       if (is.null(text_size)) text_size <- if (is.null(self$defaults$text_size)) 11 else self$defaults$text_size
@@ -222,9 +223,14 @@ VisualizerLossFuns <- R6::R6Class("VisualizerLossFuns",
       checkmate::assert_flag(show_legend)
       checkmate::assert_choice(legend_position, choices = c("top", "right", "bottom", "left", "none"))
       checkmate::assert_string(legend_title, null.ok = TRUE)
+      checkmate::assert_flag(show_title)
 
       # Determine final labels
-      final_title <- if (!is.null(plot_title)) plot_title else self$title
+      final_title <- if (show_title) {
+        if (!is.null(plot_title)) plot_title else self$title
+      } else {
+        NULL
+      }
       final_x_lab <- if (!is.null(x_lab)) x_lab else self$lab_x
       final_y_lab <- if (!is.null(y_lab)) y_lab else self$lab_y
       final_legend_title <- if (!is.null(legend_title)) legend_title else self$legend_title

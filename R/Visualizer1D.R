@@ -135,11 +135,12 @@ Visualizer1D <- R6::R6Class("Visualizer1D",
     #' @template param_show_legend
     #' @template param_legend_position
     #' @template param_legend_title
+    #' @template param_show_title
     #' @return A ggplot2 object.
     plot = function(text_size = 11, theme = "minimal", plot_title = NULL, plot_subtitle = NULL, 
                     x_lab = NULL, y_lab = NULL, x_limits = NULL, y_limits = NULL, 
                     show_grid = TRUE, grid_color = "gray90", show_legend = TRUE, 
-                    legend_position = "right", legend_title = NULL) {
+                    legend_position = "right", legend_title = NULL, show_title = TRUE) {
       checkmate::assert_number(text_size, lower = 1)
       checkmate::assert_choice(theme, choices = c("minimal", "bw", "classic", "gray", "light", "dark", "void"))
       checkmate::assert_string(plot_title, null.ok = TRUE)
@@ -153,13 +154,18 @@ Visualizer1D <- R6::R6Class("Visualizer1D",
       checkmate::assert_flag(show_legend)
       checkmate::assert_choice(legend_position, choices = c("top", "right", "bottom", "left", "none"))
       checkmate::assert_string(legend_title, null.ok = TRUE)
+      checkmate::assert_flag(show_title)
       
       dd <- data.frame(x = self$fun_x, y = self$fun_y)
       pl <- ggplot(data = dd, aes(x = x, y = y))
       pl <- pl + geom_line(linewidth = self$line_width, col = self$line_col, linetype = self$line_type)
       
       # use specified axis labels and legend title
-      final_title <- if (!is.null(plot_title)) plot_title else self$title
+      final_title <- if (show_title) {
+        if (!is.null(plot_title)) plot_title else self$title
+      } else {
+        NULL
+      }
       final_x_lab <- if (!is.null(x_lab)) x_lab else self$lab_x
       final_y_lab <- if (!is.null(y_lab)) y_lab else self$lab_y
       

@@ -90,11 +90,12 @@ Visualizer2D <- R6::R6Class("Visualizer2D",
     #' @template param_show_legend
     #' @template param_legend_position
     #' @template param_legend_title
+    #' @template param_show_title
     #' @return A ggplot2 object.
     plot = function(text_size = 11, title_size = NULL, theme = "minimal", background = "white", color_palette = "viridis",
                     plot_title = NULL, plot_subtitle = NULL, x_lab = NULL, y_lab = NULL, 
                     x_limits = NULL, y_limits = NULL, show_grid = TRUE, grid_color = "gray90",
-                    show_legend = TRUE, legend_position = "right", legend_title = NULL) {
+                    show_legend = TRUE, legend_position = "right", legend_title = NULL, show_title = TRUE) {
       checkmate::assert_number(text_size, lower = 1)
       checkmate::assert_number(title_size, lower = 1, null.ok = TRUE)
       checkmate::assert_choice(theme, choices = c("minimal", "bw", "classic", "gray", "light", "dark", "void"))
@@ -111,6 +112,7 @@ Visualizer2D <- R6::R6Class("Visualizer2D",
       checkmate::assert_flag(show_legend)
       checkmate::assert_choice(legend_position, choices = c("top", "right", "bottom", "left", "none"))
       checkmate::assert_string(legend_title, null.ok = TRUE)
+      checkmate::assert_flag(show_title)
       
       # Set default title size
       if (is.null(title_size)) title_size <- text_size + 2
@@ -122,7 +124,11 @@ Visualizer2D <- R6::R6Class("Visualizer2D",
       )
 
       # Determine final labels
-      final_title <- if (!is.null(plot_title)) plot_title else self$title
+      final_title <- if (show_title) {
+        if (!is.null(plot_title)) plot_title else self$title
+      } else {
+        NULL
+      }
       final_x_lab <- if (!is.null(x_lab)) x_lab else self$lab_x1
       final_y_lab <- if (!is.null(y_lab)) y_lab else self$lab_x2
       final_legend_title <- if (!is.null(legend_title)) legend_title else self$lab_y
