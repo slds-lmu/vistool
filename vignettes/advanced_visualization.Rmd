@@ -45,7 +45,7 @@ ssize <- (lupper - llower) / 10
 
 viz$add_contours(contours = list(
   y = list(show = TRUE, start = llower[2], end = lupper[2], size = ssize[2], color = "red")
-))$plot()
+))$plot(color_palette = "grayscale")
 ```
 
 ## Setting the layout and scene

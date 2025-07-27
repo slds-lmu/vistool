@@ -143,19 +143,33 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
       private$.layer_primary <- "surface"
 
       llp <- list(x = self$grid$x1, y = self$grid$x2, z = self$zmat)
-      private$.plot <- plot_ly() %>%
-        add_trace(
-          name = self$plot_lab,
-          showlegend = FALSE,
-          showscale = FALSE,
-          x = llp$x,
-          y = llp$y,
-          z = t(llp$z),
-          type = "surface",
-          opacity = opacity,
-          colorscale = colorscale,
-          ...
-        ) %>%
+      
+      # Check if contours layer is stored and include it in the base surface
+      contours_layer <- private$get_layer("contours")
+      
+      # Build trace arguments
+      trace_args <- list(
+        name = self$plot_lab,
+        showlegend = FALSE,
+        showscale = FALSE,
+        x = llp$x,
+        y = llp$y,
+        z = t(llp$z),
+        type = "surface",
+        opacity = opacity,
+        colorscale = colorscale
+      )
+      
+      # Add contours if available
+      if (!is.null(contours_layer)) {
+        trace_args$contours <- contours_layer$contours
+      }
+      
+      # Add additional arguments
+      trace_args <- c(trace_args, list(...))
+      
+      plot_obj <- plot_ly()
+      private$.plot <- do.call(plotly::add_trace, c(list(plot_obj), trace_args)) %>%
         layout(
           title = if (show_title) self$plot_lab else NULL,
           scene = list(
@@ -214,12 +228,7 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
     #' @param ... Additional arguments passed to the contour trace.
     #' @return Self (invisibly) for method chaining.
     add_contours = function(contours = NULL, ...) {
-      if (is.null(private$.plot)) private$.init_default_plot()
       checkmate::assert_list(contours, null.ok = TRUE)
-      
-      if (private$.layer_primary != "surface") {
-        stop("Contours can only be added to surface plots")
-      }
       
       # Handle contours: custom contours or default z-projected contours
       if (is.null(contours)) {
@@ -236,38 +245,11 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
         contours_final <- contours
       }
       
-      # Update the existing surface trace to include contours
-      # We need to reconstruct the surface with contours
-      llp <- list(x = self$grid$x1, y = self$grid$x2, z = self$zmat)
-      
-      # Get the current opacity and colorscale from the existing plot or defaults
-      current_opacity <- if(!is.null(private$.vbase$opacity)) private$.vbase$opacity else self$opacity
-      current_colorscale <- if(!is.null(private$.vbase$colorscale)) private$.vbase$colorscale else self$colorscale
-      current_show_title <- if(!is.null(private$.vbase$show_title)) private$.vbase$show_title else self$show_title
-      
-      # Recreate the plot with contours
-      private$.plot <- plot_ly() %>%
-        add_trace(
-          name = self$plot_lab,
-          showlegend = FALSE,
-          showscale = FALSE,
-          x = llp$x,
-          y = llp$y,
-          z = t(llp$z),
-          type = "surface",
-          opacity = current_opacity,
-          colorscale = current_colorscale,
-          contours = contours_final,
-          ...
-        ) %>%
-        layout(
-          title = if (current_show_title) self$plot_lab else NULL,
-          scene = list(
-            xaxis = list(title = self$x1_lab),
-            yaxis = list(title = self$x2_lab),
-            zaxis = list(title = self$z_lab)
-          )
-        )
+      # Store contours specification for deferred rendering
+      private$store_layer("contours", list(
+        contours = contours_final,
+        args = list(...)
+      ))
 
       return(invisible(self))
     },
@@ -367,10 +349,16 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
       plot_colorscale <- get_vistool_color(1, color_palette)
       
       # Check if we need to reinitialize the plot
+      # This happens if the plot type changes, colorscale changes, or contours are added/modified
+      contours_layer <- private$get_layer("contours")
+      has_contours <- !is.null(contours_layer)
+      current_has_contours <- !is.null(private$.vbase) && !is.null(private$.vbase$contours)
+      
       needs_reinit <- is.null(private$.plot) || 
                      (flatten && private$.layer_primary != "contour") ||
                      (!flatten && private$.layer_primary != "surface") ||
-                     (!identical(private$.vbase$colorscale, plot_colorscale))
+                     (!identical(private$.vbase$colorscale, plot_colorscale)) ||
+                     (has_contours != current_has_contours)
       
       # Initialize appropriate plot type based on flatten parameter
       if (needs_reinit) {
