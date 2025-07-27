@@ -106,7 +106,25 @@ vistool/
   - `VisualizerSurface*`: Interactive surface plotting with plotly for 2D functions
 - **`as_visualizer()`**: Smart constructor that selects appropriate visualizer
 
-Global settings that affect the entire plot belong in `plot()`. Settings for specific visual elements belong in the `add_*()` methods that create them. Defaults are set (at initialization) in `as_visualizer()`.
+### Deferred Rendering
+
+All visualizer classes now use a deferred rendering architecture:
+
+- **Layer Storage**: All `add_*()` methods (e.g., `$add_points()`, `$add_contours()`, etc.) do not modify the plot directly. Instead, they call the private method `$store_layer(type, spec)` to save a specification of the layer (its type and parameters) to an internal list.
+- **Rendering**: The `$plot()` method is responsible for rendering all stored layers. It iterates over the stored layer specifications and calls a private `$render_layer(layer)` method to add each layer to the plot object. This ensures that all visual properties (such as colors, alpha, etc.) are resolved at plot time, using the current global settings.
+- **Customization**: Global settings (e.g., color palette, theme, text size) are set via `$plot()`. Layer-specific settings are passed to the relevant `add_*()` method and stored with the layer specification. Defaults are set at initialization.
+- **Benefits**: This pattern ensures that plots are always up-to-date with the latest settings, supports re-plotting with different global options, and makes it easier to add, remove, or reorder layers.
+
+### Example Workflow
+
+```r
+viz <- as_visualizer(obj, type = "surface")
+viz$add_points(points = my_points, color = "red")
+viz$add_contours(contours = my_contours)
+# No plot is created yet!
+
+viz$plot(color_palette = "grayscale")  # All layers are rendered now
+```
 
 ## Development Workflow
 
