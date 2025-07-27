@@ -138,6 +138,17 @@ Visualizer1DModel <- R6::R6Class("Visualizer1DModel",
           # For regression or response predictions, use median of predictions
           values <- median(self$fun_y, na.rm = TRUE)
         }
+      } else {
+        # Validate that boundary values are within the prediction range
+        y_range <- range(self$fun_y, na.rm = TRUE)
+        invalid_values <- values[values < y_range[1] | values > y_range[2]]
+        if (length(invalid_values) > 0) {
+          warning(sprintf(
+            "Boundary values %s are outside the prediction range [%.3f, %.3f] and will not be visible.",
+            paste(round(invalid_values, 3), collapse = ", "),
+            y_range[1], y_range[2]
+          ))
+        }
       }
       
       # Store boundary specification without resolving colors yet
@@ -148,7 +159,7 @@ Visualizer1DModel <- R6::R6Class("Visualizer1DModel",
         linewidth = linewidth,
         alpha = alpha
       ))
-      
+
       return(invisible(self))
     },
 

@@ -82,7 +82,7 @@ test_that("1D Model with multiple boundary lines works", {
   learner <- lrn("regr.svm")
 
   vis <- Visualizer1DModel$new(task, learner)
-  vis$add_boundary(values = c(3, 4, 5), color = "red", linetype = "solid")
+  vis$add_boundary(values = c(16, 18, 20), color = "red", linetype = "solid")
   
   p <- vis$plot()
   expect_s3_class(p, "ggplot")

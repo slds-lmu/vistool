@@ -171,6 +171,17 @@ Visualizer2DModel <- R6::R6Class("Visualizer2DModel",
           # For regression or response predictions, use quantiles
           values <- quantile(self$fun_y, c(0.25, 0.5, 0.75), na.rm = TRUE)
         }
+      } else {
+        # Validate that boundary values are within the prediction range
+        y_range <- range(self$fun_y, na.rm = TRUE)
+        invalid_values <- values[values < y_range[1] | values > y_range[2]]
+        if (length(invalid_values) > 0) {
+          warning(sprintf(
+            "Boundary values %s are outside the prediction range [%.3f, %.3f] and will not generate visible contours.",
+            paste(round(invalid_values, 3), collapse = ", "),
+            y_range[1], y_range[2]
+          ))
+        }
       }
       
       # Store boundary specification without resolving colors yet

@@ -43,6 +43,7 @@ These parameters affect the entire plot appearance:
 
 ```r
 plot(
+  # General settings
   text_size = 11,            # Base text size for all elements
   title_size = NULL,         # Title size (defaults to text_size + 2)
   theme = "minimal",         # ggplot2 theme

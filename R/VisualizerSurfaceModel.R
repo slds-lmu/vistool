@@ -153,6 +153,17 @@ VisualizerSurfaceModel <- R6::R6Class("VisualizerSurfaceModel",
           # For regression or response predictions, use quantiles
           values <- quantile(self$zmat, c(0.25, 0.5, 0.75), na.rm = TRUE)
         }
+      } else {
+        # Validate that boundary values are within the prediction range
+        z_range <- range(self$zmat, na.rm = TRUE)
+        invalid_values <- values[values < z_range[1] | values > z_range[2]]
+        if (length(invalid_values) > 0) {
+          warning(sprintf(
+            "Boundary values %s are outside the prediction range [%.3f, %.3f] and will not generate visible surfaces.",
+            paste(round(invalid_values, 3), collapse = ", "),
+            z_range[1], z_range[2]
+          ))
+        }
       }
       
       # Default color scheme
