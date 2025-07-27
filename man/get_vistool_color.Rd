@@ -4,7 +4,7 @@
 \alias{get_vistool_color}
 \title{Get consistent color from discrete palette}
 \usage{
-get_vistool_color(index, palette = "discrete")
+get_vistool_color(index, palette = "discrete", base_palette = NULL)
 }
 \arguments{
 \item{index}{(`integer(1)`)\cr
@@ -12,6 +12,10 @@ Index of the color to retrieve from the palette.}
 
 \item{palette}{(`character(1)`)\cr
 Name of the color palette to use. Default is "discrete".}
+
+\item{base_palette}{(`character(1)`)\cr
+Base palette name (e.g., "viridis", "plasma", "grayscale") to derive 
+discrete colors from when palette is "discrete". Optional.}
 }
 \value{
 A character string containing the color in hex format.

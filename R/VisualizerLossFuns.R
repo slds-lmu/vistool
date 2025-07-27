@@ -188,6 +188,8 @@ VisualizerLossFuns <- R6::R6Class("VisualizerLossFuns",
     #' @param theme (`character(1)`)\cr
     #'   ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light",
     #'   "dark", "void". Default is "bw".
+    #' @param color_palette (`character(1)`)\cr
+    #'   Color palette for visualizations. One of "viridis", "plasma", "grayscale". Default is "viridis".
     #' @template param_plot_title
     #' @template param_plot_subtitle
     #' @template param_x_lab
@@ -201,7 +203,7 @@ VisualizerLossFuns <- R6::R6Class("VisualizerLossFuns",
     #' @template param_legend_title
     #' @template param_show_title
     #' @return A ggplot2 object.
-    plot = function(text_size = NULL, theme = NULL, plot_title = NULL, plot_subtitle = NULL, 
+    plot = function(text_size = NULL, theme = NULL, color_palette = "viridis", plot_title = NULL, plot_subtitle = NULL, 
                     x_lab = NULL, y_lab = NULL, x_limits = NULL, y_limits = NULL, 
                     show_grid = TRUE, grid_color = "gray90", show_legend = TRUE, 
                     legend_position = "right", legend_title = NULL, show_title = TRUE) {
@@ -212,6 +214,7 @@ VisualizerLossFuns <- R6::R6Class("VisualizerLossFuns",
       
       checkmate::assert_number(text_size, lower = 1)
       checkmate::assert_choice(theme, choices = c("minimal", "bw", "classic", "gray", "light", "dark", "void"))
+      checkmate::assert_choice(color_palette, choices = c("viridis", "plasma", "grayscale"))
       checkmate::assert_string(plot_title, null.ok = TRUE)
       checkmate::assert_string(plot_subtitle, null.ok = TRUE)
       checkmate::assert_string(x_lab, null.ok = TRUE)
@@ -224,6 +227,28 @@ VisualizerLossFuns <- R6::R6Class("VisualizerLossFuns",
       checkmate::assert_choice(legend_position, choices = c("top", "right", "bottom", "left", "none"))
       checkmate::assert_string(legend_title, null.ok = TRUE)
       checkmate::assert_flag(show_title)
+
+      # Store plot settings for layer resolution
+      private$.plot_settings <- list(
+        text_size = text_size,
+        theme = theme,
+        color_palette = color_palette,
+        plot_title = plot_title,
+        plot_subtitle = plot_subtitle,
+        x_lab = x_lab,
+        y_lab = y_lab,
+        x_limits = x_limits,
+        y_limits = y_limits,
+        show_grid = show_grid,
+        grid_color = grid_color,
+        show_legend = show_legend,
+        legend_position = legend_position,
+        legend_title = legend_title,
+        show_title = show_title
+      )
+      
+      # Resolve layer colors now that we have plot settings
+      private$resolve_layer_colors()
 
       # Determine final labels
       final_title <- if (show_title) {

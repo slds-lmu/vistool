@@ -117,44 +117,15 @@ VisualizerSurfaceModel <- R6::R6Class("VisualizerSurfaceModel",
       z <- data[, self$task$target_names, with = FALSE][[1]]
       if (self$learner$predict_type == "prob") z <- as.integer(z) - 1
 
-      # Process color for auto assignment
-      processed_color <- process_color(color, self)
-
-
-      if (private$.layer_primary == "contour") {
-        private$.plot <- private$.plot %>%
-          add_trace(
-            x = x1,
-            y = x2,
-            type = "scatter",
-            mode = "markers",
-            marker = list(
-              size = 10,
-              color = z,
-              cmin = min(self$zmat),
-              cmax = max(self$zmat),
-              colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")),
-              line = list(color = "black", width = 2),
-              showscale = FALSE
-            ),
-            text = ~ paste("x:", x1, "\ny:", x2, " \nz:", z),
-            hoverinfo = "text",
-            ...
-          )
-      } else {
-        private$.plot <- private$.plot %>%
-          add_trace(
-            x = x1,
-            y = x2,
-            z = z,
-            type = "scatter3d",
-            mode = "markers",
-            marker = list(size = 5, color = processed_color),
-            ...
-          )
-      }
-
-
+      # Store training data specification without resolving colors yet
+      private$store_layer("training_data", list(
+        x1 = x1,
+        x2 = x2,
+        z = z,
+        size = size,
+        color = color,  # Keep for later resolution
+        args = list(...)
+      ))
 
       return(invisible(self))
     },
@@ -189,47 +160,12 @@ VisualizerSurfaceModel <- R6::R6Class("VisualizerSurfaceModel",
         color <- list(c(0, "rgba(176,196,222,0.5)"), c(1, "rgba(160,82,45,0.5)"))
       }
 
-      for (value in values) {
-        z <- matrix(value, nrow = nrow(self$zmat), ncol = ncol(self$zmat), byrow = TRUE)
-
-        if (private$.layer_primary == "contour") {
-          llp <- list(x = self$grid$x1, y = self$grid$x2, z = self$zmat)
-          private$.plot <- private$.plot %>%
-            add_trace(
-              name = paste("boundary", value),
-              autocontour = FALSE,
-              showlegend = FALSE,
-              showscale = FALSE,
-              x = llp$x,
-              y = llp$y,
-              z = t(llp$z),
-              type = "contour",
-              colorscale = list(c(0, 1), c("rgb(0,0,0)", "rgb(0,0,0)")),
-              ncontours = 1,
-              contours = list(
-                start = value,
-                end = value,
-                coloring = "lines"
-              ),
-              line = list(
-                color = "black",
-                width = 3
-              ),
-              ...
-            )
-        } else {
-          private$.plot <- private$.plot %>%
-            add_surface(
-              x = self$grid$x1,
-              y = self$grid$x2,
-              z = z,
-              colorscale = color,
-              showscale = FALSE,
-              name = paste("boundary", value),
-              ...
-            )
-        }
-      }
+      # Store boundary specification without resolving colors yet
+      private$store_layer("boundary", list(
+        values = values,
+        color = color,  # Keep for later resolution
+        args = list(...)
+      ))
       
       return(invisible(self))
     }

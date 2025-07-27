@@ -12,6 +12,18 @@
   discrete = c("#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", 
                "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf"),
   
+  # Discrete colors for viridis-based palette  
+  discrete_viridis = c("#440154", "#3b528b", "#21908c", "#5dc863", "#fde725", 
+                      "#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd"),
+  
+  # Discrete colors for plasma-based palette
+  discrete_plasma = c("#0d0887", "#7e03a8", "#cc4778", "#f89441", "#f0f921",
+                     "#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd"),
+  
+  # Discrete colors for grayscale palette
+  discrete_grayscale = c("#000000", "#404040", "#808080", "#c0c0c0", "#ffffff",
+                        "#1f1f1f", "#5f5f5f", "#9f9f9f", "#bfbfbf", "#dfdfdf"),
+  
   # Default continuous color scale for surfaces (viridis-like)
   viridis = list(
     c(0, "#440154"), c(0.25, "#3b528b"), c(0.5, "#21908c"), 
@@ -41,15 +53,26 @@
 #'   Index of the color to retrieve from the palette.
 #' @param palette (`character(1)`)\cr
 #'   Name of the color palette to use. Default is "discrete".
+#' @param base_palette (`character(1)`)\cr
+#'   Base palette name (e.g., "viridis", "plasma", "grayscale") to derive 
+#'   discrete colors from when palette is "discrete". Optional.
 #' @return A character string containing the color in hex format.
 #' @export
-get_vistool_color <- function(index, palette = "discrete") {
+get_vistool_color <- function(index, palette = "discrete", base_palette = NULL) {
   checkmate::assert_int(index, lower = 1)
   checkmate::assert_choice(palette, choices = names(.vistool_colors))
   
+  # For discrete palettes, we can derive the palette name from base_palette
+  if (palette == "discrete" && !is.null(base_palette)) {
+    discrete_palette_name <- paste0("discrete_", base_palette)
+    if (discrete_palette_name %in% names(.vistool_colors)) {
+      palette <- discrete_palette_name
+    }
+  }
+  
   colors <- .vistool_colors[[palette]]
   
-  if (palette == "discrete") {
+  if (grepl("^discrete", palette)) {
     # For discrete colors, cycle through the palette
     color_index <- ((index - 1) %% length(colors)) + 1
     return(colors[color_index])
@@ -132,7 +155,13 @@ process_color <- function(color, visualizer = NULL) {
     if (is.null(visualizer)) {
       stop("Cannot use 'auto' color without visualizer object")
     }
-    return(get_auto_color(visualizer))
+    # Check if we should use the new palette-aware approach
+    if (!is.null(visualizer$.__enclos_env__$private$get_auto_color_with_palette)) {
+      return(visualizer$.__enclos_env__$private$get_auto_color_with_palette())
+    } else {
+      # Fallback to old behavior for backward compatibility
+      return(get_auto_color(visualizer))
+    }
   }
   
   # Validate color (basic check for hex or named colors)

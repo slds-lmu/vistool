@@ -23,6 +23,7 @@ The objective function.}
 \itemize{
 \item \href{#method-VisualizerSurfaceObj-new}{\code{VisualizerSurfaceObj$new()}}
 \item \href{#method-VisualizerSurfaceObj-add_optimization_trace}{\code{VisualizerSurfaceObj$add_optimization_trace()}}
+\item \href{#method-VisualizerSurfaceObj-plot}{\code{VisualizerSurfaceObj$plot()}}
 \item \href{#method-VisualizerSurfaceObj-add_layer_taylor}{\code{VisualizerSurfaceObj$add_layer_taylor()}}
 \item \href{#method-VisualizerSurfaceObj-add_layer_hessian}{\code{VisualizerSurfaceObj$add_layer_hessian()}}
 \item \href{#method-VisualizerSurfaceObj-animate}{\code{VisualizerSurfaceObj$animate()}}
@@ -38,7 +39,6 @@ The objective function.}
 <li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="add_contours"><a href='../../vistool/html/VisualizerSurface.html#method-VisualizerSurface-add_contours'><code>vistool::VisualizerSurface$add_contours()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="init_layer_contour"><a href='../../vistool/html/VisualizerSurface.html#method-VisualizerSurface-init_layer_contour'><code>vistool::VisualizerSurface$init_layer_contour()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="init_layer_surface"><a href='../../vistool/html/VisualizerSurface.html#method-VisualizerSurface-init_layer_surface'><code>vistool::VisualizerSurface$init_layer_surface()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="plot"><a href='../../vistool/html/VisualizerSurface.html#method-VisualizerSurface-plot'><code>vistool::VisualizerSurface$plot()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="set_layout"><a href='../../vistool/html/VisualizerSurface.html#method-VisualizerSurface-set_layout'><code>vistool::VisualizerSurface$set_layout()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="set_scene"><a href='../../vistool/html/VisualizerSurface.html#method-VisualizerSurface-set_scene'><code>vistool::VisualizerSurface$set_scene()</code></a></span></li>
 </ul>
@@ -179,6 +179,27 @@ The colors for the markers.}
 \item{\code{...}}{Further arguments passed to `add_trace(...)`.}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-VisualizerSurfaceObj-plot"></a>}}
+\if{latex}{\out{\hypertarget{method-VisualizerSurfaceObj-plot}{}}}
+\subsection{Method \code{plot()}}{
+Renders the surface plot with all added layers.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{VisualizerSurfaceObj$plot(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{(`any`)\cr
+Additional arguments passed to the parent plot method.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+The plotly object.
 }
 }
 \if{html}{\out{<hr>}}

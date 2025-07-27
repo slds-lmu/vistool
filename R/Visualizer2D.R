@@ -114,6 +114,17 @@ Visualizer2D <- R6::R6Class("Visualizer2D",
       checkmate::assert_string(legend_title, null.ok = TRUE)
       checkmate::assert_flag(show_title)
       
+      # Store plot settings and resolve layer colors
+      private$.plot_settings <- list(
+        text_size = text_size, title_size = title_size, theme = theme, 
+        background = background, color_palette = color_palette,
+        plot_title = plot_title, plot_subtitle = plot_subtitle,
+        x_lab = x_lab, y_lab = y_lab, x_limits = x_limits, y_limits = y_limits,
+        show_grid = show_grid, grid_color = grid_color, show_legend = show_legend,
+        legend_position = legend_position, legend_title = legend_title, show_title = show_title
+      )
+      private$resolve_layer_colors()
+      
       # Set default title size
       if (is.null(title_size)) title_size <- text_size + 2
       

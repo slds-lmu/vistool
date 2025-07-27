@@ -29,8 +29,6 @@ test_that("1D Model with regression task and training data works", {
   vis$add_training_data()
 
   expect_s3_class(vis, "Visualizer1DModel")
-  expect_true(!is.null(vis$points_x))
-  expect_true(!is.null(vis$points_y))
   
   p <- vis$plot()
   expect_s3_class(p, "ggplot")

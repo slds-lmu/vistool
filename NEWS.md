@@ -2,6 +2,7 @@
 # vistool 0.3.0
 
 * Polished the general workflow and unified all customization options: 1. Initialize the Visualizer object (`as_visualizer()`), 2. Layering (`add_*`) methods, 3. Rendering (`plot()`); 2. and 3. can be chained (e.g., `vis$add_*$add_*$plot()`). Global settings that affect the entire plot are set in `plot()`. Settings for specific visual elements are set in the `add_*()` methods that create them. Defaults can be set at initialization in `as_visualizer()`.
+* Layers are now only applied when calling `plot()` (instead of directly), improving predictability and allowing for greater customization.
 * `as_visualizer(..., type = "surface")`, initializes a surface plot directly (similar to the other types); `as_visualizer` can now be used on lists of loss functions (as expected).
 * Split classification loss functions into probability and score-based losses; probability-based losses can display curves for either the positive, negative or both classes.
 * Reworked boundary functionality (`add_boundary()`): Now accepts vectors for multiple boundaries; works for 1D model visualizations (horizontal lines at y-values).

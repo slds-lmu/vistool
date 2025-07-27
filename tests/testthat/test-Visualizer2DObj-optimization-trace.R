@@ -25,8 +25,9 @@ test_that("Visualizer2DObj add_optimization_trace works", {
   p <- vis$plot()
   expect_s3_class(p, "ggplot")
 
-  # Check that trace was stored
-  expect_length(vis$.__enclos_env__$private$.optimization_traces, 1)
+  # Check that trace layer was stored in the new layer system
+  trace_layers <- sapply(vis$.__enclos_env__$private$.layers_to_add, function(x) x$type == "optimization_trace")
+  expect_true(any(trace_layers))
 })
 
 test_that("Visualizer2DObj add_optimization_trace validates input", {
@@ -78,8 +79,9 @@ test_that("Visualizer2DObj multiple optimization traces work", {
   vis$add_optimization_trace(opt1, line_color = "#ff0000", name = "GD1")
   vis$add_optimization_trace(opt2, line_color = "#0000ff", name = "GD2")
 
-  # Should have 2 traces stored
-  expect_length(vis$.__enclos_env__$private$.optimization_traces, 2)
+  # Should have 2 trace layers stored
+  trace_layers <- sapply(vis$.__enclos_env__$private$.layers_to_add, function(x) x$type == "optimization_trace")
+  expect_equal(sum(trace_layers), 2)
 
   # Plot should work
   p <- vis$plot()
@@ -115,18 +117,21 @@ test_that("Visualizer2DObj optimization trace customization works", {
     name = "Custom Trace"
   )
 
-  # Check stored trace parameters
-  trace <- vis$.__enclos_env__$private$.optimization_traces[[1]]
-  expect_equal(trace$line_color, "#ff6600")
-  expect_equal(trace$line_width, 2.0)
-  expect_equal(trace$line_type, "dashed")
-  expect_equal(trace$marker_size, 4)
-  expect_equal(trace$marker_shape, 17)
-  expect_equal(trace$marker_color, "#cc0000")
-  expect_equal(trace$add_marker_at, c(1, 4, 8))
-  expect_true(trace$show_start_end)
-  expect_equal(trace$alpha, 0.9)
-  expect_equal(trace$name, "Custom Trace")
+  # Check stored trace parameters in the new layer system
+  trace_layers <- vis$.__enclos_env__$private$.layers_to_add
+  trace_layer <- trace_layers[[which(sapply(trace_layers, function(x) x$type == "optimization_trace"))[1]]]
+  trace_spec <- trace_layer$spec
+  
+  expect_equal(trace_spec$line_color, "#ff6600")
+  expect_equal(trace_spec$line_width, 2.0)
+  expect_equal(trace_spec$line_type, "dashed")
+  expect_equal(trace_spec$marker_size, 4)
+  expect_equal(trace_spec$marker_shape, 17)
+  expect_equal(trace_spec$marker_color, "#cc0000")
+  expect_equal(trace_spec$add_marker_at, c(1, 4, 8))
+  expect_true(trace_spec$show_start_end)
+  expect_equal(trace_spec$alpha, 0.9)
+  expect_equal(trace_spec$name, "Custom Trace")
 
   # Plot should work
   p <- vis$plot()
@@ -150,9 +155,13 @@ test_that("Visualizer2DObj optimization trace point filtering works", {
   # Test point filtering
   vis$add_optimization_trace(opt, npoints = 5, npmax = 10)
 
-  trace <- vis$.__enclos_env__$private$.optimization_traces[[1]]
-  expect_true(nrow(trace$data) <= 10)  # Should be limited by npmax
-  expect_true(nrow(trace$data) <= 5)   # Should be limited by npoints
+  # Check the trace data in the new layer system
+  trace_layers <- vis$.__enclos_env__$private$.layers_to_add
+  trace_layer <- trace_layers[[which(sapply(trace_layers, function(x) x$type == "optimization_trace"))[1]]]
+  trace_spec <- trace_layer$spec
+  
+  expect_true(nrow(trace_spec$data) <= 10)  # Should be limited by npmax
+  expect_true(nrow(trace_spec$data) <= 5)   # Should be limited by npoints
 
   # Plot should work
   p <- vis$plot()
@@ -184,15 +193,18 @@ test_that("Visualizer2DObj auto-color generation works", {
     vis$add_optimization_trace(opt)
   }
 
-  # Should have 3 traces with different colors
-  expect_length(vis$.__enclos_env__$private$.optimization_traces, 3)
+  # Should have 3 trace layers
+  trace_layers <- sapply(vis$.__enclos_env__$private$.layers_to_add, function(x) x$type == "optimization_trace")
+  expect_equal(sum(trace_layers), 3)
   
-  colors <- sapply(vis$.__enclos_env__$private$.optimization_traces, function(trace) trace$line_color)
-  expect_length(unique(colors), 3)  # All should be different
-
-  # Plot should work
+  # Plot to trigger color resolution
   p <- vis$plot()
   expect_s3_class(p, "ggplot")
+  
+  # After plotting, colors should be resolved and different
+  trace_specs <- vis$.__enclos_env__$private$.layers_to_add[trace_layers]
+  colors <- sapply(trace_specs, function(layer) layer$spec$line_color)
+  expect_length(unique(colors), 3)  # All should be different
 })
 
 test_that("Visualizer2DObj method chaining works", {
@@ -215,5 +227,8 @@ test_that("Visualizer2DObj method chaining works", {
   # Method chaining should work
   result <- vis$add_optimization_trace(opt1)$add_optimization_trace(opt2)
   expect_identical(result, vis)
-  expect_length(vis$.__enclos_env__$private$.optimization_traces, 2)
+  
+  # Should have 2 trace layers
+  trace_layers <- sapply(vis$.__enclos_env__$private$.layers_to_add, function(x) x$type == "optimization_trace")
+  expect_equal(sum(trace_layers), 2)
 })

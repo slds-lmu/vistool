@@ -126,21 +126,18 @@ Visualizer2DModel <- R6::R6Class("Visualizer2DModel",
         training_y <- as.integer(training_y) - 1
       }
       
-      # Store training data for later use in plot()
-      processed_color <- process_color(color, self)
-      private$.training_data <- list(
-        x1 = training_x1,
-        x2 = training_x2,
-        y = training_y
-      )
-      private$.training_data_style <- list(
-        color = processed_color,
-        size = size,
-        shape = shape,
-        alpha = alpha,
-        show_labels = show_labels,
-        label_size = label_size
-      )
+      # Store training data specification without resolving colors yet
+      private$store_layer("training_data", list(
+        data = list(x1 = training_x1, x2 = training_x2, y = training_y),
+        style = list(
+          color = color,  # Keep as "auto" for later resolution
+          size = size,
+          shape = shape,
+          alpha = alpha,
+          show_labels = show_labels,
+          label_size = label_size
+        )
+      ))
 
       return(invisible(self))
     },
@@ -176,12 +173,14 @@ Visualizer2DModel <- R6::R6Class("Visualizer2DModel",
         }
       }
       
-      # Store boundary information for plotting
-      private$.boundary_values <- values
-      private$.boundary_color <- process_color(color, self)
-      private$.boundary_line_width <- line_width
-      private$.boundary_line_type <- line_type
-      private$.boundary_alpha <- alpha
+      # Store boundary specification without resolving colors yet
+      private$store_layer("boundary", list(
+        values = values,
+        color = color,  # Keep for later resolution if "auto"
+        line_width = line_width,
+        line_type = line_type,
+        alpha = alpha
+      ))
 
       return(invisible(self))
     },
@@ -207,12 +206,20 @@ Visualizer2DModel <- R6::R6Class("Visualizer2DModel",
       checkmate::assert_string(background)
       checkmate::assert_choice(color_palette, choices = c("viridis", "plasma", "grayscale"))
       
+      # Store plot settings and resolve layer colors
+      private$.plot_settings <- list(
+        text_size = text_size, title_size = title_size, theme = theme,
+        background = background, color_palette = color_palette
+      )
+      private$resolve_layer_colors()
+      
       # Call parent plot method with all arguments
       p <- super$plot(text_size = text_size, title_size = title_size, theme = theme, 
                       background = background, color_palette = color_palette, ...)
       
       # Add boundary lines if available
-      if (!is.null(private$.boundary_values)) {
+      boundary_layer <- private$get_layer("boundary")
+      if (!is.null(boundary_layer)) {
         data <- data.table(
           fun_x1 = self$fun_x1,
           fun_x2 = self$fun_x2,
@@ -220,7 +227,7 @@ Visualizer2DModel <- R6::R6Class("Visualizer2DModel",
         )
         
         # Map line_type to ggplot2 linetype
-        gg_linetype <- switch(private$.boundary_line_type,
+        gg_linetype <- switch(boundary_layer$line_type,
           "solid" = "solid",
           "dashed" = "dashed", 
           "dotted" = "dotted",
@@ -233,28 +240,29 @@ Visualizer2DModel <- R6::R6Class("Visualizer2DModel",
         p <- p + ggplot2::geom_contour(
           data = data,
           aes(x = fun_x1, y = fun_x2, z = fun_y),
-          breaks = private$.boundary_values,
-          color = private$.boundary_color, 
-          linewidth = private$.boundary_line_width,
+          breaks = boundary_layer$values,
+          color = boundary_layer$color, 
+          linewidth = boundary_layer$line_width,
           linetype = gg_linetype,
-          alpha = private$.boundary_alpha,
+          alpha = boundary_layer$alpha,
           inherit.aes = FALSE
         )
       }
       
       # Apply custom training data styling if available
-      if (!is.null(private$.training_data_style) && !is.null(private$.training_data)) {
+      training_layer <- private$get_layer("training_data")
+      if (!is.null(training_layer)) {
         
         points_data <- data.table(
-          points_x1 = private$.training_data$x1,
-          points_x2 = private$.training_data$x2,
-          points_y = private$.training_data$y
+          points_x1 = training_layer$data$x1,
+          points_x2 = training_layer$data$x2,
+          points_y = training_layer$data$y
         )
         
-        style <- private$.training_data_style
+        style <- training_layer$style
         
         # Add styled training data points with color mapping
-        if (self$learner$predict_type == "prob" || is.numeric(private$.training_data$y)) {
+        if (self$learner$predict_type == "prob" || is.numeric(training_layer$data$y)) {
           # Use color aesthetic for continuous/probability data
           color_limits <- c(min(self$fun_y), max(self$fun_y))
           
@@ -296,7 +304,7 @@ Visualizer2DModel <- R6::R6Class("Visualizer2DModel",
           p <- p + geom_text(
             data = points_data,
             aes(x = points_x1, y = points_x2, label = seq_len(nrow(points_data))),
-            color = if (self$learner$predict_type == "prob" || is.numeric(private$.training_data$y)) "black" else style$color,
+            color = if (self$learner$predict_type == "prob" || is.numeric(training_layer$data$y)) "black" else style$color,
             size = label_size,
             vjust = -0.5,
             inherit.aes = FALSE
@@ -308,12 +316,6 @@ Visualizer2DModel <- R6::R6Class("Visualizer2DModel",
     }
   ),
   private = list(
-    .boundary_values = NULL,
-    .boundary_color = NULL,
-    .boundary_line_width = NULL,
-    .boundary_line_type = NULL,
-    .boundary_alpha = NULL,
-    .training_data = NULL,
-    .training_data_style = NULL
+    # Model-specific private fields will be inherited from base class
   )
 )

@@ -329,6 +329,32 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
       checkmate::assert_list(layout, null.ok = TRUE)
       checkmate::assert_list(scene, null.ok = TRUE)
       
+      # Store plot settings for layer resolution
+      private$.plot_settings <- list(
+        text_size = text_size,
+        title_size = title_size,
+        theme = theme,
+        background = background,
+        color_palette = color_palette,
+        flatten = flatten,
+        layout = layout,
+        scene = scene,
+        plot_title = plot_title,
+        plot_subtitle = plot_subtitle,
+        x_lab = x_lab,
+        y_lab = y_lab,
+        z_lab = z_lab,
+        x_limits = x_limits,
+        y_limits = y_limits,
+        z_limits = z_limits,
+        show_legend = show_legend,
+        legend_title = legend_title,
+        show_title = show_title
+      )
+      
+      # Resolve layer colors now that we have plot settings
+      private$resolve_layer_colors()
+      
       # Set default title size
       if (is.null(title_size)) title_size <- text_size + 2
       
@@ -340,10 +366,14 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
       # Get the appropriate colorscale based on palette choice
       plot_colorscale <- get_vistool_color(1, color_palette)
       
+      # Check if we need to reinitialize the plot
+      needs_reinit <- is.null(private$.plot) || 
+                     (flatten && private$.layer_primary != "contour") ||
+                     (!flatten && private$.layer_primary != "surface") ||
+                     (!identical(private$.vbase$colorscale, plot_colorscale))
+      
       # Initialize appropriate plot type based on flatten parameter
-      if (is.null(private$.plot) || 
-          (flatten && private$.layer_primary != "contour") ||
-          (!flatten && private$.layer_primary != "surface")) {
+      if (needs_reinit) {
         if (flatten) {
           self$init_layer_contour(colorscale = plot_colorscale)
         } else {
@@ -419,6 +449,9 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
         private$.plot <- private$add_points_to_plotly(private$.plot, "contour")
       }
       
+      # Add stored layers (training data, boundaries, etc.)
+      private$render_stored_layers()
+      
       return(private$.plot)
     }
   ),
@@ -439,6 +472,7 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
     .opts = list(),
     .vbase = list(),
     .layout = list(),
+    .plot_settings = NULL,  # Store plot settings for layer resolution
 
     # @field .freeze_plot (`logical(1)`) Indicator whether to freeze saving the plot elements.
     .freeze_plot = FALSE,
@@ -493,6 +527,102 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
       }
       
       return(z_vals)
+    },
+    
+    # Render stored layers (training data, boundaries, etc.)
+    render_stored_layers = function() {
+      # Render training data if any
+      if (length(private$.layers_to_add) > 0) {
+        training_logical <- sapply(private$.layers_to_add, function(x) x$type == "training_data")
+        training_indices <- which(training_logical)
+      } else {
+        training_indices <- integer(0)
+      }
+      for (idx in training_indices) {
+        data <- private$.layers_to_add[[idx]]$spec
+        
+        if (private$.layer_primary == "contour") {
+          private$.plot <- private$.plot %>%
+            plotly::add_trace(
+              x = data$x1,
+              y = data$x2,
+              type = "scatter",
+              mode = "markers",
+              marker = list(
+                size = 10,
+                color = data$z,
+                cmin = min(self$zmat),
+                cmax = max(self$zmat),
+                colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")),
+                line = list(color = "black", width = 2),
+                showscale = FALSE
+              ),
+              text = ~ paste("x:", data$x1, "\ny:", data$x2, " \nz:", data$z),
+              hoverinfo = "text"
+            )
+        } else {
+          private$.plot <- private$.plot %>%
+            plotly::add_trace(
+              x = data$x1,
+              y = data$x2,
+              z = data$z,
+              type = "scatter3d",
+              mode = "markers",
+              marker = list(size = data$size, color = data$color)
+            )
+        }
+      }
+      
+      # Render boundary layers if any
+      if (length(private$.layers_to_add) > 0) {
+        boundary_logical <- sapply(private$.layers_to_add, function(x) x$type == "boundary")
+        boundary_indices <- which(boundary_logical)
+      } else {
+        boundary_indices <- integer(0)
+      }
+      for (idx in boundary_indices) {
+        boundary <- private$.layers_to_add[[idx]]$spec
+        
+        for (value in boundary$values) {
+          z <- matrix(value, nrow = nrow(self$zmat), ncol = ncol(self$zmat), byrow = TRUE)
+
+          if (private$.layer_primary == "contour") {
+            llp <- list(x = self$grid$x1, y = self$grid$x2, z = self$zmat)
+            private$.plot <- private$.plot %>%
+              plotly::add_trace(
+                name = paste("boundary", value),
+                autocontour = FALSE,
+                showlegend = FALSE,
+                showscale = FALSE,
+                x = llp$x,
+                y = llp$y,
+                z = t(llp$z),
+                type = "contour",
+                colorscale = list(c(0, 1), c("rgb(0,0,0)", "rgb(0,0,0)")),
+                ncontours = 1,
+                contours = list(
+                  start = value,
+                  end = value,
+                  coloring = "lines"
+                ),
+                line = list(
+                  color = "black",
+                  width = 3
+                )
+              )
+          } else {
+            private$.plot <- private$.plot %>%
+              plotly::add_surface(
+                x = self$grid$x1,
+                y = self$grid$x2,
+                z = z,
+                colorscale = boundary$color,
+                showscale = FALSE,
+                name = paste("boundary", value)
+              )
+          }
+        }
+      }
     }
   )
 )

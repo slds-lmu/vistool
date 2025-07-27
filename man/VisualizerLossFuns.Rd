@@ -160,6 +160,7 @@ curve for the positive class (`"y1"`), the negative class (`"y0"`), or
 \if{html}{\out{<div class="r">}}\preformatted{VisualizerLossFuns$plot(
   text_size = NULL,
   theme = NULL,
+  color_palette = "viridis",
   plot_title = NULL,
   plot_subtitle = NULL,
   x_lab = NULL,
@@ -184,6 +185,9 @@ Base text size for plot elements. Default is 11.}
 \item{\code{theme}}{(`character(1)`)\cr
 ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light",
 "dark", "void". Default is "bw".}
+
+\item{\code{color_palette}}{(`character(1)`)\cr
+Color palette for visualizations. One of "viridis", "plasma", "grayscale". Default is "viridis".}
 
 \item{\code{plot_title}}{(`character(1)`)\cr
 Main plot title. If NULL, uses the visualizer's default title. Default is NULL.}

@@ -29,13 +29,11 @@ test_that("Visualizer1D with points works", {
 
   vis <- Visualizer1D$new(
     fun_x = x_vals,
-    fun_y = y_vals,
-    points_x = c(-0.5, 0, 0.5),
-    points_y = c(0.25, 0, 0.25)
+    fun_y = y_vals
   )
-
-  expect_equal(vis$points_x, c(-0.5, 0, 0.5))
-  expect_equal(vis$points_y, c(0.25, 0, 0.25))
+  
+  # Add points using the modern API
+  vis$add_points(data.frame(x = c(-0.5, 0, 0.5), y = c(0.25, 0, 0.25)))
 
   # Test plotting with points
   p <- vis$plot()

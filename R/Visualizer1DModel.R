@@ -101,8 +101,11 @@ Visualizer1DModel <- R6::R6Class("Visualizer1DModel",
     #' @return Returns the visualizer object invisibly for method chaining.
     add_training_data = function() {
       data <- self$task$data()
-      self$points_x <- data[[self$lab_x]]
-      self$points_y <- data[[self$task$target_names]]
+      points_data <- data.frame(
+        x = data[[self$lab_x]],
+        y = data[[self$task$target_names]]
+      )
+      self$add_points(points_data)
       return(invisible(self))
     },
 
@@ -137,12 +140,14 @@ Visualizer1DModel <- R6::R6Class("Visualizer1DModel",
         }
       }
       
-      # Store boundary information for plotting
-      private$.boundary_values <- values
-      private$.boundary_color <- process_color(color, self)
-      private$.boundary_linetype <- linetype
-      private$.boundary_linewidth <- linewidth
-      private$.boundary_alpha <- alpha
+      # Store boundary specification without resolving colors yet
+      private$store_layer("boundary", list(
+        values = values,
+        color = color,  # Keep for later resolution
+        linetype = linetype,
+        linewidth = linewidth,
+        alpha = alpha
+      ))
       
       return(invisible(self))
     },
@@ -159,18 +164,23 @@ Visualizer1DModel <- R6::R6Class("Visualizer1DModel",
       checkmate::assert_number(text_size, lower = 1)
       checkmate::assert_choice(theme, choices = c("minimal", "bw", "classic", "gray", "light", "dark", "void"))
       
+      # Store plot settings and resolve layer colors
+      private$.plot_settings <- list(text_size = text_size, theme = theme, ...)
+      private$resolve_layer_colors()
+      
       # Call parent plot method with all arguments
       p <- super$plot(text_size = text_size, theme = theme, ...)
       
       # Add boundary lines if available
-      if (!is.null(private$.boundary_values)) {
-        for (value in private$.boundary_values) {
+      boundary_layer <- private$get_layer("boundary")
+      if (!is.null(boundary_layer)) {
+        for (value in boundary_layer$values) {
           p <- p + ggplot2::geom_hline(
             yintercept = value,
-            color = private$.boundary_color,
-            linetype = private$.boundary_linetype,
-            linewidth = private$.boundary_linewidth,
-            alpha = private$.boundary_alpha
+            color = boundary_layer$color,
+            linetype = boundary_layer$linetype,
+            linewidth = boundary_layer$linewidth,
+            alpha = boundary_layer$alpha
           )
         }
       }
@@ -179,10 +189,6 @@ Visualizer1DModel <- R6::R6Class("Visualizer1DModel",
     }
   ),
   private = list(
-    .boundary_values = NULL,
-    .boundary_color = NULL,
-    .boundary_linetype = NULL,
-    .boundary_linewidth = NULL,
-    .boundary_alpha = NULL
+    # Model-specific private fields inherited from base class
   )
 )

@@ -5,7 +5,7 @@
 \alias{.vistool_colors}
 \title{Color Management for vistool}
 \format{
-An object of class \code{list} of length 4.
+An object of class \code{list} of length 7.
 }
 \usage{
 .vistool_colors

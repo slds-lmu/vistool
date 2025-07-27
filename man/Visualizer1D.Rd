@@ -27,14 +27,6 @@ Label of x-axis}
 \item{\code{lab_y}}{(`character(1)`)\cr
 Label of y-axis}
 
-\item{\code{points_x}}{(`numeric(m)`)\cr
-x-values of extra points to plot.
-Use NULL if no points should be plotted.}
-
-\item{\code{points_y}}{(`numeric(m)`)\cr
-y-values of extra points to plot.
-Use NULL if no points should be plotted.}
-
 \item{\code{line_col}}{(`character(1)`)\cr
 Color of plotted line}
 
@@ -81,15 +73,7 @@ Alpha blending of plotted points}
 \subsection{Method \code{new()}}{
 Creates a new instance of this [R6][R6::R6Class] class.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer1D$new(
-  fun_x,
-  fun_y,
-  title = NULL,
-  lab_x = "x",
-  lab_y = "y",
-  points_x = NULL,
-  points_y = NULL
-)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer1D$new(fun_x, fun_y, title = NULL, lab_x = "x", lab_y = "y")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -109,14 +93,6 @@ Label of x-axis}
 
 \item{\code{lab_y}}{(`character(1)`)\cr
 Label of y-axis}
-
-\item{\code{points_x}}{(`numeric()`)\cr
-x-values of extra points to plot.
-Use NULL if no points should be plotted.}
-
-\item{\code{points_y}}{(`numeric()`)\cr
-y-values of extra points to plot.
-Use NULL if no points should be plotted.}
 }
 \if{html}{\out{</div>}}
 }

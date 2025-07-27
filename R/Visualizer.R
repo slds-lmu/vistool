@@ -71,6 +71,33 @@ Visualizer <- R6::R6Class("Visualizer",
                     plot_title = NULL, plot_subtitle = NULL, x_lab = NULL, y_lab = NULL, z_lab = NULL,
                     x_limits = NULL, y_limits = NULL, z_limits = NULL, show_grid = TRUE, grid_color = "gray90",
                     show_legend = TRUE, legend_position = "right", legend_title = NULL, show_title = TRUE) {
+      
+      # Store plot settings for layer resolution
+      private$.plot_settings <- list(
+        text_size = text_size,
+        title_size = title_size,
+        theme = theme,
+        background = background,
+        color_palette = color_palette,
+        plot_title = plot_title,
+        plot_subtitle = plot_subtitle,
+        x_lab = x_lab,
+        y_lab = y_lab,
+        z_lab = z_lab,
+        x_limits = x_limits,
+        y_limits = y_limits,
+        z_limits = z_limits,
+        show_grid = show_grid,
+        grid_color = grid_color,
+        show_legend = show_legend,
+        legend_position = legend_position,
+        legend_title = legend_title,
+        show_title = show_title
+      )
+      
+      # Resolve layer colors now that we have plot settings
+      private$resolve_layer_colors()
+      
       stop("Abstract method 'plot' must be implemented by subclass")
     },
 
@@ -135,26 +162,21 @@ Visualizer <- R6::R6Class("Visualizer",
     add_points = function(points, color = "auto", size = 2, shape = 19, alpha = 1, 
                          annotations = NULL, annotation_size = NULL, ordered = FALSE, 
                          arrow_color = NULL, arrow_size = 0.3, ...) {
-      # Process color (handle "auto" assignment)
-      processed_color <- process_color(color, self)
       
-      # Use processed color for arrows if not specified
-      if (is.null(arrow_color)) arrow_color <- processed_color
-      
-      private$.points_to_add <- c(private$.points_to_add,
-        list(list(
-          points = points, color = processed_color, size = size, shape = shape, alpha = alpha,
-          annotations = annotations, annotation_size = annotation_size, ordered = ordered, 
-          arrow_color = arrow_color, arrow_size = arrow_size, args = list(...)
-        ))
-      )
+      # Store layer specification using new layer system
+      private$store_layer("points", list(
+        points = points, color = color, size = size, shape = shape, alpha = alpha,
+        annotations = annotations, annotation_size = annotation_size, ordered = ordered, 
+        arrow_color = arrow_color, arrow_size = arrow_size, args = list(...)
+      ))
       invisible(self)
     }
   ),
   private = list(
 
-    .points_to_add = list(),
+    .layers_to_add = list(),  # General storage for all layer types
     .color_index = 1,  # Track next color index for auto assignment
+    .plot_settings = NULL,  # Store plot settings for layer resolution
 
     # save a ggplot2 object
     save_ggplot = function(plot_obj, filename, width, height, dpi, ...) {
@@ -189,33 +211,35 @@ Visualizer <- R6::R6Class("Visualizer",
 
     # Helper method to add points to ggplot2 objects
     add_points_to_ggplot = function(plot_obj, visualizer_type = "2D") {
-      if (length(private$.points_to_add) == 0) {
+      # Get points layers from the new layer system
+      points_layers <- private$get_layers_by_type("points")
+      if (length(points_layers) == 0) {
         return(plot_obj)
       }
 
-      for (point_set in private$.points_to_add) {
-        points_data <- private$prepare_points_data(point_set$points, visualizer_type)
+      for (point_spec in points_layers) {
+        points_data <- private$prepare_points_data(point_spec$points, visualizer_type)
         
         # Add points layer
         plot_obj <- plot_obj + ggplot2::geom_point(
           data = points_data,
           ggplot2::aes(x = x, y = y),
-          color = point_set$color,
-          size = point_set$size,
-          shape = point_set$shape,
-          alpha = point_set$alpha,
+          color = point_spec$color,
+          size = point_spec$size,
+          shape = point_spec$shape,
+          alpha = point_spec$alpha,
           inherit.aes = FALSE
         )
         
         # Add annotations if provided
-        if (!is.null(point_set$annotations)) {
+        if (!is.null(point_spec$annotations)) {
           # Use annotation_size if provided, otherwise default to smaller text
-          ann_size <- if (!is.null(point_set$annotation_size)) point_set$annotation_size else 3
+          ann_size <- if (!is.null(point_spec$annotation_size)) point_spec$annotation_size else 3
           
           plot_obj <- plot_obj + ggplot2::geom_text(
-            data = cbind(points_data, label = point_set$annotations),
+            data = cbind(points_data, label = point_spec$annotations),
             ggplot2::aes(x = x, y = y, label = label),
-            color = point_set$color,
+            color = point_spec$color,
             size = ann_size,
             vjust = -0.5,
             inherit.aes = FALSE
@@ -223,7 +247,7 @@ Visualizer <- R6::R6Class("Visualizer",
         }
         
         # Add ordered path with arrows if requested
-        if (point_set$ordered && nrow(points_data) > 1) {
+        if (point_spec$ordered && nrow(points_data) > 1) {
           # Calculate direction vectors and create shorter arrows
           for (i in 1:(nrow(points_data) - 1)) {
             x1 <- points_data$x[i]
@@ -242,7 +266,7 @@ Visualizer <- R6::R6Class("Visualizer",
               dy_norm <- dy / dist
               
               # Calculate arrow endpoints based on arrow_size
-              arrow_size <- point_set$arrow_size
+              arrow_size <- point_spec$arrow_size
               arrow_x2 <- x1 + dx_norm * arrow_size
               arrow_y2 <- y1 + dy_norm * arrow_size
               
@@ -255,11 +279,14 @@ Visualizer <- R6::R6Class("Visualizer",
               )
               
               # Add arrow segment
+              # Use the same color as points if arrow_color is not specified
+              arrow_color <- if (is.null(point_spec$arrow_color)) point_spec$color else point_spec$arrow_color
+              
               plot_obj <- plot_obj + ggplot2::geom_segment(
                 data = arrow_data,
                 ggplot2::aes(x = x, y = y, xend = xend, yend = yend),
-                color = point_set$arrow_color,
-                alpha = point_set$alpha * 0.7,
+                color = arrow_color,
+                alpha = point_spec$alpha * 0.7,
                 arrow = ggplot2::arrow(length = ggplot2::unit(0.15, "cm"), type = "closed"),
                 inherit.aes = FALSE
               )
@@ -273,12 +300,14 @@ Visualizer <- R6::R6Class("Visualizer",
 
     # Helper method to add points to plotly objects
     add_points_to_plotly = function(plot_obj, visualizer_type = "surface") {
-      if (length(private$.points_to_add) == 0) {
+      # Get points layers from the new layer system
+      points_layers <- private$get_layers_by_type("points")
+      if (length(points_layers) == 0) {
         return(plot_obj)
       }
 
-      for (point_set in private$.points_to_add) {
-        points_data <- private$prepare_points_data(point_set$points, visualizer_type)
+      for (point_spec in points_layers) {
+        points_data <- private$prepare_points_data(point_spec$points, visualizer_type)
         
         if (visualizer_type == "surface") {
           # For 3D surface plots, need z values
@@ -295,27 +324,27 @@ Visualizer <- R6::R6Class("Visualizer",
             type = "scatter3d",
             mode = "markers",
             marker = list(
-              color = point_set$color,
-              size = point_set$size,
-              opacity = point_set$alpha
+              color = point_spec$color,
+              size = point_spec$size,
+              opacity = point_spec$alpha
             ),
             name = "Added Points",
             showlegend = FALSE
           )
           
           # Add annotations if provided (3D text)
-          if (!is.null(point_set$annotations)) {
-            for (i in seq_along(point_set$annotations)) {
+          if (!is.null(point_spec$annotations)) {
+            for (i in seq_along(point_spec$annotations)) {
               plot_obj <- plot_obj %>% plotly::add_trace(
                 x = points_data$x[i],
                 y = points_data$y[i],
                 z = points_data$z[i],
                 type = "scatter3d",
                 mode = "text",
-                text = point_set$annotations[i],
+                text = point_spec$annotations[i],
                 textfont = list(
-                  color = point_set$color,
-                  size = if (!is.null(point_set$annotation_size)) point_set$annotation_size else 12
+                  color = point_spec$color,
+                  size = if (!is.null(point_spec$annotation_size)) point_spec$annotation_size else 12
                 ),
                 showlegend = FALSE
               )
@@ -323,7 +352,7 @@ Visualizer <- R6::R6Class("Visualizer",
           }
           
           # Add ordered path if requested
-          if (point_set$ordered && nrow(points_data) > 1) {
+          if (point_spec$ordered && nrow(points_data) > 1) {
             # For 3D plots, we'll use lines but with shorter segments
             for (i in 1:(nrow(points_data) - 1)) {
               x1 <- points_data$x[i]
@@ -346,7 +375,7 @@ Visualizer <- R6::R6Class("Visualizer",
                 dz_norm <- dz / dist
                 
                 # Calculate arrow endpoints based on arrow_size
-                arrow_size <- point_set$arrow_size
+                arrow_size <- point_spec$arrow_size
                 arrow_x2 <- x1 + dx_norm * arrow_size
                 arrow_y2 <- y1 + dy_norm * arrow_size
                 arrow_z2 <- z1 + dz_norm * arrow_size
@@ -359,7 +388,7 @@ Visualizer <- R6::R6Class("Visualizer",
                   type = "scatter3d",
                   mode = "lines",
                   line = list(
-                    color = point_set$arrow_color,
+                    color = point_spec$arrow_color,
                     width = 6
                   ),
                   name = "Arrow",
@@ -376,30 +405,30 @@ Visualizer <- R6::R6Class("Visualizer",
             type = "scatter",
             mode = "markers",
             marker = list(
-              color = point_set$color,
-              size = point_set$size,
-              opacity = point_set$alpha
+              color = point_spec$color,
+              size = point_spec$size,
+              opacity = point_spec$alpha
             ),
             name = "Added Points",
             showlegend = FALSE
           )
           
           # Add annotations if provided (2D text)
-          if (!is.null(point_set$annotations)) {
+          if (!is.null(point_spec$annotations)) {
             plot_obj <- plot_obj %>% plotly::add_annotations(
               x = points_data$x,
               y = points_data$y,
-              text = point_set$annotations,
+              text = point_spec$annotations,
               showarrow = FALSE,
               font = list(
-                color = point_set$color,
-                size = if (!is.null(point_set$annotation_size)) point_set$annotation_size else 12
+                color = point_spec$color,
+                size = if (!is.null(point_spec$annotation_size)) point_spec$annotation_size else 12
               )
             )
           }
           
           # Add ordered path if requested
-          if (point_set$ordered && nrow(points_data) > 1) {
+          if (point_spec$ordered && nrow(points_data) > 1) {
             # For 2D plots, use shorter line segments
             for (i in 1:(nrow(points_data) - 1)) {
               x1 <- points_data$x[i]
@@ -418,7 +447,7 @@ Visualizer <- R6::R6Class("Visualizer",
                 dy_norm <- dy / dist
                 
                 # Calculate arrow endpoints based on arrow_size
-                arrow_size <- point_set$arrow_size
+                arrow_size <- point_spec$arrow_size
                 arrow_x2 <- x1 + dx_norm * arrow_size
                 arrow_y2 <- y1 + dy_norm * arrow_size
                 
@@ -429,7 +458,7 @@ Visualizer <- R6::R6Class("Visualizer",
                   type = "scatter",
                   mode = "lines",
                   line = list(
-                    color = point_set$arrow_color,
+                    color = point_spec$arrow_color,
                     width = 4
                   ),
                   name = "Arrow",
@@ -496,6 +525,124 @@ Visualizer <- R6::R6Class("Visualizer",
       # to provide function evaluation capabilities
       warning("Cannot infer z values - returning zeros. Consider providing z values explicitly or overriding infer_z_values method.")
       return(rep(0, nrow(points_data)))
+    },
+
+    # Resolve layer colors based on current plot settings
+    resolve_layer_colors = function() {
+      # Initialize layers_to_add if it doesn't exist
+      if (is.null(private$.layers_to_add)) {
+        private$.layers_to_add <- list()
+      }
+      
+      # Reset color index for consistent color assignment
+      private$.color_index <- 1
+      
+      # Resolve colors in any stored layer specifications
+      private$resolve_all_layer_colors()
+    },
+
+    # Resolve colors in all stored layers
+    resolve_all_layer_colors = function() {
+      # Initialize layers_to_add if it doesn't exist
+      if (is.null(private$.layers_to_add)) {
+        private$.layers_to_add <- list()
+      }
+      
+      if (length(private$.layers_to_add) == 0) {
+        return()
+      }
+      
+      for (i in seq_along(private$.layers_to_add)) {
+        layer <- private$.layers_to_add[[i]]
+        
+        # Recursively resolve any "auto" colors in the layer specification
+        layer <- private$resolve_colors_recursive(layer)
+        
+        # Update the stored layer
+        private$.layers_to_add[[i]] <- layer
+      }
+    },
+
+    # Recursively resolve colors in a data structure
+    resolve_colors_recursive = function(obj) {
+      if (is.list(obj)) {
+        for (name in names(obj)) {
+          if (identical(obj[[name]], "auto")) {
+            obj[[name]] <- private$get_auto_color_with_palette()
+          } else if (is.list(obj[[name]])) {
+            obj[[name]] <- private$resolve_colors_recursive(obj[[name]])
+          }
+        }
+      }
+      return(obj)
+    },
+
+    # Get auto color using current plot settings
+    get_auto_color_with_palette = function() {
+      if (!is.null(private$.plot_settings) && !is.null(private$.plot_settings$color_palette)) {
+        color_palette <- private$.plot_settings$color_palette
+      } else {
+        color_palette <- "viridis"  # fallback default
+      }
+      
+      # Get color from discrete palette based on the selected color_palette
+      color <- get_vistool_color(private$.color_index, "discrete", base_palette = color_palette)
+      
+      # Increment color index for next use
+      private$.color_index <- private$.color_index + 1
+      
+      return(color)
+    },
+
+    # Store a layer specification that will be resolved at plot time
+    store_layer = function(layer_type, layer_spec) {
+      # Initialize layers_to_add if it doesn't exist
+      if (is.null(private$.layers_to_add)) {
+        private$.layers_to_add <- list()
+      }
+      
+      private$.layers_to_add <- c(private$.layers_to_add, 
+                                 list(list(type = layer_type, spec = layer_spec)))
+    },
+
+    # Get a stored layer by type (returns the latest one if multiple exist)
+    get_layer = function(layer_type) {
+      # Initialize layers_to_add if it doesn't exist
+      if (is.null(private$.layers_to_add)) {
+        private$.layers_to_add <- list()
+      }
+      
+      if (length(private$.layers_to_add) == 0) {
+        return(NULL)
+      }
+      
+      for (i in rev(seq_along(private$.layers_to_add))) {
+        layer <- private$.layers_to_add[[i]]
+        if (layer$type == layer_type) {
+          return(layer$spec)
+        }
+      }
+      return(NULL)
+    },
+
+    # Get all layers of a specific type
+    get_layers_by_type = function(layer_type) {
+      # Initialize layers_to_add if it doesn't exist
+      if (is.null(private$.layers_to_add)) {
+        private$.layers_to_add <- list()
+      }
+      
+      if (length(private$.layers_to_add) == 0) {
+        return(list())
+      }
+      
+      layers <- list()
+      for (layer in private$.layers_to_add) {
+        if (layer$type == layer_type) {
+          layers <- c(layers, list(layer$spec))
+        }
+      }
+      return(layers)
     }
   )
 )

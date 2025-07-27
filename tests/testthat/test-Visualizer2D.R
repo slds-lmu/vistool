@@ -44,11 +44,14 @@ test_that("Visualizer2D with training points works", {
   )
   vis$add_points(training_points, color = "red")
 
-  # Check that points were added
-  expect_length(vis$.__enclos_env__$private$.points_to_add, 1)
-  point_set <- vis$.__enclos_env__$private$.points_to_add[[1]]
-  expect_equal(nrow(point_set$points), 3)
-  expect_equal(point_set$color, "red")
+  # Check that points layer is stored in the new layer system
+  point_layers <- sapply(vis$.__enclos_env__$private$.layers_to_add, function(x) x$type == "points")
+  expect_true(any(point_layers))
+  
+  # Check the first points layer
+  point_layer <- vis$.__enclos_env__$private$.layers_to_add[point_layers][[1]]
+  expect_equal(nrow(point_layer$spec$points), 3)
+  expect_equal(point_layer$spec$color, "red")
 
   p <- vis$plot()
   expect_s3_class(p, "ggplot")
