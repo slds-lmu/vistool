@@ -108,7 +108,7 @@ vistool/
 
 ### Deferred Rendering
 
-All visualizer classes now use a deferred rendering architecture:
+All visualizer classes (should) use a deferred rendering architecture:
 
 - **Layer Storage**: All `add_*()` methods (e.g., `$add_points()`, `$add_contours()`, etc.) do not modify the plot directly. Instead, they call the private method `$store_layer(type, spec)` to save a specification of the layer (its type and parameters) to an internal list.
 - **Rendering**: The `$plot()` method is responsible for rendering all stored layers. It iterates over the stored layer specifications and calls a private `$render_layer(layer)` method to add each layer to the plot object. This ensures that all visual properties (such as colors, alpha, etc.) are resolved at plot time, using the current global settings.
