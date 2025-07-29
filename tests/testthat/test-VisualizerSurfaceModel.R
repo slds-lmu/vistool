@@ -31,7 +31,7 @@ test_that("VisualizerSurfaceModel with custom limits works", {
   expect_s3_class(vis, "VisualizerSurfaceModel")
 })
 
-test_that("VisualizerSurfaceModel surface initialization works", {
+test_that("VisualizerSurfaceModel default plot() works directly", {
   skip_if_not_installed("mlr3learners")
 
   task <- tsk("mtcars")
@@ -40,10 +40,7 @@ test_that("VisualizerSurfaceModel surface initialization works", {
 
   vis <- VisualizerSurfaceModel$new(task, learner, n_points = 5L)
 
-  # Initialize surface layer
-  vis$init_layer_surface()
-
-  # Should have a plot now
+  # Should work directly without initialization
   p <- vis$plot()
   expect_s3_class(p, "plotly")
 })

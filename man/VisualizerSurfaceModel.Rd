@@ -26,14 +26,17 @@ Learner used to train the model.}
 \itemize{
 \item \href{#method-VisualizerSurfaceModel-new}{\code{VisualizerSurfaceModel$new()}}
 \item \href{#method-VisualizerSurfaceModel-add_training_data}{\code{VisualizerSurfaceModel$add_training_data()}}
-\item \href{#method-VisualizerSurfaceModel-add_decision_boundary}{\code{VisualizerSurfaceModel$add_decision_boundary()}}
+\item \href{#method-VisualizerSurfaceModel-add_boundary}{\code{VisualizerSurfaceModel$add_boundary()}}
 \item \href{#method-VisualizerSurfaceModel-clone}{\code{VisualizerSurfaceModel$clone()}}
 }
 }
 \if{html}{\out{
 <details><summary>Inherited methods</summary>
 <ul>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="add_points"><a href='../../vistool/html/Visualizer.html#method-Visualizer-add_points'><code>vistool::Visualizer$add_points()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="initialize_defaults"><a href='../../vistool/html/Visualizer.html#method-Visualizer-initialize_defaults'><code>vistool::Visualizer$initialize_defaults()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href='../../vistool/html/Visualizer.html#method-Visualizer-save'><code>vistool::Visualizer$save()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="add_contours"><a href='../../vistool/html/VisualizerSurface.html#method-VisualizerSurface-add_contours'><code>vistool::VisualizerSurface$add_contours()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="init_layer_contour"><a href='../../vistool/html/VisualizerSurface.html#method-VisualizerSurface-init_layer_contour'><code>vistool::VisualizerSurface$init_layer_contour()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="init_layer_surface"><a href='../../vistool/html/VisualizerSurface.html#method-VisualizerSurface-init_layer_surface'><code>vistool::VisualizerSurface$init_layer_surface()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="plot"><a href='../../vistool/html/VisualizerSurface.html#method-VisualizerSurface-plot'><code>vistool::VisualizerSurface$plot()</code></a></span></li>
@@ -54,7 +57,11 @@ Creates a new instance of this [R6][R6::R6Class] class.
   x1_limits = NULL,
   x2_limits = NULL,
   padding = 0,
-  n_points = 100L
+  n_points = 100L,
+  opacity = 0.8,
+  colorscale = list(c(0, "#440154"), c(0.25, "#3b528b"), c(0.5, "#21908c"), c(0.75,
+    "#5dc863"), c(1, "#fde725")),
+  show_title = TRUE
 )}\if{html}{\out{</div>}}
 }
 
@@ -70,8 +77,18 @@ The learner to train the model with.}
 \item{\code{x1_limits}}{(`numeric(2)`)\cr
 The x1 limits.}
 
+\item{\code{x1_limits}}{(`numeric(2)`)\cr
+The x1 limits.}
+
 \item{\code{x2_limits}}{(`numeric(2)`)\cr
 The x2 limits.}
+
+\item{\code{x2_limits}}{(`numeric(2)`)\cr
+The x2 limits.}
+
+\item{\code{padding}}{(`numeric(1)`)\cr
+A margin that is added to x1limits and x2limits.
+The x1 margin is calculated by `max(x1lmits) - min(x1limits) * padding`.}
 
 \item{\code{padding}}{(`numeric(1)`)\cr
 A margin that is added to x1limits and x2limits.
@@ -80,6 +97,25 @@ The x1 margin is calculated by `max(x1lmits) - min(x1limits) * padding`.}
 \item{\code{n_points}}{(`integer(1)`)\cr
 The number of generated point per dimension.
 Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
+
+\item{\code{n_points}}{(`integer(1)`)\cr
+The number of generated point per dimension.
+Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
+
+\item{\code{opacity}}{(`numeric(1)`)\cr
+Opacity of the layer.}
+
+\item{\code{opacity}}{(`numeric(1)`)\cr
+Opacity of the layer.}
+
+\item{\code{colorscale}}{(`list()`)\cr
+The coloring of the surface/contour.}
+
+\item{\code{colorscale}}{(`list()`)\cr
+The coloring of the surface/contour.}
+
+\item{\code{show_title}}{(`logical(1)`)\cr
+Indicator whether to show the title of the plot.}
 }
 \if{html}{\out{</div>}}
 }
@@ -109,22 +145,26 @@ Further arguments passed to `add_trace(...)`.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-VisualizerSurfaceModel-add_decision_boundary"></a>}}
-\if{latex}{\out{\hypertarget{method-VisualizerSurfaceModel-add_decision_boundary}{}}}
-\subsection{Method \code{add_decision_boundary()}}{
-Adds the decision boundary to the plot.
+\if{html}{\out{<a id="method-VisualizerSurfaceModel-add_boundary"></a>}}
+\if{latex}{\out{\hypertarget{method-VisualizerSurfaceModel-add_boundary}{}}}
+\subsection{Method \code{add_boundary()}}{
+Adds boundary surface(s) to the plot at specified values.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{VisualizerSurfaceModel$add_decision_boundary(threshold = 0.5, ...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{VisualizerSurfaceModel$add_boundary(values = NULL, color = NULL, ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{threshold}}{(`numeric(1)`)\cr
-Threshold for the decision boundary.}
+\item{\code{values}}{(`numeric()`)\cr
+Vector of z-values where to draw boundary surfaces. For classification with probability predictions,
+defaults to 0.5. For regression or response predictions, defaults to quantiles of predictions.}
+
+\item{\code{color}}{(`character(1)` or `list()`)\cr
+Color specification for boundary surfaces. Default uses a neutral colorscale.}
 
 \item{\code{...}}{(`any`)\cr
-Further arguments passed to `add_trace(...)`.}
+Further arguments passed to `add_trace(...)` or `add_surface(...)`.}
 }
 \if{html}{\out{</div>}}
 }

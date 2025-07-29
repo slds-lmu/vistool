@@ -36,6 +36,20 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
     #' Label of the z axis.
     z_lab = NULL,
 
+    #' @field opacity (`numeric(1)`)\cr
+    #' Opacity of the surface plot.
+    opacity = 0.8,
+
+    #' @field colorscale (`list()`)\cr
+    #' Color scale for the surface plot.
+    colorscale = NULL,
+
+
+
+    #' @field show_title (`logical(1)`)\cr
+    #' Whether to show the plot title.
+    show_title = TRUE,
+
     #' @description
     #' Creates a new instance of this [R6][R6::R6Class] class.
     #'
@@ -47,27 +61,35 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
     #' @template param_x1_lab
     #' @template param_x2_lab
     #' @template param_z_lab
-    initialize = function(grid, zmat, plot_lab = NULL, x1_lab = "x1", x2_lab = "x2", z_lab = "z") {
+    #' @template param_opacity
+    #' @template param_colorscale
+    #' @template param_show_title
+    initialize = function(grid, zmat, plot_lab = NULL, x1_lab = "x1", x2_lab = "x2", z_lab = "z", 
+                          opacity = 0.8, colorscale = list(
+                            c(0, "#440154"), c(0.25, "#3b528b"), c(0.5, "#21908c"), 
+                            c(0.75, "#5dc863"), c(1, "#fde725")
+                          ), show_title = TRUE) {
       self$grid <- checkmate::assert_list(grid)
       self$zmat <- checkmate::assert_matrix(zmat)
       self$plot_lab <- checkmate::assert_character(plot_lab, null.ok = TRUE)
       self$x1_lab <- checkmate::assert_character(x1_lab)
       self$x2_lab <- checkmate::assert_character(x2_lab)
       self$z_lab <- checkmate::assert_character(z_lab)
+      self$opacity <- checkmate::assert_number(opacity, lower = 0, upper = 1)
+      self$colorscale <- checkmate::assert_list(colorscale)
+      self$show_title <- checkmate::assert_flag(show_title)
       return(invisible(self))
     },
 
     #' @description
-    #' Initialize the plot with contour lines.
+    #' Initialize the plot as 2D contour.
+    #' This method is called automatically by plot() and should not be called directly.
     #'
     #' @template param_opacity
     #' @template param_colorscale
     #' @template param_show_title
     #' @template param_dots_trace
-    init_layer_contour = function(opacity = 0.8, colorscale = list(
-      c(0, "#440154"), c(0.25, "#3b528b"), c(0.5, "#21908c"), 
-      c(0.75, "#5dc863"), c(1, "#fde725")
-    ), show_title = TRUE, ...) {
+    init_layer_contour = function(opacity = self$opacity, colorscale = self$colorscale, show_title = self$show_title, ...) {
       checkmate::assert_number(opacity, lower = 0, upper = 1)
       checkmate::assert_list(colorscale)
       checkmate::assert_flag(show_title)
@@ -105,62 +127,49 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
 
     #' @description
     #' Initialize the plot as 3D surface.
+    #' This method is called automatically by plot() and should not be called directly.
     #'
     #' @template param_opacity
     #' @template param_colorscale
     #' @template param_show_title
-    #' @param show_contours (`logical(1)`)\cr
-    #'  Indicator whether to show the contours of the surface.
-    #' @param contours (`list()`)\cr
-    #'  Custom contour configuration for the surface. If provided, this takes precedence over `show_contours`.
-    #'  Can specify x, y, and z contours with custom properties like start, end, size, and color.
-    #'  See plotly documentation for detailed contour options.
     #' @template param_dots_trace
-    init_layer_surface = function(opacity = 0.8, colorscale = list(
-      c(0, "#440154"), c(0.25, "#3b528b"), c(0.5, "#21908c"), 
-      c(0.75, "#5dc863"), c(1, "#fde725")
-    ), show_contours = FALSE, contours = NULL, show_title = TRUE, ...) {
+    init_layer_surface = function(opacity = self$opacity, colorscale = self$colorscale, 
+                                  show_title = self$show_title, ...) {
       checkmate::assert_number(opacity, lower = 0, upper = 1)
       checkmate::assert_list(colorscale)
-      checkmate::assert_flag(show_contours)
-      checkmate::assert_list(contours, null.ok = TRUE)
       checkmate::assert_flag(show_title)
 
       private$.vbase <- c(as.list(environment()), list(...))
       private$.layer_primary <- "surface"
 
-      # Handle contours: custom contours take precedence over show_contours
-      if (!is.null(contours)) {
-        # Use provided custom contours
-        contours_final <- contours
-      } else if (show_contours) {
-        # Use default z-projected contours
-        contours_final <- list(
-          z = list(
-            show = TRUE,
-            project = list(z = TRUE),
-            usecolormap = TRUE
-          )
-        )
-      } else {
-        contours_final <- NULL
-      }
-
       llp <- list(x = self$grid$x1, y = self$grid$x2, z = self$zmat)
-      private$.plot <- plot_ly() %>%
-        add_trace(
-          name = self$plot_lab,
-          showlegend = FALSE,
-          showscale = FALSE,
-          x = llp$x,
-          y = llp$y,
-          z = t(llp$z),
-          type = "surface",
-          opacity = opacity,
-          colorscale = colorscale,
-          contours = contours_final,
-          ...
-        ) %>%
+      
+      # Check if contours layer is stored and include it in the base surface
+      contours_layer <- private$get_layer("contours")
+      
+      # Build trace arguments
+      trace_args <- list(
+        name = self$plot_lab,
+        showlegend = FALSE,
+        showscale = FALSE,
+        x = llp$x,
+        y = llp$y,
+        z = t(llp$z),
+        type = "surface",
+        opacity = opacity,
+        colorscale = colorscale
+      )
+      
+      # Add contours if available
+      if (!is.null(contours_layer)) {
+        trace_args$contours <- contours_layer$contours
+      }
+      
+      # Add additional arguments
+      trace_args <- c(trace_args, list(...))
+      
+      plot_obj <- plot_ly()
+      private$.plot <- do.call(plotly::add_trace, c(list(plot_obj), trace_args)) %>%
         layout(
           title = if (show_title) self$plot_lab else NULL,
           scene = list(
@@ -179,6 +188,7 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
     },
 
     #' @description Set the layout of the plotly plot.
+    #' This method is used internally by plot(layout = ...) and should not be called directly.
     #' @param ... Layout options directly passed to `layout(...)`.
     set_layout = function(...) {
       private$.layout <- list(...)
@@ -188,11 +198,12 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
     },
 
     #' @description Set the view for a 3D plot.
+    #' This method is used internally by plot(scene = ...) and should not be called directly.
     #' @param x (`numeric(1)`) The view from which the "camera looks down" to the plot.
     #' @param y (`numeric(1)`) The view from which the "camera looks down" to the plot.
     #' @param z (`numeric(1)`) The view from which the "camera looks down" to the plot.
     set_scene = function(x, y, z) {
-      if (is.null(private$.plot)) self$init_layer_surface()
+      if (is.null(private$.plot)) private$.init_default_plot()
       checkmate::assert_number(x)
       checkmate::assert_number(y)
       checkmate::assert_number(z)
@@ -207,29 +218,227 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
       return(invisible(self))
     },
 
+    #' @description
+    #' Add contours to the surface plot.
+    #'
+    #' @param contours (`list()` or `NULL`)\cr
+    #'   Custom contour configuration. If `NULL` (default), adds default z-projected contours.
+    #'   Can specify x, y, and z contours with custom properties like start, end, size, and color.
+    #'   See plotly documentation for detailed contour options.
+    #' @param ... Additional arguments passed to the contour trace.
+    #' @return Self (invisibly) for method chaining.
+    add_contours = function(contours = NULL, ...) {
+      checkmate::assert_list(contours, null.ok = TRUE)
+      
+      # Handle contours: custom contours or default z-projected contours
+      if (is.null(contours)) {
+        # Use default z-projected contours
+        contours_final <- list(
+          z = list(
+            show = TRUE,
+            project = list(z = TRUE),
+            usecolormap = TRUE
+          )
+        )
+      } else {
+        # Use provided custom contours
+        contours_final <- contours
+      }
+      
+      # Store contours specification for deferred rendering
+      private$store_layer("contours", list(
+        contours = contours_final,
+        args = list(...)
+      ))
+
+      return(invisible(self))
+    },
+
     #' @description Return the plot and hence plot it or do further processing.
     #' @param text_size (`numeric(1)`)\cr
-    #'   Base text size for plot elements. Default is 12. For 3D plotly plots, this controls axis labels and title sizes.
+    #'   Base text size for plot elements. Default is 12. For 3D plotly calls, this controls axis labels and title sizes.
+    #' @param title_size (`numeric(1)`)\cr
+    #'   Title text size. If NULL, defaults to text_size + 2.
     #' @param theme (`character(1)`)\cr
     #'   Theme parameter for compatibility with ggplot2-based visualizers. Ignored for 3D plotly plots.
-    plot = function(text_size = 12, theme = "minimal") {
+    #' @param background (`character(1)`)\cr
+    #'   Background color parameter for compatibility. Ignored for 3D plotly plots.
+    #' @param color_palette (`character(1)`)\cr
+    #'   Color palette for the surface. One of "viridis", "plasma", "grayscale". Default is "viridis".
+    #' @param flatten (`logical(1)`)\cr
+    #'   If TRUE, display as 2D contour plot. If FALSE (default), display as 3D surface plot.
+    #' @param layout (`list()`)\cr
+    #'   Layout options passed directly to `plotly::layout()`. If NULL, no additional layout modifications are applied.
+    #' @param scene (`list()`)\cr
+    #'   Scene options for 3D surface plots. Should contain camera settings like `list(camera = list(eye = list(x = 1.1, y = 1.2, z = 1.3)))`. 
+    #'   Only applies to surface plots, ignored for contour plots. If NULL, no scene modifications are applied.
+    #' @template param_plot_title
+    #' @template param_plot_subtitle
+    #' @template param_x_lab
+    #' @template param_y_lab
+    #' @template param_z_lab_custom
+    #' @template param_x_limits
+    #' @template param_y_limits
+    #' @template param_z_limits
+    #' @template param_show_legend
+    #' @template param_legend_title
+    #' @template param_show_title
+    #' @return A plotly object.
+    plot = function(text_size = 12, title_size = NULL, theme = "minimal", background = "white", 
+                    color_palette = "viridis", flatten = FALSE, layout = NULL, scene = NULL,
+                    plot_title = NULL, plot_subtitle = NULL, x_lab = NULL, y_lab = NULL, z_lab = NULL,
+                    x_limits = NULL, y_limits = NULL, z_limits = NULL, show_legend = TRUE, legend_title = NULL, show_title = TRUE) {
       checkmate::assert_number(text_size, lower = 1)
+      checkmate::assert_number(title_size, lower = 1, null.ok = TRUE)
       checkmate::assert_choice(theme, choices = c("minimal", "bw", "classic", "gray", "light", "dark", "void"))
+      checkmate::assert_string(background)
+      checkmate::assert_choice(color_palette, choices = c("viridis", "plasma", "grayscale"))
+      checkmate::assert_flag(flatten)
+      checkmate::assert_list(layout, null.ok = TRUE)
+      checkmate::assert_list(scene, null.ok = TRUE)
+      checkmate::assert_string(plot_title, null.ok = TRUE)
+      checkmate::assert_string(plot_subtitle, null.ok = TRUE)
+      checkmate::assert_string(x_lab, null.ok = TRUE)
+      checkmate::assert_string(y_lab, null.ok = TRUE)
+      checkmate::assert_string(z_lab, null.ok = TRUE)
+      checkmate::assert_numeric(x_limits, len = 2, null.ok = TRUE)
+      checkmate::assert_numeric(y_limits, len = 2, null.ok = TRUE)
+      checkmate::assert_numeric(z_limits, len = 2, null.ok = TRUE)
+      checkmate::assert_flag(show_legend)
+      checkmate::assert_string(legend_title, null.ok = TRUE)
+      checkmate::assert_flag(show_title)
+      checkmate::assert_flag(flatten)
+      checkmate::assert_list(layout, null.ok = TRUE)
+      checkmate::assert_list(scene, null.ok = TRUE)
       
-      if (is.null(private$.plot)) self$init_layer_surface()
+      # Store plot settings for layer resolution
+      private$.plot_settings <- list(
+        text_size = text_size,
+        title_size = title_size,
+        theme = theme,
+        background = background,
+        color_palette = color_palette,
+        flatten = flatten,
+        layout = layout,
+        scene = scene,
+        plot_title = plot_title,
+        plot_subtitle = plot_subtitle,
+        x_lab = x_lab,
+        y_lab = y_lab,
+        z_lab = z_lab,
+        x_limits = x_limits,
+        y_limits = y_limits,
+        z_limits = z_limits,
+        show_legend = show_legend,
+        legend_title = legend_title,
+        show_title = show_title
+      )
+      
+      # Resolve layer colors now that we have plot settings
+      private$resolve_layer_colors()
+      
+      # Set default title size
+      if (is.null(title_size)) title_size <- text_size + 2
+      
+      # Validate scene parameter is only used for surface plots
+      if (!is.null(scene) && flatten) {
+        stop("Scene parameter can only be used for surface plots (flatten = FALSE)")
+      }
+      
+      # Get the appropriate colorscale based on palette choice
+      plot_colorscale <- get_vistool_color(1, color_palette)
+      
+      # Check if we need to reinitialize the plot
+      # This happens if the plot type changes, colorscale changes, or contours are added/modified
+      contours_layer <- private$get_layer("contours")
+      has_contours <- !is.null(contours_layer)
+      current_has_contours <- !is.null(private$.vbase) && !is.null(private$.vbase$contours)
+      
+      needs_reinit <- is.null(private$.plot) || 
+                     (flatten && private$.layer_primary != "contour") ||
+                     (!flatten && private$.layer_primary != "surface") ||
+                     (!identical(private$.vbase$colorscale, plot_colorscale)) ||
+                     (has_contours != current_has_contours)
+      
+      # Initialize appropriate plot type based on flatten parameter
+      if (needs_reinit) {
+        if (flatten) {
+          self$init_layer_contour(colorscale = plot_colorscale)
+        } else {
+          self$init_layer_surface(colorscale = plot_colorscale)
+        }
+      }
       
       # apply text size to plotly layout
       if (!is.null(private$.plot)) {
-        private$.plot <- private$.plot %>%
-          layout(
-            title = list(text = self$plot_lab, font = list(size = text_size + 2)),
-            scene = list(
-              xaxis = list(title = list(text = self$x1_lab, font = list(size = text_size))),
-              yaxis = list(title = list(text = self$x2_lab, font = list(size = text_size))),
-              zaxis = list(title = list(text = self$z_lab, font = list(size = text_size)))
+        # Determine final labels
+        final_title <- if (show_title) {
+          if (!is.null(plot_title)) plot_title else self$plot_lab
+        } else {
+          ""  # Empty string instead of NULL for plotly
+        }
+        final_x_lab <- if (!is.null(x_lab)) x_lab else self$x1_lab
+        final_y_lab <- if (!is.null(y_lab)) y_lab else self$x2_lab
+        final_z_lab <- if (!is.null(z_lab)) z_lab else self$z_lab
+        
+        if (private$.layer_primary == "surface") {
+          # For 3D surface plots
+          private$.plot <- private$.plot %>%
+            plotly::layout(
+              title = list(text = final_title, font = list(size = title_size)),
+              scene = list(
+                xaxis = list(
+                  title = list(text = final_x_lab, font = list(size = text_size)),
+                  range = x_limits
+                ),
+                yaxis = list(
+                  title = list(text = final_y_lab, font = list(size = text_size)),
+                  range = y_limits
+                ),
+                zaxis = list(
+                  title = list(text = final_z_lab, font = list(size = text_size)),
+                  range = z_limits
+                )
+              ),
+              showlegend = show_legend
             )
-          )
+        } else {
+          # For 2D contour plots
+          private$.plot <- private$.plot %>%
+            plotly::layout(
+              title = list(text = final_title, font = list(size = title_size)),
+              xaxis = list(
+                title = list(text = final_x_lab, font = list(size = text_size)),
+                range = x_limits
+              ),
+              yaxis = list(
+                title = list(text = final_y_lab, font = list(size = text_size)),
+                range = y_limits
+              ),
+              showlegend = show_legend
+            )
+        }
       }
+      
+      # Apply additional layout options if provided
+      if (!is.null(layout)) {
+        private$.plot <- do.call(plotly::layout, c(list(private$.plot), layout))
+      }
+      
+      # Apply scene options if provided (only for surface plots)
+      if (!is.null(scene) && private$.layer_primary == "surface") {
+        private$.plot <- private$.plot %>% plotly::layout(scene = scene)
+      }
+      
+      # Add points from add_points() method
+      if (private$.layer_primary == "surface") {
+        private$.plot <- private$add_points_to_plotly(private$.plot, "surface")
+      } else {
+        private$.plot <- private$add_points_to_plotly(private$.plot, "contour")
+      }
+      
+      # Add stored layers (training data, boundaries, etc.)
+      private$render_stored_layers()
       
       return(private$.plot)
     }
@@ -251,12 +460,19 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
     .opts = list(),
     .vbase = list(),
     .layout = list(),
+    .plot_settings = NULL,  # Store plot settings for layer resolution
 
     # @field .freeze_plot (`logical(1)`) Indicator whether to freeze saving the plot elements.
     .freeze_plot = FALSE,
+    
+    # Initialize default surface plot (called automatically by plot())
+    .init_default_plot = function() {
+      self$init_layer_surface()
+    },
+    
     checkInit = function() {
       if (is.null(private$.plot)) {
-        stop("Initialize plot with `initLayer*`")
+        private$.init_default_plot()
       }
       return(invisible(TRUE))
     },
@@ -268,6 +484,133 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
         return(checkmate::assertNumeric(x, len = 3L))
       }
       stop("Error in `$checkInput()`")
+    },
+    
+    # Override infer_z_values to use the surface's zmat
+    infer_z_values = function(points_data) {
+      # Use bilinear interpolation to estimate z values from the surface
+      x_vals <- points_data$x
+      y_vals <- points_data$y
+      
+      # Get grid ranges
+      x1_range <- self$grid$x1
+      x2_range <- self$grid$x2
+      
+      z_vals <- numeric(length(x_vals))
+      
+      for (i in seq_along(x_vals)) {
+        x <- x_vals[i]
+        y <- y_vals[i]
+        
+        # Find closest grid points
+        x1_idx <- which.min(abs(x1_range - x))
+        x2_idx <- which.min(abs(x2_range - y))
+        
+        # Clamp to grid boundaries
+        x1_idx <- max(1, min(length(x1_range), x1_idx))
+        x2_idx <- max(1, min(length(x2_range), x2_idx))
+        
+        # Use the closest grid point value
+        z_vals[i] <- self$zmat[x1_idx, x2_idx]
+      }
+      
+      return(z_vals)
+    },
+    
+    # Render stored layers (training data, boundaries, etc.)
+    render_stored_layers = function() {
+      # Render training data if any
+      if (length(private$.layers_to_add) > 0) {
+        training_logical <- sapply(private$.layers_to_add, function(x) x$type == "training_data")
+        training_indices <- which(training_logical)
+      } else {
+        training_indices <- integer(0)
+      }
+      for (idx in training_indices) {
+        data <- private$.layers_to_add[[idx]]$spec
+        
+        if (private$.layer_primary == "contour") {
+          private$.plot <- private$.plot %>%
+            plotly::add_trace(
+              x = data$x1,
+              y = data$x2,
+              type = "scatter",
+              mode = "markers",
+              marker = list(
+                size = 10,
+                color = data$z,
+                cmin = min(self$zmat),
+                cmax = max(self$zmat),
+                colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")),
+                line = list(color = "black", width = 2),
+                showscale = FALSE
+              ),
+              text = ~ paste("x:", data$x1, "\ny:", data$x2, " \nz:", data$z),
+              hoverinfo = "text"
+            )
+        } else {
+          private$.plot <- private$.plot %>%
+            plotly::add_trace(
+              x = data$x1,
+              y = data$x2,
+              z = data$z,
+              type = "scatter3d",
+              mode = "markers",
+              marker = list(size = data$size, color = data$color)
+            )
+        }
+      }
+      
+      # Render boundary layers if any
+      if (length(private$.layers_to_add) > 0) {
+        boundary_logical <- sapply(private$.layers_to_add, function(x) x$type == "boundary")
+        boundary_indices <- which(boundary_logical)
+      } else {
+        boundary_indices <- integer(0)
+      }
+      for (idx in boundary_indices) {
+        boundary <- private$.layers_to_add[[idx]]$spec
+        
+        for (value in boundary$values) {
+          z <- matrix(value, nrow = nrow(self$zmat), ncol = ncol(self$zmat), byrow = TRUE)
+
+          if (private$.layer_primary == "contour") {
+            llp <- list(x = self$grid$x1, y = self$grid$x2, z = self$zmat)
+            private$.plot <- private$.plot %>%
+              plotly::add_trace(
+                name = paste("boundary", value),
+                autocontour = FALSE,
+                showlegend = FALSE,
+                showscale = FALSE,
+                x = llp$x,
+                y = llp$y,
+                z = t(llp$z),
+                type = "contour",
+                colorscale = list(c(0, 1), c("rgb(0,0,0)", "rgb(0,0,0)")),
+                ncontours = 1,
+                contours = list(
+                  start = value,
+                  end = value,
+                  coloring = "lines"
+                ),
+                line = list(
+                  color = "black",
+                  width = 3
+                )
+              )
+          } else {
+            private$.plot <- private$.plot %>%
+              plotly::add_surface(
+                x = self$grid$x1,
+                y = self$grid$x2,
+                z = z,
+                colorscale = boundary$color,
+                showscale = FALSE,
+                name = paste("boundary", value)
+              )
+          }
+        }
+      }
     }
   )
 )

@@ -37,17 +37,26 @@ test_that("Visualizer2D with training points works", {
     fun_y = z_vals
   )
 
-  # Add training points
-  vis$points_x1 <- c(-0.5, 0, 0.5)
-  vis$points_x2 <- c(0.5, 0, -0.5)
-  vis$points_y <- c(1, 2, 3)
+  # Add training points using the new unified system
+  training_points <- data.frame(
+    x = c(-0.5, 0, 0.5),
+    y = c(0.5, 0, -0.5)
+  )
+  vis$add_points(training_points, color = "red")
 
-  expect_length(vis$points_x1, 3)
-  expect_length(vis$points_x2, 3)
-  expect_length(vis$points_y, 3)
+  # Check that points layer is stored in the new layer system
+  point_layers <- sapply(vis$.__enclos_env__$private$.layers_to_add, function(x) x$type == "points")
+  expect_true(any(point_layers))
+  
+  # Check the first points layer
+  point_layer <- vis$.__enclos_env__$private$.layers_to_add[point_layers][[1]]
+  expect_equal(nrow(point_layer$spec$points), 3)
+  expect_equal(point_layer$spec$color, "red")
 
   p <- vis$plot()
   expect_s3_class(p, "ggplot")
+  # Should have 3 layers: raster + contour (white) + points (from add_points)
+  expect_length(p$layers, 3)
 })
 
 test_that("Visualizer2D basic functionality works", {
@@ -84,12 +93,10 @@ test_that("Visualizer2D optimization trace and compatibility methods work", {
     fun_y = z_vals
   )
 
-  # set_layout should warn that it's only available for surface visualizers
-  expect_warning(
-    vis$set_layout(),
-    "set_layout\\(\\) is only available for VisualizerSurface"
-  )
-
   # add_optimization_trace should no longer be available on base Visualizer2D
   expect_null(vis$add_optimization_trace)
+  
+  # Test that basic plotting works
+  p <- vis$plot()
+  expect_s3_class(p, "ggplot")
 })

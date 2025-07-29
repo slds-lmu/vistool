@@ -21,7 +21,20 @@ VisualizerSurfaceObj <- R6::R6Class("VisualizerSurfaceObj",
     #' Creates a new instance of this [R6][R6::R6Class] class.
     #'
     #' @template param_objective
-    initialize = function(objective, x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L) {
+    #' @template param_x1_limits
+    #' @template param_x2_limits
+    #' @template param_padding
+    #' @template param_n_points
+    #' @template param_opacity
+    #' @template param_colorscale
+    #' @template param_opacity
+    #' @template param_colorscale
+    #' @template param_show_title
+    initialize = function(objective, x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L,
+                          opacity = 0.8, colorscale = list(
+                            c(0, "#440154"), c(0.25, "#3b528b"), c(0.5, "#21908c"), 
+                            c(0.75, "#5dc863"), c(1, "#fde725")
+                          ), show_title = TRUE) {
       self$objective <- checkmate::assert_r6(objective, "Objective")
       checkmate::assert_numeric(x1_limits, len = 2, null.ok = TRUE)
       checkmate::assert_numeric(x2_limits, len = 2, null.ok = TRUE)
@@ -58,7 +71,10 @@ VisualizerSurfaceObj <- R6::R6Class("VisualizerSurfaceObj",
         plot_lab = self$objective$label,
         x1_lab = "x1",
         x2_lab = "x2",
-        z_lab = "y"
+        z_lab = "y",
+        opacity = opacity,
+        colorscale = colorscale,
+        show_title = show_title
       )
 
       # Initialize trace counter for consistent coloring
@@ -104,136 +120,45 @@ VisualizerSurfaceObj <- R6::R6Class("VisualizerSurfaceObj",
       checkmate::assert_count(npmax, null.ok = TRUE)
       checkmate::assert_string(line_color, null.ok = TRUE)
       
-      # Generate consistent color if not provided
+      # Store layer specification without immediately resolving colors
+      # Colors will be resolved in plot() when color_palette is known
       if (is.null(line_color)) {
-        # Increment trace counter and get consistent color
-        private$.trace_count <- private$.trace_count + 1
-        line_color <- get_consistent_color(private$.trace_count)
+        line_color <- "auto"  # Mark for automatic color assignment
       }
-      if (is.null(private$.plot)) self$init_layer_surface()
-
-      if (nrow(opt$archive) == 0) {
-        stop("No optimization trace in `opt$archive`. Did you forget to call `opt$optimize(steps)`?")
-      }
-
-      if (private$.layer_primary == "contour") {
-        checkmate::assertNumeric(offset, len = 2L, null.ok = TRUE)
-        if (is.null(offset)) {
-          offset <- rep(0, 2)
-        }
-        offset[3] <- 0
-      }
-      if (private$.layer_primary == "surface") {
-        checkmate::assertNumeric(offset, len = 3L, null.ok = TRUE)
-        if (is.null(offset)) {
-          offset <- rep(0, 3)
-        }
-      }
-
-      # Catch additional arguments:
-      aargs <- list(...)
-
-      if (!private$.freeze_plot) { # Just set by animate to not save the optimizer over and over again for each frame.
-        private$.opts <- c(private$.opts, list(c(as.list(environment()), aargs)))
-      }
-
-      # Assert marker styling:
-      checkmate::assertIntegerish(add_marker_at, lower = 1, upper = nrow(opt$archive))
-      if (is.null(marker_shape)) marker_shape <- NA
-      if (length(marker_shape) == 1) marker_shape <- rep(marker_shape, length(add_marker_at))
-      mvals <- NULL
-      if (private$.layer_primary == "contour") {
-        mvals <- schema(F)$traces$scatter$attributes$marker$symbol$values
-      }
-      if (private$.layer_primary == "surface") {
-        mvals <- schema(F)$traces$scatter3d$attributes$marker$symbol$values
-      }
-      invisible(lapply(marker_shape, function(marker_shape) checkmate::assertChoice(marker_shape, choices = c(mvals, NA))))
-
-      if (is.null(marker_color)) marker_color <- line_color
-      if (length(marker_color) == 1) {
-        marker_color <- rep(marker_color, length(marker_shape))
-      }
-      checkmate::assertCharacter(marker_color, len = length(marker_shape), null.ok = TRUE)
-
-      # Define marker coordinates for plotting:
-      xmat <- do.call(rbind, c(opt$archive$x_in[1], opt$archive$x_out))
-      xmarkers <- data.frame(
-        x = xmat[, 1] + offset[1], y = xmat[, 2] + offset[2],
-        z = c(opt$archive$fval_in[1], opt$archive$fval_out) + offset[3]
-      )
-      if (is.null(npoints)) {
-        npoints <- nrow(xmarkers)
-      }
-      if (is.null(npmax)) {
-        npmax <- nrow(xmarkers)
-        if (npmax > nrow(xmarkers)) {
-          npmax <- nrow(xmarkers)
-        }
-      }
-      # Cut marker after npmax iterations (if specified):
-      xmr <- xmarkers[unique(round(seq(1, nrow(xmarkers), length.out = npoints))), ]
-      xmr <- xmr[seq_len(npmax), ]
-      add_marker_at <- add_marker_at[add_marker_at <= npmax]
-
-      ptype <- NULL
-      if (is.null(name)) {
-        name <- paste0(opt$id, " on ", opt$objective$id)
-      }
-
-      # Define the plotting arguments as list, so we can call `do.call` with these arguments. This is
-      # more comfortable due to just one call to `add_trace`. Additionally, it is easier to control
-      # different default stylings (such as line width) and to recreate the layer with the stored arguments:
-      if (private$.layer_primary == "surface") {
-        ptype <- "scatter3d"
-        pargs <- list(
-          name = name,
-          x = xmr$x,
-          y = xmr$y,
-          z = xmr$z,
-          marker = list(color = line_color, line = list(color = mcolor_out, width = 6)),
-          line = list(color = line_color, width = 8)
-        )
-      }
-      if (private$.layer_primary == "contour") {
-        ptype <- "scatter"
-        pargs <- list(
-          name = name,
-          x = xmr$x,
-          y = xmr$y,
-          marker = list(color = line_color, size = 12, line = list(color = mcolor_out, width = 2)),
-          line = list(color = line_color, width = 2)
-        )
-      }
-      if (is.null(ptype)) {
-        stop("No known plot mode")
-      }
-      pargs$type <- ptype
-
-      # Add optimization traces as lines to the plot:
-      private$.plot <- do.call(add_trace, c(
-        list(private$.plot),
-        mlr3misc::insert_named(mlr3misc::remove_named(pargs, "marker"), aargs),
-        list(mode = "lines")
+      
+      # Store the optimization trace layer for later processing
+      private$store_layer("optimization_trace", list(
+        optimizer = opt,
+        line_color = line_color,
+        mcolor_out = mcolor_out,
+        npoints = npoints,
+        npmax = npmax,
+        name = name,
+        offset = offset,
+        add_marker_at = add_marker_at,
+        marker_shape = marker_shape,
+        marker_color = marker_color,
+        args = list(...)
       ))
-
-      # Now add marker to the lines. Marker are added at `add_marker_at` iterations
-      # and with the specified shape and color:
-      pargs <- list(
-        x = xmarkers$x[add_marker_at],
-        y = xmarkers$y[add_marker_at],
-        z = xmarkers$z[add_marker_at],
-        mode = "markers",
-        type = ptype,
-        marker = insert_named(pargs$marker, list(symbol = marker_shape, color = marker_color)),
-        showlegend = FALSE
-      )
-      if (private$.layer_primary == "contour") {
-        pargs$z <- NULL
-      }
-      private$.plot <- do.call(add_trace, c(list(private$.plot), pargs))
-
+      
       return(invisible(self))
+    },
+
+    #' @description
+    #' Renders the surface plot with all added layers.
+    #'
+    #' @param ... (`any`)\cr
+    #'   Additional arguments passed to the parent plot method.
+    #'
+    #' @return The plotly object.
+    plot = function(...) {
+      # Call parent plot method first to set up plot_settings and resolve colors
+      super$plot(...)
+      
+      # Process stored optimization trace layers
+      private$render_optimization_trace_layers()
+      
+      return(private$.plot)
     },
 
     #' @description
@@ -437,6 +362,163 @@ VisualizerSurfaceObj <- R6::R6Class("VisualizerSurfaceObj",
     }
   ),
   private = list(
-    .trace_count = 0
+    .trace_count = 0,
+    
+    # Render stored optimization trace layers
+    render_optimization_trace_layers = function() {
+      # Get all stored optimization trace layers
+      trace_layers <- private$get_layers_by_type("optimization_trace")
+      
+      if (length(trace_layers) == 0) {
+        return()
+      }
+      
+      for (trace_spec in trace_layers) {
+        private$render_optimization_trace_layer(trace_spec)
+      }
+    },
+    
+    # Render a single optimization trace layer
+    render_optimization_trace_layer = function(layer_spec) {
+      opt <- layer_spec$optimizer
+      line_color <- layer_spec$line_color
+      mcolor_out <- layer_spec$mcolor_out
+      npoints <- layer_spec$npoints
+      npmax <- layer_spec$npmax
+      name <- layer_spec$name
+      offset <- layer_spec$offset
+      add_marker_at <- layer_spec$add_marker_at
+      marker_shape <- layer_spec$marker_shape
+      marker_color <- layer_spec$marker_color
+      aargs <- layer_spec$args
+
+      # Resolve color if it's "auto"
+      if (line_color == "auto") {
+        private$.trace_count <- private$.trace_count + 1
+        line_color <- private$get_auto_color_with_palette()
+      }
+      
+      if (is.null(private$.plot)) private$.init_default_plot()
+
+      if (nrow(opt$archive) == 0) {
+        stop("No optimization trace in `opt$archive`. Did you forget to call `opt$optimize(steps)`?")
+      }
+
+      # Set offset defaults based on layer type
+      if (private$.layer_primary == "contour") {
+        checkmate::assertNumeric(offset, len = 2L, null.ok = TRUE)
+        if (is.null(offset)) {
+          offset <- rep(0, 2)
+        }
+        offset[3] <- 0
+      }
+      if (private$.layer_primary == "surface") {
+        checkmate::assertNumeric(offset, len = 3L, null.ok = TRUE)
+        if (is.null(offset)) {
+          offset <- rep(0, 3)
+        }
+      }
+
+      # Add to opts for animation support
+      if (!private$.freeze_plot) {
+        private$.opts <- c(private$.opts, list(c(layer_spec, list(line_color = line_color))))
+      }
+
+      # Assert marker styling:
+      checkmate::assertIntegerish(add_marker_at, lower = 1, upper = nrow(opt$archive))
+      if (is.null(marker_shape)) marker_shape <- NA
+      if (length(marker_shape) == 1) marker_shape <- rep(marker_shape, length(add_marker_at))
+      mvals <- NULL
+      if (private$.layer_primary == "contour") {
+        mvals <- plotly::schema(F)$traces$scatter$attributes$marker$symbol$values
+      }
+      if (private$.layer_primary == "surface") {
+        mvals <- plotly::schema(F)$traces$scatter3d$attributes$marker$symbol$values
+      }
+      invisible(lapply(marker_shape, function(marker_shape) checkmate::assertChoice(marker_shape, choices = c(mvals, NA))))
+
+      if (is.null(marker_color)) marker_color <- line_color
+      if (length(marker_color) == 1) {
+        marker_color <- rep(marker_color, length(marker_shape))
+      }
+      checkmate::assertCharacter(marker_color, len = length(marker_shape), null.ok = TRUE)
+
+      # Define marker coordinates for plotting:
+      xmat <- do.call(rbind, c(opt$archive$x_in[1], opt$archive$x_out))
+      xmarkers <- data.frame(
+        x = xmat[, 1] + offset[1], y = xmat[, 2] + offset[2],
+        z = c(opt$archive$fval_in[1], opt$archive$fval_out) + offset[3]
+      )
+      if (is.null(npoints)) {
+        npoints <- nrow(xmarkers)
+      }
+      if (is.null(npmax)) {
+        npmax <- nrow(xmarkers)
+        if (npmax > nrow(xmarkers)) {
+          npmax <- nrow(xmarkers)
+        }
+      }
+      # Cut marker after npmax iterations (if specified):
+      xmr <- xmarkers[unique(round(seq(1, nrow(xmarkers), length.out = npoints))), ]
+      xmr <- xmr[seq_len(npmax), ]
+      add_marker_at <- add_marker_at[add_marker_at <= npmax]
+
+      ptype <- NULL
+      if (is.null(name)) {
+        name <- paste0(opt$id, " on ", opt$objective$id)
+      }
+
+      # Define the plotting arguments as list, so we can call `do.call` with these arguments. This is
+      # more comfortable due to just one call to `add_trace`. Additionally, it is easier to control
+      # different default stylings (such as line width) and to recreate the layer with the stored arguments:
+      if (private$.layer_primary == "surface") {
+        ptype <- "scatter3d"
+        pargs <- list(
+          name = name,
+          x = xmr$x,
+          y = xmr$y,
+          z = xmr$z,
+          marker = list(color = line_color, line = list(color = mcolor_out, width = 6)),
+          line = list(color = line_color, width = 8)
+        )
+      }
+      if (private$.layer_primary == "contour") {
+        ptype <- "scatter"
+        pargs <- list(
+          name = name,
+          x = xmr$x,
+          y = xmr$y,
+          marker = list(color = line_color, size = 12, line = list(color = mcolor_out, width = 2)),
+          line = list(color = line_color, width = 2)
+        )
+      }
+      if (is.null(ptype)) {
+        stop("No known plot mode")
+      }
+      pargs$type <- ptype
+
+      # Add optimization traces as lines to the plot:
+      private$.plot <- do.call(plotly::add_trace, c(
+        list(private$.plot),
+        mlr3misc::insert_named(mlr3misc::remove_named(pargs, "marker"), aargs),
+        list(mode = "lines")
+      ))
+
+      # Now add marker to the lines. Marker are added at `add_marker_at` iterations
+      # and with the specified shape and color:
+      pargs <- list(
+        x = xmarkers$x[add_marker_at],
+        y = xmarkers$y[add_marker_at],
+        z = xmarkers$z[add_marker_at],
+        mode = "markers",
+        type = ptype,
+        marker = mlr3misc::insert_named(pargs$marker, list(symbol = marker_shape, color = marker_color)),
+        showlegend = FALSE
+      )
+      if (private$.layer_primary == "contour") {
+        pargs$z <- NULL
+      }
+      private$.plot <- do.call(plotly::add_trace, c(list(private$.plot), pargs))
+    }
   )
 )

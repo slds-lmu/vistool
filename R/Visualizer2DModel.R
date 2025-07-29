@@ -31,21 +31,17 @@ Visualizer2DModel <- R6::R6Class("Visualizer2DModel",
     #' @template param_x2_limits
     #' @template param_padding
     #' @template param_n_points
-    #' @param training_points (`logical(1)`)\cr
-    #'   Whether to show training points on the plot.
     initialize = function(task,
                           learner,
                           x1_limits = NULL,
                           x2_limits = NULL,
                           padding = 0,
-                          n_points = 100L,
-                          training_points = FALSE) {
+                          n_points = 100L) {
       self$task <- mlr3::assert_task(task)
       self$learner <- mlr3::assert_learner(learner, task = self$task)
       checkmate::assert_numeric(x1_limits, len = 2, null.ok = TRUE)
       checkmate::assert_numeric(x2_limits, len = 2, null.ok = TRUE)
       checkmate::assert_count(n_points)
-      checkmate::assert_flag(training_points)
       lab_x1 <- self$task$feature_names[1]
       lab_x2 <- self$task$feature_names[2]
       data <- task$data()
@@ -91,51 +87,111 @@ Visualizer2DModel <- R6::R6Class("Visualizer2DModel",
         lab_y = task$target_names
       )
 
-      if (training_points) {
-        data <- task$data()
-        self$points_x1 <- data[[lab_x1]]
-        self$points_x2 <- data[[lab_x2]]
-        self$points_y <- data[[task$target_names]]
-      }
-
       return(invisible(self))
     },
 
     #' @description
     #' Adds the training data to the plot.
     #'
-    #' @param size (`numeric(1)`)\cr
-    #'  Size of the points.
     #' @param color (`character(1)`)\cr
-    #' Color of the points.
-    add_training_data = function(size = 2, color = NULL) {
+    #'   Color of the points. Use "auto" for automatic color assignment. Default is "auto".
+    #' @param size (`numeric(1)`)\cr
+    #'   Size of the points. Default is 2.
+    #' @param shape (`integer(1)`)\cr
+    #'   Shape of the points. Default is 19.
+    #' @param alpha (`numeric(1)`)\cr
+    #'   Alpha transparency of the points. Default is 1.
+    #' @param show_labels (`logical(1)`)\cr
+    #'   Whether to show data point labels. Default is FALSE.
+    #' @param label_size (`numeric(1)`)\cr
+    #'   Size of data point labels. If NULL, defaults to smaller text.
+    add_training_data = function(color = "auto", size = 2, shape = 19, alpha = 1, 
+                                show_labels = FALSE, label_size = NULL) {
+      checkmate::assert_string(color)
+      checkmate::assert_number(size, lower = 0)
+      checkmate::assert_integerish(shape, len = 1)
+      checkmate::assert_number(alpha, lower = 0, upper = 1)
+      checkmate::assert_flag(show_labels)
+      checkmate::assert_number(label_size, lower = 0, null.ok = TRUE)
+      
       data <- self$task$data()
-      self$points_x1 <- data[[self$task$feature_names[1]]]
-      self$points_x2 <- data[[self$task$feature_names[2]]]
-      self$points_y <- data[[self$task$target_names]]
+      training_x1 <- data[[self$task$feature_names[1]]]
+      training_x2 <- data[[self$task$feature_names[2]]]
+      training_y <- data[[self$task$target_names]]
 
       # Convert factors to numeric for visualization
-      if (self$learner$predict_type == "prob" && is.factor(self$points_y)) {
-        self$points_y <- as.integer(self$points_y) - 1
-      } else if (self$learner$predict_type == "response" && is.factor(self$points_y)) {
-        self$points_y <- as.integer(self$points_y) - 1
+      if (self$learner$predict_type == "prob" && is.factor(training_y)) {
+        training_y <- as.integer(training_y) - 1
+      } else if (self$learner$predict_type == "response" && is.factor(training_y)) {
+        training_y <- as.integer(training_y) - 1
       }
+      
+      # Store training data specification without resolving colors yet
+      private$store_layer("training_data", list(
+        data = list(x1 = training_x1, x2 = training_x2, y = training_y),
+        style = list(
+          color = color,  # Keep as "auto" for later resolution
+          size = size,
+          shape = shape,
+          alpha = alpha,
+          show_labels = show_labels,
+          label_size = label_size
+        )
+      ))
 
       return(invisible(self))
     },
 
     #' @description
-    #' Adds the decision boundary to the plot.
+    #' Adds boundary line(s) to the plot at specified values.
     #'
-    #' @param threshold (`numeric(1)`)\cr
-    #'  Threshold for the decision boundary.
-    add_decision_boundary = function(threshold = 0.5) {
-      if (self$learner$predict_type != "prob") {
-        stop("Decision boundary can only be added for probability predictions")
+    #' @param values (`numeric()`)\cr
+    #'   Vector of values where to draw boundary contours. For classification with probability predictions,
+    #'   defaults to 0.5. For regression or response predictions, defaults to quantiles of predictions.
+    #' @param color (`character(1)`)\cr
+    #'   Color of the boundary lines. Default is "black".
+    #' @param line_width (`numeric(1)`)\cr
+    #'   Width of boundary lines. Default is 1.5.
+    #' @param line_type (`character(1)`)\cr
+    #'   Type of boundary lines. One of "solid", "dashed", "dotted". Default is "solid".
+    #' @param alpha (`numeric(1)`)\cr
+    #'   Transparency of boundary lines. Default is 0.8.
+    add_boundary = function(values = NULL, color = "black", line_width = 1.5, line_type = "solid", alpha = 0.8) {
+      checkmate::assert_numeric(values, null.ok = TRUE)
+      checkmate::assert_string(color)
+      checkmate::assert_number(line_width, lower = 0)
+      checkmate::assert_choice(line_type, choices = c("solid", "dashed", "dotted", "dotdash", "longdash", "twodash"))
+      checkmate::assert_number(alpha, lower = 0, upper = 1)
+      
+      # Determine default values based on prediction type
+      if (is.null(values)) {
+        if (self$learner$predict_type == "prob") {
+          values <- 0.5
+        } else {
+          # For regression or response predictions, use quantiles
+          values <- quantile(self$fun_y, c(0.25, 0.5, 0.75), na.rm = TRUE)
+        }
+      } else {
+        # Validate that boundary values are within the prediction range
+        y_range <- range(self$fun_y, na.rm = TRUE)
+        invalid_values <- values[values < y_range[1] | values > y_range[2]]
+        if (length(invalid_values) > 0) {
+          warning(sprintf(
+            "Boundary values %s are outside the prediction range [%.3f, %.3f] and will not generate visible contours.",
+            paste(round(invalid_values, 3), collapse = ", "),
+            y_range[1], y_range[2]
+          ))
+        }
       }
-
-      # Store the threshold for use in plotting
-      private$.decision_threshold <- threshold
+      
+      # Store boundary specification without resolving colors yet
+      private$store_layer("boundary", list(
+        values = values,
+        color = color,  # Keep for later resolution if "auto"
+        line_width = line_width,
+        line_type = line_type,
+        alpha = alpha
+      ))
 
       return(invisible(self))
     },
@@ -144,39 +200,133 @@ Visualizer2DModel <- R6::R6Class("Visualizer2DModel",
     #' Create and return the ggplot2 plot with model-specific features.
     #' @param text_size (`numeric(1)`)\cr
     #'   Base text size for plot elements. Default is 11.
+    #' @param title_size (`numeric(1)`)\cr
+    #'   Title text size. If NULL, defaults to text_size + 2.
     #' @param theme (`character(1)`)\cr
     #'   ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "minimal".
+    #' @param background (`character(1)`)\cr
+    #'   Background color for the plot. Default is "white".
+    #' @param color_palette (`character(1)`)\cr
+    #'   Color palette for the fill scale. One of "viridis", "plasma", "grayscale". Default is "viridis".
+    #' @param ... Additional arguments passed to the parent plot method.
     #' @return A ggplot2 object.
-    plot = function(text_size = 11, theme = "minimal") {
+    plot = function(text_size = 11, title_size = NULL, theme = "minimal", background = "white", color_palette = "viridis", ...) {
       checkmate::assert_number(text_size, lower = 1)
+      checkmate::assert_number(title_size, lower = 1, null.ok = TRUE)
       checkmate::assert_choice(theme, choices = c("minimal", "bw", "classic", "gray", "light", "dark", "void"))
+      checkmate::assert_string(background)
+      checkmate::assert_choice(color_palette, choices = c("viridis", "plasma", "grayscale"))
       
-      # Call parent plot method
-      p <- super$plot(text_size = text_size, theme = theme)
+      # Store plot settings and resolve layer colors
+      private$.plot_settings <- list(
+        text_size = text_size, title_size = title_size, theme = theme,
+        background = background, color_palette = color_palette
+      )
+      private$resolve_layer_colors()
       
-      # Add decision boundary if available (for classification)
-      if (!is.null(private$.decision_threshold)) {
+      # Call parent plot method with all arguments
+      p <- super$plot(text_size = text_size, title_size = title_size, theme = theme, 
+                      background = background, color_palette = color_palette, ...)
+      
+      # Add boundary lines if available
+      boundary_layer <- private$get_layer("boundary")
+      if (!is.null(boundary_layer)) {
         data <- data.table(
           fun_x1 = self$fun_x1,
           fun_x2 = self$fun_x2,
           fun_y = self$fun_y
         )
         
-        p <- p + geom_contour(
+        # Map line_type to ggplot2 linetype
+        gg_linetype <- switch(boundary_layer$line_type,
+          "solid" = "solid",
+          "dashed" = "dashed", 
+          "dotted" = "dotted",
+          "dotdash" = "dotdash",
+          "longdash" = "longdash",
+          "twodash" = "twodash",
+          "solid"  # default fallback
+        )
+        
+        p <- p + ggplot2::geom_contour(
           data = data,
           aes(x = fun_x1, y = fun_x2, z = fun_y),
-          breaks = private$.decision_threshold,
-          color = "black", 
-          linewidth = 1.5, 
-          alpha = 0.8,
+          breaks = boundary_layer$values,
+          color = boundary_layer$color, 
+          linewidth = boundary_layer$line_width,
+          linetype = gg_linetype,
+          alpha = boundary_layer$alpha,
           inherit.aes = FALSE
         )
+      }
+      
+      # Apply custom training data styling if available
+      training_layer <- private$get_layer("training_data")
+      if (!is.null(training_layer)) {
+        
+        points_data <- data.table(
+          points_x1 = training_layer$data$x1,
+          points_x2 = training_layer$data$x2,
+          points_y = training_layer$data$y
+        )
+        
+        style <- training_layer$style
+        
+        # Add styled training data points with color mapping
+        if (self$learner$predict_type == "prob" || is.numeric(training_layer$data$y)) {
+          # Use color aesthetic for continuous/probability data
+          color_limits <- c(min(self$fun_y), max(self$fun_y))
+          
+          p <- p + geom_point(
+            data = points_data,
+            aes(x = points_x1, y = points_x2, color = points_y),
+            size = style$size,
+            shape = style$shape,
+            alpha = style$alpha,
+            inherit.aes = FALSE,
+            show.legend = FALSE
+          )
+          
+          # Apply matching color scale for points based on the selected palette
+          if (color_palette == "viridis") {
+            p <- p + scale_color_viridis_c(name = self$lab_y, limits = color_limits)
+          } else if (color_palette == "plasma") {
+            p <- p + scale_color_viridis_c(name = self$lab_y, option = "plasma", limits = color_limits)
+          } else if (color_palette == "grayscale") {
+            p <- p + scale_color_gradient(name = self$lab_y, low = "black", high = "white", limits = color_limits)
+          }
+        } else {
+          # Use fixed color for discrete/categorical data
+          p <- p + geom_point(
+            data = points_data,
+            aes(x = points_x1, y = points_x2),
+            color = style$color,
+            size = style$size,
+            shape = style$shape,
+            alpha = style$alpha,
+            inherit.aes = FALSE
+          )
+        }
+        
+        # Add labels if requested
+        if (style$show_labels) {
+          label_size <- if (!is.null(style$label_size)) style$label_size else text_size * 0.8 / ggplot2::.pt
+          
+          p <- p + geom_text(
+            data = points_data,
+            aes(x = points_x1, y = points_x2, label = seq_len(nrow(points_data))),
+            color = if (self$learner$predict_type == "prob" || is.numeric(training_layer$data$y)) "black" else style$color,
+            size = label_size,
+            vjust = -0.5,
+            inherit.aes = FALSE
+          )
+        }
       }
       
       return(p)
     }
   ),
   private = list(
-    .decision_threshold = NULL
+    # Model-specific private fields will be inherited from base class
   )
 )

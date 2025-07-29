@@ -18,7 +18,7 @@ devtools::check()
 devtools::test()
 
 # Run specific test file
-testthat::test_file("tests/testthat/test-Objective.R")
+devtools::test_active_file('tests/testthat/test-plot-customization.R')
 
 # Install package locally
 devtools::install()
@@ -35,6 +35,9 @@ devtools::build_readme()
 
 # Build all vignettes
 devtools::build_vignettes()
+
+# Build a specific vignette
+R -e "devtools::load_all(); rmarkdown::render('vignettes/loss_functions.Rmd')"
 
 # Build package website
 pkgdown::build_site()
@@ -103,6 +106,26 @@ vistool/
   - `VisualizerSurface*`: Interactive surface plotting with plotly for 2D functions
 - **`as_visualizer()`**: Smart constructor that selects appropriate visualizer
 
+### Deferred Rendering
+
+All visualizer classes (should) use a deferred rendering architecture:
+
+- **Layer Storage**: All `add_*()` methods (e.g., `$add_points()`, `$add_contours()`, etc.) do not modify the plot directly. Instead, they call the private method `$store_layer(type, spec)` to save a specification of the layer (its type and parameters) to an internal list.
+- **Rendering**: The `$plot()` method is responsible for rendering all stored layers. It iterates over the stored layer specifications and calls a private `$render_layer(layer)` method to add each layer to the plot object. This ensures that all visual properties (such as colors, alpha, etc.) are resolved at plot time, using the current global settings.
+- **Customization**: Global settings (e.g., color palette, theme, text size) are set via `$plot()`. Layer-specific settings are passed to the relevant `add_*()` method and stored with the layer specification. Defaults are set at initialization.
+- **Benefits**: This pattern ensures that plots are always up-to-date with the latest settings, supports re-plotting with different global options, and makes it easier to add, remove, or reorder layers.
+
+### Example Workflow
+
+```r
+viz <- as_visualizer(obj, type = "surface")
+viz$add_points(points = my_points, color = "red")
+viz$add_contours(contours = my_contours)
+# No plot is created yet!
+
+viz$plot(color_palette = "grayscale")  # All layers are rendered now
+```
+
 ## Development Workflow
 
 ### 1. Setup Development Environment
@@ -161,13 +184,15 @@ devtools::test()    # Run tests
 devtools::check()   # Full package check
 ```
 
-### 6. Build Documentation Site
+You can also check the rendered website:
 
 ```r
 pkgdown::build_site()
 ```
 
-## Testing Guidelines
+## Guidelines
+
+### Testing
 
 - Each R file should have corresponding test file
 - Use descriptive test names: `test_that("objective evaluation works", ...)`
@@ -182,26 +207,10 @@ skip_on_ci()
 skip_if_not_installed("plotly")
 ```
 
-## Documentation Guidelines
-
-### `roxygen2`
+### Documentation with `roxygen2`
 
 - Use `roxygen2` tags (`@title`, `@description`, `@param`, `@return`, `@examples`)
 - Include working examples
 - Document all parameters
 - Use consistent style with existing code
 - For reusable documentation blocks, use templates in `man-roxygen/` directory.
-
-### Vignettes (long form documentation)
-
-- `objective.Rmd`: Objective function visualization
-- `model.Rmd`: Model prediction visualization
-- `loss_functions.Rmd`: Loss function visualization
-
-```r
-# Build all vignettes
-devtools::build_vignettes()
-
-# Build specific vignette
-rmarkdown::render("vignettes/objective.Rmd")
-```

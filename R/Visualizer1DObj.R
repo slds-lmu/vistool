@@ -1,5 +1,3 @@
-# FIXME: run rcmd check
-# FIXME: think about plotting extra points
 # FIXME: can we add optimizer traces? maybe use bbotk?
 
 #' @title Visualize Objective
@@ -60,15 +58,15 @@ Visualizer1DObj <- R6::R6Class("Visualizer1DObj",
         x_vals <- sapply(archive$x_in, function(x) x[1])
         y_vals <- archive$fval_in
 
-        # Add points to the visualizer
-        self$points_x <- x_vals
-        self$points_y <- y_vals
-
-        # Set some default styling if not set
-        if (is.null(self$points_col)) self$points_col <- "red"
-        if (is.null(self$points_size)) self$points_size <- 2
-        if (is.null(self$points_shape)) self$points_shape <- 16
-        if (is.null(self$points_alpha)) self$points_alpha <- 0.8
+        # Store optimization trace specification without resolving colors yet
+        private$store_layer("optimization_trace", list(
+          x_vals = x_vals,
+          y_vals = y_vals,
+          color = "auto",  # Will be resolved at plot time
+          size = 2,
+          shape = 16,
+          alpha = 0.8
+        ))
       }
 
       invisible(self)

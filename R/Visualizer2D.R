@@ -34,16 +34,6 @@ Visualizer2D <- R6::R6Class("Visualizer2D",
     #' @field lab_y (`character(1)`)
     lab_y = NULL,
 
-    #' @field points_x1 (`numeric()`)\cr
-    points_x1 = NULL,
-
-    #' @field points_x2 (`numeric()`)\cr
-    points_x2 = NULL,
-
-    #' @field points_y (`numeric()`)\cr
-    #' y-values of points.
-    points_y = NULL,
-
     #' @description
     #' Creates a new instance of this [R6][R6::R6Class] class.
     #'
@@ -81,12 +71,62 @@ Visualizer2D <- R6::R6Class("Visualizer2D",
     #' Create and return the ggplot2 plot.
     #' @param text_size (`numeric(1)`)\cr
     #'   Base text size for plot elements. Default is 11.
+    #' @param title_size (`numeric(1)`)\cr
+    #'   Title text size. If NULL, defaults to text_size + 2.
     #' @param theme (`character(1)`)\cr
     #'   ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "minimal".
+    #' @param background (`character(1)`)\cr
+    #'   Background color for the plot. Default is "white".
+    #' @param color_palette (`character(1)`)\cr
+    #'   Color palette for the fill scale. One of "viridis", "plasma", "grayscale". Default is "viridis".
+    #' @template param_plot_title
+    #' @template param_plot_subtitle
+    #' @template param_x_lab
+    #' @template param_y_lab
+    #' @template param_x_limits
+    #' @template param_y_limits
+    #' @template param_show_grid
+    #' @template param_grid_color
+    #' @template param_show_legend
+    #' @template param_legend_position
+    #' @template param_legend_title
+    #' @template param_show_title
     #' @return A ggplot2 object.
-    plot = function(text_size = 11, theme = "minimal") {
+    plot = function(text_size = 11, title_size = NULL, theme = "minimal", background = "white", color_palette = "viridis",
+                    plot_title = NULL, plot_subtitle = NULL, x_lab = NULL, y_lab = NULL, 
+                    x_limits = NULL, y_limits = NULL, show_grid = TRUE, grid_color = "gray90",
+                    show_legend = TRUE, legend_position = "right", legend_title = NULL, show_title = TRUE) {
       checkmate::assert_number(text_size, lower = 1)
+      checkmate::assert_number(title_size, lower = 1, null.ok = TRUE)
       checkmate::assert_choice(theme, choices = c("minimal", "bw", "classic", "gray", "light", "dark", "void"))
+      checkmate::assert_string(background)
+      checkmate::assert_choice(color_palette, choices = c("viridis", "plasma", "grayscale"))
+      checkmate::assert_string(plot_title, null.ok = TRUE)
+      checkmate::assert_string(plot_subtitle, null.ok = TRUE)
+      checkmate::assert_string(x_lab, null.ok = TRUE)
+      checkmate::assert_string(y_lab, null.ok = TRUE)
+      checkmate::assert_numeric(x_limits, len = 2, null.ok = TRUE)
+      checkmate::assert_numeric(y_limits, len = 2, null.ok = TRUE)
+      checkmate::assert_flag(show_grid)
+      checkmate::assert_string(grid_color)
+      checkmate::assert_flag(show_legend)
+      checkmate::assert_choice(legend_position, choices = c("top", "right", "bottom", "left", "none"))
+      checkmate::assert_string(legend_title, null.ok = TRUE)
+      checkmate::assert_flag(show_title)
+      
+      # Store plot settings and resolve layer colors
+      private$.plot_settings <- list(
+        text_size = text_size, title_size = title_size, theme = theme, 
+        background = background, color_palette = color_palette,
+        plot_title = plot_title, plot_subtitle = plot_subtitle,
+        x_lab = x_lab, y_lab = y_lab, x_limits = x_limits, y_limits = y_limits,
+        show_grid = show_grid, grid_color = grid_color, show_legend = show_legend,
+        legend_position = legend_position, legend_title = legend_title, show_title = show_title
+      )
+      private$resolve_layer_colors()
+      
+      # Set default title size
+      if (is.null(title_size)) title_size <- text_size + 2
       
       data <- data.table(
         fun_x1 = self$fun_x1,
@@ -94,31 +134,37 @@ Visualizer2D <- R6::R6Class("Visualizer2D",
         fun_y = self$fun_y
       )
 
-      # continuous color gradient with overlaid contours
+      # Determine final labels
+      final_title <- if (show_title) {
+        if (!is.null(plot_title)) plot_title else self$title
+      } else {
+        NULL
+      }
+      final_x_lab <- if (!is.null(x_lab)) x_lab else self$lab_x1
+      final_y_lab <- if (!is.null(y_lab)) y_lab else self$lab_x2
+      final_legend_title <- if (!is.null(legend_title)) legend_title else self$lab_y
+
+      # Create base plot with continuous color gradient and overlaid contours
       p <- ggplot(data, aes(x = fun_x1, y = fun_x2)) +
         geom_raster(aes(fill = fun_y), interpolate = TRUE) +
         geom_contour(aes(z = fun_y), color = "white", alpha = 0.3) +
-        labs(title = self$title, x = self$lab_x1, y = self$lab_x2) +
-        scale_fill_viridis_c(name = self$lab_y)
-
-      # add training points if available
-      if (!is.null(self$points_x1) && !is.null(self$points_x2) && !is.null(self$points_y)) {
-        points_data <- data.table(
-          points_x1 = self$points_x1,
-          points_x2 = self$points_x2,
-          points_y = self$points_y
-        )
-
-        # determine color scale limits based on function values
-        color_limits <- c(min(self$fun_y), max(self$fun_y))
-
-        p <- p + geom_point(aes(x = points_x1, y = points_x2, color = points_y),
-          data = points_data,
-          size = 2,
-          inherit.aes = FALSE,
-          show.legend = FALSE
-        ) +
-          scale_color_viridis_c(name = self$lab_y, limits = color_limits)
+        labs(title = final_title, subtitle = plot_subtitle, x = final_x_lab, y = final_y_lab)
+      
+      # Apply axis limits if specified
+      if (!is.null(x_limits)) {
+        p <- p + ggplot2::xlim(x_limits[1], x_limits[2])
+      }
+      if (!is.null(y_limits)) {
+        p <- p + ggplot2::ylim(y_limits[1], y_limits[2])
+      }
+      
+      # Apply color scale based on palette choice
+      if (color_palette == "viridis") {
+        p <- p + scale_fill_viridis_c(name = final_legend_title)
+      } else if (color_palette == "plasma") {
+        p <- p + scale_fill_viridis_c(name = final_legend_title, option = "plasma")
+      } else if (color_palette == "grayscale") {
+        p <- p + scale_fill_gradient(name = final_legend_title, low = "black", high = "white")
       }
 
       # apply theme
@@ -131,51 +177,18 @@ Visualizer2D <- R6::R6Class("Visualizer2D",
         "dark" = ggplot2::theme_dark,
         "void" = ggplot2::theme_void
       )
-      p <- p + theme_fun(base_size = text_size) + theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      p <- p + theme_fun(base_size = text_size) + 
+           theme(
+             plot.title = ggplot2::element_text(hjust = 0.5, size = title_size),
+             panel.background = ggplot2::element_rect(fill = background, color = NA),
+             legend.position = if (show_legend && legend_position != "none") legend_position else "none",
+             panel.grid = if (show_grid) ggplot2::element_line(color = grid_color) else ggplot2::element_blank()
+           )
+      
+      # Add points from add_points() method
+      p <- private$add_points_to_ggplot(p, "2D")
 
       return(p)
-    },
-
-    #' @description
-    #' Initialize contour layer (plotly-specific method).
-    #' @param ... Additional arguments.
-    #' @details This method is only available for surface visualizers (type="surface").
-    #' For ggplot2-based 2D visualizers, contours are created by default in the plot() method.
-    init_layer_contour = function(...) {
-      warning("init_layer_contour() is only available for VisualizerSurface (type='surface'). For ggplot2-based 2D visualizers, contours are created by default in the plot() method.")
-      invisible(self)
-    },
-
-    #' @description
-    #' Initialize surface layer (plotly-specific method).
-    #' @param ... Additional arguments.
-    #' @details This method is only available for surface visualizers (type="surface").
-    #' ggplot2-based 2D visualizers do not support 3D surfaces.
-    init_layer_surface = function(...) {
-      warning("init_layer_surface() is only available for VisualizerSurface (type='surface'). ggplot2-based 2D visualizers do not support 3D surfaces.")
-      invisible(self)
-    },
-
-    #' @description
-    #' Set layout (plotly-specific method).
-    #' @param ... Layout options.
-    #' @details This method is only available for surface visualizers (type="surface").
-    #' For ggplot2-based 2D visualizers, use ggplot2's theming system instead.
-    set_layout = function(...) {
-      warning("set_layout() is only available for VisualizerSurface (type='surface'). For ggplot2-based 2D visualizers, use ggplot2's theming system instead.")
-      invisible(self)
-    },
-
-    #' @description
-    #' Set scene (plotly-specific method for 3D plots).
-    #' @param x (`numeric(1)`) Camera x position.
-    #' @param y (`numeric(1)`) Camera y position.
-    #' @param z (`numeric(1)`) Camera z position.
-    #' @details This method is only available for surface visualizers (type="surface").
-    #' ggplot2-based 2D visualizers do not support 3D scene control.
-    set_scene = function(x, y, z) {
-      warning("set_scene() is only available for VisualizerSurface (type='surface'). ggplot2-based 2D visualizers do not support 3D scene control.")
-      invisible(self)
     }
   ),
   private = list(

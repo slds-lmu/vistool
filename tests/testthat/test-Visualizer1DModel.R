@@ -25,11 +25,10 @@ test_that("1D Model with regression task and training data works", {
 
   learner <- lrn("regr.svm")
 
-  vis <- Visualizer1DModel$new(task, learner, training_points = TRUE)
+  vis <- Visualizer1DModel$new(task, learner)
+  vis$add_training_data()
 
   expect_s3_class(vis, "Visualizer1DModel")
-  expect_true(!is.null(vis$points_x))
-  expect_true(!is.null(vis$points_y))
   
   p <- vis$plot()
   expect_s3_class(p, "ggplot")
@@ -38,7 +37,7 @@ test_that("1D Model with regression task and training data works", {
   expect_true(length(p$layers) >= 2) # function line + training points
 })
 
-test_that("1D Model initialization with custom xlim works", {
+test_that("1D Model with custom xlim works", {
   skip_if_not_installed("mlr3learners")
 
   task <- tsk("mtcars")
@@ -56,6 +55,54 @@ test_that("1D Model initialization with custom xlim works", {
   
   p <- vis$plot()
   expect_s3_class(p, "ggplot")
+})
+
+test_that("1D Model with boundary lines works", {
+  skip_if_not_installed("mlr3learners")
+
+  task <- tsk("mtcars")
+  task$select("gear")
+
+  learner <- lrn("regr.svm")
+
+  vis <- Visualizer1DModel$new(task, learner)
+  vis$add_boundary()  # Default boundary
+  
+  p <- vis$plot()
+  expect_s3_class(p, "ggplot")
+  expect_true(length(p$layers) >= 2) # function line + boundary line
+})
+
+test_that("1D Model with multiple boundary lines works", {
+  skip_if_not_installed("mlr3learners")
+
+  task <- tsk("mtcars")
+  task$select("gear")
+
+  learner <- lrn("regr.svm")
+
+  vis <- Visualizer1DModel$new(task, learner)
+  vis$add_boundary(values = c(16, 18, 20), color = "red", linetype = "solid")
+  
+  p <- vis$plot()
+  expect_s3_class(p, "ggplot")
+  expect_true(length(p$layers) >= 4) # function line + 3 boundary lines
+})
+
+test_that("1D Model with classification and boundary works", {
+  skip_if_not_installed("mlr3learners")
+
+  task <- tsk("spam")
+  task$select("receive")
+
+  learner <- lrn("classif.svm", predict_type = "prob")
+
+  vis <- Visualizer1DModel$new(task, learner)
+  vis$add_boundary()  # Should default to 0.5 for probability predictions
+  
+  p <- vis$plot()
+  expect_s3_class(p, "ggplot")
+  expect_true(length(p$layers) >= 2) # function line + boundary line
 })
 
 test_that("1D Model fails with multi-feature task", {

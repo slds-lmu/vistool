@@ -60,8 +60,7 @@ test_that("plot() methods validate parameters correctly", {
   expect_error(vis$plot(theme = "invalid_theme"), "Must be element of set")
 })
 
-test_that("backward compatibility: plot() methods work without parameters", {
-  # Test that existing code still works (backward compatibility)
+test_that("plot() methods work without parameters", {
   x_vals <- seq(-1, 1, length.out = 10)
   y_vals <- x_vals^2
 

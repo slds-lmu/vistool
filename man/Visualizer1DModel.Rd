@@ -27,14 +27,18 @@ Number of points to use for visualization.}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-Visualizer1DModel-new}{\code{Visualizer1DModel$new()}}
+\item \href{#method-Visualizer1DModel-add_training_data}{\code{Visualizer1DModel$add_training_data()}}
+\item \href{#method-Visualizer1DModel-add_boundary}{\code{Visualizer1DModel$add_boundary()}}
+\item \href{#method-Visualizer1DModel-plot}{\code{Visualizer1DModel$plot()}}
 \item \href{#method-Visualizer1DModel-clone}{\code{Visualizer1DModel$clone()}}
 }
 }
 \if{html}{\out{
 <details open><summary>Inherited methods</summary>
 <ul>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="add_points"><a href='../../vistool/html/Visualizer.html#method-Visualizer-add_points'><code>vistool::Visualizer$add_points()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="initialize_defaults"><a href='../../vistool/html/Visualizer.html#method-Visualizer-initialize_defaults'><code>vistool::Visualizer$initialize_defaults()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href='../../vistool/html/Visualizer.html#method-Visualizer-save'><code>vistool::Visualizer$save()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer1D" data-id="plot"><a href='../../vistool/html/Visualizer1D.html#method-Visualizer1D-plot'><code>vistool::Visualizer1D$plot()</code></a></span></li>
 </ul>
 </details>
 }}
@@ -44,13 +48,7 @@ Number of points to use for visualization.}
 \subsection{Method \code{new()}}{
 Creates a new instance of this [R6][R6::R6Class] class.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer1DModel$new(
-  task,
-  learner,
-  xlim = NULL,
-  n_points = 100,
-  training_points = FALSE
-)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer1DModel$new(task, learner, xlim = NULL, n_points = 100)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -72,11 +70,84 @@ Note that a grid of `npoints^2` values is generated and evaluated by `objective$
 \item{\code{n_points}}{(`integer(1)`)\cr
 The number of generated point per dimension.
 Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
-
-\item{\code{training_points}}{(`logical(1)`)\cr
-Whether to show training points on the plot.}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Visualizer1DModel-add_training_data"></a>}}
+\if{latex}{\out{\hypertarget{method-Visualizer1DModel-add_training_data}{}}}
+\subsection{Method \code{add_training_data()}}{
+Add training data points to the plot.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer1DModel$add_training_data()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Returns the visualizer object invisibly for method chaining.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Visualizer1DModel-add_boundary"></a>}}
+\if{latex}{\out{\hypertarget{method-Visualizer1DModel-add_boundary}{}}}
+\subsection{Method \code{add_boundary()}}{
+Adds boundary line(s) to the plot at specified y-values.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer1DModel$add_boundary(
+  values = NULL,
+  color = "black",
+  linetype = "dashed",
+  linewidth = 1,
+  alpha = 0.8
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{values}}{(`numeric()`)\cr
+Vector of y-values where to draw boundary lines. For classification with probability predictions,
+defaults to 0.5. For regression or response predictions, defaults to the median of predictions.}
+
+\item{\code{color}}{(`character(1)`)\cr
+Color of the boundary lines. Default is "black".}
+
+\item{\code{linetype}}{(`character(1)`)\cr
+Line type for boundary lines. Default is "dashed".}
+
+\item{\code{linewidth}}{(`numeric(1)`)\cr
+Width of boundary lines. Default is 1.}
+
+\item{\code{alpha}}{(`numeric(1)`)\cr
+Transparency of boundary lines. Default is 0.8.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Visualizer1DModel-plot"></a>}}
+\if{latex}{\out{\hypertarget{method-Visualizer1DModel-plot}{}}}
+\subsection{Method \code{plot()}}{
+Create and return the ggplot2 plot with model-specific features.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer1DModel$plot(text_size = 11, theme = "minimal", ...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{text_size}}{(`numeric(1)`)\cr
+Base text size for plot elements. Default is 11.}
+
+\item{\code{theme}}{(`character(1)`)\cr
+ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "minimal".}
+
+\item{\code{...}}{Additional arguments passed to the parent plot method.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A ggplot2 object.
 }
 }
 \if{html}{\out{<hr>}}

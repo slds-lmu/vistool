@@ -25,13 +25,6 @@ Visualizes a two-dimensional function \eqn{f: \mathbb{R}^2 \to \mathbb{R}}.
 \item{\code{lab_x2}}{(`character(1)`)}
 
 \item{\code{lab_y}}{(`character(1)`)}
-
-\item{\code{points_x1}}{(`numeric()`)\cr}
-
-\item{\code{points_x2}}{(`numeric()`)\cr}
-
-\item{\code{points_y}}{(`numeric()`)\cr
-y-values of points.}
 }
 \if{html}{\out{</div>}}
 }
@@ -40,16 +33,14 @@ y-values of points.}
 \itemize{
 \item \href{#method-Visualizer2D-new}{\code{Visualizer2D$new()}}
 \item \href{#method-Visualizer2D-plot}{\code{Visualizer2D$plot()}}
-\item \href{#method-Visualizer2D-init_layer_contour}{\code{Visualizer2D$init_layer_contour()}}
-\item \href{#method-Visualizer2D-init_layer_surface}{\code{Visualizer2D$init_layer_surface()}}
-\item \href{#method-Visualizer2D-set_layout}{\code{Visualizer2D$set_layout()}}
-\item \href{#method-Visualizer2D-set_scene}{\code{Visualizer2D$set_scene()}}
 \item \href{#method-Visualizer2D-clone}{\code{Visualizer2D$clone()}}
 }
 }
 \if{html}{\out{
 <details open><summary>Inherited methods</summary>
 <ul>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="add_points"><a href='../../vistool/html/Visualizer.html#method-Visualizer-add_points'><code>vistool::Visualizer$add_points()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="initialize_defaults"><a href='../../vistool/html/Visualizer.html#method-Visualizer-initialize_defaults'><code>vistool::Visualizer$initialize_defaults()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href='../../vistool/html/Visualizer.html#method-Visualizer-save'><code>vistool::Visualizer$save()</code></a></span></li>
 </ul>
 </details>
@@ -104,7 +95,25 @@ Label of y-axis.}
 \subsection{Method \code{plot()}}{
 Create and return the ggplot2 plot.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$plot(text_size = 11, theme = "minimal")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$plot(
+  text_size = 11,
+  title_size = NULL,
+  theme = "minimal",
+  background = "white",
+  color_palette = "viridis",
+  plot_title = NULL,
+  plot_subtitle = NULL,
+  x_lab = NULL,
+  y_lab = NULL,
+  x_limits = NULL,
+  y_limits = NULL,
+  show_grid = TRUE,
+  grid_color = "gray90",
+  show_legend = TRUE,
+  legend_position = "right",
+  legend_title = NULL,
+  show_title = TRUE
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -113,106 +122,59 @@ Create and return the ggplot2 plot.
 \item{\code{text_size}}{(`numeric(1)`)\cr
 Base text size for plot elements. Default is 11.}
 
+\item{\code{title_size}}{(`numeric(1)`)\cr
+Title text size. If NULL, defaults to text_size + 2.}
+
 \item{\code{theme}}{(`character(1)`)\cr
 ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "minimal".}
+
+\item{\code{background}}{(`character(1)`)\cr
+Background color for the plot. Default is "white".}
+
+\item{\code{color_palette}}{(`character(1)`)\cr
+Color palette for the fill scale. One of "viridis", "plasma", "grayscale". Default is "viridis".}
+
+\item{\code{plot_title}}{(`character(1)`)\cr
+Main plot title. If NULL, uses the visualizer's default title. Default is NULL.}
+
+\item{\code{plot_subtitle}}{(`character(1)`)\cr
+Plot subtitle. If NULL, no subtitle is shown. Default is NULL.}
+
+\item{\code{x_lab}}{(`character(1)`)\cr
+X-axis label. If NULL, uses the visualizer's default label. Default is NULL.}
+
+\item{\code{y_lab}}{(`character(1)`)\cr
+Y-axis label. If NULL, uses the visualizer's default label. Default is NULL.}
+
+\item{\code{x_limits}}{(`numeric(2)`)\cr
+X-axis limits as c(min, max). If NULL, uses automatic limits. Default is NULL.}
+
+\item{\code{y_limits}}{(`numeric(2)`)\cr
+Y-axis limits as c(min, max). If NULL, uses automatic limits. Default is NULL.}
+
+\item{\code{show_grid}}{(`logical(1)`)\cr
+Whether to show axis grid lines. Default is TRUE.}
+
+\item{\code{grid_color}}{(`character(1)`)\cr
+Color of grid lines. Default is "gray90".}
+
+\item{\code{show_legend}}{(`logical(1)`)\cr
+Whether to show the legend. Default is TRUE.}
+
+\item{\code{legend_position}}{(`character(1)`)\cr
+Position of the legend. One of "top", "right", "bottom", "left", "none". Default is "right".}
+
+\item{\code{legend_title}}{(`character(1)`)\cr
+Title for the legend. If NULL, uses default based on visualizer type. Default is NULL.}
+
+\item{\code{show_title}}{(`logical(1)`)\cr
+Indicator whether to show the title of the plot.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
 A ggplot2 object.
 }
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Visualizer2D-init_layer_contour"></a>}}
-\if{latex}{\out{\hypertarget{method-Visualizer2D-init_layer_contour}{}}}
-\subsection{Method \code{init_layer_contour()}}{
-Initialize contour layer (plotly-specific method).
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$init_layer_contour(...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{Additional arguments.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-This method is only available for surface visualizers (type="surface").
-For ggplot2-based 2D visualizers, contours are created by default in the plot() method.
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Visualizer2D-init_layer_surface"></a>}}
-\if{latex}{\out{\hypertarget{method-Visualizer2D-init_layer_surface}{}}}
-\subsection{Method \code{init_layer_surface()}}{
-Initialize surface layer (plotly-specific method).
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$init_layer_surface(...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{Additional arguments.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-This method is only available for surface visualizers (type="surface").
-ggplot2-based 2D visualizers do not support 3D surfaces.
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Visualizer2D-set_layout"></a>}}
-\if{latex}{\out{\hypertarget{method-Visualizer2D-set_layout}{}}}
-\subsection{Method \code{set_layout()}}{
-Set layout (plotly-specific method).
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$set_layout(...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{Layout options.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-This method is only available for surface visualizers (type="surface").
-For ggplot2-based 2D visualizers, use ggplot2's theming system instead.
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Visualizer2D-set_scene"></a>}}
-\if{latex}{\out{\hypertarget{method-Visualizer2D-set_scene}{}}}
-\subsection{Method \code{set_scene()}}{
-Set scene (plotly-specific method for 3D plots).
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer2D$set_scene(x, y, z)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{x}}{(`numeric(1)`) Camera x position.}
-
-\item{\code{y}}{(`numeric(1)`) Camera y position.}
-
-\item{\code{z}}{(`numeric(1)`) Camera z position.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-This method is only available for surface visualizers (type="surface").
-ggplot2-based 2D visualizers do not support 3D scene control.
-}
-
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Visualizer2D-clone"></a>}}

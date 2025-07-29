@@ -2,10 +2,7 @@
 % Please edit documentation in R/VisualizerLossFuns.R
 \name{VisualizerLossFuns}
 \alias{VisualizerLossFuns}
-\title{Visualizer for Losses}
-\value{
-Returns self invisibly.
-}
+\title{Visualizer for Loss Functions}
 \description{
 Visualize one or multiple loss functions.
 }
@@ -21,14 +18,14 @@ List of LossFunction objects.}
 \item{\code{task_type}}{(`character(1)`)\cr
 Task type (regr or classif).}
 
+\item{\code{title}}{(`character(1)`)\cr
+Title of plot.}
+
 \item{\code{lab_x}}{(`character(1)`)\cr
-Label for x-axis.}
+Label of x-axis.}
 
 \item{\code{lab_y}}{(`character(1)`)\cr
-Label for y-axis.}
-
-\item{\code{title}}{(`character(1)`)\cr
-Title of the plot.}
+Label of y-axis.}
 
 \item{\code{x_range}}{(`numeric(2)`)\cr
 Range for x-axis values.}
@@ -42,8 +39,8 @@ Line colors for different loss functions.}
 \item{\code{line_type}}{(`character()`)\cr
 Line types for different loss functions.}
 
-\item{\code{legend_title}}{(`element`)\cr
-Legend title element.}
+\item{\code{legend_title}}{(`character(1)`)\cr
+Legend title.}
 
 \item{\code{y_pred}}{(`numeric()`)\cr
 Predicted values.}
@@ -53,6 +50,13 @@ True values.}
 
 \item{\code{n_points}}{(`integer(1)`)\cr
 Number of points to use for plotting the loss functions.}
+
+\item{\code{input_type}}{(`character(1)`)\cr
+Input scale for classification tasks: `"score"` (margin‑based, default) or `"probability"`.}
+
+\item{\code{y_curves}}{(`character(1)`)\cr
+Which response curve(s) to draw when `input_type = "probability"`.
+One of `"both"`, `"y1"`, or `"y0"`.}
 }
 \if{html}{\out{</div>}}
 }
@@ -60,7 +64,6 @@ Number of points to use for plotting the loss functions.}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-VisualizerLossFuns-new}{\code{VisualizerLossFuns$new()}}
-\item \href{#method-VisualizerLossFuns-init_layer_lines}{\code{VisualizerLossFuns$init_layer_lines()}}
 \item \href{#method-VisualizerLossFuns-plot}{\code{VisualizerLossFuns$plot()}}
 \item \href{#method-VisualizerLossFuns-clone}{\code{VisualizerLossFuns$clone()}}
 }
@@ -68,6 +71,8 @@ Number of points to use for plotting the loss functions.}
 \if{html}{\out{
 <details open><summary>Inherited methods</summary>
 <ul>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="add_points"><a href='../../vistool/html/Visualizer.html#method-Visualizer-add_points'><code>vistool::Visualizer$add_points()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="initialize_defaults"><a href='../../vistool/html/Visualizer.html#method-Visualizer-initialize_defaults'><code>vistool::Visualizer$initialize_defaults()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href='../../vistool/html/Visualizer.html#method-Visualizer-save'><code>vistool::Visualizer$save()</code></a></span></li>
 </ul>
 </details>
@@ -78,7 +83,21 @@ Number of points to use for plotting the loss functions.}
 \subsection{Method \code{new()}}{
 Creates a new instance of this [R6][R6::R6Class] class.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{VisualizerLossFuns$new(losses, y_pred = NULL, y_true = NULL, n_points = 1000L)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{VisualizerLossFuns$new(
+  losses,
+  y_pred = NULL,
+  y_true = NULL,
+  n_points = 1000L,
+  input_type = "auto",
+  y_curves = "both",
+  default_color_palette = "viridis",
+  default_text_size = 11,
+  default_theme = "bw",
+  default_alpha = 0.8,
+  default_line_width = 1.2,
+  default_point_size = 2,
+  ...
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -95,24 +114,34 @@ True values. Optional.}
 
 \item{\code{n_points}}{(`integer(1)`)\cr
 Number of points to use for plotting the loss functions. Default is 1000.}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-VisualizerLossFuns-init_layer_lines"></a>}}
-\if{latex}{\out{\hypertarget{method-VisualizerLossFuns-init_layer_lines}{}}}
-\subsection{Method \code{init_layer_lines()}}{
-Initialize line layer for the plot.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{VisualizerLossFuns$init_layer_lines(color = NULL)}\if{html}{\out{</div>}}
-}
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{color}}{(`character()`)\cr
-Colors to use for the lines. If NULL, default colors will be used.}
+\item{\code{input_type}}{(`character(1)`)\cr
+Desired input scale. One of `"auto"`, `"score"`, `"probability"`.
+`"auto"` (default) chooses the common `input_default` of the supplied
+losses.}
+
+\item{\code{y_curves}}{(`character(1)`)\cr
+When `input_type = "probability"`, choose which curves to display: `"both"`, `"y1"`, or `"y0"`.}
+
+\item{\code{default_color_palette}}{(`character(1)`)\cr
+Default color palette for visualizations. One of "viridis", "plasma", "grayscale". Default is "viridis".}
+
+\item{\code{default_text_size}}{(`numeric(1)`)\cr
+Default base text size for plot elements. Default is 11.}
+
+\item{\code{default_theme}}{(`character(1)`)\cr
+Default ggplot2 theme. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "minimal".}
+
+\item{\code{default_alpha}}{(`numeric(1)`)\cr
+Default alpha transparency. Default is 0.8.}
+
+\item{\code{default_line_width}}{(`numeric(1)`)\cr
+Default line width. Default is 1.2.}
+
+\item{\code{default_point_size}}{(`numeric(1)`)\cr
+Default point size. Default is 2.}
+
+\item{\code{...}}{Additional arguments (currently unused).}
 }
 \if{html}{\out{</div>}}
 }
@@ -121,9 +150,30 @@ Colors to use for the lines. If NULL, default colors will be used.}
 \if{html}{\out{<a id="method-VisualizerLossFuns-plot"></a>}}
 \if{latex}{\out{\hypertarget{method-VisualizerLossFuns-plot}{}}}
 \subsection{Method \code{plot()}}{
-Create and return the ggplot2 plot.
+Create and return a ggplot2 visualisation of the loss functions.
+For classification you can switch between **margin/score** and
+**probability** representations via `input_type`.  When
+`input_type = "probability"` the argument `y_curves` controls whether the
+curve for the positive class (`"y1"`), the negative class (`"y0"`), or
+*both* are shown.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{VisualizerLossFuns$plot(text_size = 11, theme = "bw")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{VisualizerLossFuns$plot(
+  text_size = NULL,
+  theme = NULL,
+  color_palette = "viridis",
+  plot_title = NULL,
+  plot_subtitle = NULL,
+  x_lab = NULL,
+  y_lab = NULL,
+  x_limits = NULL,
+  y_limits = NULL,
+  show_grid = TRUE,
+  grid_color = "gray90",
+  show_legend = TRUE,
+  legend_position = "right",
+  legend_title = NULL,
+  show_title = TRUE
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -133,12 +183,52 @@ Create and return the ggplot2 plot.
 Base text size for plot elements. Default is 11.}
 
 \item{\code{theme}}{(`character(1)`)\cr
-ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "bw".}
+ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light",
+"dark", "void". Default is "bw".}
+
+\item{\code{color_palette}}{(`character(1)`)\cr
+Color palette for visualizations. One of "viridis", "plasma", "grayscale". Default is "viridis".}
+
+\item{\code{plot_title}}{(`character(1)`)\cr
+Main plot title. If NULL, uses the visualizer's default title. Default is NULL.}
+
+\item{\code{plot_subtitle}}{(`character(1)`)\cr
+Plot subtitle. If NULL, no subtitle is shown. Default is NULL.}
+
+\item{\code{x_lab}}{(`character(1)`)\cr
+X-axis label. If NULL, uses the visualizer's default label. Default is NULL.}
+
+\item{\code{y_lab}}{(`character(1)`)\cr
+Y-axis label. If NULL, uses the visualizer's default label. Default is NULL.}
+
+\item{\code{x_limits}}{(`numeric(2)`)\cr
+X-axis limits as c(min, max). If NULL, uses automatic limits. Default is NULL.}
+
+\item{\code{y_limits}}{(`numeric(2)`)\cr
+Y-axis limits as c(min, max). If NULL, uses automatic limits. Default is NULL.}
+
+\item{\code{show_grid}}{(`logical(1)`)\cr
+Whether to show axis grid lines. Default is TRUE.}
+
+\item{\code{grid_color}}{(`character(1)`)\cr
+Color of grid lines. Default is "gray90".}
+
+\item{\code{show_legend}}{(`logical(1)`)\cr
+Whether to show the legend. Default is TRUE.}
+
+\item{\code{legend_position}}{(`character(1)`)\cr
+Position of the legend. One of "top", "right", "bottom", "left", "none". Default is "right".}
+
+\item{\code{legend_title}}{(`character(1)`)\cr
+Title for the legend. If NULL, uses default based on visualizer type. Default is NULL.}
+
+\item{\code{show_title}}{(`logical(1)`)\cr
+Indicator whether to show the title of the plot.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A ggplot2 object showing the loss functions.
+A ggplot2 object.
 }
 }
 \if{html}{\out{<hr>}}

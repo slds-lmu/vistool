@@ -23,20 +23,22 @@ library(vistool)
 library(mlr3)
 library(mlr3learners)
 library(mlr3pipelines)
+set.seed(123)
 ```
 
 The `as_visualizer()` function automatically creates appropriate visualizers for model predictions on tasks with one or two features.
 By default, it uses `ggplot2` for 1D and 2D visualizations. 
 For 2D tasks, you can optionally specify `type = "surface"` to get interactive `plotly` surface plots.
 
-Let's start with the `boston_housing` data set.
-The goal is to predict the median value of owner-occupied homes in $1000s.
-We subset the data set to only use the features `age` and `rm`.
-The `age` feature is the proportion of owner-occupied units built prior to 1940 and `rm` is the average number of rooms per dwelling.
+Let's start with the `california_housing` data set.
+The goal is to predict the median house value for California districts.
+We subset the data set to only use the features `median_income` and `housing_median_age`, and sample 2000 observations for faster rendering.
+The `median_income` feature is the median income in block group and `housing_median_age` is the median age of a house within a block.
 
 ```{r}
-task <- tsk("boston_housing")
-task$select(c("age", "rm"))
+task <- tsk("california_housing")
+task$select(c("median_income", "housing_median_age"))
+task$filter(rows = sample(task$nrow, 2000))
 ```
 
 We load the support vector machine learner for regression.
@@ -48,7 +50,7 @@ learner <- lrn("regr.svm")
 Now we create a visualizer object, using the `plotly` backend (`type = "surface"`).
 
 ```{r}
-vis <- as_visualizer(task, learner, type = "surface")
+vis <- as_visualizer(task, learner = learner, type = "surface")
 ```
 
 First, the learner is trained on the entire task.
@@ -59,31 +61,29 @@ The predictions are then visualized using an interactive surface plot.
 vis$plot()
 ```
 
-We can also create a 2D contour plot for the predictions.
+We can also create a 2D contour plot for the predictions by using the `flatten = TRUE` parameter.
 
 ```{r, out.width='100%', out.height='700px'}
-vis$init_layer_contour()
-vis$plot()
+vis$plot(flatten = TRUE)
 ```
 
-To switch back to the surface plot initialize the surface layer again.
+To switch back to the surface plot, simply use `flatten = FALSE` (or omit the parameter since it's the default).
 
-```{r}
-vis$init_layer_surface()
+```{r, out.width='100%', out.height='700px'}
+vis$plot(flatten = FALSE)
 ```
 
 Draw with contour lines above z dimension.
 
 ```{r, out.width='100%', out.height='700px'}
-vis$init_layer_surface(show_contours = TRUE)
-vis$plot()
+vis <- as_visualizer(task, learner = learner, type = "surface")
+vis$add_contours()$plot()
 ```
 
-We can add the training points to the plot.
+We can add the training points to the plot using method chaining.
 
 ```{r, out.width='100%', out.height='700px'}
-vis$add_training_data()
-vis$plot()
+vis$add_training_data()$plot()
 ```
 
 It is also possible to visualize classification tasks.
@@ -100,13 +100,12 @@ learner <- lrn("classif.svm", predict_type = "prob")
 We create a visualizer object, using the default `ggplot2` backend, and plot the predictions.
 
 ```{r}
-vis <- as_visualizer(task, learner)
+vis <- as_visualizer(task, learner = learner)
 vis$plot()
 ```
 
-We can add the decision boundary to the plot.
+We can add (potential) decision boundaries to the plot using method chaining.
 
 ```{r, out.width='100%', out.height='700px'}
-vis$add_decision_boundary()
-vis$plot()
+vis$add_boundary(values = c(0.3, 0.5, 0.7))$plot()
 ```

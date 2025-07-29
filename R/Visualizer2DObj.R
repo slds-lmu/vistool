@@ -118,17 +118,12 @@ Visualizer2DObj <- R6::R6Class("Visualizer2DObj",
         stop("No optimization trace in `optimizer$archive`. Did you forget to call `optimizer$optimize(steps)`?")
       }
 
-      # Generate random color if not provided - convert from RGB format to R hex format
+      # Generate color if not provided using unified color system
       if (is.null(line_color)) {
-        # Use a different approach for ggplot2 - we'll use a predefined palette
-        trace_num <- length(private$.optimization_traces) + 1
-        # Use colorbrewer-style colors that are distinguishable
-        colors <- c("#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", 
-                   "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf")
-        line_color <- colors[((trace_num - 1) %% length(colors)) + 1]
+        line_color <- "auto"
       }
 
-      if (is.null(marker_color)) marker_color <- line_color
+      if (is.null(marker_color)) marker_color <- line_color  # Use same color for marker
       if (is.null(name)) {
         name <- paste0(optimizer$id, " on ", optimizer$objective$id)
       }
@@ -159,22 +154,22 @@ Visualizer2DObj <- R6::R6Class("Visualizer2DObj",
         }
       }
 
-      # Store trace information
+      # Store trace information without resolving colors yet
       trace_info <- list(
         data = trace_data,
-        line_color = line_color,
+        line_color = line_color,  # Keep for later resolution
         line_width = line_width,
         line_type = line_type,
         name = name,
         add_marker_at = add_marker_at,
         marker_size = marker_size,
         marker_shape = marker_shape,
-        marker_color = marker_color,
+        marker_color = marker_color,  # Keep for later resolution  
         show_start_end = show_start_end,
         alpha = alpha
       )
 
-      private$.optimization_traces <- c(private$.optimization_traces, list(trace_info))
+      private$store_layer("optimization_trace", trace_info)
       
       invisible(self)
     },
@@ -185,54 +180,72 @@ Visualizer2DObj <- R6::R6Class("Visualizer2DObj",
     #'   Base text size for plot elements. Default is 11.
     #' @param theme (`character(1)`)\cr
     #'   ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "minimal".
+    #' @param ... Additional arguments passed to the parent plot method.
     #' @return A ggplot2 object.
-    plot = function(text_size = 11, theme = "minimal") {
+    plot = function(text_size = 11, theme = "minimal", ...) {
       checkmate::assert_number(text_size, lower = 1)
       checkmate::assert_choice(theme, choices = c("minimal", "bw", "classic", "gray", "light", "dark", "void"))
       
-      # Call parent plot method
-      p <- super$plot(text_size = text_size, theme = theme)
+      # Store plot settings and resolve layer colors
+      private$.plot_settings <- list(text_size = text_size, theme = theme, ...)
+      private$resolve_layer_colors()
+      
+      # Call parent plot method with all arguments
+      p <- super$plot(text_size = text_size, theme = theme, ...)
       
       # Add optimization traces if any
-      if (length(private$.optimization_traces) > 0) {
-        for (trace in private$.optimization_traces) {
-          trace_data <- trace$data
+      if (length(private$.layers_to_add) > 0) {
+        trace_logical <- sapply(private$.layers_to_add, function(x) x$type == "optimization_trace")
+        trace_indices <- which(trace_logical)
+      } else {
+        trace_indices <- integer(0)
+      }
+      
+      for (idx in trace_indices) {
+        trace <- private$.layers_to_add[[idx]]$spec
+        trace_data <- trace$data
 
-          # Add the trace line
-          p <- p + geom_path(
-            data = trace_data,
-            aes(x = x1, y = x2),
-            color = trace$line_color,
-            linewidth = trace$line_width,
-            linetype = trace$line_type,
-            alpha = trace$alpha,
-            inherit.aes = FALSE
-          )
+        # Add the trace line
+        p <- p + geom_path(
+          data = trace_data,
+          aes(x = x1, y = x2),
+          color = trace$line_color,
+          linewidth = trace$line_width,
+          linetype = trace$line_type,
+          alpha = trace$alpha,
+          inherit.aes = FALSE
+        )
 
-          # Add markers at specified iterations
-          if (!is.null(trace$add_marker_at) && length(trace$add_marker_at) > 0) {
-            marker_data <- trace_data[trace_data$iteration %in% trace$add_marker_at, ]
-            if (nrow(marker_data) > 0) {
-              p <- p + geom_point(
-                data = marker_data,
-                aes(x = x1, y = x2),
-                color = trace$marker_color,
-                size = trace$marker_size,
-                shape = trace$marker_shape,
-                alpha = trace$alpha,
-                inherit.aes = FALSE
-              )
+        # Add markers at specified iterations
+        if (!is.null(trace$add_marker_at) && length(trace$add_marker_at) > 0) {
+          marker_data <- trace_data[trace_data$iteration %in% trace$add_marker_at, ]
+          if (nrow(marker_data) > 0) {
+            # Resolve marker color if it's still "auto" or matches line color
+            marker_color <- if (trace$marker_color == trace$line_color) trace$line_color else trace$marker_color
+            
+            p <- p + geom_point(
+              data = marker_data,
+              aes(x = x1, y = x2),
+              color = marker_color,
+              size = trace$marker_size,
+              shape = trace$marker_shape,
+              alpha = trace$alpha,
+              inherit.aes = FALSE
+            )
             }
           }
 
           # Add special start/end markers if requested
           if (trace$show_start_end && nrow(trace_data) > 1) {
+            # Resolve marker color for start/end points
+            marker_color <- if (trace$marker_color == trace$line_color) trace$line_color else trace$marker_color
+            
             # Start point (larger, different shape)
             start_data <- trace_data[1, ]
             p <- p + geom_point(
               data = start_data,
               aes(x = x1, y = x2),
-              color = trace$marker_color,
+              color = marker_color,
               size = trace$marker_size + 1,
               shape = 21,  # circle with border
               fill = "white",
@@ -246,39 +259,20 @@ Visualizer2DObj <- R6::R6Class("Visualizer2DObj",
             p <- p + geom_point(
               data = end_data,
               aes(x = x1, y = x2),
-              color = trace$marker_color,
+              color = marker_color,
               size = trace$marker_size + 1,
               shape = 23,  # diamond
-              fill = trace$marker_color,
+              fill = marker_color,
               alpha = 1,
               inherit.aes = FALSE
             )
           }
         }
-      }
       
       return(p)
-    },
-
-    #' @description
-    #' Add Taylor approximation layer (not implemented for ggplot2).
-    #' @param ... Additional arguments (ignored).
-    #' @details This method is only available for surface visualizers (type="surface").
-    add_layer_taylor = function(...) {
-      warning("add_layer_taylor() is only available for VisualizerSurface (type='surface'). ggplot2-based 2D visualizers do not support this functionality.")
-      invisible(self)
-    },
-
-    #' @description
-    #' Add Hessian visualization layer (not implemented for ggplot2).
-    #' @param ... Additional arguments (ignored).
-    #' @details This method is only available for surface visualizers (type="surface").
-    add_layer_hessian = function(...) {
-      warning("add_layer_hessian() is only available for VisualizerSurface (type='surface'). ggplot2-based 2D visualizers do not support this functionality.")
-      invisible(self)
     }
   ),
   private = list(
-    .optimization_traces = list()
+    # Optimization-specific private fields inherited from base class
   )
 )

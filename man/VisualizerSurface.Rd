@@ -30,6 +30,15 @@ Label of the x2 axis.}
 
 \item{\code{z_lab}}{(character(1)\cr
 Label of the z axis.}
+
+\item{\code{opacity}}{(`numeric(1)`)\cr
+Opacity of the surface plot.}
+
+\item{\code{colorscale}}{(`list()`)\cr
+Color scale for the surface plot.}
+
+\item{\code{show_title}}{(`logical(1)`)\cr
+Whether to show the plot title.}
 }
 \if{html}{\out{</div>}}
 }
@@ -41,6 +50,7 @@ Label of the z axis.}
 \item \href{#method-VisualizerSurface-init_layer_surface}{\code{VisualizerSurface$init_layer_surface()}}
 \item \href{#method-VisualizerSurface-set_layout}{\code{VisualizerSurface$set_layout()}}
 \item \href{#method-VisualizerSurface-set_scene}{\code{VisualizerSurface$set_scene()}}
+\item \href{#method-VisualizerSurface-add_contours}{\code{VisualizerSurface$add_contours()}}
 \item \href{#method-VisualizerSurface-plot}{\code{VisualizerSurface$plot()}}
 \item \href{#method-VisualizerSurface-clone}{\code{VisualizerSurface$clone()}}
 }
@@ -48,6 +58,8 @@ Label of the z axis.}
 \if{html}{\out{
 <details open><summary>Inherited methods</summary>
 <ul>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="add_points"><a href='../../vistool/html/Visualizer.html#method-Visualizer-add_points'><code>vistool::Visualizer$add_points()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="initialize_defaults"><a href='../../vistool/html/Visualizer.html#method-Visualizer-initialize_defaults'><code>vistool::Visualizer$initialize_defaults()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href='../../vistool/html/Visualizer.html#method-Visualizer-save'><code>vistool::Visualizer$save()</code></a></span></li>
 </ul>
 </details>
@@ -64,7 +76,11 @@ Creates a new instance of this [R6][R6::R6Class] class.
   plot_lab = NULL,
   x1_lab = "x1",
   x2_lab = "x2",
-  z_lab = "z"
+  z_lab = "z",
+  opacity = 0.8,
+  colorscale = list(c(0, "#440154"), c(0.25, "#3b528b"), c(0.5, "#21908c"), c(0.75,
+    "#5dc863"), c(1, "#fde725")),
+  show_title = TRUE
 )}\if{html}{\out{</div>}}
 }
 
@@ -88,6 +104,39 @@ Label of the x2 axis.}
 
 \item{\code{z_lab}}{(`character(1)`)\cr
 Label of the z axis.}
+
+\item{\code{z_lab}}{(`character(1)`)\cr
+Z-axis label (for surface plots). If NULL, uses the visualizer's default label. Default is NULL.}
+
+\item{\code{opacity}}{(`numeric(1)`)\cr
+Opacity of the layer.}
+
+\item{\code{opacity}}{(`numeric(1)`)\cr
+Opacity of the layer.}
+
+\item{\code{opacity}}{(`numeric(1)`)\cr
+Opacity of the layer.}
+
+\item{\code{colorscale}}{(`list()`)\cr
+The coloring of the surface/contour.}
+
+\item{\code{colorscale}}{(`list()`)\cr
+The coloring of the surface/contour.}
+
+\item{\code{colorscale}}{(`list()`)\cr
+The coloring of the surface/contour.}
+
+\item{\code{show_title}}{(`logical(1)`)\cr
+Indicator whether to show the title of the plot.}
+
+\item{\code{show_title}}{(`logical(1)`)\cr
+Indicator whether to show the title of the plot.}
+
+\item{\code{show_title}}{(`logical(1)`)\cr
+Indicator whether to show the title of the plot.}
+
+\item{\code{show_title}}{(`logical(1)`)\cr
+Indicator whether to show the title of the plot.}
 }
 \if{html}{\out{</div>}}
 }
@@ -96,13 +145,13 @@ Label of the z axis.}
 \if{html}{\out{<a id="method-VisualizerSurface-init_layer_contour"></a>}}
 \if{latex}{\out{\hypertarget{method-VisualizerSurface-init_layer_contour}{}}}
 \subsection{Method \code{init_layer_contour()}}{
-Initialize the plot with contour lines.
+Initialize the plot as 2D contour.
+This method is called automatically by plot() and should not be called directly.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{VisualizerSurface$init_layer_contour(
-  opacity = 0.8,
-  colorscale = list(c(0, "#440154"), c(0.25, "#3b528b"), c(0.5, "#21908c"), c(0.75,
-    "#5dc863"), c(1, "#fde725")),
-  show_title = TRUE,
+  opacity = self$opacity,
+  colorscale = self$colorscale,
+  show_title = self$show_title,
   ...
 )}\if{html}{\out{</div>}}
 }
@@ -116,11 +165,23 @@ Opacity of the layer.}
 \item{\code{opacity}}{(`numeric(1)`)\cr
 Opacity of the layer.}
 
+\item{\code{opacity}}{(`numeric(1)`)\cr
+Opacity of the layer.}
+
 \item{\code{colorscale}}{(`list()`)\cr
 The coloring of the surface/contour.}
 
 \item{\code{colorscale}}{(`list()`)\cr
 The coloring of the surface/contour.}
+
+\item{\code{colorscale}}{(`list()`)\cr
+The coloring of the surface/contour.}
+
+\item{\code{show_title}}{(`logical(1)`)\cr
+Indicator whether to show the title of the plot.}
+
+\item{\code{show_title}}{(`logical(1)`)\cr
+Indicator whether to show the title of the plot.}
 
 \item{\code{show_title}}{(`logical(1)`)\cr
 Indicator whether to show the title of the plot.}
@@ -142,14 +203,12 @@ Further arguments passed to `add_trace(...)`.}
 \if{latex}{\out{\hypertarget{method-VisualizerSurface-init_layer_surface}{}}}
 \subsection{Method \code{init_layer_surface()}}{
 Initialize the plot as 3D surface.
+This method is called automatically by plot() and should not be called directly.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{VisualizerSurface$init_layer_surface(
-  opacity = 0.8,
-  colorscale = list(c(0, "#440154"), c(0.25, "#3b528b"), c(0.5, "#21908c"), c(0.75,
-    "#5dc863"), c(1, "#fde725")),
-  show_contours = FALSE,
-  contours = NULL,
-  show_title = TRUE,
+  opacity = self$opacity,
+  colorscale = self$colorscale,
+  show_title = self$show_title,
   ...
 )}\if{html}{\out{</div>}}
 }
@@ -163,19 +222,23 @@ Opacity of the layer.}
 \item{\code{opacity}}{(`numeric(1)`)\cr
 Opacity of the layer.}
 
+\item{\code{opacity}}{(`numeric(1)`)\cr
+Opacity of the layer.}
+
+\item{\code{colorscale}}{(`list()`)\cr
+The coloring of the surface/contour.}
+
 \item{\code{colorscale}}{(`list()`)\cr
 The coloring of the surface/contour.}
 
 \item{\code{colorscale}}{(`list()`)\cr
 The coloring of the surface/contour.}
 
-\item{\code{show_contours}}{(`logical(1)`)\cr
-Indicator whether to show the contours of the surface.}
+\item{\code{show_title}}{(`logical(1)`)\cr
+Indicator whether to show the title of the plot.}
 
-\item{\code{contours}}{(`list()`)\cr
-Custom contour configuration for the surface. If provided, this takes precedence over `show_contours`.
-Can specify x, y, and z contours with custom properties like start, end, size, and color.
-See plotly documentation for detailed contour options.}
+\item{\code{show_title}}{(`logical(1)`)\cr
+Indicator whether to show the title of the plot.}
 
 \item{\code{show_title}}{(`logical(1)`)\cr
 Indicator whether to show the title of the plot.}
@@ -197,6 +260,7 @@ Further arguments passed to `add_trace(...)`.}
 \if{latex}{\out{\hypertarget{method-VisualizerSurface-set_layout}{}}}
 \subsection{Method \code{set_layout()}}{
 Set the layout of the plotly plot.
+This method is used internally by plot(layout = ...) and should not be called directly.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{VisualizerSurface$set_layout(...)}\if{html}{\out{</div>}}
 }
@@ -214,6 +278,7 @@ Set the layout of the plotly plot.
 \if{latex}{\out{\hypertarget{method-VisualizerSurface-set_scene}{}}}
 \subsection{Method \code{set_scene()}}{
 Set the view for a 3D plot.
+This method is used internally by plot(scene = ...) and should not be called directly.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{VisualizerSurface$set_scene(x, y, z)}\if{html}{\out{</div>}}
 }
@@ -231,24 +296,136 @@ Set the view for a 3D plot.
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-VisualizerSurface-add_contours"></a>}}
+\if{latex}{\out{\hypertarget{method-VisualizerSurface-add_contours}{}}}
+\subsection{Method \code{add_contours()}}{
+Add contours to the surface plot.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{VisualizerSurface$add_contours(contours = NULL, ...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{contours}}{(`list()` or `NULL`)\cr
+Custom contour configuration. If `NULL` (default), adds default z-projected contours.
+Can specify x, y, and z contours with custom properties like start, end, size, and color.
+See plotly documentation for detailed contour options.}
+
+\item{\code{...}}{Additional arguments passed to the contour trace.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Self (invisibly) for method chaining.
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-VisualizerSurface-plot"></a>}}
 \if{latex}{\out{\hypertarget{method-VisualizerSurface-plot}{}}}
 \subsection{Method \code{plot()}}{
 Return the plot and hence plot it or do further processing.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{VisualizerSurface$plot(text_size = 12, theme = "minimal")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{VisualizerSurface$plot(
+  text_size = 12,
+  title_size = NULL,
+  theme = "minimal",
+  background = "white",
+  color_palette = "viridis",
+  flatten = FALSE,
+  layout = NULL,
+  scene = NULL,
+  plot_title = NULL,
+  plot_subtitle = NULL,
+  x_lab = NULL,
+  y_lab = NULL,
+  z_lab = NULL,
+  x_limits = NULL,
+  y_limits = NULL,
+  z_limits = NULL,
+  show_legend = TRUE,
+  legend_title = NULL,
+  show_title = TRUE
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{text_size}}{(`numeric(1)`)\cr
-Base text size for plot elements. Default is 12. For 3D plotly plots, this controls axis labels and title sizes.}
+Base text size for plot elements. Default is 12. For 3D plotly calls, this controls axis labels and title sizes.}
+
+\item{\code{title_size}}{(`numeric(1)`)\cr
+Title text size. If NULL, defaults to text_size + 2.}
 
 \item{\code{theme}}{(`character(1)`)\cr
 Theme parameter for compatibility with ggplot2-based visualizers. Ignored for 3D plotly plots.}
+
+\item{\code{background}}{(`character(1)`)\cr
+Background color parameter for compatibility. Ignored for 3D plotly plots.}
+
+\item{\code{color_palette}}{(`character(1)`)\cr
+Color palette for the surface. One of "viridis", "plasma", "grayscale". Default is "viridis".}
+
+\item{\code{flatten}}{(`logical(1)`)\cr
+If TRUE, display as 2D contour plot. If FALSE (default), display as 3D surface plot.}
+
+\item{\code{layout}}{(`list()`)\cr
+Layout options passed directly to `plotly::layout()`. If NULL, no additional layout modifications are applied.}
+
+\item{\code{scene}}{(`list()`)\cr
+Scene options for 3D surface plots. Should contain camera settings like `list(camera = list(eye = list(x = 1.1, y = 1.2, z = 1.3)))`. 
+Only applies to surface plots, ignored for contour plots. If NULL, no scene modifications are applied.}
+
+\item{\code{plot_title}}{(`character(1)`)\cr
+Main plot title. If NULL, uses the visualizer's default title. Default is NULL.}
+
+\item{\code{plot_subtitle}}{(`character(1)`)\cr
+Plot subtitle. If NULL, no subtitle is shown. Default is NULL.}
+
+\item{\code{x_lab}}{(`character(1)`)\cr
+X-axis label. If NULL, uses the visualizer's default label. Default is NULL.}
+
+\item{\code{y_lab}}{(`character(1)`)\cr
+Y-axis label. If NULL, uses the visualizer's default label. Default is NULL.}
+
+\item{\code{z_lab}}{(`character(1)`)\cr
+Label of the z axis.}
+
+\item{\code{z_lab}}{(`character(1)`)\cr
+Z-axis label (for surface plots). If NULL, uses the visualizer's default label. Default is NULL.}
+
+\item{\code{x_limits}}{(`numeric(2)`)\cr
+X-axis limits as c(min, max). If NULL, uses automatic limits. Default is NULL.}
+
+\item{\code{y_limits}}{(`numeric(2)`)\cr
+Y-axis limits as c(min, max). If NULL, uses automatic limits. Default is NULL.}
+
+\item{\code{z_limits}}{(`numeric(2)`)\cr
+Z-axis limits as c(min, max) (for surface plots). If NULL, uses automatic limits. Default is NULL.}
+
+\item{\code{show_legend}}{(`logical(1)`)\cr
+Whether to show the legend. Default is TRUE.}
+
+\item{\code{legend_title}}{(`character(1)`)\cr
+Title for the legend. If NULL, uses default based on visualizer type. Default is NULL.}
+
+\item{\code{show_title}}{(`logical(1)`)\cr
+Indicator whether to show the title of the plot.}
+
+\item{\code{show_title}}{(`logical(1)`)\cr
+Indicator whether to show the title of the plot.}
+
+\item{\code{show_title}}{(`logical(1)`)\cr
+Indicator whether to show the title of the plot.}
+
+\item{\code{show_title}}{(`logical(1)`)\cr
+Indicator whether to show the title of the plot.}
 }
 \if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A plotly object.
 }
 }
 \if{html}{\out{<hr>}}

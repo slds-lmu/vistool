@@ -23,6 +23,7 @@ The objective function.}
 \itemize{
 \item \href{#method-VisualizerSurfaceObj-new}{\code{VisualizerSurfaceObj$new()}}
 \item \href{#method-VisualizerSurfaceObj-add_optimization_trace}{\code{VisualizerSurfaceObj$add_optimization_trace()}}
+\item \href{#method-VisualizerSurfaceObj-plot}{\code{VisualizerSurfaceObj$plot()}}
 \item \href{#method-VisualizerSurfaceObj-add_layer_taylor}{\code{VisualizerSurfaceObj$add_layer_taylor()}}
 \item \href{#method-VisualizerSurfaceObj-add_layer_hessian}{\code{VisualizerSurfaceObj$add_layer_hessian()}}
 \item \href{#method-VisualizerSurfaceObj-animate}{\code{VisualizerSurfaceObj$animate()}}
@@ -32,10 +33,12 @@ The objective function.}
 \if{html}{\out{
 <details><summary>Inherited methods</summary>
 <ul>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="add_points"><a href='../../vistool/html/Visualizer.html#method-Visualizer-add_points'><code>vistool::Visualizer$add_points()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="initialize_defaults"><a href='../../vistool/html/Visualizer.html#method-Visualizer-initialize_defaults'><code>vistool::Visualizer$initialize_defaults()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href='../../vistool/html/Visualizer.html#method-Visualizer-save'><code>vistool::Visualizer$save()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="add_contours"><a href='../../vistool/html/VisualizerSurface.html#method-VisualizerSurface-add_contours'><code>vistool::VisualizerSurface$add_contours()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="init_layer_contour"><a href='../../vistool/html/VisualizerSurface.html#method-VisualizerSurface-init_layer_contour'><code>vistool::VisualizerSurface$init_layer_contour()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="init_layer_surface"><a href='../../vistool/html/VisualizerSurface.html#method-VisualizerSurface-init_layer_surface'><code>vistool::VisualizerSurface$init_layer_surface()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="plot"><a href='../../vistool/html/VisualizerSurface.html#method-VisualizerSurface-plot'><code>vistool::VisualizerSurface$plot()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="set_layout"><a href='../../vistool/html/VisualizerSurface.html#method-VisualizerSurface-set_layout'><code>vistool::VisualizerSurface$set_layout()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="set_scene"><a href='../../vistool/html/VisualizerSurface.html#method-VisualizerSurface-set_scene'><code>vistool::VisualizerSurface$set_scene()</code></a></span></li>
 </ul>
@@ -52,7 +55,11 @@ Creates a new instance of this [R6][R6::R6Class] class.
   x1_limits = NULL,
   x2_limits = NULL,
   padding = 0,
-  n_points = 100L
+  n_points = 100L,
+  opacity = 0.8,
+  colorscale = list(c(0, "#440154"), c(0.25, "#3b528b"), c(0.5, "#21908c"), c(0.75,
+    "#5dc863"), c(1, "#fde725")),
+  show_title = TRUE
 )}\if{html}{\out{</div>}}
 }
 
@@ -65,8 +72,18 @@ The objective to optimize.}
 \item{\code{x1_limits}}{(`numeric(2)`)\cr
 The x1 limits.}
 
+\item{\code{x1_limits}}{(`numeric(2)`)\cr
+The x1 limits.}
+
 \item{\code{x2_limits}}{(`numeric(2)`)\cr
 The x2 limits.}
+
+\item{\code{x2_limits}}{(`numeric(2)`)\cr
+The x2 limits.}
+
+\item{\code{padding}}{(`numeric(1)`)\cr
+A margin that is added to x1limits and x2limits.
+The x1 margin is calculated by `max(x1lmits) - min(x1limits) * padding`.}
 
 \item{\code{padding}}{(`numeric(1)`)\cr
 A margin that is added to x1limits and x2limits.
@@ -75,6 +92,25 @@ The x1 margin is calculated by `max(x1lmits) - min(x1limits) * padding`.}
 \item{\code{n_points}}{(`integer(1)`)\cr
 The number of generated point per dimension.
 Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
+
+\item{\code{n_points}}{(`integer(1)`)\cr
+The number of generated point per dimension.
+Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
+
+\item{\code{opacity}}{(`numeric(1)`)\cr
+Opacity of the layer.}
+
+\item{\code{opacity}}{(`numeric(1)`)\cr
+Opacity of the layer.}
+
+\item{\code{colorscale}}{(`list()`)\cr
+The coloring of the surface/contour.}
+
+\item{\code{colorscale}}{(`list()`)\cr
+The coloring of the surface/contour.}
+
+\item{\code{show_title}}{(`logical(1)`)\cr
+Indicator whether to show the title of the plot.}
 }
 \if{html}{\out{</div>}}
 }
@@ -143,6 +179,27 @@ The colors for the markers.}
 \item{\code{...}}{Further arguments passed to `add_trace(...)`.}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-VisualizerSurfaceObj-plot"></a>}}
+\if{latex}{\out{\hypertarget{method-VisualizerSurfaceObj-plot}{}}}
+\subsection{Method \code{plot()}}{
+Renders the surface plot with all added layers.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{VisualizerSurfaceObj$plot(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{(`any`)\cr
+Additional arguments passed to the parent plot method.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+The plotly object.
 }
 }
 \if{html}{\out{<hr>}}

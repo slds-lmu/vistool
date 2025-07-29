@@ -49,7 +49,7 @@ Optimizer <- R6::R6Class("Optimizer",
         fval_in = fval_in,
         lr = as.numeric(lr),
         step_size = as.numeric(step_size),
-        objective = list(objective)
+        objective_id = objective$id
       )
       out <- cbind(out, do.call(data.table, list(...)))
       out$step <- step
@@ -114,7 +114,7 @@ Optimizer <- R6::R6Class("Optimizer",
     p_printer = function(ain) {
       xvals <- vapply(ain$x_out, function(x) sprintf("c(%s)", paste(round(x, 4), collapse = ", ")), character(1))
       msg <- sprintf(
-        "%s: Batch %s step %s: f(x) = %s, x = %s", ain$objective[[1]]$id, ain$batch,
+        "%s: Batch %s step %s: f(x) = %s, x = %s", ain$objective_id, ain$batch,
         ain$step, round(ain$fval_out, 4), xvals
       )
       message(paste(msg, collapse = "\n"))

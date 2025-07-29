@@ -25,7 +25,7 @@ Learner used to train the model.}
 \itemize{
 \item \href{#method-Visualizer2DModel-new}{\code{Visualizer2DModel$new()}}
 \item \href{#method-Visualizer2DModel-add_training_data}{\code{Visualizer2DModel$add_training_data()}}
-\item \href{#method-Visualizer2DModel-add_decision_boundary}{\code{Visualizer2DModel$add_decision_boundary()}}
+\item \href{#method-Visualizer2DModel-add_boundary}{\code{Visualizer2DModel$add_boundary()}}
 \item \href{#method-Visualizer2DModel-plot}{\code{Visualizer2DModel$plot()}}
 \item \href{#method-Visualizer2DModel-clone}{\code{Visualizer2DModel$clone()}}
 }
@@ -33,11 +33,9 @@ Learner used to train the model.}
 \if{html}{\out{
 <details open><summary>Inherited methods</summary>
 <ul>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="add_points"><a href='../../vistool/html/Visualizer.html#method-Visualizer-add_points'><code>vistool::Visualizer$add_points()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="initialize_defaults"><a href='../../vistool/html/Visualizer.html#method-Visualizer-initialize_defaults'><code>vistool::Visualizer$initialize_defaults()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href='../../vistool/html/Visualizer.html#method-Visualizer-save'><code>vistool::Visualizer$save()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="init_layer_contour"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-init_layer_contour'><code>vistool::Visualizer2D$init_layer_contour()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="init_layer_surface"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-init_layer_surface'><code>vistool::Visualizer2D$init_layer_surface()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="set_layout"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-set_layout'><code>vistool::Visualizer2D$set_layout()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer2D" data-id="set_scene"><a href='../../vistool/html/Visualizer2D.html#method-Visualizer2D-set_scene'><code>vistool::Visualizer2D$set_scene()</code></a></span></li>
 </ul>
 </details>
 }}
@@ -53,8 +51,7 @@ Creates a new instance of this [R6][R6::R6Class] class.
   x1_limits = NULL,
   x2_limits = NULL,
   padding = 0,
-  n_points = 100L,
-  training_points = FALSE
+  n_points = 100L
 )}\if{html}{\out{</div>}}
 }
 
@@ -94,9 +91,6 @@ Note that a grid of `npoints^2` values is generated and evaluated by `objective$
 \item{\code{n_points}}{(`integer(1)`)\cr
 The number of generated point per dimension.
 Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
-
-\item{\code{training_points}}{(`logical(1)`)\cr
-Whether to show training points on the plot.}
 }
 \if{html}{\out{</div>}}
 }
@@ -107,35 +101,73 @@ Whether to show training points on the plot.}
 \subsection{Method \code{add_training_data()}}{
 Adds the training data to the plot.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer2DModel$add_training_data(size = 2, color = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer2DModel$add_training_data(
+  color = "auto",
+  size = 2,
+  shape = 19,
+  alpha = 1,
+  show_labels = FALSE,
+  label_size = NULL
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{size}}{(`numeric(1)`)\cr
-Size of the points.}
-
 \item{\code{color}}{(`character(1)`)\cr
-Color of the points.}
+Color of the points. Use "auto" for automatic color assignment. Default is "auto".}
+
+\item{\code{size}}{(`numeric(1)`)\cr
+Size of the points. Default is 2.}
+
+\item{\code{shape}}{(`integer(1)`)\cr
+Shape of the points. Default is 19.}
+
+\item{\code{alpha}}{(`numeric(1)`)\cr
+Alpha transparency of the points. Default is 1.}
+
+\item{\code{show_labels}}{(`logical(1)`)\cr
+Whether to show data point labels. Default is FALSE.}
+
+\item{\code{label_size}}{(`numeric(1)`)\cr
+Size of data point labels. If NULL, defaults to smaller text.}
 }
 \if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Visualizer2DModel-add_decision_boundary"></a>}}
-\if{latex}{\out{\hypertarget{method-Visualizer2DModel-add_decision_boundary}{}}}
-\subsection{Method \code{add_decision_boundary()}}{
-Adds the decision boundary to the plot.
+\if{html}{\out{<a id="method-Visualizer2DModel-add_boundary"></a>}}
+\if{latex}{\out{\hypertarget{method-Visualizer2DModel-add_boundary}{}}}
+\subsection{Method \code{add_boundary()}}{
+Adds boundary line(s) to the plot at specified values.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer2DModel$add_decision_boundary(threshold = 0.5)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer2DModel$add_boundary(
+  values = NULL,
+  color = "black",
+  line_width = 1.5,
+  line_type = "solid",
+  alpha = 0.8
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{threshold}}{(`numeric(1)`)\cr
-Threshold for the decision boundary.}
+\item{\code{values}}{(`numeric()`)\cr
+Vector of values where to draw boundary contours. For classification with probability predictions,
+defaults to 0.5. For regression or response predictions, defaults to quantiles of predictions.}
+
+\item{\code{color}}{(`character(1)`)\cr
+Color of the boundary lines. Default is "black".}
+
+\item{\code{line_width}}{(`numeric(1)`)\cr
+Width of boundary lines. Default is 1.5.}
+
+\item{\code{line_type}}{(`character(1)`)\cr
+Type of boundary lines. One of "solid", "dashed", "dotted". Default is "solid".}
+
+\item{\code{alpha}}{(`numeric(1)`)\cr
+Transparency of boundary lines. Default is 0.8.}
 }
 \if{html}{\out{</div>}}
 }
@@ -146,7 +178,14 @@ Threshold for the decision boundary.}
 \subsection{Method \code{plot()}}{
 Create and return the ggplot2 plot with model-specific features.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer2DModel$plot(text_size = 11, theme = "minimal")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer2DModel$plot(
+  text_size = 11,
+  title_size = NULL,
+  theme = "minimal",
+  background = "white",
+  color_palette = "viridis",
+  ...
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -155,8 +194,19 @@ Create and return the ggplot2 plot with model-specific features.
 \item{\code{text_size}}{(`numeric(1)`)\cr
 Base text size for plot elements. Default is 11.}
 
+\item{\code{title_size}}{(`numeric(1)`)\cr
+Title text size. If NULL, defaults to text_size + 2.}
+
 \item{\code{theme}}{(`character(1)`)\cr
 ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "minimal".}
+
+\item{\code{background}}{(`character(1)`)\cr
+Background color for the plot. Default is "white".}
+
+\item{\code{color_palette}}{(`character(1)`)\cr
+Color palette for the fill scale. One of "viridis", "plasma", "grayscale". Default is "viridis".}
+
+\item{\code{...}}{Additional arguments passed to the parent plot method.}
 }
 \if{html}{\out{</div>}}
 }

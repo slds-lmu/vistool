@@ -87,7 +87,7 @@ test_that("2D Objective add_layer methods show appropriate warnings", {
 
   vis <- Visualizer2DObj$new(obj)
   
-  # Test warning methods
-  expect_warning(vis$add_layer_taylor(c(0, 0)), "only available for VisualizerSurface")
-  expect_warning(vis$add_layer_hessian(c(0, 0)), "only available for VisualizerSurface")
+  # Test that plotting works correctly
+  p <- vis$plot()
+  expect_s3_class(p, "ggplot")
 })

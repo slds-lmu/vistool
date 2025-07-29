@@ -7,12 +7,62 @@
 Base class for all visualizers. Provides a common interface for creating
 and saving plots across different plotting backends (ggplot2 for 1D/2D, plotly for 3D).
 }
+\section{Public fields}{
+\if{html}{\out{<div class="r6-fields">}}
+\describe{
+\item{\code{defaults}}{(`list`)\cr
+Default settings for plotting and visual elements.}
+}
+\if{html}{\out{</div>}}
+}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
+\item \href{#method-Visualizer-initialize_defaults}{\code{Visualizer$initialize_defaults()}}
 \item \href{#method-Visualizer-plot}{\code{Visualizer$plot()}}
 \item \href{#method-Visualizer-save}{\code{Visualizer$save()}}
+\item \href{#method-Visualizer-add_points}{\code{Visualizer$add_points()}}
 \item \href{#method-Visualizer-clone}{\code{Visualizer$clone()}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Visualizer-initialize_defaults"></a>}}
+\if{latex}{\out{\hypertarget{method-Visualizer-initialize_defaults}{}}}
+\subsection{Method \code{initialize_defaults()}}{
+Initialize default settings for the visualizer.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer$initialize_defaults(
+  default_color_palette = "viridis",
+  default_text_size = 11,
+  default_theme = "minimal",
+  default_alpha = 0.8,
+  default_line_width = 1.2,
+  default_point_size = 2
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{default_color_palette}}{(`character(1)`)\cr
+Default color palette. Default is "viridis".}
+
+\item{\code{default_text_size}}{(`numeric(1)`)\cr
+Default text size. Default is 11.}
+
+\item{\code{default_theme}}{(`character(1)`)\cr
+Default theme. Default is "minimal".}
+
+\item{\code{default_alpha}}{(`numeric(1)`)\cr
+Default alpha transparency. Default is 0.8.}
+
+\item{\code{default_line_width}}{(`numeric(1)`)\cr
+Default line width. Default is 1.2.}
+
+\item{\code{default_point_size}}{(`numeric(1)`)\cr
+Default point size. Default is 2.}
+}
+\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
@@ -21,7 +71,27 @@ and saving plots across different plotting backends (ggplot2 for 1D/2D, plotly f
 \subsection{Method \code{plot()}}{
 Abstract method to be implemented by subclasses.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer$plot(text_size = 11, theme = "minimal")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer$plot(
+  text_size = 11,
+  title_size = NULL,
+  theme = "minimal",
+  background = "white",
+  color_palette = "viridis",
+  plot_title = NULL,
+  plot_subtitle = NULL,
+  x_lab = NULL,
+  y_lab = NULL,
+  z_lab = NULL,
+  x_limits = NULL,
+  y_limits = NULL,
+  z_limits = NULL,
+  show_grid = TRUE,
+  grid_color = "gray90",
+  show_legend = TRUE,
+  legend_position = "right",
+  legend_title = NULL,
+  show_title = TRUE
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -30,8 +100,59 @@ Abstract method to be implemented by subclasses.
 \item{\code{text_size}}{(`numeric(1)`)\cr
 Base text size for plot elements. Default is 11.}
 
+\item{\code{title_size}}{(`numeric(1)`)\cr
+Title text size. If NULL, defaults to text_size + 2.}
+
 \item{\code{theme}}{(`character(1)`)\cr
 ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "minimal".}
+
+\item{\code{background}}{(`character(1)`)\cr
+Background color for the plot. Default is "white".}
+
+\item{\code{color_palette}}{(`character(1)`)\cr
+Default color palette to use. One of "viridis", "plasma", "grayscale". Default is "viridis".}
+
+\item{\code{plot_title}}{(`character(1)`)\cr
+Main plot title. If NULL, uses the visualizer's default title. Default is NULL.}
+
+\item{\code{plot_subtitle}}{(`character(1)`)\cr
+Plot subtitle. If NULL, no subtitle is shown. Default is NULL.}
+
+\item{\code{x_lab}}{(`character(1)`)\cr
+X-axis label. If NULL, uses the visualizer's default label. Default is NULL.}
+
+\item{\code{y_lab}}{(`character(1)`)\cr
+Y-axis label. If NULL, uses the visualizer's default label. Default is NULL.}
+
+\item{\code{z_lab}}{(`character(1)`)\cr
+Z-axis label (for surface plots). If NULL, uses the visualizer's default label. Default is NULL.}
+
+\item{\code{x_limits}}{(`numeric(2)`)\cr
+X-axis limits as c(min, max). If NULL, uses automatic limits. Default is NULL.}
+
+\item{\code{y_limits}}{(`numeric(2)`)\cr
+Y-axis limits as c(min, max). If NULL, uses automatic limits. Default is NULL.}
+
+\item{\code{z_limits}}{(`numeric(2)`)\cr
+Z-axis limits as c(min, max) (for surface plots). If NULL, uses automatic limits. Default is NULL.}
+
+\item{\code{show_grid}}{(`logical(1)`)\cr
+Whether to show axis grid lines. Default is TRUE.}
+
+\item{\code{grid_color}}{(`character(1)`)\cr
+Color of grid lines. Default is "gray90".}
+
+\item{\code{show_legend}}{(`logical(1)`)\cr
+Whether to show the legend. Default is TRUE.}
+
+\item{\code{legend_position}}{(`character(1)`)\cr
+Position of the legend. One of "top", "right", "bottom", "left", "none". Default is "right".}
+
+\item{\code{legend_title}}{(`character(1)`)\cr
+Title for the legend. If NULL, uses default based on visualizer type. Default is NULL.}
+
+\item{\code{show_title}}{(`logical(1)`)\cr
+Indicator whether to show the title of the plot.}
 }
 \if{html}{\out{</div>}}
 }
@@ -64,6 +185,67 @@ Height of the plot in pixels (for plotly) or inches (for ggplot2).}
 Resolution for ggplot2 plots (ignored for plotly plots).}
 
 \item{\code{...}}{Additional arguments passed to the underlying save function.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Visualizer-add_points"></a>}}
+\if{latex}{\out{\hypertarget{method-Visualizer-add_points}{}}}
+\subsection{Method \code{add_points()}}{
+Add points to the plot. This method can be called multiple times to add different sets of points.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer$add_points(
+  points,
+  color = "auto",
+  size = 2,
+  shape = 19,
+  alpha = 1,
+  annotations = NULL,
+  annotation_size = NULL,
+  ordered = FALSE,
+  arrow_color = NULL,
+  arrow_size = 0.3,
+  ...
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{points}}{(`data.frame` or `matrix` or `list`)\cr
+The points to add.
+- For 1D: A `data.frame` or `matrix` with one column for x-values, or a numeric vector of x-values. If y-values are not provided, they will be inferred if possible (e.g., for objective functions).
+- For 2D/Surface: A `data.frame` or `matrix` with two columns (x1, x2), or a list of 2-element vectors.}
+
+\item{\code{color}}{(`character(1)`)\cr
+Color of the points. Use "auto" for automatic color assignment from palette. Default is "auto".}
+
+\item{\code{size}}{(`numeric(1)`)\cr
+Size of the points. Default is 2.}
+
+\item{\code{shape}}{(`integer(1)` or `character(1)`)\cr
+Shape of the points. For ggplot2: integer codes (e.g., 19 for solid circle). For plotly: shape names. Default is 19/"circle".}
+
+\item{\code{alpha}}{(`numeric(1)`)\cr
+Alpha transparency of the points. Default is 1.}
+
+\item{\code{annotations}}{(`character`)\cr
+Optional text labels for each point. If provided, must be the same length as the number of points.}
+
+\item{\code{annotation_size}}{(`numeric(1)`)\cr
+Size of annotation text. If NULL, defaults to text_size - 2 from plot().}
+
+\item{\code{ordered}}{(`logical(1)`)\cr
+If `TRUE`, draws arrows between consecutive points to indicate order. Default is `FALSE`.}
+
+\item{\code{arrow_color}}{(`character(1)`)\cr
+Color of arrows when ordered = TRUE. If NULL, uses point color.}
+
+\item{\code{arrow_size}}{(`numeric(1)`)\cr
+Length/size of arrows when `ordered = TRUE`. Default is 0.3 units in the coordinate system.}
+
+\item{\code{...}}{Additional arguments passed to the plotting layers.}
 }
 \if{html}{\out{</div>}}
 }

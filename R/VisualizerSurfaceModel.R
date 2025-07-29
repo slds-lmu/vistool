@@ -28,7 +28,20 @@ VisualizerSurfaceModel <- R6::R6Class("VisualizerSurfaceModel",
     #' @param task ([mlr3::Task])\cr
     #'   The task to train the model on.
     #' @template param_learner
-    initialize = function(task, learner, x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L) {
+    #' @template param_x1_limits
+    #' @template param_x2_limits
+    #' @template param_padding
+    #' @template param_n_points
+    #' @template param_opacity
+    #' @template param_colorscale
+    #' @template param_opacity
+    #' @template param_colorscale
+    #' @template param_show_title
+    initialize = function(task, learner, x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L,
+                          opacity = 0.8, colorscale = list(
+                            c(0, "#440154"), c(0.25, "#3b528b"), c(0.5, "#21908c"), 
+                            c(0.75, "#5dc863"), c(1, "#fde725")
+                          ), show_title = TRUE) {
       self$task <- mlr3::assert_task(task)
       self$learner <- mlr3::assert_learner(learner, task = self$task)
       checkmate::assert_numeric(x1_limits, len = 2, null.ok = TRUE)
@@ -72,13 +85,16 @@ VisualizerSurfaceModel <- R6::R6Class("VisualizerSurfaceModel",
       }
       zmat <- matrix(z, nrow = n_points, ncol = n_points, byrow = TRUE)
 
-      super$initialize(
+            super$initialize(
         grid = grid,
         zmat = zmat,
-        plot_lab = sprintf("%s on %s", self$learner$id, self$task$id),
-        x1_lab = x1,
-        x2_lab = x2,
-        z_lab = task$target_names
+        plot_lab = paste(self$learner$id, "on", self$task$id),
+        x1_lab = self$task$feature_names[1],
+        x2_lab = self$task$feature_names[2],
+        z_lab = self$task$target_names,
+        opacity = opacity,
+        colorscale = colorscale,
+        show_title = show_title
       )
 
       return(invisible(self))
@@ -94,99 +110,75 @@ VisualizerSurfaceModel <- R6::R6Class("VisualizerSurfaceModel",
     #' @param ... (`any`)\cr
     #'   Further arguments passed to `add_trace(...)`.
     add_training_data = function(size = 5, color = "grey", ...) {
-      if (is.null(private$.plot)) self$init_layer_surface()
+      if (is.null(private$.plot)) private$.init_default_plot()
       data <- self$task$data()
       x1 <- data[, self$task$feature_names[1], with = FALSE][[1]]
       x2 <- data[, self$task$feature_names[2], with = FALSE][[1]]
       z <- data[, self$task$target_names, with = FALSE][[1]]
       if (self$learner$predict_type == "prob") z <- as.integer(z) - 1
 
-
-      if (private$.layer_primary == "contour") {
-        private$.plot <- private$.plot %>%
-          add_trace(
-            x = x1,
-            y = x2,
-            type = "scatter",
-            mode = "markers",
-            marker = list(
-              size = 10,
-              color = z,
-              cmin = min(self$zmat),
-              cmax = max(self$zmat),
-              colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")),
-              line = list(color = "black", width = 2),
-              showscale = FALSE
-            ),
-            text = ~ paste("x:", x1, "\ny:", x2, " \nz:", z),
-            hoverinfo = "text",
-            ...
-          )
-      } else {
-        private$.plot <- private$.plot %>%
-          add_trace(
-            x = x1,
-            y = x2,
-            z = z,
-            type = "scatter3d",
-            mode = "markers",
-            marker = list(size = 5, color = grey),
-            ...
-          )
-      }
-
-
+      # Store training data specification without resolving colors yet
+      private$store_layer("training_data", list(
+        x1 = x1,
+        x2 = x2,
+        z = z,
+        size = size,
+        color = color,  # Keep for later resolution
+        args = list(...)
+      ))
 
       return(invisible(self))
     },
 
     #' @description
-    #' Adds the decision boundary to the plot.
+    #' Adds boundary surface(s) to the plot at specified values.
     #'
-    #' @param threshold (`numeric(1)`)\cr
-    #'  Threshold for the decision boundary.
+    #' @param values (`numeric()`)\cr
+    #'   Vector of z-values where to draw boundary surfaces. For classification with probability predictions,
+    #'   defaults to 0.5. For regression or response predictions, defaults to quantiles of predictions.
+    #' @param color (`character(1)` or `list()`)\cr
+    #'   Color specification for boundary surfaces. Default uses a neutral colorscale.
     #' @param ... (`any`)\cr
-    #'   Further arguments passed to `add_trace(...)`.
-    add_decision_boundary = function(threshold = 0.5, ...) {
-      if (is.null(private$.plot)) self$init_layer_surface()
-      z <- matrix(threshold, nrow = nrow(self$zmat), ncol = ncol(self$zmat), byrow = TRUE)
-
-      if (private$.layer_primary == "contour") {
-        llp <- list(x = self$grid$x1, y = self$grid$x2, z = self$zmat)
-        private$.plot <- private$.plot %>%
-          add_trace(
-            name = "decision boundary",
-            autocontour = FALSE,
-            showlegend = FALSE,
-            showscale = FALSE,
-            x = llp$x,
-            y = llp$y,
-            z = t(llp$z),
-            type = "contour",
-            colorscale = list(c(0, 1), c("rgb(0,0,0)", "rgb(0,0,0)")),
-            ncontours = 1,
-            contours = list(
-              start = threshold,
-              end = threshold,
-              coloring = "lines"
-            ),
-            line = list(
-              color = "black",
-              width = 3
-            ),
-            ...
-          )
+    #'   Further arguments passed to `add_trace(...)` or `add_surface(...)`.
+    add_boundary = function(values = NULL, color = NULL, ...) {
+      checkmate::assert_numeric(values, null.ok = TRUE)
+      
+      if (is.null(private$.plot)) private$.init_default_plot()
+      
+      # Determine default values based on prediction type
+      if (is.null(values)) {
+        if (self$learner$predict_type == "prob") {
+          values <- 0.5
+        } else {
+          # For regression or response predictions, use quantiles
+          values <- quantile(self$zmat, c(0.25, 0.5, 0.75), na.rm = TRUE)
+        }
       } else {
-        private$.plot <- private$.plot %>%
-          add_surface(
-            x = self$grid$x1,
-            y = self$grid$x2,
-            z = z,
-            colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")),
-            showscale = FALSE,
-            ...
-          )
+        # Validate that boundary values are within the prediction range
+        z_range <- range(self$zmat, na.rm = TRUE)
+        invalid_values <- values[values < z_range[1] | values > z_range[2]]
+        if (length(invalid_values) > 0) {
+          warning(sprintf(
+            "Boundary values %s are outside the prediction range [%.3f, %.3f] and will not generate visible surfaces.",
+            paste(round(invalid_values, 3), collapse = ", "),
+            z_range[1], z_range[2]
+          ))
+        }
       }
+      
+      # Default color scheme
+      if (is.null(color)) {
+        color <- list(c(0, "rgba(176,196,222,0.5)"), c(1, "rgba(160,82,45,0.5)"))
+      }
+
+      # Store boundary specification without resolving colors yet
+      private$store_layer("boundary", list(
+        values = values,
+        color = color,  # Keep for later resolution
+        args = list(...)
+      ))
+      
+      return(invisible(self))
     }
   )
 )

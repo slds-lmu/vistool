@@ -1,0 +1,151 @@
+---
+title: "Customization Guide"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Customization Guide}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  dpi = 150,
+  dev = "png",
+  out.width = "100%",
+  fig.retina = 2
+)
+```
+
+The three-step workflow,
+
+1. **Initialize** the Visualizer using `as_visualizer()`,
+2. **Add** visualization layers (e.g., contours, training_data, boundaries, optimization traces),
+3. **Plot** using `plot()` and optionally `save()` or `animate()`,
+
+offers consistent customization options across all visualization types.
+In particular, all visual elements support automatic color assignment using `color = "auto"`:
+
+- Colors are automatically assigned from a consistent discrete palette
+- Each visualizer tracks its color index to ensure distinct colors
+- Manual colors can still be specified using hex codes or named colors
+
+For convenience, three pre-defined color palettes are available:
+
+- **viridis** (default): Perceptually uniform, colorblind-friendly
+- **plasma**: High contrast alternative to viridis
+- **grayscale**: For monochrome plots
+
+## Global Settings (`plot()`)
+
+These parameters affect the entire plot appearance:
+
+```r
+plot(
+  # General settings
+  text_size = 11,            # Base text size for all elements
+  title_size = NULL,         # Title size (defaults to text_size + 2)
+  theme = "minimal",         # ggplot2 theme
+  background = "white",      # Background color
+  color_palette = "viridis", # Color palette for continuous scales
+  flatten = FALSE,           # Surface only: 2D vs 3D view
+  layout = NULL,             # plotly: custom layout options
+  scene = NULL,              # plotly: 3D scene settings
+  
+  # Title and Subtitle Customization
+  plot_title = NULL,         # Override plot title
+  plot_subtitle = NULL,      # Add subtitle to plot
+  show_title = TRUE,         # Show/hide plot title completely
+  
+  # Axis Customization
+  x_lab = NULL,              # Custom x-axis label
+  y_lab = NULL,              # Custom y-axis label  
+  z_lab = NULL,              # Custom z-axis label (surface plots)
+  x_limits = NULL,           # X-axis limits: c(min, max)
+  y_limits = NULL,           # Y-axis limits: c(min, max)
+  z_limits = NULL,           # Z-axis limits: c(min, max) (surface plots)
+  show_grid = TRUE,          # Show/hide grid lines
+  grid_color = "gray90",     # Grid line color
+  
+  # Legend Customization
+  show_legend = TRUE,        # Show/hide legend
+  legend_position = "right", # "top", "right", "bottom", "left", "none"
+  legend_title = NULL        # Custom legend title
+)
+```
+
+## Layer-Specific Settings (in `add_*()` methods)
+
+### `add_points()`
+```r
+add_points(
+  points,                   # Point data
+  color = "auto",           # Auto-assign or specify color
+  size = 2,                 # Point size
+  shape = 19,               # Point shape (ggplot2) or "circle" (plotly)
+  alpha = 1,                # Transparency
+  annotations = NULL,       # Text labels for points
+  annotation_size = NULL,   # Size of annotations
+  ordered = FALSE,          # Draw arrows between consecutive points
+  arrow_color = NULL,       # Color of arrows (defaults to point color)
+  arrow_size = 0.3          # Size/length of arrows
+)
+```
+
+### `add_training_data()`
+```r
+add_training_data(
+  color = "auto",          # Auto-assign color
+  size = 2,                # Point size
+  shape = 19,              # Point shape
+  alpha = 1,               # Transparency
+  show_labels = FALSE,     # Show data point indices
+  label_size = NULL        # Size of labels
+)
+```
+
+### `add_boundary()`
+```r
+add_boundary(
+  values = NULL,           # Boundary values (auto-determined if NULL)
+  color = "black",         # Line color
+  line_width = 1.5,        # Line width
+  line_type = "solid",     # Line type: "solid", "dashed", "dotted", etc.
+  alpha = 0.8              # Transparency
+)
+```
+
+### `add_optimization_trace()`
+```r
+add_optimization_trace(
+  optimizer,                # Optimizer object with trace data
+  line_color = "auto",      # Auto-assign line color
+  line_width = 1.2,         # Line width
+  line_type = "solid",      # Line type
+  marker_color = NULL,      # Marker color (defaults to line color)
+  marker_size = 3,          # Marker size
+  marker_shape = 16,        # Marker shape
+  show_start_end = TRUE,    # Highlight start/end points
+  start_marker_size = NULL, # Custom start marker size
+  end_marker_size = NULL,   # Custom end marker size
+  alpha = 0.8,              # Overall transparency
+  name = NULL,              # Trace name for legend
+  npoints = NULL,           # Limit number of points shown
+  npmax = NULL              # Alternative point limit
+)
+```
+
+## (Setting) Defaults at Initialization
+```r
+as_visualizer(
+  x,                       # Task, Objective, or LossFunction
+  ...,                     # Type-specific parameters
+  default_color_palette = "viridis",
+  default_text_size = 11,
+  default_theme = "minimal",
+  default_alpha = 0.8,
+  default_line_width = 1.2,
+  default_point_size = 2
+)
+```

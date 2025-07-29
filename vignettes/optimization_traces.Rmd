@@ -1,0 +1,236 @@
+---
+title: "Optimization & Traces"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Optimization & Traces}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  dpi = 150,
+  dev = "png",
+  out.width = "100%",
+  fig.retina = 2
+)
+```
+
+```{r, message=FALSE}
+library(vistool)
+library(plotly)
+library(purrr)
+```
+
+This vignette covers the available optimizers, step size control, and how to visualize optimization traces.
+
+## Optimizers
+
+The optimizer class defines the optimization strategy and is initialized by taking an objective function, start value, and learning rate.
+Available optimizer are:
+
+- Gradient descent with `OptimizerGD`
+- Momentum with `OptimizerMomentum`
+- Nesterovs momentum with `OptimizerNAG`
+
+Creating an optimizer is done by (let's use an x value that works well):
+
+```{r}
+obj <- obj("TF_GoldsteinPriceLog")
+opt <- OptimizerGD$new(obj, x_start = c(0.22, 0.77), lr = 0.01)
+```
+
+With these value set, optimization is done by calling `$optimize()` with the number of steps as argument:
+
+```{r}
+opt$optimize(10L)
+```
+
+Calling `$optimize()` also writes into the archive of the optimizer and also calls `$evalStore()` of the objective.
+Therefore, `$optimize()` writes into two archives:
+
+```{r}
+opt$archive
+opt$objective$archive
+```
+
+## Visualize Optimization Traces
+
+A layer of the `Visualizer` class is `$add_optimization_trace()` that gets the optimizer as argument and adds the optimization trace to the plot:
+
+```{r, out.width='100%', out.height='700px'}
+viz <- as_visualizer(obj, type = "surface")
+viz$add_optimization_trace(opt)
+viz$plot()
+```
+
+## Step size control
+
+When calling `$optimize()`, the second argument is `stepSizeControl` that allows to expand or compress the update added to the old value of $x$.
+For example, for GD with $x_{\text{new}} = x_{\text{old}} + lr * \Delta_f(x_{\text{old}})$ the update $u = lr * \Delta_f(x_{\text{old}})$ is multiplied with the return value of `stepSizeControl()`.
+There are a few pre-implemented control functions like line search or various decaying methods:
+
+- `stepSizeControlLineSearch(lower, upper)`: Conduct a line search for $a$ in $x_{\text{new}} = x_{\text{old}} +  a * lr * \Delta_f(x_{\text{old}})$`.
+- `stepSizeControlDecayTime(decay) `: Lower the updates by $(1 + decay * iteration)^{-1}$.
+- `stepSizeControlDecayExp(decay)`: Lower the updates by $exp(-decay * iteration)$.
+- `stepSizeControlDecayLinear(iter_zero)`: Lower the updates until `iter_zero` is reached. Updates with `iter > iter_zero` are 0.
+- `stepSizeControlDecaySteps(drop_rate, every_iter)`: Lower the updates `every_iter` by `drop_rate`.
+
+Note that these functions return a function that contains a function with the required signature:
+
+```{r}
+stepSizeControlDecayTime()
+```
+
+Let's define multiple gradient descent optimizers and optimize 10 steps with a step size control:
+
+```{r}
+x0 <- c(0.22, 0.77)
+lr <- 0.01
+
+oo1 <- OptimizerGD$new(obj, x_start = x0, lr = lr, id = "GD without LR Control", print_trace = FALSE)
+oo2 <- OptimizerGD$new(obj, x_start = x0, lr = lr, id = "GD with Line Search", print_trace = FALSE)
+oo3 <- OptimizerGD$new(obj, x_start = x0, lr = lr, id = "GD with Time Decay", print_trace = FALSE)
+oo4 <- OptimizerGD$new(obj, x_start = x0, lr = lr, id = "GD with Exp Decay", print_trace = FALSE)
+oo5 <- OptimizerGD$new(obj, x_start = x0, lr = lr, id = "GD with Linear Decay", print_trace = FALSE)
+oo6 <- OptimizerGD$new(obj, x_start = x0, lr = lr, id = "GD with Step Decay", print_trace = FALSE)
+
+oo1$optimize(steps = 10)
+oo2$optimize(steps = 10, stepSizeControlLineSearch())
+oo3$optimize(steps = 10, stepSizeControlDecayTime())
+oo4$optimize(steps = 10, stepSizeControlDecayExp())
+oo5$optimize(steps = 10, stepSizeControlDecayLinear())
+oo6$optimize(steps = 10, stepSizeControlDecaySteps())
+```
+
+For now we don't know how well it worked. Let's collect all archives with `mergeOptimArchives()` and visualize the step sizes and function values with `patchwork` magic:
+
+```{r}
+arx <- mergeOptimArchives(oo1, oo2, oo3, oo4, oo5, oo6)
+
+library(ggplot2)
+library(patchwork)
+gg1 <- ggplot(arx, aes(x = iteration, y = step_size, color = optim_id))
+gg2 <- ggplot(arx, aes(x = iteration, y = fval_out, color = optim_id))
+
+(gg1 + ggtitle("Step sizes") |
+  gg1 + ylim(0, 1) + ggtitle("Step sizes (zoomed)") |
+  gg2 + ggtitle("Objective")) +
+  plot_layout(guides = "collect") &
+  geom_line() &
+  theme_minimal() &
+  theme(legend.position = "bottom") &
+  ggsci::scale_color_simpsons()
+```
+
+Visualizing the traces is done as before by adding optimization trace layer.
+We can do this for all optimizers to add multiple traces to the plot:
+
+```{r, out.width='100%', out.height='700px'}
+viz <- as_visualizer(obj, type = "surface")
+
+viz$add_optimization_trace(oo1)
+viz$add_optimization_trace(oo2)
+viz$add_optimization_trace(oo3)
+viz$add_optimization_trace(oo4)
+viz$add_optimization_trace(oo5)
+viz$add_optimization_trace(oo6)
+
+viz$plot()
+```
+
+Practically, it should be no issue to also combine multiple control functions.
+The important thing is to keep the signature of the function by allowing the function to get the arguments `x` (current value), `u` (current update), `obj` (`Objective` object), and `opt` (`Optimizer` object):
+
+```{r}
+myStepSizeControl <- function(x, u, obj, opt) {
+  sc1 <- stepSizeControlLineSearch(0, 10)
+  sc2 <- stepSizeControlDecayTime(0.1)
+  return(sc1(x, u, obj, opt) * sc2(x, u, obj, opt))
+}
+
+my_oo <- OptimizerGD$new(obj, x_start = x0, lr = lr, id = "GD without LR Control", print_trace = FALSE)
+my_oo$optimize(100, myStepSizeControl)
+tail(my_oo$archive)
+```
+
+## Optimization traces
+
+Let's optimize a custom linear model objective (TODO: see objective_functions vignette) using the three available optimizers.
+```{r}
+# Define the linear model loss function as SSE:
+l2norm <- function(x) sqrt(sum(crossprod(x)))
+
+mylm <- function(x, Xmat, y) {
+  l2norm(y - Xmat %*% x)
+}
+# Use the iris dataset with response `Sepal.Width` and feature `Petal.Width`:
+Xmat <- model.matrix(~Petal.Width, data = iris)
+y <- iris$Sepal.Width
+
+# Create a new object:
+obj_lm <- Objective$new(id = "iris LM", fun = mylm, xdim = 2, Xmat = Xmat, y = y, minimize = TRUE)
+
+oo1 <- OptimizerGD$new(obj_lm, x_start = c(0, -0.05), lr = 0.001, print_trace = FALSE)
+oo2 <- OptimizerMomentum$new(obj_lm, x_start = c(-0.05, 0), lr = 0.001, print_trace = FALSE)
+oo3 <- OptimizerNAG$new(obj_lm, x_start = c(0, 0), lr = 0.001, print_trace = FALSE)
+
+oo1$optimize(steps = 100)
+oo2$optimize(steps = 100)
+oo3$optimize(steps = 100)
+```
+
+As shown previously, optimization traces can be added by `$add_optimization_trace`.
+
+```{r, out.width='100%', out.height='700px'}
+viz <- as_visualizer(obj_lm, x1_limits = c(-0.5, 5), x2_limits = c(-3.2, 2.8), type = "surface")
+
+
+viz$add_optimization_trace(oo1, add_marker_at = round(seq(1, 100, len = 10L)))
+viz$add_optimization_trace(oo2, add_marker_at = c(1, 50, 90), marker_shape = c("square", "diamond", "cross"))
+viz$add_optimization_trace(oo3, add_marker_at = 100, marker_shape = "diamond-open")
+
+viz$plot()
+```
+
+#TODO: add_points()
+
+Using the alternative `ggplot2` backend makes sense when further customization is desired (TODO see advanced_visualization vignette):
+
+```{r, out.width='100%', out.height='700px'}
+viz_2d <- as_visualizer(obj_lm, x1_limits = c(-0.5, 5), x2_limits = c(-3.2, 2.8))
+
+viz_2d$add_optimization_trace(oo1, 
+  line_color = "#1f77b4", 
+  line_width = 1.5,
+  marker_size = 3,
+  add_marker_at = c(1, 25, 50, 75, 100),
+  name = "Gradient Descent"
+)
+
+viz_2d$add_optimization_trace(oo2, 
+  line_color = "#ff7f0e", 
+  line_width = 1.5,
+  line_type = "dashed",
+  marker_size = 3,
+  marker_shape = 17,  # triangle
+  add_marker_at = c(1, 30, 60, 100),
+  name = "Momentum"
+)
+
+viz_2d$add_optimization_trace(oo3, 
+  line_color = "#2ca02c", 
+  line_width = 1.5,
+  line_type = "dotted",
+  marker_size = 3,
+  marker_shape = 15,  # square
+  add_marker_at = c(1, 20, 40, 80, 100),
+  name = "Nesterov AG"
+)
+
+viz_2d$plot()
+```
+
+#TODO: add_points(), show with annotation and arrows
