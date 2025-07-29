@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">vistool</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -18,9 +18,12 @@
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/loss_functions.html">Visualization of Loss Functions</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/advanced_visualization.html">Advanced Visualization (TODO)</a></li>
+    <li><a class="dropdown-item" href="../articles/customization_guide.html">Customization Guide</a></li>
+    <li><a class="dropdown-item" href="../articles/loss_functions.html">Visualization of Loss Functions</a></li>
     <li><a class="dropdown-item" href="../articles/model.html">Visualization of Model Predictions</a></li>
-    <li><a class="dropdown-item" href="../articles/objective.html">Visualization of Objective Functions</a></li>
+    <li><a class="dropdown-item" href="../articles/objective_functions.html">Visualization of Objective Functions</a></li>
+    <li><a class="dropdown-item" href="../articles/optimization_traces.html">Optimization &amp; Traces</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -74,18 +77,6 @@ Label of x-axis</p></dd>
 Label of y-axis</p></dd>
 
 
-<dt><code>points_x</code></dt>
-<dd><p>(`numeric(m)`)<br>
-x-values of extra points to plot.
-Use NULL if no points should be plotted.</p></dd>
-
-
-<dt><code>points_y</code></dt>
-<dd><p>(`numeric(m)`)<br>
-y-values of extra points to plot.
-Use NULL if no points should be plotted.</p></dd>
-
-
 <dt><code>line_col</code></dt>
 <dd><p>(`character(1)`)<br>
 Color of plotted line</p></dd>
@@ -132,20 +123,14 @@ Alpha blending of plotted points</p></dd>
 <ul><li><p><a href="#method-Visualizer1D-new"><code>Visualizer1D$new()</code></a></p></li>
 <li><p><a href="#method-Visualizer1D-plot"><code>Visualizer1D$plot()</code></a></p></li>
 <li><p><a href="#method-Visualizer1D-clone"><code>Visualizer1D$clone()</code></a></p></li>
-</ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href="Visualizer.html#method-save"><code>vistool::Visualizer$save()</code></a></span></li>
+</ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="add_points"><a href="Visualizer.html#method-add_points"><code>vistool::Visualizer$add_points()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="initialize_defaults"><a href="Visualizer.html#method-initialize_defaults"><code>vistool::Visualizer$initialize_defaults()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href="Visualizer.html#method-save"><code>vistool::Visualizer$save()</code></a></span></li>
 </ul></details></p><hr><a id="method-Visualizer1D-new"></a><div class="section">
 <h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
 <p>Creates a new instance of this [R6][R6::R6Class] class.</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/Visualizer1D.html">Visualizer1D</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
-<span>  <span class="va">fun_x</span>,</span>
-<span>  <span class="va">fun_y</span>,</span>
-<span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  lab_x <span class="op">=</span> <span class="st">"x"</span>,</span>
-<span>  lab_y <span class="op">=</span> <span class="st">"y"</span>,</span>
-<span>  points_x <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  points_y <span class="op">=</span> <span class="cn">NULL</span></span>
-<span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/Visualizer1D.html">Visualizer1D</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">fun_x</span>, <span class="va">fun_y</span>, title <span class="op">=</span> <span class="cn">NULL</span>, lab_x <span class="op">=</span> <span class="st">"x"</span>, lab_y <span class="op">=</span> <span class="st">"y"</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -175,18 +160,6 @@ Label of x-axis</p></dd>
 Label of y-axis</p></dd>
 
 
-<dt><code>points_x</code></dt>
-<dd><p>(`numeric()`)<br>
-x-values of extra points to plot.
-Use NULL if no points should be plotted.</p></dd>
-
-
-<dt><code>points_y</code></dt>
-<dd><p>(`numeric()`)<br>
-y-values of extra points to plot.
-Use NULL if no points should be plotted.</p></dd>
-
-
 </dl><p></p></div>
 </div>
 
@@ -194,7 +167,22 @@ Use NULL if no points should be plotted.</p></dd>
 <h3 id="method-plot-">Method <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code><a class="anchor" aria-label="anchor" href="#method-plot-"></a></h3>
 <p>Create and return the ggplot2 plot.</p><div class="section">
 <h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Visualizer1D</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span>text_size <span class="op">=</span> <span class="fl">11</span>, theme <span class="op">=</span> <span class="st">"minimal"</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Visualizer1D</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span></span>
+<span>  text_size <span class="op">=</span> <span class="fl">11</span>,</span>
+<span>  theme <span class="op">=</span> <span class="st">"minimal"</span>,</span>
+<span>  plot_title <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  plot_subtitle <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  x_lab <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  y_lab <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  x_limits <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  y_limits <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  show_grid <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  grid_color <span class="op">=</span> <span class="st">"gray90"</span>,</span>
+<span>  show_legend <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  legend_position <span class="op">=</span> <span class="st">"right"</span>,</span>
+<span>  legend_title <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  show_title <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -207,6 +195,66 @@ Base text size for plot elements. Default is 11.</p></dd>
 <dt><code>theme</code></dt>
 <dd><p>(`character(1)`)<br>
 ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "minimal".</p></dd>
+
+
+<dt><code>plot_title</code></dt>
+<dd><p>(`character(1)`)<br>
+Main plot title. If NULL, uses the visualizer's default title. Default is NULL.</p></dd>
+
+
+<dt><code>plot_subtitle</code></dt>
+<dd><p>(`character(1)`)<br>
+Plot subtitle. If NULL, no subtitle is shown. Default is NULL.</p></dd>
+
+
+<dt><code>x_lab</code></dt>
+<dd><p>(`character(1)`)<br>
+X-axis label. If NULL, uses the visualizer's default label. Default is NULL.</p></dd>
+
+
+<dt><code>y_lab</code></dt>
+<dd><p>(`character(1)`)<br>
+Y-axis label. If NULL, uses the visualizer's default label. Default is NULL.</p></dd>
+
+
+<dt><code>x_limits</code></dt>
+<dd><p>(`numeric(2)`)<br>
+X-axis limits as c(min, max). If NULL, uses automatic limits. Default is NULL.</p></dd>
+
+
+<dt><code>y_limits</code></dt>
+<dd><p>(`numeric(2)`)<br>
+Y-axis limits as c(min, max). If NULL, uses automatic limits. Default is NULL.</p></dd>
+
+
+<dt><code>show_grid</code></dt>
+<dd><p>(`logical(1)`)<br>
+Whether to show axis grid lines. Default is TRUE.</p></dd>
+
+
+<dt><code>grid_color</code></dt>
+<dd><p>(`character(1)`)<br>
+Color of grid lines. Default is "gray90".</p></dd>
+
+
+<dt><code>show_legend</code></dt>
+<dd><p>(`logical(1)`)<br>
+Whether to show the legend. Default is TRUE.</p></dd>
+
+
+<dt><code>legend_position</code></dt>
+<dd><p>(`character(1)`)<br>
+Position of the legend. One of "top", "right", "bottom", "left", "none". Default is "right".</p></dd>
+
+
+<dt><code>legend_title</code></dt>
+<dd><p>(`character(1)`)<br>
+Title for the legend. If NULL, uses default based on visualizer type. Default is NULL.</p></dd>
+
+
+<dt><code>show_title</code></dt>
+<dd><p>(`logical(1)`)<br>
+Indicator whether to show the title of the plot.</p></dd>
 
 
 </dl><p></p></div>

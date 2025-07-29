@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">vistool</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -18,9 +18,12 @@
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/loss_functions.html">Visualization of Loss Functions</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/advanced_visualization.html">Advanced Visualization (TODO)</a></li>
+    <li><a class="dropdown-item" href="../articles/customization_guide.html">Customization Guide</a></li>
+    <li><a class="dropdown-item" href="../articles/loss_functions.html">Visualization of Loss Functions</a></li>
     <li><a class="dropdown-item" href="../articles/model.html">Visualization of Model Predictions</a></li>
-    <li><a class="dropdown-item" href="../articles/objective.html">Visualization of Objective Functions</a></li>
+    <li><a class="dropdown-item" href="../articles/objective_functions.html">Visualization of Objective Functions</a></li>
+    <li><a class="dropdown-item" href="../articles/optimization_traces.html">Optimization &amp; Traces</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -37,6 +40,20 @@
 
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.3.0" id="vistool-030">vistool 0.3.0<a class="anchor" aria-label="anchor" href="#vistool-030"></a></h2>
+<ul><li>Polished the general workflow and unified all customization options: 1. Initialize the Visualizer object (<code><a href="../reference/as_visualizer.html">as_visualizer()</a></code>), 2. Layering (<code>add_*</code>) methods, 3. Rendering (<code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>); 2. and 3. can be chained (e.g., <code>vis$add_*$add_*$plot()</code>). Global settings that affect the entire plot are set in <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>. Settings for specific visual elements are set in the <code>add_*()</code> methods that create them. Defaults can be set at initialization in <code><a href="../reference/as_visualizer.html">as_visualizer()</a></code>.</li>
+<li>Layers are now only applied when calling <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> (instead of directly), improving predictability and allowing for greater customization.</li>
+<li>
+<code>as_visualizer(..., type = "surface")</code>, initializes a surface plot directly (similar to the other types); <code>as_visualizer</code> can now be used on lists of loss functions (as expected).</li>
+<li>Split classification loss functions into probability and score-based losses; probability-based losses can display curves for either the positive, negative or both classes.</li>
+<li>Reworked boundary functionality (<code>add_boundary()</code>): Now accepts vectors for multiple boundaries; works for 1D model visualizations (horizontal lines at y-values).</li>
+<li>
+<code>add_points()</code> for adding (ordered) points; with the possibility of annotating them for all <code>Visualizer</code> types.</li>
+<li>Unified custom contour functionality (surface plots) in separate <code>add_contours()</code> method.</li>
+<li>Split objective vignette into <code>objective_functions</code>, <code>optimization_traces</code> and <code>advanced_visualization</code>; swapped out the <code>banana</code> objective for <code>GoldsteinPriceLog</code> and <code>boston_housing</code> for <code>california_housing</code>.</li>
+<li>Fixed bugs (optimization &amp; traces).</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.0" id="vistool-020">vistool 0.2.0<a class="anchor" aria-label="anchor" href="#vistool-020"></a></h2>
 <ul><li>Switched to <code>ggplot2</code> for the visualization of loss functions, model predictions and objectives (all 2D, non-interactive); the <code>plotly</code> implementation remains intact for interactive surface visualizations (in 3D, <code>type = "surface"</code> in <code><a href="../reference/as_visualizer.html">as_visualizer()</a></code>). The <code><a href="../reference/as_visualizer.html">as_visualizer()</a></code> interface, <code>save</code> functions and various other things were reworked to match this.</li>

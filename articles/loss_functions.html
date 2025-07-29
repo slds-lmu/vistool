@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">vistool</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,9 +33,12 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/loss_functions.html">Visualization of Loss Functions</a></li>
+<li><a class="dropdown-item" href="../articles/advanced_visualization.html">Advanced Visualization (TODO)</a></li>
+    <li><a class="dropdown-item" href="../articles/customization_guide.html">Customization Guide</a></li>
+    <li><a class="dropdown-item" href="../articles/loss_functions.html">Visualization of Loss Functions</a></li>
     <li><a class="dropdown-item" href="../articles/model.html">Visualization of Model Predictions</a></li>
-    <li><a class="dropdown-item" href="../articles/objective.html">Visualization of Objective Functions</a></li>
+    <li><a class="dropdown-item" href="../articles/objective_functions.html">Visualization of Objective Functions</a></li>
+    <li><a class="dropdown-item" href="../articles/optimization_traces.html">Optimization &amp; Traces</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -66,30 +69,28 @@
 
     
     
-<div class="section level2">
-<h2 id="loss-functions">Loss Functions<a class="anchor" aria-label="anchor" href="#loss-functions"></a>
-</h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://slds-lmu.github.io/vistool/">vistool</a></span><span class="op">)</span></span></code></pre></div>
-<p>The <code>VisualizerLossFunction</code> class visualizes loss
-functions. Loss functions are wrapped in <code>LossFunction</code>
-objects. The package includes a few predefined loss functions that are
-used for classification and regression.</p>
+<p>Loss functions are wrapped in <code>LossFunction</code> objects. The
+package includes predefined loss functions for both regression and
+classification tasks. Classification loss functions can work with
+different input scales (scores vs. probabilities).</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/as.data.table.html" class="external-link">as.data.table</a></span><span class="op">(</span><span class="va">dict_loss</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Key: &lt;key&gt;</span></span>
 <span><span class="co">#&gt;                     key                    label task_type</span></span>
 <span><span class="co">#&gt;                  &lt;char&gt;                   &lt;char&gt;    &lt;char&gt;</span></span>
-<span><span class="co">#&gt;  1:              cauchy              Cauchy Loss      regr</span></span>
-<span><span class="co">#&gt;  2:       cross-entropy                 Log Loss   classif</span></span>
-<span><span class="co">#&gt;  3: epsilon-insensitive Epsilon-Insensitive Loss      regr</span></span>
-<span><span class="co">#&gt;  4:               hinge               Hinge Loss   classif</span></span>
-<span><span class="co">#&gt;  5:               huber               Huber Loss      regr</span></span>
-<span><span class="co">#&gt;  6:               l1_ae        L1 Absolute Error      regr</span></span>
-<span><span class="co">#&gt;  7:               l2_se         L2 Squared Error      regr</span></span>
-<span><span class="co">#&gt;  8:         log-barrier         Log-Barrier Loss      regr</span></span>
-<span><span class="co">#&gt;  9:            log-cosh            Log-Cosh Loss      regr</span></span>
-<span><span class="co">#&gt; 10:             pinball             Pinball Loss      regr</span></span></code></pre></div>
+<span><span class="co">#&gt;  1:               brier              Brier Score   classif</span></span>
+<span><span class="co">#&gt;  2:              cauchy              Cauchy Loss      regr</span></span>
+<span><span class="co">#&gt;  3:       cross-entropy            Logistic Loss   classif</span></span>
+<span><span class="co">#&gt;  4: epsilon-insensitive Epsilon-Insensitive Loss      regr</span></span>
+<span><span class="co">#&gt;  5:               hinge               Hinge Loss   classif</span></span>
+<span><span class="co">#&gt;  6:               huber               Huber Loss      regr</span></span>
+<span><span class="co">#&gt;  7:               l1_ae        L1 Absolute Error      regr</span></span>
+<span><span class="co">#&gt;  8:               l2_se         L2 Squared Error      regr</span></span>
+<span><span class="co">#&gt;  9:         log-barrier         Log-Barrier Loss      regr</span></span>
+<span><span class="co">#&gt; 10:            log-cosh            Log-Cosh Loss      regr</span></span>
+<span><span class="co">#&gt; 11:             pinball             Pinball Loss      regr</span></span></code></pre></div>
 <p>To get a loss function from the dictionary, use the
 <code><a href="../reference/lss.html">lss()</a></code> function. Many loss functions support parameters
 (e.g., <code>quantile</code> for pinball loss, <code>delta</code> for
@@ -99,17 +100,18 @@ call. Here we retrieve the pinball loss function for regression with a
 custom quantile parameter.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">loss_function</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lss.html">lss</a></span><span class="op">(</span><span class="st">"pinball"</span>, quantile <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span></code></pre></div>
-</div>
 <div class="section level2">
 <h2 id="visualization">Visualization<a class="anchor" aria-label="anchor" href="#visualization"></a>
 </h2>
-<p>To visualize the loss function, use the <code><a href="../reference/as_visualizer.html">as_visualizer()</a></code>
-function. The <code>y_pred</code> arguments contains
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi><mo>−</mo><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">y - f(x)</annotation></semantics></math>
-(for regression losses) and <code>y_true</code> the true value
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>.
-By default, loss functions are plotted with 1000 points for smooth
-curves.</p>
+<p>To visualize a loss function, use the <code><a href="../reference/as_visualizer.html">as_visualizer()</a></code>
+function. For regression losses, the input represents residuals
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>r</mi><mo>=</mo><mi>y</mi><mo>−</mo><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">r = y - f(x)</annotation></semantics></math>.
+For classification losses, the input can be either margins
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi><mo>⋅</mo><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">y \cdot f(x)</annotation></semantics></math>
+(score-based) or probabilities
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>π</mi><annotation encoding="application/x-tex">\pi</annotation></semantics></math>
+(probability-based). By default, loss functions are plotted with 1000
+points for smooth curves.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">vis</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_visualizer.html">as_visualizer</a></span><span class="op">(</span><span class="va">loss_function</span>, y_pred <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">4</span>, <span class="fl">4</span><span class="op">)</span>, y_true <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p>Use the <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method to plot the loss function.</p>
@@ -127,7 +129,7 @@ curves.</p>
 <span><span class="va">loss_l1</span> <span class="op">=</span> <span class="fu"><a href="../reference/lss.html">lss</a></span><span class="op">(</span><span class="st">"l1_ae"</span><span class="op">)</span></span>
 <span><span class="va">loss_logcosh</span> <span class="op">=</span> <span class="fu"><a href="../reference/lss.html">lss</a></span><span class="op">(</span><span class="st">"log-cosh"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">vis_combined</span> <span class="op">=</span> <span class="va"><a href="../reference/VisualizerLossFuns.html">VisualizerLossFuns</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
+<span><span class="va">vis_combined</span> <span class="op">=</span> <span class="fu"><a href="../reference/as_visualizer.html">as_visualizer</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">loss_huber</span>, <span class="va">loss_l2</span>, <span class="va">loss_l1</span>, <span class="va">loss_logcosh</span><span class="op">)</span>,</span>
 <span>  y_pred <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">4</span>, <span class="fl">4</span><span class="op">)</span>,</span>
 <span>  y_true <span class="op">=</span> <span class="fl">0</span>,</span>
@@ -139,16 +141,69 @@ curves.</p>
 <div class="section level2">
 <h2 id="classification-loss-functions">Classification Loss Functions<a class="anchor" aria-label="anchor" href="#classification-loss-functions"></a>
 </h2>
-<p>Here we visualize classification loss functions, where
-<code>y_pred</code> contains
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi><mo>*</mo><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">y * f(x)</annotation></semantics></math>:</p>
+<p>Classification loss functions can operate on different input scales
+depending on the loss function. Some work with scores, while others work
+with probabilities.</p>
+<div class="section level3">
+<h3 id="score-based-classification-losses">Score-based Classification Losses<a class="anchor" aria-label="anchor" href="#score-based-classification-losses"></a>
+</h3>
+<p>Score-based losses operate on the margin
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi><mo>⋅</mo><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">y \cdot f(x)</annotation></semantics></math>
+where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi><mo>∈</mo><mo stretchy="false" form="prefix">{</mo><mo>−</mo><mn>1</mn><mo>,</mo><mo>+</mo><mn>1</mn><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">y \in \{-1, +1\}</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f(x)</annotation></semantics></math>
+is the prediction score:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">hinge_loss</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lss.html">lss</a></span><span class="op">(</span><span class="st">"hinge"</span><span class="op">)</span></span>
+<span><span class="va">crossentropy_loss</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lss.html">lss</a></span><span class="op">(</span><span class="st">"cross-entropy"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">vis_scores</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_visualizer.html">as_visualizer</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">hinge_loss</span>, <span class="va">crossentropy_loss</span><span class="op">)</span>,</span>
+<span>  input_type <span class="op">=</span> <span class="st">"score"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">vis_scores</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="loss_functions_files/figure-html/unnamed-chunk-8-1.png" width="100%"></p>
+</div>
+<div class="section level3">
+<h3 id="probability-based-classification-losses">Probability-based Classification Losses<a class="anchor" aria-label="anchor" href="#probability-based-classification-losses"></a>
+</h3>
+<p>Probability-based losses operate on predicted probabilities
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>π</mi><mo>∈</mo><mrow><mo stretchy="true" form="prefix">[</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">\pi \in [0, 1]</annotation></semantics></math>.
+The cross-entropy loss can be expressed in both score and probability
+forms, while the Brier score is naturally probability-based:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">brier_loss</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lss.html">lss</a></span><span class="op">(</span><span class="st">"brier"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">vis_probs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_visualizer.html">as_visualizer</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">crossentropy_loss</span>, <span class="va">brier_loss</span><span class="op">)</span>,</span>
+<span>  input_type <span class="op">=</span> <span class="st">"probability"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">vis_probs</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><img src="loss_functions_files/figure-html/unnamed-chunk-9-1.png" width="100%"></p>
+</div>
+<div class="section level3">
+<h3 id="controlling-which-class-curves-to-display">Controlling Which Class Curves to Display<a class="anchor" aria-label="anchor" href="#controlling-which-class-curves-to-display"></a>
+</h3>
+<p>When visualizing probability-based losses, you can control whether to
+show curves for the positive class (<code>y = 1</code>), negative class
+(<code>y = 0</code>), or both (default) using the <code>y_curves</code>
+parameter:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">vis_y1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_visualizer.html">as_visualizer</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">crossentropy_loss</span>, <span class="va">brier_loss</span><span class="op">)</span>,</span>
+<span>  input_type <span class="op">=</span> <span class="st">"probability"</span>,</span>
+<span>  y_curves <span class="op">=</span> <span class="st">"y1"</span>  <span class="co"># Only show y = 1 curve</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">vis_y1</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><img src="loss_functions_files/figure-html/unnamed-chunk-10-1.png" width="100%"></p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="custom-loss-functions">Custom Loss Functions<a class="anchor" aria-label="anchor" href="#custom-loss-functions"></a>
 </h2>
 <p>We can also define and visualize custom loss functions:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">custom_loss</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/LossFunction.html">LossFunction</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
 <span>  id <span class="op">=</span> <span class="st">"custom_loss"</span>,</span>
 <span>  label <span class="op">=</span> <span class="st">"Sinusoidal-Exponential Loss"</span>,</span>
@@ -158,7 +213,7 @@ curves.</p>
 <span></span>
 <span><span class="va">vis</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_visualizer.html">as_visualizer</a></span><span class="op">(</span><span class="va">custom_loss</span>, y_pred <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, y_true <span class="op">=</span> <span class="fl">0</span>, n_points <span class="op">=</span> <span class="fl">5000L</span><span class="op">)</span></span>
 <span><span class="va">vis</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="loss_functions_files/figure-html/unnamed-chunk-9-1.png" width="100%"></p>
+<p><img src="loss_functions_files/figure-html/unnamed-chunk-11-1.png" width="100%"></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

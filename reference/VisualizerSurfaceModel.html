@@ -9,7 +9,7 @@ for 2D input data using plotly."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">vistool</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -20,9 +20,12 @@ for 2D input data using plotly."></head><body>
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/loss_functions.html">Visualization of Loss Functions</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/advanced_visualization.html">Advanced Visualization (TODO)</a></li>
+    <li><a class="dropdown-item" href="../articles/customization_guide.html">Customization Guide</a></li>
+    <li><a class="dropdown-item" href="../articles/loss_functions.html">Visualization of Loss Functions</a></li>
     <li><a class="dropdown-item" href="../articles/model.html">Visualization of Model Predictions</a></li>
-    <li><a class="dropdown-item" href="../articles/objective.html">Visualization of Objective Functions</a></li>
+    <li><a class="dropdown-item" href="../articles/objective_functions.html">Visualization of Objective Functions</a></li>
+    <li><a class="dropdown-item" href="../articles/optimization_traces.html">Optimization &amp; Traces</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -72,9 +75,12 @@ Learner used to train the model.</p></dd>
 
 <ul><li><p><a href="#method-VisualizerSurfaceModel-new"><code>VisualizerSurfaceModel$new()</code></a></p></li>
 <li><p><a href="#method-VisualizerSurfaceModel-add_training_data"><code>VisualizerSurfaceModel$add_training_data()</code></a></p></li>
-<li><p><a href="#method-VisualizerSurfaceModel-add_decision_boundary"><code>VisualizerSurfaceModel$add_decision_boundary()</code></a></p></li>
+<li><p><a href="#method-VisualizerSurfaceModel-add_boundary"><code>VisualizerSurfaceModel$add_boundary()</code></a></p></li>
 <li><p><a href="#method-VisualizerSurfaceModel-clone"><code>VisualizerSurfaceModel$clone()</code></a></p></li>
-</ul></div><p><details><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href="Visualizer.html#method-save"><code>vistool::Visualizer$save()</code></a></span></li>
+</ul></div><p><details><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="add_points"><a href="Visualizer.html#method-add_points"><code>vistool::Visualizer$add_points()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="initialize_defaults"><a href="Visualizer.html#method-initialize_defaults"><code>vistool::Visualizer$initialize_defaults()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href="Visualizer.html#method-save"><code>vistool::Visualizer$save()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="add_contours"><a href="VisualizerSurface.html#method-add_contours"><code>vistool::VisualizerSurface$add_contours()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="init_layer_contour"><a href="VisualizerSurface.html#method-init_layer_contour"><code>vistool::VisualizerSurface$init_layer_contour()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="init_layer_surface"><a href="VisualizerSurface.html#method-init_layer_surface"><code>vistool::VisualizerSurface$init_layer_surface()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="plot"><a href="VisualizerSurface.html#method-plot"><code>vistool::VisualizerSurface$plot()</code></a></span></li>
@@ -90,7 +96,11 @@ Learner used to train the model.</p></dd>
 <span>  x1_limits <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  x2_limits <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  padding <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  n_points <span class="op">=</span> <span class="fl">100L</span></span>
+<span>  n_points <span class="op">=</span> <span class="fl">100L</span>,</span>
+<span>  opacity <span class="op">=</span> <span class="fl">0.8</span>,</span>
+<span>  colorscale <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="st">"#440154"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.25</span>, <span class="st">"#3b528b"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="st">"#21908c"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.75</span>,</span>
+<span>    <span class="st">"#5dc863"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="st">"#fde725"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  show_title <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -111,9 +121,25 @@ The learner to train the model with.</p></dd>
 The x1 limits.</p></dd>
 
 
+<dt><code>x1_limits</code></dt>
+<dd><p>(`numeric(2)`)<br>
+The x1 limits.</p></dd>
+
+
 <dt><code>x2_limits</code></dt>
 <dd><p>(`numeric(2)`)<br>
 The x2 limits.</p></dd>
+
+
+<dt><code>x2_limits</code></dt>
+<dd><p>(`numeric(2)`)<br>
+The x2 limits.</p></dd>
+
+
+<dt><code>padding</code></dt>
+<dd><p>(`numeric(1)`)<br>
+A margin that is added to x1limits and x2limits.
+The x1 margin is calculated by `max(x1lmits) - min(x1limits) * padding`.</p></dd>
 
 
 <dt><code>padding</code></dt>
@@ -126,6 +152,37 @@ The x1 margin is calculated by `max(x1lmits) - min(x1limits) * padding`.</p></dd
 <dd><p>(`integer(1)`)<br>
 The number of generated point per dimension.
 Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.</p></dd>
+
+
+<dt><code>n_points</code></dt>
+<dd><p>(`integer(1)`)<br>
+The number of generated point per dimension.
+Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.</p></dd>
+
+
+<dt><code>opacity</code></dt>
+<dd><p>(`numeric(1)`)<br>
+Opacity of the layer.</p></dd>
+
+
+<dt><code>opacity</code></dt>
+<dd><p>(`numeric(1)`)<br>
+Opacity of the layer.</p></dd>
+
+
+<dt><code>colorscale</code></dt>
+<dd><p>(`list()`)<br>
+The coloring of the surface/contour.</p></dd>
+
+
+<dt><code>colorscale</code></dt>
+<dd><p>(`list()`)<br>
+The coloring of the surface/contour.</p></dd>
+
+
+<dt><code>show_title</code></dt>
+<dd><p>(`logical(1)`)<br>
+Indicator whether to show the title of the plot.</p></dd>
 
 
 </dl><p></p></div>
@@ -158,23 +215,29 @@ Further arguments passed to `add_trace(...)`.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-VisualizerSurfaceModel-add_decision_boundary"></a><div class="section">
-<h3 id="method-add-decision-boundary-">Method <code>add_decision_boundary()</code><a class="anchor" aria-label="anchor" href="#method-add-decision-boundary-"></a></h3>
-<p>Adds the decision boundary to the plot.</p><div class="section">
+</div><p></p><hr><a id="method-VisualizerSurfaceModel-add_boundary"></a><div class="section">
+<h3 id="method-add-boundary-">Method <code>add_boundary()</code><a class="anchor" aria-label="anchor" href="#method-add-boundary-"></a></h3>
+<p>Adds boundary surface(s) to the plot at specified values.</p><div class="section">
 <h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">VisualizerSurfaceModel</span><span class="op">$</span><span class="fu">add_decision_boundary</span><span class="op">(</span>threshold <span class="op">=</span> <span class="fl">0.5</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">VisualizerSurfaceModel</span><span class="op">$</span><span class="fu">add_boundary</span><span class="op">(</span>values <span class="op">=</span> <span class="cn">NULL</span>, color <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
 <h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>threshold</code></dt>
-<dd><p>(`numeric(1)`)<br>
-Threshold for the decision boundary.</p></dd>
+<p></p><div class="arguments"><dl><dt><code>values</code></dt>
+<dd><p>(`numeric()`)<br>
+Vector of z-values where to draw boundary surfaces. For classification with probability predictions,
+defaults to 0.5. For regression or response predictions, defaults to quantiles of predictions.</p></dd>
+
+
+<dt><code>color</code></dt>
+<dd><p>(`character(1)` or `list()`)<br>
+Color specification for boundary surfaces. Default uses a neutral colorscale.</p></dd>
 
 
 <dt><code>...</code></dt>
 <dd><p>(`any`)<br>
-Further arguments passed to `add_trace(...)`.</p></dd>
+Further arguments passed to `add_trace(...)` or `add_surface(...)`.</p></dd>
 
 
 </dl><p></p></div>

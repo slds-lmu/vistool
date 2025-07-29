@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="index.html">vistool</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -18,9 +18,12 @@
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="articles/loss_functions.html">Visualization of Loss Functions</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="articles/advanced_visualization.html">Advanced Visualization (TODO)</a></li>
+    <li><a class="dropdown-item" href="articles/customization_guide.html">Customization Guide</a></li>
+    <li><a class="dropdown-item" href="articles/loss_functions.html">Visualization of Loss Functions</a></li>
     <li><a class="dropdown-item" href="articles/model.html">Visualization of Model Predictions</a></li>
-    <li><a class="dropdown-item" href="articles/objective.html">Visualization of Objective Functions</a></li>
+    <li><a class="dropdown-item" href="articles/objective_functions.html">Visualization of Objective Functions</a></li>
+    <li><a class="dropdown-item" href="articles/optimization_traces.html">Optimization &amp; Traces</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -57,28 +60,30 @@
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">test</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Run specific test file</span></span>
-<span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/test_file.html" class="external-link">test_file</a></span><span class="op">(</span><span class="st">"tests/testthat/test-Objective.R"</span><span class="op">)</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">test_active_file</span><span class="op">(</span><span class="st">'tests/testthat/test-plot-customization.R'</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Install package locally</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a></h3>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Generate function documentation from roxygen2 comments</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">document</span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Build README.md from README.Rmd</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">build_readme</span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Build all vignettes</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">build_vignettes</span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Build package website</span></span>
-<span><span class="fu">pkgdown</span><span class="fu">::</span><span class="fu"><a href="https://pkgdown.r-lib.org/reference/build_site.html" class="external-link">build_site</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Preview website locally</span></span>
-<span><span class="fu">pkgdown</span><span class="fu">::</span><span class="fu"><a href="https://pkgdown.r-lib.org/reference/preview_site.html" class="external-link">preview_site</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># Generate function documentation from roxygen2 comments</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">document</span>()</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="co"># Build README.md from README.Rmd</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">build_readme</span>()</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co"># Build all vignettes</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">build_vignettes</span>()</span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co"># Build a specific vignette</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>R <span class="sc">-</span>e <span class="st">"devtools::load_all(); rmarkdown::render('vignettes/loss_functions.Rmd')"</span></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="co"># Build package website</span></span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a>pkgdown<span class="sc">::</span><span class="fu">build_site</span>()</span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co"># Preview website locally</span></span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a>pkgdown<span class="sc">::</span><span class="fu">preview_site</span>()</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="testing">Testing<a class="anchor" aria-label="anchor" href="#testing"></a></h3>
@@ -142,21 +147,43 @@
 </ul></li>
 <li>
 <strong><code><a href="reference/as_visualizer.html">as_visualizer()</a></code></strong>: Smart constructor that selects appropriate visualizer</li>
+</ul><div class="section level3">
+<h3 id="deferred-rendering">Deferred Rendering<a class="anchor" aria-label="anchor" href="#deferred-rendering"></a></h3>
+<p>All visualizer classes (should) use a deferred rendering architecture:</p>
+<ul><li>
+<strong>Layer Storage</strong>: All <code>add_*()</code> methods (e.g., <code>$add_points()</code>, <code>$add_contours()</code>, etc.) do not modify the plot directly. Instead, they call the private method <code>$store_layer(type, spec)</code> to save a specification of the layer (its type and parameters) to an internal list.</li>
+<li>
+<strong>Rendering</strong>: The <code>$plot()</code> method is responsible for rendering all stored layers. It iterates over the stored layer specifications and calls a private <code>$render_layer(layer)</code> method to add each layer to the plot object. This ensures that all visual properties (such as colors, alpha, etc.) are resolved at plot time, using the current global settings.</li>
+<li>
+<strong>Customization</strong>: Global settings (e.g., color palette, theme, text size) are set via <code>$plot()</code>. Layer-specific settings are passed to the relevant <code>add_*()</code> method and stored with the layer specification. Defaults are set at initialization.</li>
+<li>
+<strong>Benefits</strong>: This pattern ensures that plots are always up-to-date with the latest settings, supports re-plotting with different global options, and makes it easier to add, remove, or reorder layers.</li>
 </ul></div>
+<div class="section level3">
+<h3 id="example-workflow">Example Workflow<a class="anchor" aria-label="anchor" href="#example-workflow"></a></h3>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">viz</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/as_visualizer.html">as_visualizer</a></span><span class="op">(</span><span class="va">obj</span>, type <span class="op">=</span> <span class="st">"surface"</span><span class="op">)</span></span>
+<span><span class="va">viz</span><span class="op">$</span><span class="fu">add_points</span><span class="op">(</span>points <span class="op">=</span> <span class="va">my_points</span>, color <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span></span>
+<span><span class="va">viz</span><span class="op">$</span><span class="fu">add_contours</span><span class="op">(</span>contours <span class="op">=</span> <span class="va">my_contours</span><span class="op">)</span></span>
+<span><span class="co"># No plot is created yet!</span></span>
+<span></span>
+<span><span class="va">viz</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span>color_palette <span class="op">=</span> <span class="st">"grayscale"</span><span class="op">)</span>  <span class="co"># All layers are rendered now</span></span></code></pre></div>
+</div>
+</div>
 <div class="section level2">
 <h2 id="development-workflow">Development Workflow<a class="anchor" aria-label="anchor" href="#development-workflow"></a></h2>
 <div class="section level3">
 <h3 id="id_1-setup-development-environment">1. Setup Development Environment<a class="anchor" aria-label="anchor" href="#id_1-setup-development-environment"></a></h3>
-<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/slds-lmu/vistool.git</span>
-<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="bu">cd</span> vistool</span></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/slds-lmu/vistool.git</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="bu">cd</span> vistool</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">load_all</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_deps</span><span class="op">(</span>dependencies <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="id_2-make-changes">2. Make Changes<a class="anchor" aria-label="anchor" href="#id_2-make-changes"></a></h3>
 <p>Edit files in <code>R/</code>, add roxygen2 documentation:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#' @title Brief description</span></span>
 <span><span class="co">#' @description Detailed description  </span></span>
 <span><span class="co">#' @param x Parameter description</span></span>
@@ -171,14 +198,14 @@
 </div>
 <div class="section level3">
 <h3 id="id_3-update-documentation">3. Update Documentation<a class="anchor" aria-label="anchor" href="#id_3-update-documentation"></a></h3>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">document</span><span class="op">(</span><span class="op">)</span>  <span class="co"># Generate man/ files</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">build_readme</span><span class="op">(</span><span class="op">)</span>  <span class="co"># Update README.md</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="id_4-add-tests">4. Add Tests<a class="anchor" aria-label="anchor" href="#id_4-add-tests"></a></h3>
 <p>Test all public functions using <code>testthat</code>:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">test_that</span><span class="op">(</span><span class="st">"my feature works"</span>, <span class="op">{</span></span>
 <span>  <span class="va">result</span> <span class="op">=</span> <span class="fu">my_function</span><span class="op">(</span><span class="va">input</span><span class="op">)</span></span>
 <span>  <span class="fu">expect_equal</span><span class="op">(</span><span class="va">result</span>, <span class="va">expected</span><span class="op">)</span></span>
@@ -186,55 +213,39 @@
 </div>
 <div class="section level3">
 <h3 id="id_5-check-package">5. Check Package<a class="anchor" aria-label="anchor" href="#id_5-check-package"></a></h3>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">test</span><span class="op">(</span><span class="op">)</span>    <span class="co"># Run tests</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">check</span><span class="op">(</span><span class="op">)</span>   <span class="co"># Full package check</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="id_6-build-documentation-site">6. Build Documentation Site<a class="anchor" aria-label="anchor" href="#id_6-build-documentation-site"></a></h3>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<p>You can also check the rendered website:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">pkgdown</span><span class="fu">::</span><span class="fu"><a href="https://pkgdown.r-lib.org/reference/build_site.html" class="external-link">build_site</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
-<h2 id="testing-guidelines">Testing Guidelines<a class="anchor" aria-label="anchor" href="#testing-guidelines"></a></h2>
+<h2 id="guidelines">Guidelines<a class="anchor" aria-label="anchor" href="#guidelines"></a></h2>
+<div class="section level3">
+<h3 id="testing-1">Testing<a class="anchor" aria-label="anchor" href="#testing-1"></a></h3>
 <ul><li>Each R file should have corresponding test file</li>
 <li>Use descriptive test names: <code>test_that("objective evaluation works", ...)</code>
 </li>
 <li>Test both success and failure cases</li>
 <li>Use appropriate <code>expect_*()</code> functions</li>
-</ul><div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+</ul><div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Skip tests requiring Python dependencies on CI</span></span>
 <span><span class="fu">skip_on_ci</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Skip if optional package not available  </span></span>
 <span><span class="fu">skip_if_not_installed</span><span class="op">(</span><span class="st">"plotly"</span><span class="op">)</span></span></code></pre></div>
 </div>
-<div class="section level2">
-<h2 id="documentation-guidelines">Documentation Guidelines<a class="anchor" aria-label="anchor" href="#documentation-guidelines"></a></h2>
 <div class="section level3">
-<h3 id="roxygen2"><code>roxygen2</code><a class="anchor" aria-label="anchor" href="#roxygen2"></a></h3>
+<h3 id="documentation-with-roxygen2">Documentation with <code>roxygen2</code>
+<a class="anchor" aria-label="anchor" href="#documentation-with-roxygen2"></a></h3>
 <ul><li>Use <code>roxygen2</code> tags (<code>@title</code>, <code>@description</code>, <code>@param</code>, <code>@return</code>, <code>@examples</code>)</li>
 <li>Include working examples</li>
 <li>Document all parameters</li>
 <li>Use consistent style with existing code</li>
 <li>For reusable documentation blocks, use templates in <code>man-roxygen/</code> directory.</li>
 </ul></div>
-<div class="section level3">
-<h3 id="vignettes-long-form-documentation">Vignettes (long form documentation)<a class="anchor" aria-label="anchor" href="#vignettes-long-form-documentation"></a></h3>
-<ul><li>
-<code>objective.Rmd</code>: Objective function visualization</li>
-<li>
-<code>model.Rmd</code>: Model prediction visualization</li>
-<li>
-<code>loss_functions.Rmd</code>: Loss function visualization</li>
-</ul><div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Build all vignettes</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">build_vignettes</span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Build specific vignette</span></span>
-<span><span class="fu">rmarkdown</span><span class="fu">::</span><span class="fu"><a href="https://pkgs.rstudio.com/rmarkdown/reference/render.html" class="external-link">render</a></span><span class="op">(</span><span class="st">"vignettes/objective.Rmd"</span><span class="op">)</span></span></code></pre></div>
-</div>
 </div>
 </div>
 

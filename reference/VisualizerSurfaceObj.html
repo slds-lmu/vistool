@@ -9,7 +9,7 @@ for 2D objectives using plotly."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">vistool</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -20,9 +20,12 @@ for 2D objectives using plotly."></head><body>
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/loss_functions.html">Visualization of Loss Functions</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/advanced_visualization.html">Advanced Visualization (TODO)</a></li>
+    <li><a class="dropdown-item" href="../articles/customization_guide.html">Customization Guide</a></li>
+    <li><a class="dropdown-item" href="../articles/loss_functions.html">Visualization of Loss Functions</a></li>
     <li><a class="dropdown-item" href="../articles/model.html">Visualization of Model Predictions</a></li>
-    <li><a class="dropdown-item" href="../articles/objective.html">Visualization of Objective Functions</a></li>
+    <li><a class="dropdown-item" href="../articles/objective_functions.html">Visualization of Objective Functions</a></li>
+    <li><a class="dropdown-item" href="../articles/optimization_traces.html">Optimization &amp; Traces</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -67,14 +70,17 @@ The objective function.</p></dd>
 
 <ul><li><p><a href="#method-VisualizerSurfaceObj-new"><code>VisualizerSurfaceObj$new()</code></a></p></li>
 <li><p><a href="#method-VisualizerSurfaceObj-add_optimization_trace"><code>VisualizerSurfaceObj$add_optimization_trace()</code></a></p></li>
+<li><p><a href="#method-VisualizerSurfaceObj-plot"><code>VisualizerSurfaceObj$plot()</code></a></p></li>
 <li><p><a href="#method-VisualizerSurfaceObj-add_layer_taylor"><code>VisualizerSurfaceObj$add_layer_taylor()</code></a></p></li>
 <li><p><a href="#method-VisualizerSurfaceObj-add_layer_hessian"><code>VisualizerSurfaceObj$add_layer_hessian()</code></a></p></li>
 <li><p><a href="#method-VisualizerSurfaceObj-animate"><code>VisualizerSurfaceObj$animate()</code></a></p></li>
 <li><p><a href="#method-VisualizerSurfaceObj-clone"><code>VisualizerSurfaceObj$clone()</code></a></p></li>
-</ul></div><p><details><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href="Visualizer.html#method-save"><code>vistool::Visualizer$save()</code></a></span></li>
+</ul></div><p><details><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="add_points"><a href="Visualizer.html#method-add_points"><code>vistool::Visualizer$add_points()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="initialize_defaults"><a href="Visualizer.html#method-initialize_defaults"><code>vistool::Visualizer$initialize_defaults()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href="Visualizer.html#method-save"><code>vistool::Visualizer$save()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="add_contours"><a href="VisualizerSurface.html#method-add_contours"><code>vistool::VisualizerSurface$add_contours()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="init_layer_contour"><a href="VisualizerSurface.html#method-init_layer_contour"><code>vistool::VisualizerSurface$init_layer_contour()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="init_layer_surface"><a href="VisualizerSurface.html#method-init_layer_surface"><code>vistool::VisualizerSurface$init_layer_surface()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="plot"><a href="VisualizerSurface.html#method-plot"><code>vistool::VisualizerSurface$plot()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="set_layout"><a href="VisualizerSurface.html#method-set_layout"><code>vistool::VisualizerSurface$set_layout()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="set_scene"><a href="VisualizerSurface.html#method-set_scene"><code>vistool::VisualizerSurface$set_scene()</code></a></span></li>
 </ul></details></p><hr><a id="method-VisualizerSurfaceObj-new"></a><div class="section">
@@ -86,7 +92,11 @@ The objective function.</p></dd>
 <span>  x1_limits <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  x2_limits <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  padding <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  n_points <span class="op">=</span> <span class="fl">100L</span></span>
+<span>  n_points <span class="op">=</span> <span class="fl">100L</span>,</span>
+<span>  opacity <span class="op">=</span> <span class="fl">0.8</span>,</span>
+<span>  colorscale <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="st">"#440154"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.25</span>, <span class="st">"#3b528b"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="st">"#21908c"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.75</span>,</span>
+<span>    <span class="st">"#5dc863"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="st">"#fde725"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  show_title <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -102,9 +112,25 @@ The objective to optimize.</p></dd>
 The x1 limits.</p></dd>
 
 
+<dt><code>x1_limits</code></dt>
+<dd><p>(`numeric(2)`)<br>
+The x1 limits.</p></dd>
+
+
 <dt><code>x2_limits</code></dt>
 <dd><p>(`numeric(2)`)<br>
 The x2 limits.</p></dd>
+
+
+<dt><code>x2_limits</code></dt>
+<dd><p>(`numeric(2)`)<br>
+The x2 limits.</p></dd>
+
+
+<dt><code>padding</code></dt>
+<dd><p>(`numeric(1)`)<br>
+A margin that is added to x1limits and x2limits.
+The x1 margin is calculated by `max(x1lmits) - min(x1limits) * padding`.</p></dd>
 
 
 <dt><code>padding</code></dt>
@@ -117,6 +143,37 @@ The x1 margin is calculated by `max(x1lmits) - min(x1limits) * padding`.</p></dd
 <dd><p>(`integer(1)`)<br>
 The number of generated point per dimension.
 Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.</p></dd>
+
+
+<dt><code>n_points</code></dt>
+<dd><p>(`integer(1)`)<br>
+The number of generated point per dimension.
+Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.</p></dd>
+
+
+<dt><code>opacity</code></dt>
+<dd><p>(`numeric(1)`)<br>
+Opacity of the layer.</p></dd>
+
+
+<dt><code>opacity</code></dt>
+<dd><p>(`numeric(1)`)<br>
+Opacity of the layer.</p></dd>
+
+
+<dt><code>colorscale</code></dt>
+<dd><p>(`list()`)<br>
+The coloring of the surface/contour.</p></dd>
+
+
+<dt><code>colorscale</code></dt>
+<dd><p>(`list()`)<br>
+The coloring of the surface/contour.</p></dd>
+
+
+<dt><code>show_title</code></dt>
+<dd><p>(`logical(1)`)<br>
+Indicator whether to show the title of the plot.</p></dd>
 
 
 </dl><p></p></div>
@@ -207,10 +264,31 @@ The colors for the markers.</p></dd>
 </dl><p></p></div>
 </div>
 
+</div><p></p><hr><a id="method-VisualizerSurfaceObj-plot"></a><div class="section">
+<h3 id="method-plot-">Method <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code><a class="anchor" aria-label="anchor" href="#method-plot-"></a></h3>
+<p>Renders the surface plot with all added layers.</p><div class="section">
+<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">VisualizerSurfaceObj</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>...</code></dt>
+<dd><p>(`any`)<br>
+Additional arguments passed to the parent plot method.</p></dd>
+
+
+</dl><p></p></div>
+</div>
+<div class="section">
+<h4 id="returns">Returns<a class="anchor" aria-label="anchor" href="#returns"></a></h4>
+<p>The plotly object.</p>
+</div>
+
 </div><p></p><hr><a id="method-VisualizerSurfaceObj-add_layer_taylor"></a><div class="section">
 <h3 id="method-add-layer-taylor-">Method <code>add_layer_taylor()</code><a class="anchor" aria-label="anchor" href="#method-add-layer-taylor-"></a></h3>
 <p>Add a Taylor approximation (for 1 and 2 degrees).</p><div class="section">
-<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
+<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">VisualizerSurfaceObj</span><span class="op">$</span><span class="fu">add_layer_taylor</span><span class="op">(</span></span>
 <span>  <span class="va">x0</span>,</span>
 <span>  degree <span class="op">=</span> <span class="fl">2</span>,</span>
@@ -223,7 +301,7 @@ The colors for the markers.</p></dd>
 </div>
 
 <div class="section">
-<h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
+<h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>x0</code></dt>
 <dd><p>(`numeric()) `<br>
 The point around which the approximation is done.</p></dd>
@@ -266,12 +344,12 @@ Additional parameter passed to `add_surface()`.</p></dd>
 </div><p></p><hr><a id="method-VisualizerSurfaceObj-add_layer_hessian"></a><div class="section">
 <h3 id="method-add-layer-hessian-">Method <code>add_layer_hessian()</code><a class="anchor" aria-label="anchor" href="#method-add-layer-hessian-"></a></h3>
 <p>Add two "arrows" as eigenvectors of the Hessian.</p><div class="section">
-<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
+<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">VisualizerSurfaceObj</span><span class="op">$</span><span class="fu">add_layer_hessian</span><span class="op">(</span><span class="va">x0</span>, x1length <span class="op">=</span> <span class="fl">0.1</span>, x2length <span class="op">=</span> <span class="fl">0.1</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
+<h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>x0</code></dt>
 <dd><p>(`numeric(2)`)<br>
 The point at which the Hessian is calculated.</p></dd>
@@ -298,7 +376,7 @@ Additional arguments passed to `add_trace`.</p></dd>
 </div><p></p><hr><a id="method-VisualizerSurfaceObj-animate"></a><div class="section">
 <h3 id="method-animate-">Method <code>animate()</code><a class="anchor" aria-label="anchor" href="#method-animate-"></a></h3>
 <p>Create an animation of `$plot()`.</p><div class="section">
-<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
+<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">VisualizerSurfaceObj</span><span class="op">$</span><span class="fu">animate</span><span class="op">(</span></span>
 <span>  dir <span class="op">=</span> <span class="st">"animation"</span>,</span>
 <span>  nframes <span class="op">=</span> <span class="fl">10L</span>,</span>
@@ -311,7 +389,7 @@ Additional arguments passed to `add_trace`.</p></dd>
 </div>
 
 <div class="section">
-<h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
+<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>dir</code></dt>
 <dd><p>(`character(1)`)<br>
 The directory in which all the images are saved.</p></dd>
@@ -355,12 +433,12 @@ Additional arguments passed to `$save(...)`.</p></dd>
 </div><p></p><hr><a id="method-VisualizerSurfaceObj-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
+<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">VisualizerSurfaceObj</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
+<h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 
