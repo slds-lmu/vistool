@@ -67,7 +67,7 @@ test_that("2D Model boundary works with regression", {
   learner <- lrn("regr.svm")
 
   vis <- Visualizer2DModel$new(task, learner)
-  vis$add_boundary() # Should use quantiles for regression
+  vis$add_boundary() # Should use median for regression
 
   p <- vis$plot()
   expect_s3_class(p, "gg")

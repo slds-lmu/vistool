@@ -147,7 +147,7 @@ Visualizer2DModel <- R6::R6Class("Visualizer2DModel",
     #'
     #' @param values (`numeric()`)\cr
     #'   Vector of values where to draw boundary contours. For classification with probability predictions,
-    #'   defaults to 0.5. For regression or response predictions, defaults to quantiles of predictions.
+    #'   defaults to 0.5. For regression or response predictions, defaults to the median of predictions.
     #' @param color (`character(1)`)\cr
     #'   Color of the boundary lines. Default is "black".
     #' @param line_width (`numeric(1)`)\cr
@@ -168,8 +168,8 @@ Visualizer2DModel <- R6::R6Class("Visualizer2DModel",
         if (self$learner$predict_type == "prob") {
           values <- 0.5
         } else {
-          # For regression or response predictions, use quantiles
-          values <- quantile(self$fun_y, c(0.25, 0.5, 0.75), na.rm = TRUE)
+          # For regression or response predictions, use median (single central tendency)
+          values <- median(self$fun_y, na.rm = TRUE)
         }
       } else {
         # Validate that boundary values are within the prediction range

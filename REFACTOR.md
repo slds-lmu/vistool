@@ -26,72 +26,44 @@ viz$add_contours(contours = my_contours)
 viz$plot(color_palette = "grayscale")  # All layers are rendered now, also resolving colors
 ```
 
-### OVERVIEW OF CURRENT STATE
+## OVERVIEW OF CURRENT STATE
 
-Based on analysis of all Visualizer classes, here's the current deferred rendering implementation status:
+### `plot()` Method Locations
+- **Base class**: `Visualizer.R` (abstract)
+- **Override heavy**: `Visualizer1D`, `Visualizer2D`, `VisualizerSurface`, `VisualizerLossFuns`
+- **Override simple**: `Visualizer2DModel`, `Visualizer2DObj`, `VisualizerSurfaceObj`
+- **Use parent**: `Visualizer1DModel`, `Visualizer1DObj`, `VisualizerSurfaceModel`
 
-#### ✅ **Fully Implemented (Excellent Examples)**
+### `add_*()` Method Distribution
+- **Base**: `add_points()` in `Visualizer.R`
+- **Model classes**: `add_training_data()`, `add_boundary()`
+- **Objective classes**: `add_optimization_trace()`
+- **Surface objective**: `add_taylor()`, `add_hessian()`
+- **Loss functions**: `add_points()` (specialized)
+- **Surface**: `add_contours()`
 
-- **`Visualizer.R`** - Perfect base implementation
-  - ✅ `store_layer()`, `get_layer()`, `get_layers_by_type()` methods
-  - ✅ `resolve_layer_colors()` for color resolution at plot time
-  - ✅ `add_points()` uses deferred rendering correctly
-  - ✅ Helper methods `add_points_to_ggplot()` and `add_points_to_plotly()`
+## Issues Identified
 
-- **`Visualizer1DObj.R`** - Good implementation
-  - ✅ `add_optimization_trace()` uses `store_layer()` correctly
-  - ✅ Plot method renders stored layers properly
+### 1. **Inconsistent plot() Override Patterns**
+- Some classes properly delegate to parent (good): `VisualizerSurfaceObj`
+- Others completely override (sometimes necessary): `Visualizer1D`, `Visualizer2D`
+- Some have minimal overrides (good): `Visualizer2DObj`
 
-- **`Visualizer2DObj.R`** - Good implementation  
-  - ✅ `add_optimization_trace()` uses `store_layer()` correctly
-  - ✅ Plot method iterates through stored layers and renders them
+### 2. **Color Management Inconsistencies** 
+- Most classes use `"auto"` color system correctly
+- Some hardcoded colors remain in older implementations
 
-- **`VisualizerSurface.R`** - Good implementation
-  - ✅ `add_contours()` uses `store_layer()` correctly
-  - ✅ Plot method calls `render_stored_layers()`
-    (render training data and boundary SHOULD BE MOVED TO VisualizerSurfaceModel)
+**Changes Made:**
+- **`Visualizer1D.R`**: Removed direct optimization trace rendering from `plot()` method
+- **`Visualizer1DObj.R`**: Added proper `plot()` method that calls `super$plot()` first, then renders optimization traces using deferred system with dedicated private methods `render_optimization_trace_layers()` and `render_optimization_trace_layer()`
+- **`Visualizer2DObj.R`**: Refactored existing `plot()` method to follow the same pattern - simplified to call `super$plot()` first, then use dedicated private rendering methods
+- **Architecture**: All objective visualizers now follow the same consistent pattern as `VisualizerSurfaceObj`
 
-- **`VisualizerSurfaceObj.R`** - Good implementation
-  - ✅ `add_optimization_trace()` uses `store_layer()` correctly
-  - ✅ Has `render_optimization_trace_layers()` and `render_optimization_trace_layer()` methods
+### Medium Priority
+2. **Standardize plot() override patterns** - prefer delegation where possible
+3. **Review and clean up color management** - ensure all use unified system
+4. **Add consistent error handling** for layer rendering failures
 
-- **`Visualizer1DModel.R`** - Good implementation
-  - ✅ `add_training_data()` delegates to `add_points()` (deferred)
-  - ✅ `add_boundary()` uses `store_layer()` correctly
-
-- **`Visualizer2DModel.R`** - Good implementation
-  - ✅ `add_training_data()` and `add_boundary()` use `store_layer()` correctly
-
-- **`VisualizerSurfaceModel.R`** - Good implementation
-  - ✅ `add_training_data()` and `add_boundary()` use `store_layer()` correctly 
-
-- **`VisualizerSurfaceObj.R`** - Excellent implementation
-  - ✅ `add_optimization_trace()` uses `store_layer()` correctly
-  - ✅ Has `render_optimization_trace_layers()` and `render_optimization_trace_layer()` methods
-  - ✅ `add_taylor()` uses `store_layer()` with `render_taylor_layers()` method
-  - ✅ `add_hessian()` uses `store_layer()` with `render_hessian_layers()` method
-  - ✅ Plot method renders all stored layers correctly
-
-#### ❌ **Issues Identified**
-
-- ✅ **COMPLETED: VisualizerLossFuns.R** - Fully refactored to use deferred rendering
-  - ✅ Adopted deferred rendering pattern with `store_layer()` and `render_plot()`
-  - ✅ Implemented custom `add_points()` method for loss function-specific point visualization
-  - ✅ Added specialized layer rendering with hollow points and optional vertical lines
-  - ✅ All plotting logic now uses stored plot settings from `private$.plot_settings`
-
-
-#### 📋 **Priority Refactoring Tasks**
-
-1. **✅ COMPLETED: Refactor VisualizerSurfaceObj legacy methods**:
-   - ✅ Convert `add_layer_taylor()` and `add_layer_hessian()` to use `store_layer()`
-   - ✅ Add corresponding render methods
-   - ✅ Update method names to follow consistent naming (remove `_layer` prefix)
-
-2. ✅ **COMPLETED: Enhance VisualizerLossFuns**:
-   - ✅ Added `add_points()` method with automatic y-value inference from loss functions
-   - ✅ Implemented deferred rendering pattern with `store_layer()`, `render_plot()`, and specialized layer rendering
-   - ✅ Added hollow points with optional vertical lines to x-axis for visualizing loss magnitude
-
-3. **Consider extending base classes**:
-   - `Visualizer1D` and `Visualizer2D` could benefit from `add_lines()`, `add_annotations()`, etc.
+### Low Priority
+5. **Documentation consistency** - ensure all add_* methods documented
+6. **Test coverage** - verify deferred rendering in all classes

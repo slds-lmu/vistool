@@ -158,7 +158,7 @@ Adds boundary surface(s) to the plot at specified values.
 \describe{
 \item{\code{values}}{(`numeric()`)\cr
 Vector of z-values where to draw boundary surfaces. For classification with probability predictions,
-defaults to 0.5. For regression or response predictions, defaults to quantiles of predictions.}
+defaults to 0.5. For regression or response predictions, defaults to the median of predictions.}
 
 \item{\code{color}}{(`character(1)` or `list()`)\cr
 Color specification for boundary surfaces. Default uses a neutral colorscale.}

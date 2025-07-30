@@ -85,7 +85,7 @@ VisualizerSurfaceModel <- R6::R6Class("VisualizerSurfaceModel",
       }
       zmat <- matrix(z, nrow = n_points, ncol = n_points, byrow = TRUE)
 
-            super$initialize(
+      super$initialize(
         grid = grid,
         zmat = zmat,
         plot_lab = paste(self$learner$id, "on", self$task$id),
@@ -135,7 +135,7 @@ VisualizerSurfaceModel <- R6::R6Class("VisualizerSurfaceModel",
     #'
     #' @param values (`numeric()`)\cr
     #'   Vector of z-values where to draw boundary surfaces. For classification with probability predictions,
-    #'   defaults to 0.5. For regression or response predictions, defaults to quantiles of predictions.
+    #'   defaults to 0.5. For regression or response predictions, defaults to the median of predictions.
     #' @param color (`character(1)` or `list()`)\cr
     #'   Color specification for boundary surfaces. Default uses a neutral colorscale.
     #' @param ... (`any`)\cr
@@ -150,8 +150,8 @@ VisualizerSurfaceModel <- R6::R6Class("VisualizerSurfaceModel",
         if (self$learner$predict_type == "prob") {
           values <- 0.5
         } else {
-          # For regression or response predictions, use quantiles
-          values <- quantile(self$zmat, c(0.25, 0.5, 0.75), na.rm = TRUE)
+          # For regression or response predictions, use median (single central tendency)
+          values <- median(self$zmat, na.rm = TRUE)
         }
       } else {
         # Validate that boundary values are within the prediction range
@@ -179,6 +179,115 @@ VisualizerSurfaceModel <- R6::R6Class("VisualizerSurfaceModel",
       ))
       
       return(invisible(self))
+    }
+  ),
+  
+  private = list(
+    # Override render_layer to handle model-specific layers
+    render_layer = function(p, layer) {
+      layer_type <- layer$type
+      layer_spec <- layer$spec
+      
+      if (layer_type == "training_data") {
+        return(private$render_training_data(p, layer))
+      } else if (layer_type == "boundary") {
+        return(private$render_boundary(p, layer))
+      } else {
+        # Delegate to parent for other layer types
+        return(super$render_layer(p, layer))
+      }
+    },
+    
+    # Render training data points
+    render_training_data = function(p, layer) {
+      data <- layer$spec
+      
+      # Resolve color at plot time
+      resolved_color <- if (data$color == "auto") {
+        private$get_auto_color_with_palette()
+      } else {
+        process_color(data$color, self)
+      }
+      
+      if (private$.layer_primary == "contour") {
+        p <- p %>%
+          plotly::add_trace(
+            x = data$x1,
+            y = data$x2,
+            type = "scatter",
+            mode = "markers",
+            marker = list(
+              size = 10,
+              color = data$z,
+              cmin = min(self$zmat),
+              cmax = max(self$zmat),
+              colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")),
+              line = list(color = "black", width = 2),
+              showscale = FALSE
+            ),
+            text = ~ paste("x:", data$x1, "\ny:", data$x2, " \nz:", data$z),
+            hoverinfo = "text"
+          )
+      } else {
+        p <- p %>%
+          plotly::add_trace(
+            x = data$x1,
+            y = data$x2,
+            z = data$z,
+            type = "scatter3d",
+            mode = "markers",
+            marker = list(size = data$size, color = resolved_color)
+          )
+      }
+      
+      return(p)
+    },
+    
+    # Render boundary surfaces
+    render_boundary = function(p, layer) {
+      boundary <- layer$spec
+      
+      for (value in boundary$values) {
+        z <- matrix(value, nrow = nrow(self$zmat), ncol = ncol(self$zmat), byrow = TRUE)
+
+        if (private$.layer_primary == "contour") {
+          llp <- list(x = self$grid$x1, y = self$grid$x2, z = self$zmat)
+          p <- p %>%
+            plotly::add_trace(
+              name = paste("boundary", value),
+              autocontour = FALSE,
+              showlegend = FALSE,
+              showscale = FALSE,
+              x = llp$x,
+              y = llp$y,
+              z = t(llp$z),
+              type = "contour",
+              colorscale = list(c(0, 1), c("rgb(0,0,0)", "rgb(0,0,0)")),
+              ncontours = 1,
+              contours = list(
+                start = value,
+                end = value,
+                coloring = "lines"
+              ),
+              line = list(
+                color = "black",
+                width = 3
+              )
+            )
+        } else {
+          p <- p %>%
+            plotly::add_surface(
+              x = self$grid$x1,
+              y = self$grid$x2,
+              z = z,
+              colorscale = boundary$color,
+              showscale = FALSE,
+              name = paste("boundary", value)
+            )
+        }
+      }
+      
+      return(p)
     }
   )
 )

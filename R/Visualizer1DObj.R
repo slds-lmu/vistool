@@ -68,6 +68,50 @@ Visualizer1DObj <- R6::R6Class("Visualizer1DObj",
       }
 
       invisible(self)
+    },
+
+    #' @description
+    #' Create and return the ggplot2 plot with optimization traces.
+    #' @param ... Additional arguments passed to the parent plot method.
+    #' @return A ggplot2 object.
+    plot = function(...) {
+      # Call parent plot method first
+      p <- super$plot(...)
+      
+      # Render optimization traces if any exist
+      private$render_optimization_trace_layers(p)
+    }
+  ),
+  private = list(
+    # Render stored optimization trace layers
+    render_optimization_trace_layers = function(plot_obj) {
+      # Get all stored optimization trace layers
+      trace_layers <- private$get_layers_by_type("optimization_trace")
+      
+      if (length(trace_layers) == 0) {
+        return(plot_obj)
+      }
+      
+      for (trace_spec in trace_layers) {
+        plot_obj <- private$render_optimization_trace_layer(plot_obj, trace_spec)
+      }
+      
+      return(plot_obj)
+    },
+    
+    # Render a single optimization trace layer
+    render_optimization_trace_layer = function(plot_obj, layer_spec) {
+      dd_trace <- data.frame(x = layer_spec$x_vals, y = layer_spec$y_vals)
+      
+      plot_obj <- plot_obj + ggplot2::geom_point(
+        data = dd_trace, 
+        size = layer_spec$size, 
+        color = layer_spec$color,
+        shape = layer_spec$shape, 
+        alpha = layer_spec$alpha
+      )
+      
+      return(plot_obj)
     }
   )
 )

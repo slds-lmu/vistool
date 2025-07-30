@@ -25,6 +25,7 @@ The objective function.}
 \itemize{
 \item \href{#method-Visualizer1DObj-new}{\code{Visualizer1DObj$new()}}
 \item \href{#method-Visualizer1DObj-add_optimization_trace}{\code{Visualizer1DObj$add_optimization_trace()}}
+\item \href{#method-Visualizer1DObj-plot}{\code{Visualizer1DObj$plot()}}
 \item \href{#method-Visualizer1DObj-clone}{\code{Visualizer1DObj$clone()}}
 }
 }
@@ -34,7 +35,6 @@ The objective function.}
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="add_points"><a href='../../vistool/html/Visualizer.html#method-Visualizer-add_points'><code>vistool::Visualizer$add_points()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="initialize_defaults"><a href='../../vistool/html/Visualizer.html#method-Visualizer-initialize_defaults'><code>vistool::Visualizer$initialize_defaults()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href='../../vistool/html/Visualizer.html#method-Visualizer-save'><code>vistool::Visualizer$save()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer1D" data-id="plot"><a href='../../vistool/html/Visualizer1D.html#method-Visualizer1D-plot'><code>vistool::Visualizer1D$plot()</code></a></span></li>
 </ul>
 </details>
 }}
@@ -83,6 +83,26 @@ Add optimization trace to the plot.
 The optimizer to add to the plot.}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Visualizer1DObj-plot"></a>}}
+\if{latex}{\out{\hypertarget{method-Visualizer1DObj-plot}{}}}
+\subsection{Method \code{plot()}}{
+Create and return the ggplot2 plot with optimization traces.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer1DObj$plot(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{Additional arguments passed to the parent plot method.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A ggplot2 object.
 }
 }
 \if{html}{\out{<hr>}}

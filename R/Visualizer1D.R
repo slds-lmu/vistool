@@ -175,26 +175,7 @@ Visualizer1D <- R6::R6Class("Visualizer1D",
         pl <- pl + ggplot2::ylim(y_limits[1], y_limits[2])
       }
       
-      # Add optimization traces if any exist
-      # Add optimization traces with resolved colors
-      if (length(private$.layers_to_add) > 0) {
-        trace_logical <- sapply(private$.layers_to_add, function(x) x$type == "optimization_trace")
-        trace_indices <- which(trace_logical)
-      } else {
-        trace_indices <- integer(0)
-      }
-      
-      for (idx in trace_indices) {
-        trace <- private$.layers_to_add[[idx]]$spec
-        dd_trace <- data.frame(x = trace$x_vals, y = trace$y_vals)
-        pl <- pl + geom_point(
-          data = dd_trace, 
-          size = trace$size, 
-          color = trace$color,
-          shape = trace$shape, 
-          alpha = trace$alpha
-        )
-      }
+      # Note: Optimization traces are handled by objective-specific visualizer classes
       
       # Add points from add_points() method
       pl <- private$add_points_to_ggplot(pl, "1D")

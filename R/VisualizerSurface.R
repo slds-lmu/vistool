@@ -437,8 +437,11 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
         private$.plot <- private$add_points_to_plotly(private$.plot, "contour")
       }
       
-      # Add stored layers (training data, boundaries, etc.)
-      private$render_stored_layers()
+      # Render stored layers using the deferred rendering system
+      layers_to_add <- if (is.null(private$.layers_to_add)) list() else private$.layers_to_add
+      for (layer in layers_to_add) {
+        private$.plot <- private$render_layer(private$.plot, layer)
+      }
       
       return(private$.plot)
     }
@@ -517,100 +520,19 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
       return(z_vals)
     },
     
-    # Render stored layers (training data, boundaries, etc.)
-    render_stored_layers = function() {
-      # Render training data if any
-      if (length(private$.layers_to_add) > 0) {
-        training_logical <- sapply(private$.layers_to_add, function(x) x$type == "training_data")
-        training_indices <- which(training_logical)
-      } else {
-        training_indices <- integer(0)
-      }
-      for (idx in training_indices) {
-        data <- private$.layers_to_add[[idx]]$spec
-        
-        if (private$.layer_primary == "contour") {
-          private$.plot <- private$.plot %>%
-            plotly::add_trace(
-              x = data$x1,
-              y = data$x2,
-              type = "scatter",
-              mode = "markers",
-              marker = list(
-                size = 10,
-                color = data$z,
-                cmin = min(self$zmat),
-                cmax = max(self$zmat),
-                colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")),
-                line = list(color = "black", width = 2),
-                showscale = FALSE
-              ),
-              text = ~ paste("x:", data$x1, "\ny:", data$x2, " \nz:", data$z),
-              hoverinfo = "text"
-            )
-        } else {
-          private$.plot <- private$.plot %>%
-            plotly::add_trace(
-              x = data$x1,
-              y = data$x2,
-              z = data$z,
-              type = "scatter3d",
-              mode = "markers",
-              marker = list(size = data$size, color = data$color)
-            )
-        }
+    # Render a specific layer based on its type
+    render_layer = function(p, layer) {
+      layer_type <- layer$type
+      layer_spec <- layer$spec
+      
+      if (layer_type == "contours") {
+        # This is handled during plot initialization, not here
+        return(p)
       }
       
-      # Render boundary layers if any
-      if (length(private$.layers_to_add) > 0) {
-        boundary_logical <- sapply(private$.layers_to_add, function(x) x$type == "boundary")
-        boundary_indices <- which(boundary_logical)
-      } else {
-        boundary_indices <- integer(0)
-      }
-      for (idx in boundary_indices) {
-        boundary <- private$.layers_to_add[[idx]]$spec
-        
-        for (value in boundary$values) {
-          z <- matrix(value, nrow = nrow(self$zmat), ncol = ncol(self$zmat), byrow = TRUE)
-
-          if (private$.layer_primary == "contour") {
-            llp <- list(x = self$grid$x1, y = self$grid$x2, z = self$zmat)
-            private$.plot <- private$.plot %>%
-              plotly::add_trace(
-                name = paste("boundary", value),
-                autocontour = FALSE,
-                showlegend = FALSE,
-                showscale = FALSE,
-                x = llp$x,
-                y = llp$y,
-                z = t(llp$z),
-                type = "contour",
-                colorscale = list(c(0, 1), c("rgb(0,0,0)", "rgb(0,0,0)")),
-                ncontours = 1,
-                contours = list(
-                  start = value,
-                  end = value,
-                  coloring = "lines"
-                ),
-                line = list(
-                  color = "black",
-                  width = 3
-                )
-              )
-          } else {
-            private$.plot <- private$.plot %>%
-              plotly::add_surface(
-                x = self$grid$x1,
-                y = self$grid$x2,
-                z = z,
-                colorscale = boundary$color,
-                showscale = FALSE,
-                name = paste("boundary", value)
-              )
-          }
-        }
-      }
+      # For unknown layer types, return the plot unchanged
+      # Subclasses should override this method to handle their specific layer types
+      return(p)
     }
   )
 )
