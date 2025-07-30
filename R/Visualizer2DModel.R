@@ -211,24 +211,20 @@ Visualizer2DModel <- R6::R6Class("Visualizer2DModel",
     #' @param ... Additional arguments passed to the parent plot method.
     #' @return A ggplot2 object.
     plot = function(text_size = 11, title_size = NULL, theme = "minimal", background = "white", color_palette = "viridis", ...) {
-      checkmate::assert_number(text_size, lower = 1)
-      checkmate::assert_number(title_size, lower = 1, null.ok = TRUE)
-      checkmate::assert_choice(theme, choices = c("minimal", "bw", "classic", "gray", "light", "dark", "void"))
-      checkmate::assert_string(background)
-      checkmate::assert_choice(color_palette, choices = c("viridis", "plasma", "grayscale"))
-      
-      # Store plot settings and resolve layer colors
-      private$.plot_settings <- list(
-        text_size = text_size, title_size = title_size, theme = theme,
-        background = background, color_palette = color_palette
-      )
-      private$resolve_layer_colors()
-      
-      # Call parent plot method with all arguments
+      # Call parent first to set up plot_settings and base plot
       p <- super$plot(text_size = text_size, title_size = title_size, theme = theme, 
                       background = background, color_palette = color_palette, ...)
       
-      # Add boundary lines if available
+      # Render class-specific layers
+      p <- private$render_boundary_layers(p, color_palette)
+      p <- private$render_training_data_layers(p, color_palette, text_size)
+      
+      return(p)
+    }
+  ),
+  private = list(
+    # Render stored boundary layers
+    render_boundary_layers = function(plot_obj, color_palette) {
       boundary_layer <- private$get_layer("boundary")
       if (!is.null(boundary_layer)) {
         data <- data.table(
@@ -248,7 +244,7 @@ Visualizer2DModel <- R6::R6Class("Visualizer2DModel",
           "solid"  # default fallback
         )
         
-        p <- p + ggplot2::geom_contour(
+        plot_obj <- plot_obj + ggplot2::geom_contour(
           data = data,
           aes(x = fun_x1, y = fun_x2, z = fun_y),
           breaks = boundary_layer$values,
@@ -259,8 +255,11 @@ Visualizer2DModel <- R6::R6Class("Visualizer2DModel",
           inherit.aes = FALSE
         )
       }
-      
-      # Apply custom training data styling if available
+      return(plot_obj)
+    },
+    
+    # Render stored training data layers
+    render_training_data_layers = function(plot_obj, color_palette, text_size) {
       training_layer <- private$get_layer("training_data")
       if (!is.null(training_layer)) {
         
@@ -277,7 +276,7 @@ Visualizer2DModel <- R6::R6Class("Visualizer2DModel",
           # Use color aesthetic for continuous/probability data
           color_limits <- c(min(self$fun_y), max(self$fun_y))
           
-          p <- p + geom_point(
+          plot_obj <- plot_obj + geom_point(
             data = points_data,
             aes(x = points_x1, y = points_x2, color = points_y),
             size = style$size,
@@ -289,15 +288,15 @@ Visualizer2DModel <- R6::R6Class("Visualizer2DModel",
           
           # Apply matching color scale for points based on the selected palette
           if (color_palette == "viridis") {
-            p <- p + scale_color_viridis_c(name = self$lab_y, limits = color_limits)
+            plot_obj <- plot_obj + scale_color_viridis_c(name = self$lab_y, limits = color_limits)
           } else if (color_palette == "plasma") {
-            p <- p + scale_color_viridis_c(name = self$lab_y, option = "plasma", limits = color_limits)
+            plot_obj <- plot_obj + scale_color_viridis_c(name = self$lab_y, option = "plasma", limits = color_limits)
           } else if (color_palette == "grayscale") {
-            p <- p + scale_color_gradient(name = self$lab_y, low = "black", high = "white", limits = color_limits)
+            plot_obj <- plot_obj + scale_color_gradient(name = self$lab_y, low = "black", high = "white", limits = color_limits)
           }
         } else {
           # Use fixed color for discrete/categorical data
-          p <- p + geom_point(
+          plot_obj <- plot_obj + geom_point(
             data = points_data,
             aes(x = points_x1, y = points_x2),
             color = style$color,
@@ -312,7 +311,7 @@ Visualizer2DModel <- R6::R6Class("Visualizer2DModel",
         if (style$show_labels) {
           label_size <- if (!is.null(style$label_size)) style$label_size else text_size * 0.8 / ggplot2::.pt
           
-          p <- p + geom_text(
+          plot_obj <- plot_obj + geom_text(
             data = points_data,
             aes(x = points_x1, y = points_x2, label = seq_len(nrow(points_data))),
             color = if (self$learner$predict_type == "prob" || is.numeric(training_layer$data$y)) "black" else style$color,
@@ -322,11 +321,7 @@ Visualizer2DModel <- R6::R6Class("Visualizer2DModel",
           )
         }
       }
-      
-      return(p)
+      return(plot_obj)
     }
-  ),
-  private = list(
-    # Model-specific private fields will be inherited from base class
   )
 )

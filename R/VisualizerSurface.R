@@ -437,12 +437,6 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
         private$.plot <- private$add_points_to_plotly(private$.plot, "contour")
       }
       
-      # Render stored layers using the deferred rendering system
-      layers_to_add <- if (is.null(private$.layers_to_add)) list() else private$.layers_to_add
-      for (layer in layers_to_add) {
-        private$.plot <- private$render_layer(private$.plot, layer)
-      }
-      
       return(private$.plot)
     }
   ),
@@ -518,21 +512,6 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
       }
       
       return(z_vals)
-    },
-    
-    # Render a specific layer based on its type
-    render_layer = function(p, layer) {
-      layer_type <- layer$type
-      layer_spec <- layer$spec
-      
-      if (layer_type == "contours") {
-        # This is handled during plot initialization, not here
-        return(p)
-      }
-      
-      # For unknown layer types, return the plot unchanged
-      # Subclasses should override this method to handle their specific layer types
-      return(p)
     }
   )
 )

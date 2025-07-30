@@ -106,6 +106,7 @@ Create and return the ggplot2 plot.
 \if{html}{\out{<div class="r">}}\preformatted{Visualizer1D$plot(
   text_size = 11,
   theme = "minimal",
+  color_palette = "viridis",
   plot_title = NULL,
   plot_subtitle = NULL,
   x_lab = NULL,
@@ -117,7 +118,8 @@ Create and return the ggplot2 plot.
   show_legend = TRUE,
   legend_position = "right",
   legend_title = NULL,
-  show_title = TRUE
+  show_title = TRUE,
+  ...
 )}\if{html}{\out{</div>}}
 }
 
@@ -129,6 +131,9 @@ Base text size for plot elements. Default is 11.}
 
 \item{\code{theme}}{(`character(1)`)\cr
 ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "minimal".}
+
+\item{\code{color_palette}}{(`character(1)`)\cr
+Default color palette to use. One of "viridis", "plasma", "grayscale". Default is "viridis".}
 
 \item{\code{plot_title}}{(`character(1)`)\cr
 Main plot title. If NULL, uses the visualizer's default title. Default is NULL.}
@@ -165,6 +170,8 @@ Title for the legend. If NULL, uses default based on visualizer type. Default is
 
 \item{\code{show_title}}{(`logical(1)`)\cr
 Indicator whether to show the title of the plot.}
+
+\item{\code{...}}{Additional arguments for future extensibility.}
 }
 \if{html}{\out{</div>}}
 }

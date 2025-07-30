@@ -179,80 +179,100 @@ VisualizerSurfaceModel <- R6::R6Class("VisualizerSurfaceModel",
       ))
       
       return(invisible(self))
+    },
+
+    #' @description
+    #' Create and return the plotly plot with model-specific layers.
+    #' @param ... Additional arguments passed to the parent plot method.
+    #' @return A plotly object.
+    plot = function(...) {
+      # Call parent first to set up plot_settings and resolve colors
+      super$plot(...)
+      
+      # Render class-specific layers
+      private$render_training_data_layers()
+      private$render_boundary_layers()
+      
+      return(private$.plot)
     }
   ),
   
   private = list(
-    # Override render_layer to handle model-specific layers
-    render_layer = function(p, layer) {
-      layer_type <- layer$type
-      layer_spec <- layer$spec
+    # Render stored training data layers
+    render_training_data_layers = function() {
+      training_layers <- private$get_layers_by_type("training_data")
       
-      if (layer_type == "training_data") {
-        return(private$render_training_data(p, layer))
-      } else if (layer_type == "boundary") {
-        return(private$render_boundary(p, layer))
-      } else {
-        # Delegate to parent for other layer types
-        return(super$render_layer(p, layer))
+      if (length(training_layers) == 0) {
+        return()
+      }
+      
+      for (training_spec in training_layers) {
+        private$render_training_data_layer(training_spec)
       }
     },
     
-    # Render training data points
-    render_training_data = function(p, layer) {
-      data <- layer$spec
-      
+    # Render a single training data layer
+    render_training_data_layer = function(layer_spec) {
       # Resolve color at plot time
-      resolved_color <- if (data$color == "auto") {
+      resolved_color <- if (layer_spec$color == "auto") {
         private$get_auto_color_with_palette()
       } else {
-        process_color(data$color, self)
+        process_color(layer_spec$color, self)
       }
       
       if (private$.layer_primary == "contour") {
-        p <- p %>%
+        private$.plot <- private$.plot %>%
           plotly::add_trace(
-            x = data$x1,
-            y = data$x2,
+            x = layer_spec$x1,
+            y = layer_spec$x2,
             type = "scatter",
             mode = "markers",
             marker = list(
               size = 10,
-              color = data$z,
+              color = layer_spec$z,
               cmin = min(self$zmat),
               cmax = max(self$zmat),
               colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")),
               line = list(color = "black", width = 2),
               showscale = FALSE
             ),
-            text = ~ paste("x:", data$x1, "\ny:", data$x2, " \nz:", data$z),
+            text = ~ paste("x:", layer_spec$x1, "\ny:", layer_spec$x2, " \nz:", layer_spec$z),
             hoverinfo = "text"
           )
       } else {
-        p <- p %>%
+        private$.plot <- private$.plot %>%
           plotly::add_trace(
-            x = data$x1,
-            y = data$x2,
-            z = data$z,
+            x = layer_spec$x1,
+            y = layer_spec$x2,
+            z = layer_spec$z,
             type = "scatter3d",
             mode = "markers",
-            marker = list(size = data$size, color = resolved_color)
+            marker = list(size = layer_spec$size, color = resolved_color)
           )
       }
-      
-      return(p)
     },
     
-    # Render boundary surfaces
-    render_boundary = function(p, layer) {
-      boundary <- layer$spec
+    # Render stored boundary layers
+    render_boundary_layers = function() {
+      boundary_layers <- private$get_layers_by_type("boundary")
       
-      for (value in boundary$values) {
+      if (length(boundary_layers) == 0) {
+        return()
+      }
+      
+      for (boundary_spec in boundary_layers) {
+        private$render_boundary_layer(boundary_spec)
+      }
+    },
+    
+    # Render a single boundary layer
+    render_boundary_layer = function(layer_spec) {
+      for (value in layer_spec$values) {
         z <- matrix(value, nrow = nrow(self$zmat), ncol = ncol(self$zmat), byrow = TRUE)
 
         if (private$.layer_primary == "contour") {
           llp <- list(x = self$grid$x1, y = self$grid$x2, z = self$zmat)
-          p <- p %>%
+          private$.plot <- private$.plot %>%
             plotly::add_trace(
               name = paste("boundary", value),
               autocontour = FALSE,
@@ -275,19 +295,17 @@ VisualizerSurfaceModel <- R6::R6Class("VisualizerSurfaceModel",
               )
             )
         } else {
-          p <- p %>%
+          private$.plot <- private$.plot %>%
             plotly::add_surface(
               x = self$grid$x1,
               y = self$grid$x2,
               z = z,
-              colorscale = boundary$color,
+              colorscale = layer_spec$color,
               showscale = FALSE,
               name = paste("boundary", value)
             )
         }
       }
-      
-      return(p)
     }
   )
 )

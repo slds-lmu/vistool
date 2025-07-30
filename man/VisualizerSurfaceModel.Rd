@@ -27,6 +27,7 @@ Learner used to train the model.}
 \item \href{#method-VisualizerSurfaceModel-new}{\code{VisualizerSurfaceModel$new()}}
 \item \href{#method-VisualizerSurfaceModel-add_training_data}{\code{VisualizerSurfaceModel$add_training_data()}}
 \item \href{#method-VisualizerSurfaceModel-add_boundary}{\code{VisualizerSurfaceModel$add_boundary()}}
+\item \href{#method-VisualizerSurfaceModel-plot}{\code{VisualizerSurfaceModel$plot()}}
 \item \href{#method-VisualizerSurfaceModel-clone}{\code{VisualizerSurfaceModel$clone()}}
 }
 }
@@ -39,7 +40,6 @@ Learner used to train the model.}
 <li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="add_contours"><a href='../../vistool/html/VisualizerSurface.html#method-VisualizerSurface-add_contours'><code>vistool::VisualizerSurface$add_contours()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="init_layer_contour"><a href='../../vistool/html/VisualizerSurface.html#method-VisualizerSurface-init_layer_contour'><code>vistool::VisualizerSurface$init_layer_contour()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="init_layer_surface"><a href='../../vistool/html/VisualizerSurface.html#method-VisualizerSurface-init_layer_surface'><code>vistool::VisualizerSurface$init_layer_surface()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="plot"><a href='../../vistool/html/VisualizerSurface.html#method-VisualizerSurface-plot'><code>vistool::VisualizerSurface$plot()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="set_layout"><a href='../../vistool/html/VisualizerSurface.html#method-VisualizerSurface-set_layout'><code>vistool::VisualizerSurface$set_layout()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="set_scene"><a href='../../vistool/html/VisualizerSurface.html#method-VisualizerSurface-set_scene'><code>vistool::VisualizerSurface$set_scene()</code></a></span></li>
 </ul>
@@ -167,6 +167,26 @@ Color specification for boundary surfaces. Default uses a neutral colorscale.}
 Further arguments passed to `add_trace(...)` or `add_surface(...)`.}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-VisualizerSurfaceModel-plot"></a>}}
+\if{latex}{\out{\hypertarget{method-VisualizerSurfaceModel-plot}{}}}
+\subsection{Method \code{plot()}}{
+Create and return the plotly plot with model-specific layers.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{VisualizerSurfaceModel$plot(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{Additional arguments passed to the parent plot method.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A plotly object.
 }
 }
 \if{html}{\out{<hr>}}

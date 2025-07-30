@@ -98,6 +98,8 @@ Visualizer1D <- R6::R6Class("Visualizer1D",
     #'   Base text size for plot elements. Default is 11.
     #' @param theme (`character(1)`)\cr
     #'   ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "minimal".
+    #' @param color_palette (`character(1)`)\cr
+    #'   Default color palette to use. One of "viridis", "plasma", "grayscale". Default is "viridis".
     #' @template param_plot_title
     #' @template param_plot_subtitle
     #' @template param_x_lab
@@ -110,13 +112,15 @@ Visualizer1D <- R6::R6Class("Visualizer1D",
     #' @template param_legend_position
     #' @template param_legend_title
     #' @template param_show_title
+    #' @param ... Additional arguments for future extensibility.
     #' @return A ggplot2 object.
-    plot = function(text_size = 11, theme = "minimal", plot_title = NULL, plot_subtitle = NULL, 
+    plot = function(text_size = 11, theme = "minimal", color_palette = "viridis", plot_title = NULL, plot_subtitle = NULL, 
                     x_lab = NULL, y_lab = NULL, x_limits = NULL, y_limits = NULL, 
                     show_grid = TRUE, grid_color = "gray90", show_legend = TRUE, 
-                    legend_position = "right", legend_title = NULL, show_title = TRUE) {
+                    legend_position = "right", legend_title = NULL, show_title = TRUE, ...) {
       checkmate::assert_number(text_size, lower = 1)
       checkmate::assert_choice(theme, choices = c("minimal", "bw", "classic", "gray", "light", "dark", "void"))
+      checkmate::assert_choice(color_palette, choices = c("viridis", "plasma", "grayscale"))
       checkmate::assert_string(plot_title, null.ok = TRUE)
       checkmate::assert_string(plot_subtitle, null.ok = TRUE)
       checkmate::assert_string(x_lab, null.ok = TRUE)
@@ -134,6 +138,7 @@ Visualizer1D <- R6::R6Class("Visualizer1D",
       private$.plot_settings <- list(
         text_size = text_size,
         theme = theme,
+        color_palette = color_palette,
         plot_title = plot_title,
         plot_subtitle = plot_subtitle,
         x_lab = x_lab,
@@ -145,8 +150,7 @@ Visualizer1D <- R6::R6Class("Visualizer1D",
         show_legend = show_legend,
         legend_position = legend_position,
         legend_title = legend_title,
-        show_title = show_title,
-        color_palette = "viridis"  # Default for 1D plots
+        show_title = show_title
       )
       
       # Resolve layer colors now that we have plot settings

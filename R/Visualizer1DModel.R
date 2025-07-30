@@ -172,21 +172,22 @@ Visualizer1DModel <- R6::R6Class("Visualizer1DModel",
     #' @param ... Additional arguments passed to the parent plot method.
     #' @return A ggplot2 object.
     plot = function(text_size = 11, theme = "minimal", ...) {
-      checkmate::assert_number(text_size, lower = 1)
-      checkmate::assert_choice(theme, choices = c("minimal", "bw", "classic", "gray", "light", "dark", "void"))
-      
-      # Store plot settings and resolve layer colors
-      private$.plot_settings <- list(text_size = text_size, theme = theme, ...)
-      private$resolve_layer_colors()
-      
-      # Call parent plot method with all arguments
+      # Call parent first to set up plot_settings and base plot
       p <- super$plot(text_size = text_size, theme = theme, ...)
       
-      # Add boundary lines if available
+      # Render class-specific layers
+      p <- private$render_boundary_layers(p)
+      
+      return(p)
+    }
+  ),
+  private = list(
+    # Render stored boundary layers
+    render_boundary_layers = function(plot_obj) {
       boundary_layer <- private$get_layer("boundary")
       if (!is.null(boundary_layer)) {
         for (value in boundary_layer$values) {
-          p <- p + ggplot2::geom_hline(
+          plot_obj <- plot_obj + ggplot2::geom_hline(
             yintercept = value,
             color = boundary_layer$color,
             linetype = boundary_layer$linetype,
@@ -195,11 +196,7 @@ Visualizer1DModel <- R6::R6Class("Visualizer1DModel",
           )
         }
       }
-      
-      return(p)
+      return(plot_obj)
     }
-  ),
-  private = list(
-    # Model-specific private fields inherited from base class
   )
 )
