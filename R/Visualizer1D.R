@@ -175,7 +175,6 @@ Visualizer1D <- R6::R6Class("Visualizer1D",
         pl <- pl + ggplot2::ylim(y_limits[1], y_limits[2])
       }
       
-      # Note: Optimization traces are handled by objective-specific visualizer classes
       
       # Add points from add_points() method
       pl <- private$add_points_to_ggplot(pl, "1D")
