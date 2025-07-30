@@ -163,7 +163,7 @@ Visualizer <- R6::R6Class("Visualizer",
                          annotations = NULL, annotation_size = NULL, ordered = FALSE, 
                          arrow_color = NULL, arrow_size = 0.3, ...) {
       
-      # Store layer specification using new layer system
+      # Store layer specification
       private$store_layer("points", list(
         points = points, color = color, size = size, shape = shape, alpha = alpha,
         annotations = annotations, annotation_size = annotation_size, ordered = ordered, 
@@ -211,7 +211,7 @@ Visualizer <- R6::R6Class("Visualizer",
 
     # Helper method to add points to ggplot2 objects
     add_points_to_ggplot = function(plot_obj, visualizer_type = "2D") {
-      # Get points layers from the new layer system
+      # Get points layers from the layer system
       points_layers <- private$get_layers_by_type("points")
       if (length(points_layers) == 0) {
         return(plot_obj)
@@ -300,7 +300,6 @@ Visualizer <- R6::R6Class("Visualizer",
 
     # Helper method to add points to plotly objects
     add_points_to_plotly = function(plot_obj, visualizer_type = "surface") {
-      # Get points layers from the new layer system
       points_layers <- private$get_layers_by_type("points")
       if (length(points_layers) == 0) {
         return(plot_obj)

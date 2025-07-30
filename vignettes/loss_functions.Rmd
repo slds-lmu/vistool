@@ -123,6 +123,39 @@ vis_y1 <- as_visualizer(
 vis_y1$plot()
 ```
 
+# Adding Points to Loss Function Visualizations
+
+You can add specific points to loss function plots to highlight particular residual values and their corresponding loss values. The `add_points()` method automatically calculates the y-coordinates by evaluating the loss function at the given x-coordinates.
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, out.width='100%'}
+vis_with_points <- as_visualizer(
+  list(loss_l2, loss_l1),
+  y_pred = seq(-3, 3),
+  y_true = 0
+)
+
+vis_with_points$add_points(
+  x = c(-2, -1, 1, 2),
+  loss_id = "l2",
+  show_line = TRUE,
+  color = "red",
+  size = 3,
+  alpha = 0.8
+)$add_points(
+  x = c(-2, 2),
+  loss_id = "l1",  # Specify the L1 loss
+  show_line = FALSE,
+  color = "blue",
+  size = 2.5,
+  alpha = 0.7
+)
+
+vis_with_points$plot(
+  plot_title = "Loss Functions with Points",
+  show_legend = TRUE
+)
+```
+
 # Custom Loss Functions
 
 We can also define and visualize custom loss functions:

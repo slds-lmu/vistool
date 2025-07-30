@@ -69,8 +69,6 @@ VisualizerLossFuns <- R6::R6Class("VisualizerLossFuns",
     #' One of `"both"`, `"y1"`, or `"y0"`.
     y_curves = NULL,
 
-    # FIXME: better doc the class
-
     #' @description
     #' Creates a new instance of this [R6][R6::R6Class] class.
     #'
@@ -249,17 +247,141 @@ VisualizerLossFuns <- R6::R6Class("VisualizerLossFuns",
       
       # Resolve layer colors now that we have plot settings
       private$resolve_layer_colors()
+      
+      # Render the plot
+      return(private$render_plot())
+    },
 
+    #' @description
+    #' Add points to the loss function visualization with optional vertical lines.
+    #' Points are automatically positioned on the loss curve by evaluating the
+    #' selected loss function at the given x-coordinates.
+    #'
+    #' @param x (`numeric()`)\cr
+    #'   x-coordinates where to place points on the loss curves. These represent
+    #'   the residual values (y-f for regression, y*f for classification scores,
+    #'   or probabilities for classification probability mode).
+    #' @param loss_id (`character(1)`)\cr
+    #'   ID of the loss function to use for y-value calculation. If NULL (default),
+    #'   uses the first loss function.
+    #' @param show_line (`logical(1)`)\cr
+    #'   If TRUE (default), draws vertical lines from points to x-axis.
+    #' @param color (`character(1)`)\cr
+    #'   Color of the points and lines. Use "auto" for automatic color assignment.
+    #'   Default is "red".
+    #' @param size (`numeric(1)`)\cr
+    #'   Size of the points. Default is 3.
+    #' @param alpha (`numeric(1)`)\cr
+    #'   Alpha transparency of points and lines. Default is 0.8.
+    #' @param line_color (`character(1)`)\cr
+    #'   Color of vertical lines. If NULL, uses the same color as points.
+    #' @param line_alpha (`numeric(1)`)\cr
+    #'   Alpha transparency of vertical lines. If NULL, uses alpha * 0.7.
+    #' @param ... Additional arguments passed to point and line geoms.
+    add_points = function(x, loss_id = NULL, show_line = TRUE, color = "red", size = 3, alpha = 0.8,
+                         line_color = NULL, line_alpha = NULL, ...) {
+      checkmate::assert_numeric(x)
+      checkmate::assert_string(loss_id, null.ok = TRUE)
+      checkmate::assert_flag(show_line)
+      checkmate::assert_string(color)
+      checkmate::assert_number(size, lower = 0)
+      checkmate::assert_number(alpha, lower = 0, upper = 1)
+      checkmate::assert_string(line_color, null.ok = TRUE)
+      checkmate::assert_number(line_alpha, lower = 0, upper = 1, null.ok = TRUE)
+      
+      # Store layer specification using layer system
+      private$store_layer("loss_points", list(
+        x = x, loss_id = loss_id, show_line = show_line, color = color, size = size, alpha = alpha,
+        line_color = line_color, line_alpha = line_alpha, args = list(...)
+      ))
+      invisible(self)
+    }
+  ),
+  private = list(
+    # Override infer_z_values to handle loss function evaluation
+    infer_z_values = function(points_data) {
+      # For loss function visualizers, we can evaluate the loss at given points
+      # if we have the necessary data
+      if (all(is.na(points_data$y)) && "x" %in% names(points_data)) {
+        # Try to evaluate the first loss function at the given x values
+        if (length(self$losses) > 0) {
+          first_loss <- self$losses[[1]]
+          loss_fun <- first_loss$get_fun(self$input_type)
+          points_data$y <- loss_fun(points_data$x)
+        } else {
+          # Fallback to zeros if no loss functions available
+          points_data$y <- rep(0, nrow(points_data))
+        }
+      }
+      return(points_data$y)
+    },
+
+    # Override prepare_points_data to handle loss function-specific point preparation
+    prepare_points_data = function(points, visualizer_type) {
+      points_data <- super$prepare_points_data(points, visualizer_type)
+      
+      # For loss function visualizers, try to infer y values if not provided
+      if (visualizer_type == "1D" && all(is.na(points_data$y))) {
+        points_data$y <- private$infer_z_values(points_data)
+      }
+      
+      return(points_data)
+    },
+
+    # Render the complete plot using stored settings and layers
+    render_plot = function() {
+      settings <- private$.plot_settings
+      
       # Determine final labels
-      final_title <- if (show_title) {
-        if (!is.null(plot_title)) plot_title else self$title
+      final_title <- if (settings$show_title) {
+        if (!is.null(settings$plot_title)) settings$plot_title else self$title
       } else {
         NULL
       }
-      final_x_lab <- if (!is.null(x_lab)) x_lab else self$lab_x
-      final_y_lab <- if (!is.null(y_lab)) y_lab else self$lab_y
-      final_legend_title <- if (!is.null(legend_title)) legend_title else self$legend_title
+      final_x_lab <- if (!is.null(settings$x_lab)) settings$x_lab else self$lab_x
+      final_y_lab <- if (!is.null(settings$y_lab)) settings$y_lab else self$lab_y
+      final_legend_title <- if (!is.null(settings$legend_title)) settings$legend_title else self$legend_title
+      
+      # Create the base plot with loss function curves
+      pl <- private$render_loss_curves()
+      
+      # Add stored layers
+      pl <- private$render_stored_layers(pl)
+      
+      # Apply final styling
+      theme_fun <- switch(settings$theme,
+        "minimal" = ggplot2::theme_minimal,
+        "bw"      = ggplot2::theme_bw,
+        "classic" = ggplot2::theme_classic,
+        "gray"    = ggplot2::theme_gray,
+        "light"   = ggplot2::theme_light,
+        "dark"    = ggplot2::theme_dark,
+        "void"    = ggplot2::theme_void
+      )
+      pl <- pl + theme_fun(base_size = settings$text_size) +
+        ggplot2::theme(
+          plot.title = ggplot2::element_text(hjust = 0.5),
+          legend.position = if (settings$show_legend && settings$legend_position != "none") settings$legend_position else "none",
+          panel.grid = if (settings$show_grid) ggplot2::element_line(color = settings$grid_color) else ggplot2::element_blank()
+        )
 
+      pl <- pl + ggplot2::labs(title = final_title, subtitle = settings$plot_subtitle, x = final_x_lab, y = final_y_lab)
+      
+      # Apply axis limits if specified
+      if (!is.null(settings$x_limits)) {
+        pl <- pl + ggplot2::xlim(settings$x_limits[1], settings$x_limits[2])
+      }
+      if (!is.null(settings$y_limits)) {
+        pl <- pl + ggplot2::ylim(settings$y_limits[1], settings$y_limits[2])
+      }
+
+      return(pl)
+    },
+
+    # Render the base loss function curves
+    render_loss_curves = function() {
+      settings <- private$.plot_settings
+      final_legend_title <- if (!is.null(settings$legend_title)) settings$legend_title else self$legend_title
       loss_labels <- sapply(self$losses, function(x) x$label)
 
       if (self$task_type == "classif" && self$input_type == "probability") {
@@ -387,67 +509,84 @@ VisualizerLossFuns <- R6::R6Class("VisualizerLossFuns",
         }
       }
 
-      theme_fun <- switch(theme,
-        "minimal" = ggplot2::theme_minimal,
-        "bw"      = ggplot2::theme_bw,
-        "classic" = ggplot2::theme_classic,
-        "gray"    = ggplot2::theme_gray,
-        "light"   = ggplot2::theme_light,
-        "dark"    = ggplot2::theme_dark,
-        "void"    = ggplot2::theme_void
-      )
-      pl <- pl + theme_fun(base_size = text_size) +
-        ggplot2::theme(
-          plot.title = ggplot2::element_text(hjust = 0.5),
-          legend.position = if (show_legend && legend_position != "none") legend_position else "none",
-          panel.grid = if (show_grid) ggplot2::element_line(color = grid_color) else ggplot2::element_blank()
-        )
-
-      pl <- pl + ggplot2::labs(title = final_title, subtitle = plot_subtitle, x = final_x_lab, y = final_y_lab)
-      
-      # Apply axis limits if specified
-      if (!is.null(x_limits)) {
-        pl <- pl + ggplot2::xlim(x_limits[1], x_limits[2])
-      }
-      if (!is.null(y_limits)) {
-        pl <- pl + ggplot2::ylim(y_limits[1], y_limits[2])
-      }
-
-      # Add points from add_points() method
-      pl <- private$add_points_to_ggplot(pl, "1D")
-
       return(pl)
-    }
-  ),
-  private = list(
-    # Override infer_z_values to handle loss function evaluation
-    infer_z_values = function(points_data) {
-      # For loss function visualizers, we can evaluate the loss at given points
-      # if we have the necessary data
-      if (all(is.na(points_data$y)) && "x" %in% names(points_data)) {
-        # Try to evaluate the first loss function at the given x values
-        if (length(self$losses) > 0) {
-          first_loss <- self$losses[[1]]
-          loss_fun <- first_loss$get_fun(self$input_type)
-          points_data$y <- loss_fun(points_data$x)
-        } else {
-          # Fallback to zeros if no loss functions available
-          points_data$y <- rep(0, nrow(points_data))
-        }
-      }
-      return(points_data$y)
     },
 
-    # Override prepare_points_data to handle loss function-specific point preparation
-    prepare_points_data = function(points, visualizer_type) {
-      points_data <- super$prepare_points_data(points, visualizer_type)
+    # Render all stored layers
+    render_stored_layers = function(plot_obj) {
+      # First add the generic points layers from base class
+      plot_obj <- private$add_points_to_ggplot(plot_obj, "1D")
       
-      # For loss function visualizers, try to infer y values if not provided
-      if (visualizer_type == "1D" && all(is.na(points_data$y))) {
-        points_data$y <- private$infer_z_values(points_data)
+      # Then add loss-specific point layers
+      loss_points_layers <- private$get_layers_by_type("loss_points")
+      for (point_spec in loss_points_layers) {
+        plot_obj <- private$render_loss_points_layer(plot_obj, point_spec)
       }
       
-      return(points_data)
+      return(plot_obj)
+    },
+
+    # Render a single loss points layer
+    render_loss_points_layer = function(plot_obj, point_spec) {
+      # Determine which loss function to use
+      if (is.null(point_spec$loss_id)) {
+        if (length(self$losses) == 0) {
+          stop("No loss functions available and no loss_id specified")
+        }
+        loss_fun <- self$losses[[1]]$get_fun(self$input_type)
+      } else {
+        if (!point_spec$loss_id %in% names(self$losses)) {
+          stop(sprintf("Loss function '%s' not found", point_spec$loss_id))
+        }
+        loss_fun <- self$losses[[point_spec$loss_id]]$get_fun(self$input_type)
+      }
+      
+      # Calculate y-values by evaluating the loss function
+      y_vals <- loss_fun(point_spec$x)
+      
+      # Create points data
+      points_data <- data.frame(
+        x = point_spec$x,
+        y = y_vals
+      )
+      
+      # Add points
+      plot_obj <- plot_obj + ggplot2::geom_point(
+        data = points_data,
+        ggplot2::aes(x = x, y = y),
+        color = point_spec$color,
+        size = point_spec$size,
+        alpha = point_spec$alpha,
+        shape = 21,  # Circle with border and fill
+        fill = "white",  # Hollow center
+        stroke = 1,  # Border thickness
+        inherit.aes = FALSE
+      )
+      
+      # Add vertical lines if requested
+      if (point_spec$show_line) {
+        line_color <- if (is.null(point_spec$line_color)) point_spec$color else point_spec$line_color
+        line_alpha <- if (is.null(point_spec$line_alpha)) point_spec$alpha * 0.7 else point_spec$line_alpha
+        
+        # Create line segments from points to x-axis
+        line_data <- data.frame(
+          x = point_spec$x,
+          y = y_vals,
+          xend = point_spec$x,
+          yend = 0
+        )
+        
+        plot_obj <- plot_obj + ggplot2::geom_segment(
+          data = line_data,
+          ggplot2::aes(x = x, y = y, xend = xend, yend = yend),
+          color = line_color,
+          alpha = line_alpha,
+          linetype = "dashed",
+          inherit.aes = FALSE
+        )
+      }
+      
+      return(plot_obj)
     }
   )
 )

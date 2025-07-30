@@ -1,5 +1,3 @@
-# FIXME: can we add optimizer traces? maybe use bbotk?
-
 #' @title Visualize Objective
 #'
 #' @description

@@ -222,25 +222,22 @@ test_that("VisualizerSurfaceObj add_contours parameter validation", {
   expect_silent(vis$add_contours(contours = list()))
 })
 
-test_that("VisualizerSurfaceObj layer methods auto-initialize plot", {
+test_that("VisualizerSurfaceObj layer methods use deferred rendering", {
   obj <- obj("TF_branin")
   vis <- VisualizerSurfaceObj$new(obj, n_points = 10L)
 
-  # Test that add_layer_taylor works without explicit initialization
+  # Test that add_taylor works with deferred rendering
   x0 <- c(2.5, 7.5)
-  expect_silent(vis$add_layer_taylor(x0, degree = 1))
+  expect_silent(vis$add_taylor(x0, degree = 1))
   
-  # Verify plot was automatically initialized
-  expect_true(!is.null(vis$plot()))
-  expect_equal(vis$.__enclos_env__$private$.layer_primary, "surface")
+  # Test that add_hessian works with deferred rendering
+  expect_silent(vis$add_hessian(x0))
   
-  # Reset for next test
-  vis2 <- VisualizerSurfaceObj$new(obj, n_points = 10L)
+  # Verify layers are stored but plot isn't created until plot() is called
+  layers <- vis$.__enclos_env__$private$.layers_to_add
+  expect_true(length(layers) >= 2)  # Should have stored the taylor and hessian layers
   
-  # Test that add_layer_hessian works without explicit initialization
-  expect_silent(vis2$add_layer_hessian(x0))
-  
-  # Verify plot was automatically initialized
-  expect_true(!is.null(vis2$plot()))
-  expect_equal(vis2$.__enclos_env__$private$.layer_primary, "surface")
+  # Now verify plot renders correctly
+  expect_silent(p <- vis$plot())
+  expect_true(!is.null(p))
 })

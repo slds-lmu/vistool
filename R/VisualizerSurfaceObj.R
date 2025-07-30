@@ -158,6 +158,12 @@ VisualizerSurfaceObj <- R6::R6Class("VisualizerSurfaceObj",
       # Process stored optimization trace layers
       private$render_optimization_trace_layers()
       
+      # Process stored Taylor approximation layers
+      private$render_taylor_layers()
+      
+      # Process stored Hessian eigenvector layers
+      private$render_hessian_layers()
+      
       return(private$.plot)
     },
 
@@ -179,59 +185,26 @@ VisualizerSurfaceObj <- R6::R6Class("VisualizerSurfaceObj",
     #'   Can be helpful if the hyperplane as a huge z range and therefore the plot looks ugly.
     #' @param ... (`any`)\cr
     #'   Additional parameter passed to `add_surface()`.
-    add_layer_taylor = function(x0, degree = 2, x1margin = 0, x2margin = 0, npoints_per_dim = 20L, zlim = NULL, ...) {
-      private$checkInit()
-      if (private$.layer_primary != "surface") stop("Atm just available for `surface`")
+    add_taylor = function(x0, degree = 2, x1margin = 0, x2margin = 0, npoints_per_dim = 20L, zlim = NULL, ...) {
       checkmate::assertNumeric(x0, len = 2L)
       checkmate::assertIntegerish(degree, len = 1, lower = 1, upper = 2)
       checkmate::assertNumber(x1margin)
       checkmate::assertNumber(x2margin)
+      checkmate::assertIntegerish(npoints_per_dim, len = 1, lower = 5)
+      checkmate::assertNumeric(zlim, len = 2L, null.ok = TRUE)
 
-      # checkmate::assertNumeric(x1limits, len = 2L, null.ok = TRUE)
-      # checkmate::assertNumeric(x2limits, len = 2L, null.ok = TRUE)
-
-      # if (is.null(x1limits)) x1limits = x0[1] + c(-0.05, 0.05)
-      # if (is.null(x2limits)) x2limits = x0[2] + c(-0.05, 0.05)
-
-      f0 <- self$objective$eval(x0)
-      g <- self$objective$grad(x0)
-      h <- self$objective$hess(x0)
-
-      # Create box based on the gradient at x0:
-      # - Normalize vector to length x1margin / 2
-      # - Calculate perpendicular vector
-      # - These vectors define the rotation
-      gn <- g / l2norm(g)
-      gp <- rbind(c(0, -1), c(1, 0)) %*% gn
-
-      gn <- gn * x1margin / 2
-      gp <- gp * x2margin / 2
-
-      # - Create grid in (0,0) x (1,1) and rotate w.r.t. to gn and gp:
-      rotation <- cbind(gn, gp)
-      square <- as.matrix(expand.grid(x = seq(0, 1, len = npoints_per_dim), y = seq(0, 1, len = npoints_per_dim)))
-      grid <- square %*% rotation
-      grid[, 1] <- grid[, 1] - max(grid[, 1]) + (max(grid[, 1]) - min(grid[, 1])) / 2 + x0[1]
-      grid[, 2] <- grid[, 2] - max(grid[, 2]) + (max(grid[, 2]) - min(grid[, 2])) / 2 + x0[2]
-
-      fapp <- function(x) {
-        out <- f0 + crossprod(g, x - x0) * f0
-        if (degree == 2) {
-          out <- out + 0.5 * f0 * t(x - x0) %*% h %*% (x - x0)
-        }
-        return(as.numeric(out))
-      }
-      fappV <- function(x, y) {
-        X <- cbind(x = x, y = y)
-        apply(X, 1, fapp)
-      }
-      z <- outer(X = grid[, 1], Y = grid[, 2], FUN = function(x, y) fappV(x, y))
-      if (!is.null(zlim)) {
-        checkmate::assertNumeric(zlim, len = 2L)
-        z[!between(z, zlim[1], zlim[2])] <- NA
-      }
-
-      private$.plot <- private$.plot %>% add_surface(x = grid[, 1], y = grid[, 2], z = t(z), showscale = FALSE, ...)
+      # Store layer specification for later processing
+      private$store_layer("taylor", list(
+        x0 = x0,
+        degree = degree,
+        x1margin = x1margin,
+        x2margin = x2margin,
+        npoints_per_dim = npoints_per_dim,
+        zlim = zlim,
+        args = list(...)
+      ))
+      
+      return(invisible(self))
     },
 
     #' @description
@@ -245,42 +218,20 @@ VisualizerSurfaceObj <- R6::R6Class("VisualizerSurfaceObj",
     #'   The length of the second eigenvector.
     #' @param ... (`any`)\cr
     #'   Additional arguments passed to `add_trace`.
-    add_layer_hessian = function(x0, x1length = 0.1, x2length = 0.1, ...) {
-      private$checkInit()
+    add_hessian = function(x0, x1length = 0.1, x2length = 0.1, ...) {
       checkmate::assertNumeric(x0, len = 2L)
       checkmate::assertNumber(x1length)
       checkmate::assertNumber(x2length)
 
-      f0 <- self$objective$eval(x0)
-      h <- self$objective$hess(x0)
-      ev <- eigen(h)$vectors
-
-      v1 <- ev[, 1]
-      v2 <- ev[, 2]
-
-      if (private$.layer_primary == "contour") {
-        # Transpose x and y to macht contour:
-        v1 <- v1 * x1length + x0
-        v2 <- v2 * x2length + x0
-
-        mx <- c(v1[1], x0[1], v2[1])
-        my <- c(v1[2], x0[2], v2[2])
-
-        private$.plot <- private$.plot %>% add_trace(x = mx, y = my, mode = "lines", type = "scatter", showlegend = FALSE, ...)
-      }
-      if (private$.layer_primary == "surface") {
-        v1 <- v1 * x1length + x0
-        v2 <- v2 * x2length + x0
-
-        v0 <- c(x0, f0)
-        v1 <- c(v1, f0)
-        v2 <- c(v2, f0)
-
-        # Order is important to have the angle:
-        marker <- cbind(v1, v0, v2)
-
-        private$.plot <- private$.plot %>% add_trace(x = marker[1, ], y = marker[2, ], z = marker[3, ], mode = "lines", type = "scatter3d", showlegend = FALSE, ...)
-      }
+      # Store layer specification for later processing
+      private$store_layer("hessian", list(
+        x0 = x0,
+        x1length = x1length,
+        x2length = x2length,
+        args = list(...)
+      ))
+      
+      return(invisible(self))
     },
 
     #' @description
@@ -519,6 +470,132 @@ VisualizerSurfaceObj <- R6::R6Class("VisualizerSurfaceObj",
         pargs$z <- NULL
       }
       private$.plot <- do.call(plotly::add_trace, c(list(private$.plot), pargs))
+    },
+    
+    # Render stored Taylor approximation layers
+    render_taylor_layers = function() {
+      # Get all stored Taylor layers
+      taylor_layers <- private$get_layers_by_type("taylor")
+      
+      if (length(taylor_layers) == 0) {
+        return()
+      }
+      
+      for (taylor_spec in taylor_layers) {
+        private$render_taylor_layer(taylor_spec)
+      }
+    },
+    
+    # Render a single Taylor approximation layer
+    render_taylor_layer = function(layer_spec) {
+      x0 <- layer_spec$x0
+      degree <- layer_spec$degree
+      x1margin <- layer_spec$x1margin
+      x2margin <- layer_spec$x2margin
+      npoints_per_dim <- layer_spec$npoints_per_dim
+      zlim <- layer_spec$zlim
+      aargs <- layer_spec$args
+      
+      if (is.null(private$.plot)) private$.init_default_plot()
+      
+      # Check if this is only available for surface mode
+      if (private$.layer_primary != "surface") {
+        stop("Taylor approximation is currently only available for surface plots")
+      }
+      
+      f0 <- self$objective$eval(x0)
+      g <- self$objective$grad(x0)
+      h <- self$objective$hess(x0)
+
+      # Create box based on the gradient at x0:
+      # - Normalize vector to length x1margin / 2
+      # - Calculate perpendicular vector
+      # - These vectors define the rotation
+      gn <- g / l2norm(g)
+      gp <- rbind(c(0, -1), c(1, 0)) %*% gn
+
+      gn <- gn * x1margin / 2
+      gp <- gp * x2margin / 2
+
+      # - Create grid in (0,0) x (1,1) and rotate w.r.t. to gn and gp:
+      rotation <- cbind(gn, gp)
+      square <- as.matrix(expand.grid(x = seq(0, 1, len = npoints_per_dim), y = seq(0, 1, len = npoints_per_dim)))
+      grid <- square %*% rotation
+      grid[, 1] <- grid[, 1] - max(grid[, 1]) + (max(grid[, 1]) - min(grid[, 1])) / 2 + x0[1]
+      grid[, 2] <- grid[, 2] - max(grid[, 2]) + (max(grid[, 2]) - min(grid[, 2])) / 2 + x0[2]
+
+      fapp <- function(x) {
+        out <- f0 + crossprod(g, x - x0) * f0
+        if (degree == 2) {
+          out <- out + 0.5 * f0 * t(x - x0) %*% h %*% (x - x0)
+        }
+        return(as.numeric(out))
+      }
+      fappV <- function(x, y) {
+        X <- cbind(x = x, y = y)
+        apply(X, 1, fapp)
+      }
+      z <- outer(X = grid[, 1], Y = grid[, 2], FUN = function(x, y) fappV(x, y))
+      if (!is.null(zlim)) {
+        z[!between(z, zlim[1], zlim[2])] <- NA
+      }
+
+      private$.plot <- do.call(plotly::add_surface, c(list(private$.plot, x = grid[, 1], y = grid[, 2], z = t(z), showscale = FALSE), aargs))
+    },
+    
+    # Render stored Hessian eigenvector layers
+    render_hessian_layers = function() {
+      # Get all stored Hessian layers
+      hessian_layers <- private$get_layers_by_type("hessian")
+      
+      if (length(hessian_layers) == 0) {
+        return()
+      }
+      
+      for (hessian_spec in hessian_layers) {
+        private$render_hessian_layer(hessian_spec)
+      }
+    },
+    
+    # Render a single Hessian eigenvector layer
+    render_hessian_layer = function(layer_spec) {
+      x0 <- layer_spec$x0
+      x1length <- layer_spec$x1length
+      x2length <- layer_spec$x2length
+      aargs <- layer_spec$args
+      
+      if (is.null(private$.plot)) private$.init_default_plot()
+
+      f0 <- self$objective$eval(x0)
+      h <- self$objective$hess(x0)
+      ev <- eigen(h)$vectors
+
+      v1 <- ev[, 1]
+      v2 <- ev[, 2]
+
+      if (private$.layer_primary == "contour") {
+        # Transpose x and y to match contour:
+        v1 <- v1 * x1length + x0
+        v2 <- v2 * x2length + x0
+
+        mx <- c(v1[1], x0[1], v2[1])
+        my <- c(v1[2], x0[2], v2[2])
+
+        private$.plot <- do.call(plotly::add_trace, c(list(private$.plot, x = mx, y = my, mode = "lines", type = "scatter", showlegend = FALSE), aargs))
+      }
+      if (private$.layer_primary == "surface") {
+        v1 <- v1 * x1length + x0
+        v2 <- v2 * x2length + x0
+
+        v0 <- c(x0, f0)
+        v1 <- c(v1, f0)
+        v2 <- c(v2, f0)
+
+        # Order is important to have the angle:
+        marker <- cbind(v1, v0, v2)
+
+        private$.plot <- do.call(plotly::add_trace, c(list(private$.plot, x = marker[1, ], y = marker[2, ], z = marker[3, ], mode = "lines", type = "scatter3d", showlegend = FALSE), aargs))
+      }
     }
   )
 )

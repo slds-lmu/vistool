@@ -115,15 +115,21 @@ All visualizer classes (should) use a deferred rendering architecture:
 - **Customization**: Global settings (e.g., color palette, theme, text size) are set via `$plot()`. Layer-specific settings are passed to the relevant `add_*()` method and stored with the layer specification. Defaults are set at initialization.
 - **Benefits**: This pattern ensures that plots are always up-to-date with the latest settings, supports re-plotting with different global options, and makes it easier to add, remove, or reorder layers.
 
+### Color Management
+
+vistool uses a unified color management system to ensure consistent colors across ggplot2 and plotly visualizations (`color_management.R`). The system supports both discrete colors (for points, traces, lines) and continuous color scales (for surfaces, contours).
+
+**Integration with Deferred Rendering**: Colors marked as `"auto"` in layer specifications are resolved at plot time using the current `color_palette` setting. This ensures colors match the selected palette.
+
 ### Example Workflow
 
 ```r
 viz <- as_visualizer(obj, type = "surface")
-viz$add_points(points = my_points, color = "red")
+viz$add_points(points = my_points)
 viz$add_contours(contours = my_contours)
 # No plot is created yet!
 
-viz$plot(color_palette = "grayscale")  # All layers are rendered now
+viz$plot(color_palette = "grayscale")  # All layers are rendered now, also resolving colors
 ```
 
 ## Development Workflow
