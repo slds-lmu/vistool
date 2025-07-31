@@ -96,8 +96,12 @@ Visualizer1D <- R6::R6Class("Visualizer1D",
     #' Create and return the ggplot2 plot.
     #' @param text_size (`numeric(1)`)\cr
     #'   Base text size for plot elements. Default is 11.
+    #' @param title_size (`numeric(1)`)\cr
+    #'   Title text size. If NULL, defaults to text_size + 2.
     #' @param theme (`character(1)`)\cr
     #'   ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "minimal".
+    #' @param background (`character(1)`)\cr
+    #'   Background color for the plot. Default is "white".
     #' @param color_palette (`character(1)`)\cr
     #'   Default color palette to use. One of "viridis", "plasma", "grayscale". Default is "viridis".
     #' @template param_plot_title
@@ -112,14 +116,15 @@ Visualizer1D <- R6::R6Class("Visualizer1D",
     #' @template param_legend_position
     #' @template param_legend_title
     #' @template param_show_title
-    #' @param ... Additional arguments for future extensibility.
     #' @return A ggplot2 object.
-    plot = function(text_size = 11, theme = "minimal", color_palette = "viridis", plot_title = NULL, plot_subtitle = NULL, 
-                    x_lab = NULL, y_lab = NULL, x_limits = NULL, y_limits = NULL, 
-                    show_grid = TRUE, grid_color = "gray90", show_legend = TRUE, 
-                    legend_position = "right", legend_title = NULL, show_title = TRUE, ...) {
+    plot = function(text_size = 11, title_size = NULL, theme = "minimal", background = "white", color_palette = "viridis",
+                    plot_title = NULL, plot_subtitle = NULL, x_lab = NULL, y_lab = NULL, 
+                    x_limits = NULL, y_limits = NULL, show_grid = TRUE, grid_color = "gray90",
+                    show_legend = TRUE, legend_position = "right", legend_title = NULL, show_title = TRUE) {
       checkmate::assert_number(text_size, lower = 1)
+      checkmate::assert_number(title_size, lower = 1, null.ok = TRUE)
       checkmate::assert_choice(theme, choices = c("minimal", "bw", "classic", "gray", "light", "dark", "void"))
+      checkmate::assert_string(background)
       checkmate::assert_choice(color_palette, choices = c("viridis", "plasma", "grayscale"))
       checkmate::assert_string(plot_title, null.ok = TRUE)
       checkmate::assert_string(plot_subtitle, null.ok = TRUE)
@@ -137,7 +142,9 @@ Visualizer1D <- R6::R6Class("Visualizer1D",
       # Store plot settings and resolve layer colors
       private$.plot_settings <- list(
         text_size = text_size,
+        title_size = title_size,
         theme = theme,
+        background = background,
         color_palette = color_palette,
         plot_title = plot_title,
         plot_subtitle = plot_subtitle,
@@ -155,6 +162,9 @@ Visualizer1D <- R6::R6Class("Visualizer1D",
       
       # Resolve layer colors now that we have plot settings
       private$resolve_layer_colors()
+      
+      # Set default title size
+      if (is.null(title_size)) title_size <- text_size + 2
       
       dd <- data.frame(x = self$fun_x, y = self$fun_y)
       pl <- ggplot(data = dd, aes(x = x, y = y))
@@ -195,7 +205,8 @@ Visualizer1D <- R6::R6Class("Visualizer1D",
       )
       pl <- pl + theme_fun(base_size = text_size) + 
             theme(
-              plot.title = ggplot2::element_text(hjust = 0.5),
+              plot.title = ggplot2::element_text(hjust = 0.5, size = title_size),
+              panel.background = ggplot2::element_rect(fill = background, color = NA),
               legend.position = if (show_legend && legend_position != "none") legend_position else "none",
               panel.grid = if (show_grid) ggplot2::element_line(color = grid_color) else ggplot2::element_blank()
             )
