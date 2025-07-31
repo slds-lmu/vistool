@@ -71,8 +71,8 @@ The objective function.</p></dd>
 <ul><li><p><a href="#method-VisualizerSurfaceObj-new"><code>VisualizerSurfaceObj$new()</code></a></p></li>
 <li><p><a href="#method-VisualizerSurfaceObj-add_optimization_trace"><code>VisualizerSurfaceObj$add_optimization_trace()</code></a></p></li>
 <li><p><a href="#method-VisualizerSurfaceObj-plot"><code>VisualizerSurfaceObj$plot()</code></a></p></li>
-<li><p><a href="#method-VisualizerSurfaceObj-add_layer_taylor"><code>VisualizerSurfaceObj$add_layer_taylor()</code></a></p></li>
-<li><p><a href="#method-VisualizerSurfaceObj-add_layer_hessian"><code>VisualizerSurfaceObj$add_layer_hessian()</code></a></p></li>
+<li><p><a href="#method-VisualizerSurfaceObj-add_taylor"><code>VisualizerSurfaceObj$add_taylor()</code></a></p></li>
+<li><p><a href="#method-VisualizerSurfaceObj-add_hessian"><code>VisualizerSurfaceObj$add_hessian()</code></a></p></li>
 <li><p><a href="#method-VisualizerSurfaceObj-animate"><code>VisualizerSurfaceObj$animate()</code></a></p></li>
 <li><p><a href="#method-VisualizerSurfaceObj-clone"><code>VisualizerSurfaceObj$clone()</code></a></p></li>
 </ul></div><p><details><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="add_points"><a href="Visualizer.html#method-add_points"><code>vistool::Visualizer$add_points()</code></a></span></li>
@@ -94,8 +94,7 @@ The objective function.</p></dd>
 <span>  padding <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  n_points <span class="op">=</span> <span class="fl">100L</span>,</span>
 <span>  opacity <span class="op">=</span> <span class="fl">0.8</span>,</span>
-<span>  colorscale <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="st">"#440154"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.25</span>, <span class="st">"#3b528b"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="st">"#21908c"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.75</span>,</span>
-<span>    <span class="st">"#5dc863"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="st">"#fde725"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  colorscale <span class="op">=</span> <span class="st">"auto"</span>,</span>
 <span>  show_title <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
@@ -285,11 +284,11 @@ Additional arguments passed to the parent plot method.</p></dd>
 <p>The plotly object.</p>
 </div>
 
-</div><p></p><hr><a id="method-VisualizerSurfaceObj-add_layer_taylor"></a><div class="section">
-<h3 id="method-add-layer-taylor-">Method <code>add_layer_taylor()</code><a class="anchor" aria-label="anchor" href="#method-add-layer-taylor-"></a></h3>
+</div><p></p><hr><a id="method-VisualizerSurfaceObj-add_taylor"></a><div class="section">
+<h3 id="method-add-taylor-">Method <code>add_taylor()</code><a class="anchor" aria-label="anchor" href="#method-add-taylor-"></a></h3>
 <p>Add a Taylor approximation (for 1 and 2 degrees).</p><div class="section">
 <h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">VisualizerSurfaceObj</span><span class="op">$</span><span class="fu">add_layer_taylor</span><span class="op">(</span></span>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">VisualizerSurfaceObj</span><span class="op">$</span><span class="fu">add_taylor</span><span class="op">(</span></span>
 <span>  <span class="va">x0</span>,</span>
 <span>  degree <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  x1margin <span class="op">=</span> <span class="fl">0</span>,</span>
@@ -341,11 +340,11 @@ Additional parameter passed to `add_surface()`.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-VisualizerSurfaceObj-add_layer_hessian"></a><div class="section">
-<h3 id="method-add-layer-hessian-">Method <code>add_layer_hessian()</code><a class="anchor" aria-label="anchor" href="#method-add-layer-hessian-"></a></h3>
+</div><p></p><hr><a id="method-VisualizerSurfaceObj-add_hessian"></a><div class="section">
+<h3 id="method-add-hessian-">Method <code>add_hessian()</code><a class="anchor" aria-label="anchor" href="#method-add-hessian-"></a></h3>
 <p>Add two "arrows" as eigenvectors of the Hessian.</p><div class="section">
 <h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">VisualizerSurfaceObj</span><span class="op">$</span><span class="fu">add_layer_hessian</span><span class="op">(</span><span class="va">x0</span>, x1length <span class="op">=</span> <span class="fl">0.1</span>, x2length <span class="op">=</span> <span class="fl">0.1</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">VisualizerSurfaceObj</span><span class="op">$</span><span class="fu">add_hessian</span><span class="op">(</span><span class="va">x0</span>, x1length <span class="op">=</span> <span class="fl">0.1</span>, x2length <span class="op">=</span> <span class="fl">0.1</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">

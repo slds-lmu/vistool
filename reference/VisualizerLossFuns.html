@@ -138,9 +138,9 @@ One of `"both"`, `"y1"`, or `"y0"`.</p></dd>
 
 <ul><li><p><a href="#method-VisualizerLossFuns-new"><code>VisualizerLossFuns$new()</code></a></p></li>
 <li><p><a href="#method-VisualizerLossFuns-plot"><code>VisualizerLossFuns$plot()</code></a></p></li>
+<li><p><a href="#method-VisualizerLossFuns-add_points"><code>VisualizerLossFuns$add_points()</code></a></p></li>
 <li><p><a href="#method-VisualizerLossFuns-clone"><code>VisualizerLossFuns$clone()</code></a></p></li>
-</ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="add_points"><a href="Visualizer.html#method-add_points"><code>vistool::Visualizer$add_points()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="initialize_defaults"><a href="Visualizer.html#method-initialize_defaults"><code>vistool::Visualizer$initialize_defaults()</code></a></span></li>
+</ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="initialize_defaults"><a href="Visualizer.html#method-initialize_defaults"><code>vistool::Visualizer$initialize_defaults()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href="Visualizer.html#method-save"><code>vistool::Visualizer$save()</code></a></span></li>
 </ul></details></p><hr><a id="method-VisualizerLossFuns-new"></a><div class="section">
 <h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
@@ -347,15 +347,87 @@ Indicator whether to show the title of the plot.</p></dd>
 <p>A ggplot2 object.</p>
 </div>
 
-</div><p></p><hr><a id="method-VisualizerLossFuns-clone"></a><div class="section">
-<h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
-<p>The objects of this class are cloneable with this method.</p><div class="section">
+</div><p></p><hr><a id="method-VisualizerLossFuns-add_points"></a><div class="section">
+<h3 id="method-add-points-">Method <code>add_points()</code><a class="anchor" aria-label="anchor" href="#method-add-points-"></a></h3>
+<p>Add points to the loss function visualization with optional vertical lines.
+Points are automatically positioned on the loss curve by evaluating the
+selected loss function at the given x-coordinates.</p><div class="section">
 <h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">VisualizerLossFuns</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">VisualizerLossFuns</span><span class="op">$</span><span class="fu">add_points</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  loss_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  show_line <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  color <span class="op">=</span> <span class="st">"red"</span>,</span>
+<span>  size <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  alpha <span class="op">=</span> <span class="fl">0.8</span>,</span>
+<span>  line_color <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  line_alpha <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
 <h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>x</code></dt>
+<dd><p>(`numeric()`)<br>
+x-coordinates where to place points on the loss curves. These represent
+the residual values (y-f for regression, y*f for classification scores,
+or probabilities for classification probability mode).</p></dd>
+
+
+<dt><code>loss_id</code></dt>
+<dd><p>(`character(1)`)<br>
+ID of the loss function to use for y-value calculation. If NULL (default),
+uses the first loss function.</p></dd>
+
+
+<dt><code>show_line</code></dt>
+<dd><p>(`logical(1)`)<br>
+If TRUE (default), draws vertical lines from points to x-axis.</p></dd>
+
+
+<dt><code>color</code></dt>
+<dd><p>(`character(1)`)<br>
+Color of the points and lines. Use "auto" for automatic color assignment.
+Default is "red".</p></dd>
+
+
+<dt><code>size</code></dt>
+<dd><p>(`numeric(1)`)<br>
+Size of the points. Default is 3.</p></dd>
+
+
+<dt><code>alpha</code></dt>
+<dd><p>(`numeric(1)`)<br>
+Alpha transparency of points and lines. Default is 0.8.</p></dd>
+
+
+<dt><code>line_color</code></dt>
+<dd><p>(`character(1)`)<br>
+Color of vertical lines. If NULL, uses the same color as points.</p></dd>
+
+
+<dt><code>line_alpha</code></dt>
+<dd><p>(`numeric(1)`)<br>
+Alpha transparency of vertical lines. If NULL, uses alpha * 0.7.</p></dd>
+
+
+<dt><code>...</code></dt>
+<dd><p>Additional arguments passed to point and line geoms.</p></dd>
+
+
+</dl><p></p></div>
+</div>
+
+</div><p></p><hr><a id="method-VisualizerLossFuns-clone"></a><div class="section">
+<h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
+<p>The objects of this class are cloneable with this method.</p><div class="section">
+<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">VisualizerLossFuns</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 

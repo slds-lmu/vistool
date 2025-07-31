@@ -41,6 +41,12 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.3.1" id="vistool-031">vistool 0.3.1<a class="anchor" aria-label="anchor" href="#vistool-031"></a></h2>
+<ul><li>All classes now use the deferred rendering architecture.</li>
+<li>Implemented <code>add_points()</code> for loss functions.</li>
+<li>Minor fixes.</li>
+</ul></div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.0" id="vistool-030">vistool 0.3.0<a class="anchor" aria-label="anchor" href="#vistool-030"></a></h2>
 <ul><li>Polished the general workflow and unified all customization options: 1. Initialize the Visualizer object (<code><a href="../reference/as_visualizer.html">as_visualizer()</a></code>), 2. Layering (<code>add_*</code>) methods, 3. Rendering (<code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>); 2. and 3. can be chained (e.g., <code>vis$add_*$add_*$plot()</code>). Global settings that affect the entire plot are set in <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>. Settings for specific visual elements are set in the <code>add_*()</code> methods that create them. Defaults can be set at initialization in <code><a href="../reference/as_visualizer.html">as_visualizer()</a></code>.</li>
 <li>Layers are now only applied when calling <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> (instead of directly), improving predictability and allowing for greater customization.</li>

@@ -99,7 +99,7 @@ specify these parameters directly in the <code><a href="../reference/lss.html">l
 call. Here we retrieve the pinball loss function for regression with a
 custom quantile parameter.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">loss_function</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lss.html">lss</a></span><span class="op">(</span><span class="st">"pinball"</span>, quantile <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">loss_function</span> <span class="op">=</span> <span class="fu"><a href="../reference/lss.html">lss</a></span><span class="op">(</span><span class="st">"pinball"</span>, quantile <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="visualization">Visualization<a class="anchor" aria-label="anchor" href="#visualization"></a>
 </h2>
@@ -113,7 +113,7 @@ For classification losses, the input can be either margins
 (probability-based). By default, loss functions are plotted with 1000
 points for smooth curves.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">vis</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_visualizer.html">as_visualizer</a></span><span class="op">(</span><span class="va">loss_function</span>, y_pred <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">4</span>, <span class="fl">4</span><span class="op">)</span>, y_true <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">vis</span> <span class="op">=</span> <span class="fu"><a href="../reference/as_visualizer.html">as_visualizer</a></span><span class="op">(</span><span class="va">loss_function</span>, y_pred <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">4</span>, <span class="fl">4</span><span class="op">)</span>, y_true <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p>Use the <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method to plot the loss function.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">vis</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
@@ -155,10 +155,10 @@ and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f(x)</annotation></semantics></math>
 is the prediction score:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">hinge_loss</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lss.html">lss</a></span><span class="op">(</span><span class="st">"hinge"</span><span class="op">)</span></span>
-<span><span class="va">crossentropy_loss</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lss.html">lss</a></span><span class="op">(</span><span class="st">"cross-entropy"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">hinge_loss</span> <span class="op">=</span> <span class="fu"><a href="../reference/lss.html">lss</a></span><span class="op">(</span><span class="st">"hinge"</span><span class="op">)</span></span>
+<span><span class="va">crossentropy_loss</span> <span class="op">=</span> <span class="fu"><a href="../reference/lss.html">lss</a></span><span class="op">(</span><span class="st">"cross-entropy"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">vis_scores</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_visualizer.html">as_visualizer</a></span><span class="op">(</span></span>
+<span><span class="va">vis_scores</span> <span class="op">=</span> <span class="fu"><a href="../reference/as_visualizer.html">as_visualizer</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">hinge_loss</span>, <span class="va">crossentropy_loss</span><span class="op">)</span>,</span>
 <span>  input_type <span class="op">=</span> <span class="st">"score"</span></span>
 <span><span class="op">)</span></span>
@@ -173,9 +173,9 @@ is the prediction score:</p>
 The cross-entropy loss can be expressed in both score and probability
 forms, while the Brier score is naturally probability-based:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">brier_loss</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lss.html">lss</a></span><span class="op">(</span><span class="st">"brier"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">brier_loss</span> <span class="op">=</span> <span class="fu"><a href="../reference/lss.html">lss</a></span><span class="op">(</span><span class="st">"brier"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">vis_probs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_visualizer.html">as_visualizer</a></span><span class="op">(</span></span>
+<span><span class="va">vis_probs</span> <span class="op">=</span> <span class="fu"><a href="../reference/as_visualizer.html">as_visualizer</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">crossentropy_loss</span>, <span class="va">brier_loss</span><span class="op">)</span>,</span>
 <span>  input_type <span class="op">=</span> <span class="st">"probability"</span></span>
 <span><span class="op">)</span></span>
@@ -190,7 +190,7 @@ show curves for the positive class (<code>y = 1</code>), negative class
 (<code>y = 0</code>), or both (default) using the <code>y_curves</code>
 parameter:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">vis_y1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_visualizer.html">as_visualizer</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">vis_y1</span> <span class="op">=</span> <span class="fu"><a href="../reference/as_visualizer.html">as_visualizer</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">crossentropy_loss</span>, <span class="va">brier_loss</span><span class="op">)</span>,</span>
 <span>  input_type <span class="op">=</span> <span class="st">"probability"</span>,</span>
 <span>  y_curves <span class="op">=</span> <span class="st">"y1"</span>  <span class="co"># Only show y = 1 curve</span></span>
@@ -200,20 +200,57 @@ parameter:</p>
 </div>
 </div>
 <div class="section level2">
+<h2 id="adding-points-to-loss-function-visualizations">Adding Points to Loss Function Visualizations<a class="anchor" aria-label="anchor" href="#adding-points-to-loss-function-visualizations"></a>
+</h2>
+<p>You can add specific points to loss function plots to highlight
+particular residual values and their corresponding loss values. The
+<code>add_points()</code> method automatically calculates the
+y-coordinates by evaluating the loss function at the given
+x-coordinates.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">vis_with_points</span> <span class="op">=</span> <span class="fu"><a href="../reference/as_visualizer.html">as_visualizer</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">loss_l2</span>, <span class="va">loss_l1</span><span class="op">)</span>,</span>
+<span>  y_pred <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>,</span>
+<span>  y_true <span class="op">=</span> <span class="fl">0</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">vis_with_points</span><span class="op">$</span><span class="fu">add_points</span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>, <span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>,</span>
+<span>  loss_id <span class="op">=</span> <span class="st">"l2"</span>,</span>
+<span>  show_line <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  color <span class="op">=</span> <span class="st">"red"</span>,</span>
+<span>  size <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  alpha <span class="op">=</span> <span class="fl">0.8</span></span>
+<span><span class="op">)</span><span class="op">$</span><span class="fu">add_points</span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span>,</span>
+<span>  loss_id <span class="op">=</span> <span class="st">"l1"</span>,  <span class="co"># Specify the L1 loss</span></span>
+<span>  show_line <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  color <span class="op">=</span> <span class="st">"blue"</span>,</span>
+<span>  size <span class="op">=</span> <span class="fl">2.5</span>,</span>
+<span>  alpha <span class="op">=</span> <span class="fl">0.7</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">vis_with_points</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span></span>
+<span>  plot_title <span class="op">=</span> <span class="st">"Loss Functions with Points"</span>,</span>
+<span>  show_legend <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="loss_functions_files/figure-html/unnamed-chunk-11-1.png" width="100%"></p>
+</div>
+<div class="section level2">
 <h2 id="custom-loss-functions">Custom Loss Functions<a class="anchor" aria-label="anchor" href="#custom-loss-functions"></a>
 </h2>
 <p>We can also define and visualize custom loss functions:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">custom_loss</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/LossFunction.html">LossFunction</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">custom_loss</span> <span class="op">=</span> <span class="va"><a href="../reference/LossFunction.html">LossFunction</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
 <span>  id <span class="op">=</span> <span class="st">"custom_loss"</span>,</span>
 <span>  label <span class="op">=</span> <span class="st">"Sinusoidal-Exponential Loss"</span>,</span>
 <span>  task_type <span class="op">=</span> <span class="st">"regr"</span>,</span>
 <span>  fun <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">r</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span> <span class="op">/</span> <span class="fl">3</span><span class="op">)</span> <span class="op">+</span> <span class="fl">0.5</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="fl">2</span> <span class="op">*</span> <span class="va">r</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">vis</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_visualizer.html">as_visualizer</a></span><span class="op">(</span><span class="va">custom_loss</span>, y_pred <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, y_true <span class="op">=</span> <span class="fl">0</span>, n_points <span class="op">=</span> <span class="fl">5000L</span><span class="op">)</span></span>
+<span><span class="va">vis</span> <span class="op">=</span> <span class="fu"><a href="../reference/as_visualizer.html">as_visualizer</a></span><span class="op">(</span><span class="va">custom_loss</span>, y_pred <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, y_true <span class="op">=</span> <span class="fl">0</span>, n_points <span class="op">=</span> <span class="fl">5000L</span><span class="op">)</span></span>
 <span><span class="va">vis</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="loss_functions_files/figure-html/unnamed-chunk-11-1.png" width="100%"></p>
+<p><img src="loss_functions_files/figure-html/unnamed-chunk-12-1.png" width="100%"></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

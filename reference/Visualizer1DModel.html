@@ -124,14 +124,51 @@ Note that a grid of `npoints^2` values is generated and evaluated by `objective$
 
 </div><p></p><hr><a id="method-Visualizer1DModel-add_training_data"></a><div class="section">
 <h3 id="method-add-training-data-">Method <code>add_training_data()</code><a class="anchor" aria-label="anchor" href="#method-add-training-data-"></a></h3>
-<p>Add training data points to the plot.</p><div class="section">
+<p>Adds the training data to the plot.</p><div class="section">
 <h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Visualizer1DModel</span><span class="op">$</span><span class="fu">add_training_data</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Visualizer1DModel</span><span class="op">$</span><span class="fu">add_training_data</span><span class="op">(</span></span>
+<span>  color <span class="op">=</span> <span class="st">"auto"</span>,</span>
+<span>  size <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  shape <span class="op">=</span> <span class="fl">19</span>,</span>
+<span>  alpha <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  show_labels <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  label_size <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="returns">Returns<a class="anchor" aria-label="anchor" href="#returns"></a></h4>
-<p>Returns the visualizer object invisibly for method chaining.</p>
+<h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>color</code></dt>
+<dd><p>(`character(1)`)<br>
+Color of the points. Use "auto" for automatic color assignment. Default is "auto".</p></dd>
+
+
+<dt><code>size</code></dt>
+<dd><p>(`numeric(1)`)<br>
+Size of the points. Default is 2.</p></dd>
+
+
+<dt><code>shape</code></dt>
+<dd><p>(`integer(1)`)<br>
+Shape of the points. Default is 19.</p></dd>
+
+
+<dt><code>alpha</code></dt>
+<dd><p>(`numeric(1)`)<br>
+Alpha transparency of the points. Default is 1.</p></dd>
+
+
+<dt><code>show_labels</code></dt>
+<dd><p>(`logical(1)`)<br>
+Whether to show data point labels. Default is FALSE.</p></dd>
+
+
+<dt><code>label_size</code></dt>
+<dd><p>(`numeric(1)`)<br>
+Size of data point labels. If NULL, defaults to smaller text.</p></dd>
+
+
+</dl><p></p></div>
 </div>
 
 </div><p></p><hr><a id="method-Visualizer1DModel-add_boundary"></a><div class="section">
@@ -148,7 +185,7 @@ Note that a grid of `npoints^2` values is generated and evaluated by `objective$
 </div>
 
 <div class="section">
-<h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
+<h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>values</code></dt>
 <dd><p>(`numeric()`)<br>
 Vector of y-values where to draw boundary lines. For classification with probability predictions,
@@ -182,11 +219,16 @@ Transparency of boundary lines. Default is 0.8.</p></dd>
 <h3 id="method-plot-">Method <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code><a class="anchor" aria-label="anchor" href="#method-plot-"></a></h3>
 <p>Create and return the ggplot2 plot with model-specific features.</p><div class="section">
 <h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Visualizer1DModel</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span>text_size <span class="op">=</span> <span class="fl">11</span>, theme <span class="op">=</span> <span class="st">"minimal"</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Visualizer1DModel</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span></span>
+<span>  text_size <span class="op">=</span> <span class="fl">11</span>,</span>
+<span>  theme <span class="op">=</span> <span class="st">"minimal"</span>,</span>
+<span>  color_palette <span class="op">=</span> <span class="st">"viridis"</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
+<h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>text_size</code></dt>
 <dd><p>(`numeric(1)`)<br>
 Base text size for plot elements. Default is 11.</p></dd>
@@ -197,6 +239,11 @@ Base text size for plot elements. Default is 11.</p></dd>
 ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "minimal".</p></dd>
 
 
+<dt><code>color_palette</code></dt>
+<dd><p>(`character(1)`)<br>
+Color palette for the fill scale. One of "viridis", "plasma", "grayscale". Default is "viridis".</p></dd>
+
+
 <dt><code>...</code></dt>
 <dd><p>Additional arguments passed to the parent plot method.</p></dd>
 
@@ -204,7 +251,7 @@ ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark"
 </dl><p></p></div>
 </div>
 <div class="section">
-<h4 id="returns-1">Returns<a class="anchor" aria-label="anchor" href="#returns-1"></a></h4>
+<h4 id="returns">Returns<a class="anchor" aria-label="anchor" href="#returns"></a></h4>
 <p>A ggplot2 object.</p>
 </div>
 
@@ -216,7 +263,7 @@ ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark"
 </div>
 
 <div class="section">
-<h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
+<h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 

@@ -37,8 +37,8 @@
 <url><loc>https://slds-lmu.github.io/vistool/reference/dict_loss.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/dict_objective.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/dot-vistool_colors.html</loc></url>
-<url><loc>https://slds-lmu.github.io/vistool/reference/get_auto_color.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/get_consistent_color.html</loc></url>
+<url><loc>https://slds-lmu.github.io/vistool/reference/get_continuous_colorscale.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/get_vistool_color.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/hex_to_rgba.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/index.html</loc></url>
@@ -46,12 +46,12 @@
 <url><loc>https://slds-lmu.github.io/vistool/reference/mergeOptimArchives.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/mlr_learners_regr.lm_formula.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/obj.html</loc></url>
-<url><loc>https://slds-lmu.github.io/vistool/reference/process_color.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/reexports.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/stepSizeControlDecayExp.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/stepSizeControlDecayLinear.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/stepSizeControlDecaySteps.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/stepSizeControlDecayTime.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/stepSizeControlLineSearch.html</loc></url>
+<url><loc>https://slds-lmu.github.io/vistool/reference/validate_color.html</loc></url>
 </urlset>
 
