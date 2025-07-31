@@ -9,7 +9,7 @@
 #' @template param_n_points
 #'
 #' @export
-Visualizer2D <- R6::R6Class("Visualizer2D",
+Visualizer2D = R6::R6Class("Visualizer2D",
   inherit = Visualizer,
   public = list(
 
@@ -58,13 +58,13 @@ Visualizer2D <- R6::R6Class("Visualizer2D",
                           lab_x1 = "x1",
                           lab_x2 = "x2",
                           lab_y = "y") {
-      self$fun_x1 <- checkmate::assert_numeric(fun_x1)
-      self$fun_x2 <- checkmate::assert_numeric(fun_x2)
-      self$fun_y <- checkmate::assert_numeric(fun_y)
-      self$title <- checkmate::assert_character(title, null.ok = TRUE)
-      self$lab_x1 <- checkmate::assert_character(lab_x1)
-      self$lab_x2 <- checkmate::assert_character(lab_x2)
-      self$lab_y <- checkmate::assert_character(lab_y)
+      self$fun_x1 = checkmate::assert_numeric(fun_x1)
+      self$fun_x2 = checkmate::assert_numeric(fun_x2)
+      self$fun_y = checkmate::assert_numeric(fun_y)
+      self$title = checkmate::assert_character(title, null.ok = TRUE)
+      self$lab_x1 = checkmate::assert_character(lab_x1)
+      self$lab_x2 = checkmate::assert_character(lab_x2)
+      self$lab_y = checkmate::assert_character(lab_y)
     },
 
     #' @description
@@ -115,7 +115,7 @@ Visualizer2D <- R6::R6Class("Visualizer2D",
       checkmate::assert_flag(show_title)
       
       # Store plot settings and resolve layer colors
-      private$.plot_settings <- list(
+      private$.plot_settings = list(
         text_size = text_size, title_size = title_size, theme = theme, 
         background = background, color_palette = color_palette,
         plot_title = plot_title, plot_subtitle = plot_subtitle,
@@ -126,49 +126,49 @@ Visualizer2D <- R6::R6Class("Visualizer2D",
       private$resolve_layer_colors()
       
       # Set default title size
-      if (is.null(title_size)) title_size <- text_size + 2
+      if (is.null(title_size)) title_size = text_size + 2
       
-      data <- data.table(
+      data = data.table(
         fun_x1 = self$fun_x1,
         fun_x2 = self$fun_x2,
         fun_y = self$fun_y
       )
 
       # Determine final labels
-      final_title <- if (show_title) {
+      final_title = if (show_title) {
         if (!is.null(plot_title)) plot_title else self$title
       } else {
         NULL
       }
-      final_x_lab <- if (!is.null(x_lab)) x_lab else self$lab_x1
-      final_y_lab <- if (!is.null(y_lab)) y_lab else self$lab_x2
-      final_legend_title <- if (!is.null(legend_title)) legend_title else self$lab_y
+      final_x_lab = if (!is.null(x_lab)) x_lab else self$lab_x1
+      final_y_lab = if (!is.null(y_lab)) y_lab else self$lab_x2
+      final_legend_title = if (!is.null(legend_title)) legend_title else self$lab_y
 
       # Create base plot with continuous color gradient and overlaid contours
-      p <- ggplot(data, aes(x = fun_x1, y = fun_x2)) +
+      p = ggplot(data, aes(x = fun_x1, y = fun_x2)) +
         geom_raster(aes(fill = fun_y), interpolate = TRUE) +
         geom_contour(aes(z = fun_y), color = "white", alpha = 0.3) +
         labs(title = final_title, subtitle = plot_subtitle, x = final_x_lab, y = final_y_lab)
       
       # Apply axis limits if specified
       if (!is.null(x_limits)) {
-        p <- p + ggplot2::xlim(x_limits[1], x_limits[2])
+        p = p + ggplot2::xlim(x_limits[1], x_limits[2])
       }
       if (!is.null(y_limits)) {
-        p <- p + ggplot2::ylim(y_limits[1], y_limits[2])
+        p = p + ggplot2::ylim(y_limits[1], y_limits[2])
       }
       
       # Apply color scale based on palette choice
       if (color_palette == "viridis") {
-        p <- p + scale_fill_viridis_c(name = final_legend_title)
+        p = p + scale_fill_viridis_c(name = final_legend_title)
       } else if (color_palette == "plasma") {
-        p <- p + scale_fill_viridis_c(name = final_legend_title, option = "plasma")
+        p = p + scale_fill_viridis_c(name = final_legend_title, option = "plasma")
       } else if (color_palette == "grayscale") {
-        p <- p + scale_fill_gradient(name = final_legend_title, low = "black", high = "white")
+        p = p + scale_fill_gradient(name = final_legend_title, low = "black", high = "white")
       }
 
       # apply theme
-      theme_fun <- switch(theme,
+      theme_fun = switch(theme,
         "minimal" = ggplot2::theme_minimal,
         "bw" = ggplot2::theme_bw,
         "classic" = ggplot2::theme_classic,
@@ -177,7 +177,7 @@ Visualizer2D <- R6::R6Class("Visualizer2D",
         "dark" = ggplot2::theme_dark,
         "void" = ggplot2::theme_void
       )
-      p <- p + theme_fun(base_size = text_size) + 
+      p = p + theme_fun(base_size = text_size) + 
            theme(
              plot.title = ggplot2::element_text(hjust = 0.5, size = title_size),
              panel.background = ggplot2::element_rect(fill = background, color = NA),
@@ -186,7 +186,7 @@ Visualizer2D <- R6::R6Class("Visualizer2D",
            )
       
       # Add points from add_points() method
-      p <- private$add_points_to_ggplot(p, "2D")
+      p = private$add_points_to_ggplot(p, "2D")
 
       return(p)
     }

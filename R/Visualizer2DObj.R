@@ -9,7 +9,7 @@
 #' @template param_n_points
 #'
 #' @export
-Visualizer2DObj <- R6::R6Class("Visualizer2DObj",
+Visualizer2DObj = R6::R6Class("Visualizer2DObj",
   inherit = Visualizer2D,
   public = list(
 
@@ -25,7 +25,7 @@ Visualizer2DObj <- R6::R6Class("Visualizer2DObj",
                           x2_limits = NULL,
                           padding = 0,
                           n_points = 100L) {
-      self$objective <- checkmate::assert_r6(objective, "Objective")
+      self$objective = checkmate::assert_r6(objective, "Objective")
       checkmate::assert_numeric(x1_limits, len = 2, null.ok = TRUE)
       checkmate::assert_numeric(x2_limits, len = 2, null.ok = TRUE)
       checkmate::assert_numeric(padding)
@@ -35,21 +35,21 @@ Visualizer2DObj <- R6::R6Class("Visualizer2DObj",
         mlr3misc::stopf("`Visualizer2D` requires 2-dimensional inputs, but `objective$xdim = %s`", objective$xdim)
       }
 
-      x1_limits <- x1_limits %??% c(objective$lower[1], objective$upper[1])
-      x2_limits <- x2_limits %??% c(objective$lower[2], objective$upper[2])
+      x1_limits = x1_limits %??% c(objective$lower[1], objective$upper[1])
+      x2_limits = x2_limits %??% c(objective$lower[2], objective$upper[2])
 
       if (any(is.na(x1_limits)) || any(is.na(x2_limits))) {
         stop("Limits could not be extracted from the objective. Please use `x_limits`.")
       }
 
-      x1_pad <- (x1_limits[2] - x1_limits[1]) * padding
-      x2_pad <- (x2_limits[2] - x2_limits[1]) * padding
+      x1_pad = (x1_limits[2] - x1_limits[1]) * padding
+      x2_pad = (x2_limits[2] - x2_limits[1]) * padding
 
-      x1 <- unique(seq(x1_limits[1] - x1_pad, x1_limits[2] + x1_pad, length.out = n_points))
-      x2 <- unique(seq(x2_limits[1] - x2_pad, x2_limits[2] + x2_pad, length.out = n_points))
-      grid <- CJ(x1, x2)
+      x1 = unique(seq(x1_limits[1] - x1_pad, x1_limits[2] + x1_pad, length.out = n_points))
+      x2 = unique(seq(x2_limits[1] - x2_pad, x2_limits[2] + x2_pad, length.out = n_points))
+      grid = CJ(x1, x2)
 
-      y <- apply(grid, 1, function(row) {
+      y = apply(grid, 1, function(row) {
         self$objective$eval(c(row[1], row[2]))
       })
 
@@ -120,17 +120,17 @@ Visualizer2DObj <- R6::R6Class("Visualizer2DObj",
 
       # Generate color if not provided using unified color system
       if (is.null(line_color)) {
-        line_color <- "auto"
+        line_color = "auto"
       }
 
-      if (is.null(marker_color)) marker_color <- line_color  # Use same color for marker
+      if (is.null(marker_color)) marker_color = line_color  # Use same color for marker
       if (is.null(name)) {
-        name <- paste0(optimizer$id, " on ", optimizer$objective$id)
+        name = paste0(optimizer$id, " on ", optimizer$objective$id)
       }
 
       # Extract trace data from optimizer archive
-      xmat <- do.call(rbind, c(optimizer$archive$x_in[1], optimizer$archive$x_out))
-      trace_data <- data.frame(
+      xmat = do.call(rbind, c(optimizer$archive$x_in[1], optimizer$archive$x_out))
+      trace_data = data.frame(
         x1 = xmat[, 1],
         x2 = xmat[, 2],
         iteration = seq_len(nrow(xmat)),
@@ -139,23 +139,23 @@ Visualizer2DObj <- R6::R6Class("Visualizer2DObj",
 
       # Apply point filtering if requested
       if (!is.null(npoints) || !is.null(npmax)) {
-        if (is.null(npoints)) npoints <- nrow(trace_data)
-        if (is.null(npmax)) npmax <- nrow(trace_data)
-        npmax <- min(npmax, nrow(trace_data))
+        if (is.null(npoints)) npoints = nrow(trace_data)
+        if (is.null(npmax)) npmax = nrow(trace_data)
+        npmax = min(npmax, nrow(trace_data))
         
         # Subsample points
-        indices <- unique(round(seq(1, nrow(trace_data), length.out = npoints)))
-        indices <- indices[indices <= npmax]
-        trace_data <- trace_data[indices, ]
+        indices = unique(round(seq(1, nrow(trace_data), length.out = npoints)))
+        indices = indices[indices <= npmax]
+        trace_data = trace_data[indices, ]
         
         # Adjust marker positions
         if (!is.null(add_marker_at)) {
-          add_marker_at <- add_marker_at[add_marker_at <= npmax]
+          add_marker_at = add_marker_at[add_marker_at <= npmax]
         }
       }
 
       # Store trace information without resolving colors yet
-      trace_info <- list(
+      trace_info = list(
         data = trace_data,
         line_color = line_color,  # Keep for later resolution
         line_width = line_width,
@@ -182,97 +182,99 @@ Visualizer2DObj <- R6::R6Class("Visualizer2DObj",
     #'   ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "minimal".
     #' @param ... Additional arguments passed to the parent plot method.
     #' @return A ggplot2 object.
-    plot = function(text_size = 11, theme = "minimal", ...) {
-      checkmate::assert_number(text_size, lower = 1)
-      checkmate::assert_choice(theme, choices = c("minimal", "bw", "classic", "gray", "light", "dark", "void"))
+    plot = function(...) {
+      # Call parent plot method first to set up plot_settings and resolve colors
+      p = super$plot(...)
       
-      # Store plot settings and resolve layer colors
-      private$.plot_settings <- list(text_size = text_size, theme = theme, ...)
-      private$resolve_layer_colors()
-      
-      # Call parent plot method with all arguments
-      p <- super$plot(text_size = text_size, theme = theme, ...)
-      
-      # Add optimization traces if any
-      if (length(private$.layers_to_add) > 0) {
-        trace_logical <- sapply(private$.layers_to_add, function(x) x$type == "optimization_trace")
-        trace_indices <- which(trace_logical)
-      } else {
-        trace_indices <- integer(0)
-      }
-      
-      for (idx in trace_indices) {
-        trace <- private$.layers_to_add[[idx]]$spec
-        trace_data <- trace$data
-
-        # Add the trace line
-        p <- p + geom_path(
-          data = trace_data,
-          aes(x = x1, y = x2),
-          color = trace$line_color,
-          linewidth = trace$line_width,
-          linetype = trace$line_type,
-          alpha = trace$alpha,
-          inherit.aes = FALSE
-        )
-
-        # Add markers at specified iterations
-        if (!is.null(trace$add_marker_at) && length(trace$add_marker_at) > 0) {
-          marker_data <- trace_data[trace_data$iteration %in% trace$add_marker_at, ]
-          if (nrow(marker_data) > 0) {
-            # Resolve marker color if it's still "auto" or matches line color
-            marker_color <- if (trace$marker_color == trace$line_color) trace$line_color else trace$marker_color
-            
-            p <- p + geom_point(
-              data = marker_data,
-              aes(x = x1, y = x2),
-              color = marker_color,
-              size = trace$marker_size,
-              shape = trace$marker_shape,
-              alpha = trace$alpha,
-              inherit.aes = FALSE
-            )
-            }
-          }
-
-          # Add special start/end markers if requested
-          if (trace$show_start_end && nrow(trace_data) > 1) {
-            # Resolve marker color for start/end points
-            marker_color <- if (trace$marker_color == trace$line_color) trace$line_color else trace$marker_color
-            
-            # Start point (larger, different shape)
-            start_data <- trace_data[1, ]
-            p <- p + geom_point(
-              data = start_data,
-              aes(x = x1, y = x2),
-              color = marker_color,
-              size = trace$marker_size + 1,
-              shape = 21,  # circle with border
-              fill = "white",
-              stroke = 2,
-              alpha = 1,
-              inherit.aes = FALSE
-            )
-
-            # End point (larger, different shape)
-            end_data <- trace_data[nrow(trace_data), ]
-            p <- p + geom_point(
-              data = end_data,
-              aes(x = x1, y = x2),
-              color = marker_color,
-              size = trace$marker_size + 1,
-              shape = 23,  # diamond
-              fill = marker_color,
-              alpha = 1,
-              inherit.aes = FALSE
-            )
-          }
-        }
-      
-      return(p)
+      # Render optimization traces if any exist
+      private$render_optimization_trace_layers(p)
     }
   ),
   private = list(
-    # Optimization-specific private fields inherited from base class
+    # Render stored optimization trace layers
+    render_optimization_trace_layers = function(plot_obj) {
+      # Get all stored optimization trace layers
+      trace_layers = private$get_layers_by_type("optimization_trace")
+      
+      if (length(trace_layers) == 0) {
+        return(plot_obj)
+      }
+      
+      for (trace_spec in trace_layers) {
+        plot_obj = private$render_optimization_trace_layer(plot_obj, trace_spec)
+      }
+      
+      return(plot_obj)
+    },
+    
+    # Render a single optimization trace layer
+    render_optimization_trace_layer = function(plot_obj, layer_spec) {
+      trace_data = layer_spec$data
+
+      # Add the trace line
+      plot_obj = plot_obj + ggplot2::geom_path(
+        data = trace_data,
+        ggplot2::aes(x = x1, y = x2),
+        color = layer_spec$line_color,
+        linewidth = layer_spec$line_width,
+        linetype = layer_spec$line_type,
+        alpha = layer_spec$alpha,
+        inherit.aes = FALSE
+      )
+
+      # Add markers at specified iterations
+      if (!is.null(layer_spec$add_marker_at) && length(layer_spec$add_marker_at) > 0) {
+        marker_data = trace_data[trace_data$iteration %in% layer_spec$add_marker_at, ]
+        if (nrow(marker_data) > 0) {
+          # Resolve marker color if it's still "auto" or matches line color
+          marker_color = if (layer_spec$marker_color == layer_spec$line_color) layer_spec$line_color else layer_spec$marker_color
+          
+          plot_obj = plot_obj + ggplot2::geom_point(
+            data = marker_data,
+            ggplot2::aes(x = x1, y = x2),
+            color = marker_color,
+            size = layer_spec$marker_size,
+            shape = layer_spec$marker_shape,
+            alpha = layer_spec$alpha,
+            inherit.aes = FALSE
+          )
+        }
+      }
+
+      # Add special start/end markers if requested
+      if (layer_spec$show_start_end && nrow(trace_data) > 1) {
+        # Resolve marker color for start/end points
+        marker_color = if (layer_spec$marker_color == layer_spec$line_color) layer_spec$line_color else layer_spec$marker_color
+        
+        # Start point (larger, different shape)
+        start_data = trace_data[1, ]
+        plot_obj = plot_obj + ggplot2::geom_point(
+          data = start_data,
+          ggplot2::aes(x = x1, y = x2),
+          color = marker_color,
+          size = layer_spec$marker_size + 1,
+          shape = 21,  # circle with border
+          fill = "white",
+          stroke = 2,
+          alpha = 1,
+          inherit.aes = FALSE
+        )
+
+        # End point (larger, different shape)
+        end_data = trace_data[nrow(trace_data), ]
+        plot_obj = plot_obj + ggplot2::geom_point(
+          data = end_data,
+          ggplot2::aes(x = x1, y = x2),
+          color = marker_color,
+          size = layer_spec$marker_size + 1,
+          shape = 23,  # diamond
+          fill = marker_color,
+          alpha = 1,
+          inherit.aes = FALSE
+        )
+      }
+      
+      return(plot_obj)
+    }
   )
 )

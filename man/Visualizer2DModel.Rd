@@ -155,7 +155,7 @@ Adds boundary line(s) to the plot at specified values.
 \describe{
 \item{\code{values}}{(`numeric()`)\cr
 Vector of values where to draw boundary contours. For classification with probability predictions,
-defaults to 0.5. For regression or response predictions, defaults to quantiles of predictions.}
+defaults to 0.5. For regression or response predictions, defaults to the median of predictions.}
 
 \item{\code{color}}{(`character(1)`)\cr
 Color of the boundary lines. Default is "black".}

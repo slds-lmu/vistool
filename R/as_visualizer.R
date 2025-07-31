@@ -44,7 +44,7 @@
 #' You can override this by specifying `type = "1d"`, `type = "2d"`, or for 2D inputs only: `type = "surface"` (uses plotly for interactive surfaces, Models and Objectives only).
 #'
 #' @export
-as_visualizer <- function(x, type = "auto", x1_limits = NULL, x2_limits = NULL, 
+as_visualizer = function(x, type = "auto", x1_limits = NULL, x2_limits = NULL, 
                          padding = 0, n_points = 100L, y_pred = NULL, y_true = NULL,
                          input_type = "auto", y_curves = "both", learner = NULL,
                          default_color_palette = "viridis", default_text_size = 11, 
@@ -55,7 +55,7 @@ as_visualizer <- function(x, type = "auto", x1_limits = NULL, x2_limits = NULL,
 
 #' @rdname as_visualizer
 #' @export
-as_visualizer.Task <- function(x, type = "auto", x1_limits = NULL, x2_limits = NULL, 
+as_visualizer.Task = function(x, type = "auto", x1_limits = NULL, x2_limits = NULL, 
                               padding = 0, n_points = 100L, y_pred = NULL, y_true = NULL,
                               input_type = "auto", y_curves = "both", learner = NULL,
                               default_color_palette = "viridis", default_text_size = 11, 
@@ -65,19 +65,19 @@ as_visualizer.Task <- function(x, type = "auto", x1_limits = NULL, x2_limits = N
     stop("Argument 'learner' is required for Task visualizations")
   }
   checkmate::assert_choice(type, choices = c("auto", "1d", "2d", "surface"))
-  n_features <- length(x$feature_names)
+  n_features = length(x$feature_names)
   
   # Determine visualization type
   if (type == "auto") {
     if (n_features == 1) {
-      vis_type <- "1d"
+      vis_type = "1d"
     } else if (n_features == 2) {
-      vis_type <- "2d"  # Default to ggplot2 for 2D
+      vis_type = "2d"  # Default to ggplot2 for 2D
     } else {
       stop("Auto visualization only supports 1D and 2D tasks. For higher dimensions, please specify type explicitly.")
     }
   } else {
-    vis_type <- type
+    vis_type = type
   }
   
   # Validate type against features
@@ -90,12 +90,12 @@ as_visualizer.Task <- function(x, type = "auto", x1_limits = NULL, x2_limits = N
   
   # Create appropriate visualizer
   if (vis_type == "1d") {
-    vis <- Visualizer1DModel$new(x, learner, xlim = x1_limits, n_points = n_points, ...)
+    vis = Visualizer1DModel$new(x, learner, xlim = x1_limits, n_points = n_points, ...)
   } else if (vis_type == "2d") {
-    vis <- Visualizer2DModel$new(x, learner, x1_limits = x1_limits, x2_limits = x2_limits, 
+    vis = Visualizer2DModel$new(x, learner, x1_limits = x1_limits, x2_limits = x2_limits, 
                                 padding = padding, n_points = n_points, ...)
   } else if (vis_type == "surface") {
-    vis <- VisualizerSurfaceModel$new(x, learner, x1_limits = x1_limits, x2_limits = x2_limits, 
+    vis = VisualizerSurfaceModel$new(x, learner, x1_limits = x1_limits, x2_limits = x2_limits, 
                                      padding = padding, n_points = n_points, ...)
   } else {
     stop("Unknown visualization type.")
@@ -110,26 +110,26 @@ as_visualizer.Task <- function(x, type = "auto", x1_limits = NULL, x2_limits = N
 
 #' @rdname as_visualizer
 #' @export
-as_visualizer.Objective <- function(x, type = "auto", x1_limits = NULL, x2_limits = NULL, 
+as_visualizer.Objective = function(x, type = "auto", x1_limits = NULL, x2_limits = NULL, 
                                    padding = 0, n_points = 100L, y_pred = NULL, y_true = NULL,
                                    input_type = "auto", y_curves = "both", learner = NULL,
                                    default_color_palette = "viridis", default_text_size = 11, 
                                    default_theme = "minimal", default_alpha = 0.8, 
                                    default_line_width = 1.2, default_point_size = 2, ...) {
   checkmate::assert_choice(type, choices = c("auto", "1d", "2d", "surface"))
-  n_dim <- x$xdim
+  n_dim = x$xdim
   
   # Determine visualization type
   if (type == "auto") {
     if (n_dim == 1) {
-      vis_type <- "1d"
+      vis_type = "1d"
     } else if (n_dim == 2) {
-      vis_type <- "2d"  # Default to ggplot2 for 2D
+      vis_type = "2d"  # Default to ggplot2 for 2D
     } else {
       stop("Auto visualization only supports 1D and 2D objectives. For higher dimensions, please specify type explicitly.")
     }
   } else {
-    vis_type <- type
+    vis_type = type
   }
   
   # Validate type against dimensions
@@ -154,7 +154,7 @@ as_visualizer.Objective <- function(x, type = "auto", x1_limits = NULL, x2_limit
 
 #' @rdname as_visualizer
 #' @export
-as_visualizer.LossFunction <- function(x, type = "auto", x1_limits = NULL, x2_limits = NULL,
+as_visualizer.LossFunction = function(x, type = "auto", x1_limits = NULL, x2_limits = NULL,
                                        padding = 0, n_points = 1000L,
                                        y_pred = NULL, y_true = NULL,
                                        input_type = "auto", y_curves = "both", learner = NULL,
@@ -172,7 +172,7 @@ as_visualizer.LossFunction <- function(x, type = "auto", x1_limits = NULL, x2_li
 
 #' @rdname as_visualizer
 #' @export
-as_visualizer.list <- function(x, type = "auto", x1_limits = NULL, x2_limits = NULL,
+as_visualizer.list = function(x, type = "auto", x1_limits = NULL, x2_limits = NULL,
                                 padding = 0, n_points = 1000L,
                                 y_pred = NULL, y_true = NULL,
                                 input_type = "auto", y_curves = "both", learner = NULL,
@@ -180,7 +180,7 @@ as_visualizer.list <- function(x, type = "auto", x1_limits = NULL, x2_limits = N
                                 default_theme = "minimal", default_alpha = 0.8, 
                                 default_line_width = 1.2, default_point_size = 2, ...) {
   # Check all elements are LossFunction objects
-  invalid_indices <- which(!vapply(x, function(obj) inherits(obj, "LossFunction"), logical(1)))
+  invalid_indices = which(!vapply(x, function(obj) inherits(obj, "LossFunction"), logical(1)))
   if (length(invalid_indices) > 0) {
     stop(sprintf("The following elements of the list are not LossFunction objects: %s", paste(invalid_indices, collapse = ", ")))
   }

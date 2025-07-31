@@ -1,6 +1,6 @@
 test_that("Objective creation works", {
   # Simple 1D objective
-  obj_1d <- Objective$new(
+  obj_1d = Objective$new(
     id = "test_1d",
     fun = function(x) x^2,
     xdim = 1,
@@ -16,7 +16,7 @@ test_that("Objective creation works", {
   expect_false(obj_1d$minimize)
 
   # Simple 2D objective
-  obj_2d <- Objective$new(
+  obj_2d = Objective$new(
     id = "test_2d",
     fun = function(x) sum(x^2),
     xdim = 2,
@@ -33,7 +33,7 @@ test_that("Objective creation works", {
 })
 
 test_that("Objective evaluation works", {
-  obj <- Objective$new(
+  obj = Objective$new(
     id = "test",
     fun = function(x) sum(x^2),
     xdim = 2,
@@ -42,11 +42,11 @@ test_that("Objective evaluation works", {
   )
 
   # Test eval
-  result <- obj$eval(c(1, 1))
+  result = obj$eval(c(1, 1))
   expect_equal(result, 2)
 
   # Test evalStore
-  stored <- obj$evalStore(c(0.5, 0.5))
+  stored = obj$evalStore(c(0.5, 0.5))
   expect_equal(stored$fval, 0.5)
   expect_length(stored$x[[1]], 2)
 
@@ -56,7 +56,7 @@ test_that("Objective evaluation works", {
 
 test_that("Objective gradient and hessian work", {
   # Objective with gradient and hessian
-  obj <- Objective$new(
+  obj = Objective$new(
     id = "quadratic",
     fun = function(x) sum(x^2),
     xdim = 2,
@@ -65,18 +65,18 @@ test_that("Objective gradient and hessian work", {
   )
 
   # Test gradient (should be 2*x for quadratic)
-  grad <- obj$grad(c(1, 2))
+  grad = obj$grad(c(1, 2))
   expect_equal(grad, c(2, 4))
 
   # Test hessian (hessian fallback uses numerical approximation)
-  hess <- obj$hess(c(1, 1))
+  hess = obj$hess(c(1, 1))
   expect_equal(dim(hess), c(2, 2))
   # For numerical hessian approximation, we can't expect exact values
   expect_true(all(is.finite(hess)))
 })
 
 test_that("Objective input validation works", {
-  obj <- Objective$new(
+  obj = Objective$new(
     id = "test",
     fun = function(x) sum(x^2),
     xdim = 2,
@@ -89,12 +89,12 @@ test_that("Objective input validation works", {
   expect_error(obj$eval(c(1, 2, 3)), "Assertion on 'x' failed")
 
   # Test boundary checking with assertX
-  valid_x <- obj$assertX(c(0.5, 0.5))
+  valid_x = obj$assertX(c(0.5, 0.5))
   expect_equal(valid_x, c(0.5, 0.5))
 })
 
 test_that("Objective archive works", {
-  obj <- Objective$new(
+  obj = Objective$new(
     id = "test",
     fun = function(x) sum(x^2),
     xdim = 2,
@@ -120,35 +120,35 @@ test_that("Objective archive works", {
 
 test_that("Built-in objectives work", {
   # Test TF_branin objective
-  obj_branin <- obj("TF_branin")
+  obj_branin = obj("TF_branin")
   expect_s3_class(obj_branin, "Objective")
   expect_equal(obj_branin$xdim, 2)
 
   # Test evaluation
-  result <- obj_branin$eval(c(0.5, 0.5))
+  result = obj_branin$eval(c(0.5, 0.5))
   expect_true(is.numeric(result))
   expect_length(result, 1)
 
   # Test TF_banana objective
-  obj_banana <- obj("TF_banana")
+  obj_banana = obj("TF_banana")
   expect_s3_class(obj_banana, "Objective")
   expect_equal(obj_banana$xdim, 2)
 })
 
 test_that("Dictionary operations work", {
   # Test dictionary access
-  dict <- dict_objective
+  dict = dict_objective
   expect_true(length(dict) > 0)
 
   # Test getting available objectives
-  keys <- dict$keys()
+  keys = dict$keys()
   expect_true("TF_branin" %in% keys)
   expect_true("TF_banana" %in% keys)
 })
 
 test_that("Objective with custom arguments works", {
   # Objective with additional arguments
-  obj <- Objective$new(
+  obj = Objective$new(
     id = "custom",
     fun = function(x, scale = 1) scale * sum(x^2),
     xdim = 2,
@@ -157,6 +157,6 @@ test_that("Objective with custom arguments works", {
     scale = 2
   )
 
-  result <- obj$eval(c(1, 1))
+  result = obj$eval(c(1, 1))
   expect_equal(result, 4) # 2 * (1^2 + 1^2)
 })

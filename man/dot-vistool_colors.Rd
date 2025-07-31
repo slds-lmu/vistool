@@ -11,7 +11,8 @@ An object of class \code{list} of length 7.
 .vistool_colors
 }
 \description{
-Internal color management system to ensure consistent colors across
-ggplot2 and plotly visualizations.
+Unified color management system for consistent colors across
+ggplot2 and plotly visualizations. Supports both discrete colors 
+(for points, traces, lines) and continuous colorscales (for surfaces).
 }
 \keyword{internal}

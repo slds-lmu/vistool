@@ -4,7 +4,7 @@
 #' @param obj (`Objective`) The usd objective object.
 #' @param opt (`Optimizer`) The optimizer object from which the function is called.
 #' @export
-assertStepSizeControl <- function(x, u, obj, opt) {
+assertStepSizeControl = function(x, u, obj, opt) {
   checkmate::assertR6(obj, "Objective")
   checkmate::assertR6(opt, "Optimizer")
   obj$assertX(checkmate::assertNumeric(x))
@@ -16,16 +16,16 @@ assertStepSizeControl <- function(x, u, obj, opt) {
 #' @param upper (`numeric(1)`) The upper bound for the step_size.
 #' @template return_step_size
 #' @export
-stepSizeControlLineSearch <- function(lower = 0, upper = 10) {
+stepSizeControlLineSearch = function(lower = 0, upper = 10) {
   checkmate::assertNumber(lower)
   checkmate::assertNumber(upper, lower = lower)
   function(x, u, obj, opt) {
     assertStepSizeControl(x, u, obj, opt)
-    f <- function(a) {
-      dir <- ifelse(obj$minimize, -1, 1)
+    f = function(a) {
+      dir = ifelse(obj$minimize, -1, 1)
       obj$eval(x + dir * a * u)
     }
-    res <- optimize(f, lower = lower, upper = upper, maximum = !obj$minimize)
+    res = optimize(f, lower = lower, upper = upper, maximum = !obj$minimize)
     return(res[[ifelse(obj$minimize, "minimum", "maximum")]])
   }
 }
@@ -35,13 +35,13 @@ stepSizeControlLineSearch <- function(lower = 0, upper = 10) {
 #' @template param_decay
 #' @template return_step_size
 #' @export
-stepSizeControlDecayTime <- function(decay = 0.01) {
+stepSizeControlDecayTime = function(decay = 0.01) {
   checkmate::assertNumber(decay, lower = 0, upper = 1)
 
   function(x, u, obj, opt) {
     assertStepSizeControl(x, u, obj, opt)
 
-    epoch <- nrow(obj$archive)
+    epoch = nrow(obj$archive)
     return(1 / (1 + decay * epoch))
   }
 }
@@ -51,13 +51,13 @@ stepSizeControlDecayTime <- function(decay = 0.01) {
 #' @template param_decay
 #' @template return_step_size
 #' @export
-stepSizeControlDecayExp <- function(decay = 0.01) {
+stepSizeControlDecayExp = function(decay = 0.01) {
   checkmate::assertNumber(decay, lower = 0, upper = 1)
 
   function(x, u, obj, opt) {
     assertStepSizeControl(x, u, obj, opt)
 
-    epoch <- nrow(obj$archive)
+    epoch = nrow(obj$archive)
     return(exp(-decay * epoch))
   }
 }
@@ -67,17 +67,17 @@ stepSizeControlDecayExp <- function(decay = 0.01) {
 #' @param iter_zero (`integer(1)`) The iteration at which the update is shrinked to zero.
 #' @template return_step_size
 #' @export
-stepSizeControlDecayLinear <- function(iter_zero = 100L) {
+stepSizeControlDecayLinear = function(iter_zero = 100L) {
   checkmate::assertIntegerish(iter_zero, lower = 0, len = 1)
 
   function(x, u, obj, opt) {
     assertStepSizeControl(x, u, obj, opt)
 
-    epoch <- nrow(obj$archive)
+    epoch = nrow(obj$archive)
     if (epoch > iter_zero) {
       warning("Learning rate already decayed to 0, progressing further doesn't have any effect.")
     }
-    decay <- 1 - (epoch / iter_zero)
+    decay = 1 - (epoch / iter_zero)
     return(ifelse(decay < 0, 0, decay))
   }
 }
@@ -90,14 +90,14 @@ stepSizeControlDecayLinear <- function(iter_zero = 100L) {
 #' learning rate is reduced by `drop_rate`.
 #' @template return_step_size
 #' @export
-stepSizeControlDecaySteps <- function(drop_rate = 0.1, every_iter = 10) {
+stepSizeControlDecaySteps = function(drop_rate = 0.1, every_iter = 10) {
   checkmate::assertNumber(drop_rate, lower = 0, upper = 1)
   checkmate::assertIntegerish(every_iter, lower = 1, len = 1L)
 
   function(x, u, obj, opt) {
     assertStepSizeControl(x, u, obj, opt)
 
-    epoch <- nrow(obj$archive)
+    epoch = nrow(obj$archive)
     return((1 - drop_rate)^(floor(epoch / every_iter)))
   }
 }

@@ -78,13 +78,40 @@ Note that a grid of `npoints^2` values is generated and evaluated by `objective$
 \if{html}{\out{<a id="method-Visualizer1DModel-add_training_data"></a>}}
 \if{latex}{\out{\hypertarget{method-Visualizer1DModel-add_training_data}{}}}
 \subsection{Method \code{add_training_data()}}{
-Add training data points to the plot.
+Adds the training data to the plot.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer1DModel$add_training_data()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer1DModel$add_training_data(
+  color = "auto",
+  size = 2,
+  shape = 19,
+  alpha = 1,
+  show_labels = FALSE,
+  label_size = NULL
+)}\if{html}{\out{</div>}}
 }
 
-\subsection{Returns}{
-Returns the visualizer object invisibly for method chaining.
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{color}}{(`character(1)`)\cr
+Color of the points. Use "auto" for automatic color assignment. Default is "auto".}
+
+\item{\code{size}}{(`numeric(1)`)\cr
+Size of the points. Default is 2.}
+
+\item{\code{shape}}{(`integer(1)`)\cr
+Shape of the points. Default is 19.}
+
+\item{\code{alpha}}{(`numeric(1)`)\cr
+Alpha transparency of the points. Default is 1.}
+
+\item{\code{show_labels}}{(`logical(1)`)\cr
+Whether to show data point labels. Default is FALSE.}
+
+\item{\code{label_size}}{(`numeric(1)`)\cr
+Size of data point labels. If NULL, defaults to smaller text.}
+}
+\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
@@ -130,7 +157,12 @@ Transparency of boundary lines. Default is 0.8.}
 \subsection{Method \code{plot()}}{
 Create and return the ggplot2 plot with model-specific features.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer1DModel$plot(text_size = 11, theme = "minimal", ...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer1DModel$plot(
+  text_size = 11,
+  theme = "minimal",
+  color_palette = "viridis",
+  ...
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -141,6 +173,9 @@ Base text size for plot elements. Default is 11.}
 
 \item{\code{theme}}{(`character(1)`)\cr
 ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "minimal".}
+
+\item{\code{color_palette}}{(`character(1)`)\cr
+Color palette for the fill scale. One of "viridis", "plasma", "grayscale". Default is "viridis".}
 
 \item{\code{...}}{Additional arguments passed to the parent plot method.}
 }

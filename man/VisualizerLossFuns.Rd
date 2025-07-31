@@ -65,13 +65,13 @@ One of `"both"`, `"y1"`, or `"y0"`.}
 \itemize{
 \item \href{#method-VisualizerLossFuns-new}{\code{VisualizerLossFuns$new()}}
 \item \href{#method-VisualizerLossFuns-plot}{\code{VisualizerLossFuns$plot()}}
+\item \href{#method-VisualizerLossFuns-add_points}{\code{VisualizerLossFuns$add_points()}}
 \item \href{#method-VisualizerLossFuns-clone}{\code{VisualizerLossFuns$clone()}}
 }
 }
 \if{html}{\out{
 <details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="add_points"><a href='../../vistool/html/Visualizer.html#method-Visualizer-add_points'><code>vistool::Visualizer$add_points()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="initialize_defaults"><a href='../../vistool/html/Visualizer.html#method-Visualizer-initialize_defaults'><code>vistool::Visualizer$initialize_defaults()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href='../../vistool/html/Visualizer.html#method-Visualizer-save'><code>vistool::Visualizer$save()</code></a></span></li>
 </ul>
@@ -229,6 +229,63 @@ Indicator whether to show the title of the plot.}
 }
 \subsection{Returns}{
 A ggplot2 object.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-VisualizerLossFuns-add_points"></a>}}
+\if{latex}{\out{\hypertarget{method-VisualizerLossFuns-add_points}{}}}
+\subsection{Method \code{add_points()}}{
+Add points to the loss function visualization with optional vertical lines.
+Points are automatically positioned on the loss curve by evaluating the
+selected loss function at the given x-coordinates.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{VisualizerLossFuns$add_points(
+  x,
+  loss_id = NULL,
+  show_line = TRUE,
+  color = "red",
+  size = 3,
+  alpha = 0.8,
+  line_color = NULL,
+  line_alpha = NULL,
+  ...
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{x}}{(`numeric()`)\cr
+x-coordinates where to place points on the loss curves. These represent
+the residual values (y-f for regression, y*f for classification scores,
+or probabilities for classification probability mode).}
+
+\item{\code{loss_id}}{(`character(1)`)\cr
+ID of the loss function to use for y-value calculation. If NULL (default),
+uses the first loss function.}
+
+\item{\code{show_line}}{(`logical(1)`)\cr
+If TRUE (default), draws vertical lines from points to x-axis.}
+
+\item{\code{color}}{(`character(1)`)\cr
+Color of the points and lines. Use "auto" for automatic color assignment.
+Default is "red".}
+
+\item{\code{size}}{(`numeric(1)`)\cr
+Size of the points. Default is 3.}
+
+\item{\code{alpha}}{(`numeric(1)`)\cr
+Alpha transparency of points and lines. Default is 0.8.}
+
+\item{\code{line_color}}{(`character(1)`)\cr
+Color of vertical lines. If NULL, uses the same color as points.}
+
+\item{\code{line_alpha}}{(`numeric(1)`)\cr
+Alpha transparency of vertical lines. If NULL, uses alpha * 0.7.}
+
+\item{\code{...}}{Additional arguments passed to point and line geoms.}
+}
+\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}

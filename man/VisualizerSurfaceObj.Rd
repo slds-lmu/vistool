@@ -24,8 +24,8 @@ The objective function.}
 \item \href{#method-VisualizerSurfaceObj-new}{\code{VisualizerSurfaceObj$new()}}
 \item \href{#method-VisualizerSurfaceObj-add_optimization_trace}{\code{VisualizerSurfaceObj$add_optimization_trace()}}
 \item \href{#method-VisualizerSurfaceObj-plot}{\code{VisualizerSurfaceObj$plot()}}
-\item \href{#method-VisualizerSurfaceObj-add_layer_taylor}{\code{VisualizerSurfaceObj$add_layer_taylor()}}
-\item \href{#method-VisualizerSurfaceObj-add_layer_hessian}{\code{VisualizerSurfaceObj$add_layer_hessian()}}
+\item \href{#method-VisualizerSurfaceObj-add_taylor}{\code{VisualizerSurfaceObj$add_taylor()}}
+\item \href{#method-VisualizerSurfaceObj-add_hessian}{\code{VisualizerSurfaceObj$add_hessian()}}
 \item \href{#method-VisualizerSurfaceObj-animate}{\code{VisualizerSurfaceObj$animate()}}
 \item \href{#method-VisualizerSurfaceObj-clone}{\code{VisualizerSurfaceObj$clone()}}
 }
@@ -57,8 +57,7 @@ Creates a new instance of this [R6][R6::R6Class] class.
   padding = 0,
   n_points = 100L,
   opacity = 0.8,
-  colorscale = list(c(0, "#440154"), c(0.25, "#3b528b"), c(0.5, "#21908c"), c(0.75,
-    "#5dc863"), c(1, "#fde725")),
+  colorscale = "auto",
   show_title = TRUE
 )}\if{html}{\out{</div>}}
 }
@@ -203,12 +202,12 @@ The plotly object.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-VisualizerSurfaceObj-add_layer_taylor"></a>}}
-\if{latex}{\out{\hypertarget{method-VisualizerSurfaceObj-add_layer_taylor}{}}}
-\subsection{Method \code{add_layer_taylor()}}{
+\if{html}{\out{<a id="method-VisualizerSurfaceObj-add_taylor"></a>}}
+\if{latex}{\out{\hypertarget{method-VisualizerSurfaceObj-add_taylor}{}}}
+\subsection{Method \code{add_taylor()}}{
 Add a Taylor approximation (for 1 and 2 degrees).
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{VisualizerSurfaceObj$add_layer_taylor(
+\if{html}{\out{<div class="r">}}\preformatted{VisualizerSurfaceObj$add_taylor(
   x0,
   degree = 2,
   x1margin = 0,
@@ -248,12 +247,12 @@ Additional parameter passed to `add_surface()`.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-VisualizerSurfaceObj-add_layer_hessian"></a>}}
-\if{latex}{\out{\hypertarget{method-VisualizerSurfaceObj-add_layer_hessian}{}}}
-\subsection{Method \code{add_layer_hessian()}}{
+\if{html}{\out{<a id="method-VisualizerSurfaceObj-add_hessian"></a>}}
+\if{latex}{\out{\hypertarget{method-VisualizerSurfaceObj-add_hessian}{}}}
+\subsection{Method \code{add_hessian()}}{
 Add two "arrows" as eigenvectors of the Hessian.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{VisualizerSurfaceObj$add_layer_hessian(x0, x1length = 0.1, x2length = 0.1, ...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{VisualizerSurfaceObj$add_hessian(x0, x1length = 0.1, x2length = 0.1, ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{

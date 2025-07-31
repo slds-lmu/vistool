@@ -10,7 +10,7 @@
 #' @template param_n_points
 #'
 #' @export
-VisualizerSurfaceObj <- R6::R6Class("VisualizerSurfaceObj",
+VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
   inherit = VisualizerSurface,
   public = list(
 
@@ -31,11 +31,8 @@ VisualizerSurfaceObj <- R6::R6Class("VisualizerSurfaceObj",
     #' @template param_colorscale
     #' @template param_show_title
     initialize = function(objective, x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L,
-                          opacity = 0.8, colorscale = list(
-                            c(0, "#440154"), c(0.25, "#3b528b"), c(0.5, "#21908c"), 
-                            c(0.75, "#5dc863"), c(1, "#fde725")
-                          ), show_title = TRUE) {
-      self$objective <- checkmate::assert_r6(objective, "Objective")
+                          opacity = 0.8, colorscale = "auto", show_title = TRUE) {
+      self$objective = checkmate::assert_r6(objective, "Objective")
       checkmate::assert_numeric(x1_limits, len = 2, null.ok = TRUE)
       checkmate::assert_numeric(x2_limits, len = 2, null.ok = TRUE)
       checkmate::assert_numeric(padding)
@@ -45,23 +42,23 @@ VisualizerSurfaceObj <- R6::R6Class("VisualizerSurfaceObj",
         mlr3misc::stopf("`VisualizerSurface` requires 2-dimensional inputs, but `objective$xdim = %s`", objective$xdim)
       }
 
-      x1_limits <- x1_limits %??% c(objective$lower[1], objective$upper[1])
-      x2_limits <- x2_limits %??% c(objective$lower[2], objective$upper[2])
+      x1_limits = x1_limits %??% c(objective$lower[1], objective$upper[1])
+      x2_limits = x2_limits %??% c(objective$lower[2], objective$upper[2])
 
       if (any(is.na(x1_limits)) || any(is.na(x2_limits))) {
         stop("Limits could not be extracted from the objective. Please use `x_limits`.")
       }
 
-      x1_pad <- (x1_limits[2] - x1_limits[1]) * padding
-      x2_pad <- (x2_limits[2] - x2_limits[1]) * padding
+      x1_pad = (x1_limits[2] - x1_limits[1]) * padding
+      x2_pad = (x2_limits[2] - x2_limits[1]) * padding
 
-      grid <- list(
+      grid = list(
         x1 = unique(seq(x1_limits[1] - x1_pad, x1_limits[2] + x1_pad, length.out = n_points)),
         x2 = unique(seq(x2_limits[1] - x2_pad, x2_limits[2] + x2_pad, length.out = n_points))
       )
 
-      zmat <- outer(grid$x1, grid$x2, function(x, y) {
-        xin <- cbind(x, y)
+      zmat = outer(grid$x1, grid$x2, function(x, y) {
+        xin = cbind(x, y)
         apply(xin, 1, function(x) self$objective$eval(x))
       })
 
@@ -78,7 +75,7 @@ VisualizerSurfaceObj <- R6::R6Class("VisualizerSurfaceObj",
       )
 
       # Initialize trace counter for consistent coloring
-      private$.trace_count <- 0
+      private$.trace_count = 0
 
       return(invisible(self))
     },
@@ -123,7 +120,7 @@ VisualizerSurfaceObj <- R6::R6Class("VisualizerSurfaceObj",
       # Store layer specification without immediately resolving colors
       # Colors will be resolved in plot() when color_palette is known
       if (is.null(line_color)) {
-        line_color <- "auto"  # Mark for automatic color assignment
+        line_color = "auto"  # Mark for automatic color assignment
       }
       
       # Store the optimization trace layer for later processing
@@ -158,6 +155,12 @@ VisualizerSurfaceObj <- R6::R6Class("VisualizerSurfaceObj",
       # Process stored optimization trace layers
       private$render_optimization_trace_layers()
       
+      # Process stored Taylor approximation layers
+      private$render_taylor_layers()
+      
+      # Process stored Hessian eigenvector layers
+      private$render_hessian_layers()
+      
       return(private$.plot)
     },
 
@@ -179,59 +182,26 @@ VisualizerSurfaceObj <- R6::R6Class("VisualizerSurfaceObj",
     #'   Can be helpful if the hyperplane as a huge z range and therefore the plot looks ugly.
     #' @param ... (`any`)\cr
     #'   Additional parameter passed to `add_surface()`.
-    add_layer_taylor = function(x0, degree = 2, x1margin = 0, x2margin = 0, npoints_per_dim = 20L, zlim = NULL, ...) {
-      private$checkInit()
-      if (private$.layer_primary != "surface") stop("Atm just available for `surface`")
+    add_taylor = function(x0, degree = 2, x1margin = 0, x2margin = 0, npoints_per_dim = 20L, zlim = NULL, ...) {
       checkmate::assertNumeric(x0, len = 2L)
       checkmate::assertIntegerish(degree, len = 1, lower = 1, upper = 2)
       checkmate::assertNumber(x1margin)
       checkmate::assertNumber(x2margin)
+      checkmate::assertIntegerish(npoints_per_dim, len = 1, lower = 5)
+      checkmate::assertNumeric(zlim, len = 2L, null.ok = TRUE)
 
-      # checkmate::assertNumeric(x1limits, len = 2L, null.ok = TRUE)
-      # checkmate::assertNumeric(x2limits, len = 2L, null.ok = TRUE)
-
-      # if (is.null(x1limits)) x1limits = x0[1] + c(-0.05, 0.05)
-      # if (is.null(x2limits)) x2limits = x0[2] + c(-0.05, 0.05)
-
-      f0 <- self$objective$eval(x0)
-      g <- self$objective$grad(x0)
-      h <- self$objective$hess(x0)
-
-      # Create box based on the gradient at x0:
-      # - Normalize vector to length x1margin / 2
-      # - Calculate perpendicular vector
-      # - These vectors define the rotation
-      gn <- g / l2norm(g)
-      gp <- rbind(c(0, -1), c(1, 0)) %*% gn
-
-      gn <- gn * x1margin / 2
-      gp <- gp * x2margin / 2
-
-      # - Create grid in (0,0) x (1,1) and rotate w.r.t. to gn and gp:
-      rotation <- cbind(gn, gp)
-      square <- as.matrix(expand.grid(x = seq(0, 1, len = npoints_per_dim), y = seq(0, 1, len = npoints_per_dim)))
-      grid <- square %*% rotation
-      grid[, 1] <- grid[, 1] - max(grid[, 1]) + (max(grid[, 1]) - min(grid[, 1])) / 2 + x0[1]
-      grid[, 2] <- grid[, 2] - max(grid[, 2]) + (max(grid[, 2]) - min(grid[, 2])) / 2 + x0[2]
-
-      fapp <- function(x) {
-        out <- f0 + crossprod(g, x - x0) * f0
-        if (degree == 2) {
-          out <- out + 0.5 * f0 * t(x - x0) %*% h %*% (x - x0)
-        }
-        return(as.numeric(out))
-      }
-      fappV <- function(x, y) {
-        X <- cbind(x = x, y = y)
-        apply(X, 1, fapp)
-      }
-      z <- outer(X = grid[, 1], Y = grid[, 2], FUN = function(x, y) fappV(x, y))
-      if (!is.null(zlim)) {
-        checkmate::assertNumeric(zlim, len = 2L)
-        z[!between(z, zlim[1], zlim[2])] <- NA
-      }
-
-      private$.plot <- private$.plot %>% add_surface(x = grid[, 1], y = grid[, 2], z = t(z), showscale = FALSE, ...)
+      # Store layer specification for later processing
+      private$store_layer("taylor", list(
+        x0 = x0,
+        degree = degree,
+        x1margin = x1margin,
+        x2margin = x2margin,
+        npoints_per_dim = npoints_per_dim,
+        zlim = zlim,
+        args = list(...)
+      ))
+      
+      return(invisible(self))
     },
 
     #' @description
@@ -245,42 +215,20 @@ VisualizerSurfaceObj <- R6::R6Class("VisualizerSurfaceObj",
     #'   The length of the second eigenvector.
     #' @param ... (`any`)\cr
     #'   Additional arguments passed to `add_trace`.
-    add_layer_hessian = function(x0, x1length = 0.1, x2length = 0.1, ...) {
-      private$checkInit()
+    add_hessian = function(x0, x1length = 0.1, x2length = 0.1, ...) {
       checkmate::assertNumeric(x0, len = 2L)
       checkmate::assertNumber(x1length)
       checkmate::assertNumber(x2length)
 
-      f0 <- self$objective$eval(x0)
-      h <- self$objective$hess(x0)
-      ev <- eigen(h)$vectors
-
-      v1 <- ev[, 1]
-      v2 <- ev[, 2]
-
-      if (private$.layer_primary == "contour") {
-        # Transpose x and y to macht contour:
-        v1 <- v1 * x1length + x0
-        v2 <- v2 * x2length + x0
-
-        mx <- c(v1[1], x0[1], v2[1])
-        my <- c(v1[2], x0[2], v2[2])
-
-        private$.plot <- private$.plot %>% add_trace(x = mx, y = my, mode = "lines", type = "scatter", showlegend = FALSE, ...)
-      }
-      if (private$.layer_primary == "surface") {
-        v1 <- v1 * x1length + x0
-        v2 <- v2 * x2length + x0
-
-        v0 <- c(x0, f0)
-        v1 <- c(v1, f0)
-        v2 <- c(v2, f0)
-
-        # Order is important to have the angle:
-        marker <- cbind(v1, v0, v2)
-
-        private$.plot <- private$.plot %>% add_trace(x = marker[1, ], y = marker[2, ], z = marker[3, ], mode = "lines", type = "scatter3d", showlegend = FALSE, ...)
-      }
+      # Store layer specification for later processing
+      private$store_layer("hessian", list(
+        x0 = x0,
+        x1length = x1length,
+        x2length = x2length,
+        args = list(...)
+      ))
+      
+      return(invisible(self))
     },
 
     #' @description
@@ -315,23 +263,23 @@ VisualizerSurfaceObj <- R6::R6Class("VisualizerSurfaceObj",
       }
       invisible(lapply(c(view_start, view_end), checkmate::assertNumber))
 
-      views <- list(
+      views = list(
         x = seq(view_start$x, view_end$x, len = nframes),
         y = seq(view_start$y, view_end$y, len = nframes),
         z = seq(view_start$z, view_end$z, len = nframes)
       )
 
       if (is.null(stops)) {
-        maxcalls <- max(vapply(private$.opts, function(oo) nrow(oo$opt$archive), integer(1)))
-        stops <- unique(round(seq(1, maxcalls, len = nframes)))
+        maxcalls = max(vapply(private$.opts, function(oo) nrow(oo$opt$archive), integer(1)))
+        stops = unique(round(seq(1, maxcalls, len = nframes)))
       }
 
-      plot_temp <- private$.plot
-      private$.freeze_plot <- TRUE
+      plot_temp = private$.plot
+      private$.freeze_plot = TRUE
 
       for (i in seq_len(nframes)) {
-        is <- stringr::str_pad(i, width = 4, pad = "0")
-        fname <- sprintf("%s/frame-%s.%s", dir, is, fext)
+        is = stringr::str_pad(i, width = 4, pad = "0")
+        fname = sprintf("%s/frame-%s.%s", dir, is, fext)
 
         if (private$.layer_primary == "surface") {
           do.call(self$initLayerSurface, private$.vbase)
@@ -355,8 +303,8 @@ VisualizerSurfaceObj <- R6::R6Class("VisualizerSurfaceObj",
         self$save(fname, ...)
       }
 
-      private$.freeze_plot <- FALSE
-      private$.plot <- plot_temp
+      private$.freeze_plot = FALSE
+      private$.plot = plot_temp
 
       message(sprintf("Files stored in '%s'. Use, e.g., ImageMagic (http://www.imagemagick.org/) with `convert -delay 20 -loop 0 %s/*.%s myimage.gif` to create gif with 20 ms frames.", dir, dir, fext))
     }
@@ -367,7 +315,7 @@ VisualizerSurfaceObj <- R6::R6Class("VisualizerSurfaceObj",
     # Render stored optimization trace layers
     render_optimization_trace_layers = function() {
       # Get all stored optimization trace layers
-      trace_layers <- private$get_layers_by_type("optimization_trace")
+      trace_layers = private$get_layers_by_type("optimization_trace")
       
       if (length(trace_layers) == 0) {
         return()
@@ -380,22 +328,22 @@ VisualizerSurfaceObj <- R6::R6Class("VisualizerSurfaceObj",
     
     # Render a single optimization trace layer
     render_optimization_trace_layer = function(layer_spec) {
-      opt <- layer_spec$optimizer
-      line_color <- layer_spec$line_color
-      mcolor_out <- layer_spec$mcolor_out
-      npoints <- layer_spec$npoints
-      npmax <- layer_spec$npmax
-      name <- layer_spec$name
-      offset <- layer_spec$offset
-      add_marker_at <- layer_spec$add_marker_at
-      marker_shape <- layer_spec$marker_shape
-      marker_color <- layer_spec$marker_color
-      aargs <- layer_spec$args
+      opt = layer_spec$optimizer
+      line_color = layer_spec$line_color
+      mcolor_out = layer_spec$mcolor_out
+      npoints = layer_spec$npoints
+      npmax = layer_spec$npmax
+      name = layer_spec$name
+      offset = layer_spec$offset
+      add_marker_at = layer_spec$add_marker_at
+      marker_shape = layer_spec$marker_shape
+      marker_color = layer_spec$marker_color
+      aargs = layer_spec$args
 
       # Resolve color if it's "auto"
       if (line_color == "auto") {
-        private$.trace_count <- private$.trace_count + 1
-        line_color <- private$get_auto_color_with_palette()
+        private$.trace_count = private$.trace_count + 1
+        line_color = private$get_auto_color_with_palette()
       }
       
       if (is.null(private$.plot)) private$.init_default_plot()
@@ -408,72 +356,72 @@ VisualizerSurfaceObj <- R6::R6Class("VisualizerSurfaceObj",
       if (private$.layer_primary == "contour") {
         checkmate::assertNumeric(offset, len = 2L, null.ok = TRUE)
         if (is.null(offset)) {
-          offset <- rep(0, 2)
+          offset = rep(0, 2)
         }
-        offset[3] <- 0
+        offset[3] = 0
       }
       if (private$.layer_primary == "surface") {
         checkmate::assertNumeric(offset, len = 3L, null.ok = TRUE)
         if (is.null(offset)) {
-          offset <- rep(0, 3)
+          offset = rep(0, 3)
         }
       }
 
       # Add to opts for animation support
       if (!private$.freeze_plot) {
-        private$.opts <- c(private$.opts, list(c(layer_spec, list(line_color = line_color))))
+        private$.opts = c(private$.opts, list(c(layer_spec, list(line_color = line_color))))
       }
 
       # Assert marker styling:
       checkmate::assertIntegerish(add_marker_at, lower = 1, upper = nrow(opt$archive))
-      if (is.null(marker_shape)) marker_shape <- NA
-      if (length(marker_shape) == 1) marker_shape <- rep(marker_shape, length(add_marker_at))
-      mvals <- NULL
+      if (is.null(marker_shape)) marker_shape = NA
+      if (length(marker_shape) == 1) marker_shape = rep(marker_shape, length(add_marker_at))
+      mvals = NULL
       if (private$.layer_primary == "contour") {
-        mvals <- plotly::schema(F)$traces$scatter$attributes$marker$symbol$values
+        mvals = plotly::schema(F)$traces$scatter$attributes$marker$symbol$values
       }
       if (private$.layer_primary == "surface") {
-        mvals <- plotly::schema(F)$traces$scatter3d$attributes$marker$symbol$values
+        mvals = plotly::schema(F)$traces$scatter3d$attributes$marker$symbol$values
       }
       invisible(lapply(marker_shape, function(marker_shape) checkmate::assertChoice(marker_shape, choices = c(mvals, NA))))
 
-      if (is.null(marker_color)) marker_color <- line_color
+      if (is.null(marker_color)) marker_color = line_color
       if (length(marker_color) == 1) {
-        marker_color <- rep(marker_color, length(marker_shape))
+        marker_color = rep(marker_color, length(marker_shape))
       }
       checkmate::assertCharacter(marker_color, len = length(marker_shape), null.ok = TRUE)
 
       # Define marker coordinates for plotting:
-      xmat <- do.call(rbind, c(opt$archive$x_in[1], opt$archive$x_out))
-      xmarkers <- data.frame(
+      xmat = do.call(rbind, c(opt$archive$x_in[1], opt$archive$x_out))
+      xmarkers = data.frame(
         x = xmat[, 1] + offset[1], y = xmat[, 2] + offset[2],
         z = c(opt$archive$fval_in[1], opt$archive$fval_out) + offset[3]
       )
       if (is.null(npoints)) {
-        npoints <- nrow(xmarkers)
+        npoints = nrow(xmarkers)
       }
       if (is.null(npmax)) {
-        npmax <- nrow(xmarkers)
+        npmax = nrow(xmarkers)
         if (npmax > nrow(xmarkers)) {
-          npmax <- nrow(xmarkers)
+          npmax = nrow(xmarkers)
         }
       }
       # Cut marker after npmax iterations (if specified):
-      xmr <- xmarkers[unique(round(seq(1, nrow(xmarkers), length.out = npoints))), ]
-      xmr <- xmr[seq_len(npmax), ]
-      add_marker_at <- add_marker_at[add_marker_at <= npmax]
+      xmr = xmarkers[unique(round(seq(1, nrow(xmarkers), length.out = npoints))), ]
+      xmr = xmr[seq_len(npmax), ]
+      add_marker_at = add_marker_at[add_marker_at <= npmax]
 
-      ptype <- NULL
+      ptype = NULL
       if (is.null(name)) {
-        name <- paste0(opt$id, " on ", opt$objective$id)
+        name = paste0(opt$id, " on ", opt$objective$id)
       }
 
       # Define the plotting arguments as list, so we can call `do.call` with these arguments. This is
       # more comfortable due to just one call to `add_trace`. Additionally, it is easier to control
       # different default stylings (such as line width) and to recreate the layer with the stored arguments:
       if (private$.layer_primary == "surface") {
-        ptype <- "scatter3d"
-        pargs <- list(
+        ptype = "scatter3d"
+        pargs = list(
           name = name,
           x = xmr$x,
           y = xmr$y,
@@ -483,8 +431,8 @@ VisualizerSurfaceObj <- R6::R6Class("VisualizerSurfaceObj",
         )
       }
       if (private$.layer_primary == "contour") {
-        ptype <- "scatter"
-        pargs <- list(
+        ptype = "scatter"
+        pargs = list(
           name = name,
           x = xmr$x,
           y = xmr$y,
@@ -495,10 +443,10 @@ VisualizerSurfaceObj <- R6::R6Class("VisualizerSurfaceObj",
       if (is.null(ptype)) {
         stop("No known plot mode")
       }
-      pargs$type <- ptype
+      pargs$type = ptype
 
       # Add optimization traces as lines to the plot:
-      private$.plot <- do.call(plotly::add_trace, c(
+      private$.plot = do.call(plotly::add_trace, c(
         list(private$.plot),
         mlr3misc::insert_named(mlr3misc::remove_named(pargs, "marker"), aargs),
         list(mode = "lines")
@@ -506,7 +454,7 @@ VisualizerSurfaceObj <- R6::R6Class("VisualizerSurfaceObj",
 
       # Now add marker to the lines. Marker are added at `add_marker_at` iterations
       # and with the specified shape and color:
-      pargs <- list(
+      pargs = list(
         x = xmarkers$x[add_marker_at],
         y = xmarkers$y[add_marker_at],
         z = xmarkers$z[add_marker_at],
@@ -516,9 +464,135 @@ VisualizerSurfaceObj <- R6::R6Class("VisualizerSurfaceObj",
         showlegend = FALSE
       )
       if (private$.layer_primary == "contour") {
-        pargs$z <- NULL
+        pargs$z = NULL
       }
-      private$.plot <- do.call(plotly::add_trace, c(list(private$.plot), pargs))
+      private$.plot = do.call(plotly::add_trace, c(list(private$.plot), pargs))
+    },
+    
+    # Render stored Taylor approximation layers
+    render_taylor_layers = function() {
+      # Get all stored Taylor layers
+      taylor_layers = private$get_layers_by_type("taylor")
+      
+      if (length(taylor_layers) == 0) {
+        return()
+      }
+      
+      for (taylor_spec in taylor_layers) {
+        private$render_taylor_layer(taylor_spec)
+      }
+    },
+    
+    # Render a single Taylor approximation layer
+    render_taylor_layer = function(layer_spec) {
+      x0 = layer_spec$x0
+      degree = layer_spec$degree
+      x1margin = layer_spec$x1margin
+      x2margin = layer_spec$x2margin
+      npoints_per_dim = layer_spec$npoints_per_dim
+      zlim = layer_spec$zlim
+      aargs = layer_spec$args
+      
+      if (is.null(private$.plot)) private$.init_default_plot()
+      
+      # Check if this is only available for surface mode
+      if (private$.layer_primary != "surface") {
+        stop("Taylor approximation is currently only available for surface plots")
+      }
+      
+      f0 = self$objective$eval(x0)
+      g = self$objective$grad(x0)
+      h = self$objective$hess(x0)
+
+      # Create box based on the gradient at x0:
+      # - Normalize vector to length x1margin / 2
+      # - Calculate perpendicular vector
+      # - These vectors define the rotation
+      gn = g / l2norm(g)
+      gp = rbind(c(0, -1), c(1, 0)) %*% gn
+
+      gn = gn * x1margin / 2
+      gp = gp * x2margin / 2
+
+      # - Create grid in (0,0) x (1,1) and rotate w.r.t. to gn and gp:
+      rotation = cbind(gn, gp)
+      square = as.matrix(expand.grid(x = seq(0, 1, len = npoints_per_dim), y = seq(0, 1, len = npoints_per_dim)))
+      grid = square %*% rotation
+      grid[, 1] = grid[, 1] - max(grid[, 1]) + (max(grid[, 1]) - min(grid[, 1])) / 2 + x0[1]
+      grid[, 2] = grid[, 2] - max(grid[, 2]) + (max(grid[, 2]) - min(grid[, 2])) / 2 + x0[2]
+
+      fapp = function(x) {
+        out = f0 + crossprod(g, x - x0) * f0
+        if (degree == 2) {
+          out = out + 0.5 * f0 * t(x - x0) %*% h %*% (x - x0)
+        }
+        return(as.numeric(out))
+      }
+      fappV = function(x, y) {
+        X = cbind(x = x, y = y)
+        apply(X, 1, fapp)
+      }
+      z = outer(X = grid[, 1], Y = grid[, 2], FUN = function(x, y) fappV(x, y))
+      if (!is.null(zlim)) {
+        z[!between(z, zlim[1], zlim[2])] = NA
+      }
+
+      private$.plot = do.call(plotly::add_surface, c(list(private$.plot, x = grid[, 1], y = grid[, 2], z = t(z), showscale = FALSE), aargs))
+    },
+    
+    # Render stored Hessian eigenvector layers
+    render_hessian_layers = function() {
+      # Get all stored Hessian layers
+      hessian_layers = private$get_layers_by_type("hessian")
+      
+      if (length(hessian_layers) == 0) {
+        return()
+      }
+      
+      for (hessian_spec in hessian_layers) {
+        private$render_hessian_layer(hessian_spec)
+      }
+    },
+    
+    # Render a single Hessian eigenvector layer
+    render_hessian_layer = function(layer_spec) {
+      x0 = layer_spec$x0
+      x1length = layer_spec$x1length
+      x2length = layer_spec$x2length
+      aargs = layer_spec$args
+      
+      if (is.null(private$.plot)) private$.init_default_plot()
+
+      f0 = self$objective$eval(x0)
+      h = self$objective$hess(x0)
+      ev = eigen(h)$vectors
+
+      v1 = ev[, 1]
+      v2 = ev[, 2]
+
+      if (private$.layer_primary == "contour") {
+        # Transpose x and y to match contour:
+        v1 = v1 * x1length + x0
+        v2 = v2 * x2length + x0
+
+        mx = c(v1[1], x0[1], v2[1])
+        my = c(v1[2], x0[2], v2[2])
+
+        private$.plot = do.call(plotly::add_trace, c(list(private$.plot, x = mx, y = my, mode = "lines", type = "scatter", showlegend = FALSE), aargs))
+      }
+      if (private$.layer_primary == "surface") {
+        v1 = v1 * x1length + x0
+        v2 = v2 * x2length + x0
+
+        v0 = c(x0, f0)
+        v1 = c(v1, f0)
+        v2 = c(v2, f0)
+
+        # Order is important to have the angle:
+        marker = cbind(v1, v0, v2)
+
+        private$.plot = do.call(plotly::add_trace, c(list(private$.plot, x = marker[1, ], y = marker[2, ], z = marker[3, ], mode = "lines", type = "scatter3d", showlegend = FALSE), aargs))
+      }
     }
   )
 )

@@ -2,7 +2,7 @@ library(vistool)
 
 test_that("Visualizer2DObj add_optimization_trace works", {
   # Create a simple 2D objective
-  obj <- Objective$new(
+  obj = Objective$new(
     id = "test_2d",
     fun = function(x) sum(x^2),
     xdim = 2,
@@ -12,26 +12,26 @@ test_that("Visualizer2DObj add_optimization_trace works", {
   )
 
   # Create visualizer
-  vis <- Visualizer2DObj$new(obj, n_points = 20L)
+  vis = Visualizer2DObj$new(obj, n_points = 20L)
 
   # Create and run optimizer
-  opt <- OptimizerGD$new(obj, x_start = c(1.5, 1.0), lr = 0.1, print_trace = FALSE)
+  opt = OptimizerGD$new(obj, x_start = c(1.5, 1.0), lr = 0.1, print_trace = FALSE)
   opt$optimize(steps = 5L)
 
   # Add optimization trace
   expect_silent(vis$add_optimization_trace(opt))
 
   # Plot should work
-  p <- vis$plot()
+  p = vis$plot()
   expect_s3_class(p, "ggplot")
 
   # Check that trace layer was stored in the new layer system
-  trace_layers <- sapply(vis$.__enclos_env__$private$.layers_to_add, function(x) x$type == "optimization_trace")
+  trace_layers = sapply(vis$.__enclos_env__$private$.layers_to_add, function(x) x$type == "optimization_trace")
   expect_true(any(trace_layers))
 })
 
 test_that("Visualizer2DObj add_optimization_trace validates input", {
-  obj <- Objective$new(
+  obj = Objective$new(
     id = "test_2d",
     fun = function(x) sum(x^2),
     xdim = 2,
@@ -40,8 +40,8 @@ test_that("Visualizer2DObj add_optimization_trace validates input", {
     minimize = TRUE
   )
 
-  vis <- Visualizer2DObj$new(obj, n_points = 20L)
-  opt <- OptimizerGD$new(obj, x_start = c(1, 1), lr = 0.1, print_trace = FALSE)
+  vis = Visualizer2DObj$new(obj, n_points = 20L)
+  opt = OptimizerGD$new(obj, x_start = c(1, 1), lr = 0.1, print_trace = FALSE)
 
   # Should fail with empty archive
   expect_error(
@@ -57,7 +57,7 @@ test_that("Visualizer2DObj add_optimization_trace validates input", {
 })
 
 test_that("Visualizer2DObj multiple optimization traces work", {
-  obj <- Objective$new(
+  obj = Objective$new(
     id = "test_2d",
     fun = function(x) sum(x^2),
     xdim = 2,
@@ -66,11 +66,11 @@ test_that("Visualizer2DObj multiple optimization traces work", {
     minimize = TRUE
   )
 
-  vis <- Visualizer2DObj$new(obj, n_points = 20L)
+  vis = Visualizer2DObj$new(obj, n_points = 20L)
 
   # Create multiple optimizers
-  opt1 <- OptimizerGD$new(obj$clone(deep = TRUE), x_start = c(2, 1), lr = 0.1, print_trace = FALSE)
-  opt2 <- OptimizerGD$new(obj$clone(deep = TRUE), x_start = c(-1, 2), lr = 0.15, print_trace = FALSE)
+  opt1 = OptimizerGD$new(obj$clone(deep = TRUE), x_start = c(2, 1), lr = 0.1, print_trace = FALSE)
+  opt2 = OptimizerGD$new(obj$clone(deep = TRUE), x_start = c(-1, 2), lr = 0.15, print_trace = FALSE)
 
   opt1$optimize(steps = 3L)
   opt2$optimize(steps = 4L)
@@ -80,16 +80,16 @@ test_that("Visualizer2DObj multiple optimization traces work", {
   vis$add_optimization_trace(opt2, line_color = "#0000ff", name = "GD2")
 
   # Should have 2 trace layers stored
-  trace_layers <- sapply(vis$.__enclos_env__$private$.layers_to_add, function(x) x$type == "optimization_trace")
+  trace_layers = sapply(vis$.__enclos_env__$private$.layers_to_add, function(x) x$type == "optimization_trace")
   expect_equal(sum(trace_layers), 2)
 
   # Plot should work
-  p <- vis$plot()
+  p = vis$plot()
   expect_s3_class(p, "ggplot")
 })
 
 test_that("Visualizer2DObj optimization trace customization works", {
-  obj <- Objective$new(
+  obj = Objective$new(
     id = "test_2d",
     fun = function(x) sum(x^2),
     xdim = 2,
@@ -98,8 +98,8 @@ test_that("Visualizer2DObj optimization trace customization works", {
     minimize = TRUE
   )
 
-  vis <- Visualizer2DObj$new(obj, n_points = 20L)
-  opt <- OptimizerGD$new(obj, x_start = c(1.5, 1.0), lr = 0.1, print_trace = FALSE)
+  vis = Visualizer2DObj$new(obj, n_points = 20L)
+  opt = OptimizerGD$new(obj, x_start = c(1.5, 1.0), lr = 0.1, print_trace = FALSE)
   opt$optimize(steps = 8L)
 
   # Test various customization options
@@ -118,9 +118,9 @@ test_that("Visualizer2DObj optimization trace customization works", {
   )
 
   # Check stored trace parameters in the new layer system
-  trace_layers <- vis$.__enclos_env__$private$.layers_to_add
-  trace_layer <- trace_layers[[which(sapply(trace_layers, function(x) x$type == "optimization_trace"))[1]]]
-  trace_spec <- trace_layer$spec
+  trace_layers = vis$.__enclos_env__$private$.layers_to_add
+  trace_layer = trace_layers[[which(sapply(trace_layers, function(x) x$type == "optimization_trace"))[1]]]
+  trace_spec = trace_layer$spec
   
   expect_equal(trace_spec$line_color, "#ff6600")
   expect_equal(trace_spec$line_width, 2.0)
@@ -134,12 +134,12 @@ test_that("Visualizer2DObj optimization trace customization works", {
   expect_equal(trace_spec$name, "Custom Trace")
 
   # Plot should work
-  p <- vis$plot()
+  p = vis$plot()
   expect_s3_class(p, "ggplot")
 })
 
 test_that("Visualizer2DObj optimization trace point filtering works", {
-  obj <- Objective$new(
+  obj = Objective$new(
     id = "test_2d",
     fun = function(x) sum(x^2),
     xdim = 2,
@@ -148,28 +148,28 @@ test_that("Visualizer2DObj optimization trace point filtering works", {
     minimize = TRUE
   )
 
-  vis <- Visualizer2DObj$new(obj, n_points = 20L)
-  opt <- OptimizerGD$new(obj, x_start = c(1.5, 1.0), lr = 0.1, print_trace = FALSE)
+  vis = Visualizer2DObj$new(obj, n_points = 20L)
+  opt = OptimizerGD$new(obj, x_start = c(1.5, 1.0), lr = 0.1, print_trace = FALSE)
   opt$optimize(steps = 20L)
 
   # Test point filtering
   vis$add_optimization_trace(opt, npoints = 5, npmax = 10)
 
   # Check the trace data in the new layer system
-  trace_layers <- vis$.__enclos_env__$private$.layers_to_add
-  trace_layer <- trace_layers[[which(sapply(trace_layers, function(x) x$type == "optimization_trace"))[1]]]
-  trace_spec <- trace_layer$spec
+  trace_layers = vis$.__enclos_env__$private$.layers_to_add
+  trace_layer = trace_layers[[which(sapply(trace_layers, function(x) x$type == "optimization_trace"))[1]]]
+  trace_spec = trace_layer$spec
   
   expect_true(nrow(trace_spec$data) <= 10)  # Should be limited by npmax
   expect_true(nrow(trace_spec$data) <= 5)   # Should be limited by npoints
 
   # Plot should work
-  p <- vis$plot()
+  p = vis$plot()
   expect_s3_class(p, "ggplot")
 })
 
 test_that("Visualizer2DObj auto-color generation works", {
-  obj <- Objective$new(
+  obj = Objective$new(
     id = "test_2d",
     fun = function(x) sum(x^2),
     xdim = 2,
@@ -178,14 +178,14 @@ test_that("Visualizer2DObj auto-color generation works", {
     minimize = TRUE
   )
 
-  vis <- Visualizer2DObj$new(obj, n_points = 20L)
+  vis = Visualizer2DObj$new(obj, n_points = 20L)
 
   # Create multiple optimizers without specifying colors
-  opts <- list()
+  opts = list()
   for (i in 1:3) {
-    opt <- OptimizerGD$new(obj$clone(deep = TRUE), x_start = c(runif(1, -1, 1), runif(1, -1, 1)), lr = 0.1, print_trace = FALSE)
+    opt = OptimizerGD$new(obj$clone(deep = TRUE), x_start = c(runif(1, -1, 1), runif(1, -1, 1)), lr = 0.1, print_trace = FALSE)
     opt$optimize(steps = 3L)
-    opts[[i]] <- opt
+    opts[[i]] = opt
   }
 
   # Add traces without specifying colors
@@ -194,21 +194,21 @@ test_that("Visualizer2DObj auto-color generation works", {
   }
 
   # Should have 3 trace layers
-  trace_layers <- sapply(vis$.__enclos_env__$private$.layers_to_add, function(x) x$type == "optimization_trace")
+  trace_layers = sapply(vis$.__enclos_env__$private$.layers_to_add, function(x) x$type == "optimization_trace")
   expect_equal(sum(trace_layers), 3)
   
   # Plot to trigger color resolution
-  p <- vis$plot()
+  p = vis$plot()
   expect_s3_class(p, "ggplot")
   
   # After plotting, colors should be resolved and different
-  trace_specs <- vis$.__enclos_env__$private$.layers_to_add[trace_layers]
-  colors <- sapply(trace_specs, function(layer) layer$spec$line_color)
+  trace_specs = vis$.__enclos_env__$private$.layers_to_add[trace_layers]
+  colors = sapply(trace_specs, function(layer) layer$spec$line_color)
   expect_length(unique(colors), 3)  # All should be different
 })
 
 test_that("Visualizer2DObj method chaining works", {
-  obj <- Objective$new(
+  obj = Objective$new(
     id = "test_2d",
     fun = function(x) sum(x^2),
     xdim = 2,
@@ -217,18 +217,18 @@ test_that("Visualizer2DObj method chaining works", {
     minimize = TRUE
   )
 
-  vis <- Visualizer2DObj$new(obj, n_points = 20L)
-  opt1 <- OptimizerGD$new(obj$clone(deep = TRUE), x_start = c(1, 1), lr = 0.1, print_trace = FALSE)
-  opt2 <- OptimizerGD$new(obj$clone(deep = TRUE), x_start = c(-1, -1), lr = 0.1, print_trace = FALSE)
+  vis = Visualizer2DObj$new(obj, n_points = 20L)
+  opt1 = OptimizerGD$new(obj$clone(deep = TRUE), x_start = c(1, 1), lr = 0.1, print_trace = FALSE)
+  opt2 = OptimizerGD$new(obj$clone(deep = TRUE), x_start = c(-1, -1), lr = 0.1, print_trace = FALSE)
 
   opt1$optimize(steps = 3L)
   opt2$optimize(steps = 3L)
 
   # Method chaining should work
-  result <- vis$add_optimization_trace(opt1)$add_optimization_trace(opt2)
+  result = vis$add_optimization_trace(opt1)$add_optimization_trace(opt2)
   expect_identical(result, vis)
   
   # Should have 2 trace layers
-  trace_layers <- sapply(vis$.__enclos_env__$private$.layers_to_add, function(x) x$type == "optimization_trace")
+  trace_layers = sapply(vis$.__enclos_env__$private$.layers_to_add, function(x) x$type == "optimization_trace")
   expect_equal(sum(trace_layers), 2)
 })

@@ -1,20 +1,20 @@
 test_that("2D Objective works", {
   skip_if_not_installed("mlr3learners")
 
-  obj_branin <- obj("TF_branin")
+  obj_branin = obj("TF_branin")
 
-  vis <- as_visualizer(obj_branin, type = "2d")
+  vis = as_visualizer(obj_branin, type = "2d")
 
   expect_s3_class(vis, "Visualizer2DObj")
   expect_s3_class(vis, "Visualizer2D")
   expect_identical(vis$objective, obj_branin)
   
-  p <- vis$plot()
+  p = vis$plot()
   expect_s3_class(p, "ggplot")
 })
 
 test_that("2D Objective creation with custom parameters works", {
-  obj <- Objective$new(
+  obj = Objective$new(
     id = "test_2d",
     fun = function(x) x[1]^2 + x[2]^2,
     xdim = 2,
@@ -22,7 +22,7 @@ test_that("2D Objective creation with custom parameters works", {
     upper = c(2, 2)
   )
 
-  vis <- Visualizer2DObj$new(obj, n_points = 50L, padding = 0.1)
+  vis = Visualizer2DObj$new(obj, n_points = 50L, padding = 0.1)
 
   expect_s3_class(vis, "Visualizer2DObj")
   expect_identical(vis$objective, obj)
@@ -30,12 +30,12 @@ test_that("2D Objective creation with custom parameters works", {
   expect_true(length(vis$fun_x2) > 0)
   expect_true(length(vis$fun_y) > 0)
   
-  p <- vis$plot()
+  p = vis$plot()
   expect_s3_class(p, "ggplot")
 })
 
 test_that("2D Objective fails with wrong dimension", {
-  obj_1d <- Objective$new(
+  obj_1d = Objective$new(
     id = "test_1d",
     fun = function(x) x^2,
     xdim = 1,
@@ -50,7 +50,7 @@ test_that("2D Objective fails with wrong dimension", {
 })
 
 test_that("2D Objective with optimization trace works", {
-  obj <- Objective$new(
+  obj = Objective$new(
     id = "test_2d",
     fun = function(x) x[1]^2 + x[2]^2,
     xdim = 2,
@@ -58,10 +58,10 @@ test_that("2D Objective with optimization trace works", {
     upper = c(2, 2)
   )
 
-  vis <- Visualizer2DObj$new(obj)
+  vis = Visualizer2DObj$new(obj)
   
   # Create a simple optimizer with proper x_start
-  opt <- OptimizerGD$new(objective = obj, x_start = c(1, 1))
+  opt = OptimizerGD$new(objective = obj, x_start = c(1, 1))
   opt$optimize(steps = 5L)
 
   expect_true(nrow(opt$archive) > 0)
@@ -69,7 +69,7 @@ test_that("2D Objective with optimization trace works", {
   # Add optimization trace
   vis$add_optimization_trace(opt)
   
-  p <- vis$plot()
+  p = vis$plot()
   expect_s3_class(p, "ggplot")
   
   # Should have additional layers for the optimization trace
@@ -77,7 +77,7 @@ test_that("2D Objective with optimization trace works", {
 })
 
 test_that("2D Objective add_layer methods show appropriate warnings", {
-  obj <- Objective$new(
+  obj = Objective$new(
     id = "test_2d",
     fun = function(x) x[1]^2 + x[2]^2,
     xdim = 2,
@@ -85,9 +85,9 @@ test_that("2D Objective add_layer methods show appropriate warnings", {
     upper = c(2, 2)
   )
 
-  vis <- Visualizer2DObj$new(obj)
+  vis = Visualizer2DObj$new(obj)
   
   # Test that plotting works correctly
-  p <- vis$plot()
+  p = vis$plot()
   expect_s3_class(p, "ggplot")
 })

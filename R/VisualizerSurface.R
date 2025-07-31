@@ -10,7 +10,7 @@
 #' @template param_n_points
 #'
 #' @export
-VisualizerSurface <- R6::R6Class("VisualizerSurface",
+VisualizerSurface = R6::R6Class("VisualizerSurface",
   inherit = Visualizer,
   public = list(
 
@@ -65,19 +65,22 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
     #' @template param_colorscale
     #' @template param_show_title
     initialize = function(grid, zmat, plot_lab = NULL, x1_lab = "x1", x2_lab = "x2", z_lab = "z", 
-                          opacity = 0.8, colorscale = list(
-                            c(0, "#440154"), c(0.25, "#3b528b"), c(0.5, "#21908c"), 
-                            c(0.75, "#5dc863"), c(1, "#fde725")
-                          ), show_title = TRUE) {
-      self$grid <- checkmate::assert_list(grid)
-      self$zmat <- checkmate::assert_matrix(zmat)
-      self$plot_lab <- checkmate::assert_character(plot_lab, null.ok = TRUE)
-      self$x1_lab <- checkmate::assert_character(x1_lab)
-      self$x2_lab <- checkmate::assert_character(x2_lab)
-      self$z_lab <- checkmate::assert_character(z_lab)
-      self$opacity <- checkmate::assert_number(opacity, lower = 0, upper = 1)
-      self$colorscale <- checkmate::assert_list(colorscale)
-      self$show_title <- checkmate::assert_flag(show_title)
+                          opacity = 0.8, colorscale = "auto", show_title = TRUE) {
+      self$grid = checkmate::assert_list(grid)
+      self$zmat = checkmate::assert_matrix(zmat)
+      self$plot_lab = checkmate::assert_character(plot_lab, null.ok = TRUE)
+      self$x1_lab = checkmate::assert_character(x1_lab)
+      self$x2_lab = checkmate::assert_character(x2_lab)
+      self$z_lab = checkmate::assert_character(z_lab)
+      self$opacity = checkmate::assert_number(opacity, lower = 0, upper = 1)
+      self$colorscale = if (is.character(colorscale)) {
+        checkmate::assert_string(colorscale)
+        colorscale
+      } else {
+        checkmate::assert_list(colorscale)
+        colorscale
+      }
+      self$show_title = checkmate::assert_flag(show_title)
       return(invisible(self))
     },
 
@@ -91,14 +94,24 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
     #' @template param_dots_trace
     init_layer_contour = function(opacity = self$opacity, colorscale = self$colorscale, show_title = self$show_title, ...) {
       checkmate::assert_number(opacity, lower = 0, upper = 1)
+      # Resolve colorscale if it's "auto"
+      if (is.character(colorscale) && colorscale == "auto") {
+        # Default to viridis if no plot settings available
+        palette = if (!is.null(private$.plot_settings)) {
+          private$.plot_settings$color_palette %||% "viridis"
+        } else {
+          "viridis"
+        }
+        colorscale = get_continuous_colorscale(palette)
+      }
       checkmate::assert_list(colorscale)
       checkmate::assert_flag(show_title)
 
-      private$.vbase <- c(as.list(environment()), list(...))
-      private$.layer_primary <- "contour"
+      private$.vbase = c(as.list(environment()), list(...))
+      private$.layer_primary = "contour"
 
-      llp <- list(x = self$grid$x1, y = self$grid$x2, z = self$zmat)
-      private$.plot <- plot_ly() %>%
+      llp = list(x = self$grid$x1, y = self$grid$x2, z = self$zmat)
+      private$.plot = plot_ly() %>%
         add_trace(
           name = self$plot_lab,
           showlegend = TRUE,
@@ -118,8 +131,8 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
         )
 
       if (!private$.freeze_plot) { # Used in animate to not overwrite the
-        private$.opts <- list() # plot over and over again when calling
-        private$.layer_arrow <- list() # `$initLayerXXX`.
+        private$.opts = list() # plot over and over again when calling
+        private$.layer_arrow = list() # `$initLayerXXX`.
       }
 
       return(invisible(self))
@@ -136,19 +149,29 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
     init_layer_surface = function(opacity = self$opacity, colorscale = self$colorscale, 
                                   show_title = self$show_title, ...) {
       checkmate::assert_number(opacity, lower = 0, upper = 1)
+      # Resolve colorscale if it's "auto"
+      if (is.character(colorscale) && colorscale == "auto") {
+        # Default to viridis if no plot settings available
+        palette = if (!is.null(private$.plot_settings)) {
+          private$.plot_settings$color_palette %||% "viridis"
+        } else {
+          "viridis"
+        }
+        colorscale = get_continuous_colorscale(palette)
+      }
       checkmate::assert_list(colorscale)
       checkmate::assert_flag(show_title)
 
-      private$.vbase <- c(as.list(environment()), list(...))
-      private$.layer_primary <- "surface"
+      private$.vbase = c(as.list(environment()), list(...))
+      private$.layer_primary = "surface"
 
-      llp <- list(x = self$grid$x1, y = self$grid$x2, z = self$zmat)
+      llp = list(x = self$grid$x1, y = self$grid$x2, z = self$zmat)
       
       # Check if contours layer is stored and include it in the base surface
-      contours_layer <- private$get_layer("contours")
+      contours_layer = private$get_layer("contours")
       
       # Build trace arguments
-      trace_args <- list(
+      trace_args = list(
         name = self$plot_lab,
         showlegend = FALSE,
         showscale = FALSE,
@@ -162,14 +185,14 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
       
       # Add contours if available
       if (!is.null(contours_layer)) {
-        trace_args$contours <- contours_layer$contours
+        trace_args$contours = contours_layer$contours
       }
       
       # Add additional arguments
-      trace_args <- c(trace_args, list(...))
+      trace_args = c(trace_args, list(...))
       
-      plot_obj <- plot_ly()
-      private$.plot <- do.call(plotly::add_trace, c(list(plot_obj), trace_args)) %>%
+      plot_obj = plot_ly()
+      private$.plot = do.call(plotly::add_trace, c(list(plot_obj), trace_args)) %>%
         layout(
           title = if (show_title) self$plot_lab else NULL,
           scene = list(
@@ -180,8 +203,8 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
         )
 
       if (!private$.freeze_plot) { # Used in animate to not overwrite the plot over and over again.
-        private$.opts <- list()
-        private$.layer_arrow <- list()
+        private$.opts = list()
+        private$.layer_arrow = list()
       }
 
       return(invisible(self))
@@ -191,8 +214,8 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
     #' This method is used internally by plot(layout = ...) and should not be called directly.
     #' @param ... Layout options directly passed to `layout(...)`.
     set_layout = function(...) {
-      private$.layout <- list(...)
-      private$.plot <- private$.plot %>% layout(...)
+      private$.layout = list(...)
+      private$.plot = private$.plot %>% layout(...)
 
       return(invisible(self))
     },
@@ -212,7 +235,7 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
         stop("Scene can only be set for `surface` plots")
       }
 
-      private$.plot <- private$.plot %>%
+      private$.plot = private$.plot %>%
         layout(scene = list(camera = list(eye = list(x = x, y = y, z = z))))
 
       return(invisible(self))
@@ -233,7 +256,7 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
       # Handle contours: custom contours or default z-projected contours
       if (is.null(contours)) {
         # Use default z-projected contours
-        contours_final <- list(
+        contours_final = list(
           z = list(
             show = TRUE,
             project = list(z = TRUE),
@@ -242,7 +265,7 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
         )
       } else {
         # Use provided custom contours
-        contours_final <- contours
+        contours_final = contours
       }
       
       # Store contours specification for deferred rendering
@@ -312,7 +335,7 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
       checkmate::assert_list(scene, null.ok = TRUE)
       
       # Store plot settings for layer resolution
-      private$.plot_settings <- list(
+      private$.plot_settings = list(
         text_size = text_size,
         title_size = title_size,
         theme = theme,
@@ -337,24 +360,29 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
       # Resolve layer colors now that we have plot settings
       private$resolve_layer_colors()
       
+      # Resolve colorscale if it's "auto"
+      if (is.character(self$colorscale) && self$colorscale == "auto") {
+        self$colorscale = get_continuous_colorscale(color_palette)
+      }
+      
       # Set default title size
-      if (is.null(title_size)) title_size <- text_size + 2
+      if (is.null(title_size)) title_size = text_size + 2
       
       # Validate scene parameter is only used for surface plots
       if (!is.null(scene) && flatten) {
         stop("Scene parameter can only be used for surface plots (flatten = FALSE)")
       }
       
-      # Get the appropriate colorscale based on palette choice
-      plot_colorscale <- get_vistool_color(1, color_palette)
+      # Get the appropriate colorscale based on current settings
+      plot_colorscale = self$colorscale
       
       # Check if we need to reinitialize the plot
       # This happens if the plot type changes, colorscale changes, or contours are added/modified
-      contours_layer <- private$get_layer("contours")
-      has_contours <- !is.null(contours_layer)
-      current_has_contours <- !is.null(private$.vbase) && !is.null(private$.vbase$contours)
+      contours_layer = private$get_layer("contours")
+      has_contours = !is.null(contours_layer)
+      current_has_contours = !is.null(private$.vbase) && !is.null(private$.vbase$contours)
       
-      needs_reinit <- is.null(private$.plot) || 
+      needs_reinit = is.null(private$.plot) || 
                      (flatten && private$.layer_primary != "contour") ||
                      (!flatten && private$.layer_primary != "surface") ||
                      (!identical(private$.vbase$colorscale, plot_colorscale)) ||
@@ -372,18 +400,18 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
       # apply text size to plotly layout
       if (!is.null(private$.plot)) {
         # Determine final labels
-        final_title <- if (show_title) {
+        final_title = if (show_title) {
           if (!is.null(plot_title)) plot_title else self$plot_lab
         } else {
           ""  # Empty string instead of NULL for plotly
         }
-        final_x_lab <- if (!is.null(x_lab)) x_lab else self$x1_lab
-        final_y_lab <- if (!is.null(y_lab)) y_lab else self$x2_lab
-        final_z_lab <- if (!is.null(z_lab)) z_lab else self$z_lab
+        final_x_lab = if (!is.null(x_lab)) x_lab else self$x1_lab
+        final_y_lab = if (!is.null(y_lab)) y_lab else self$x2_lab
+        final_z_lab = if (!is.null(z_lab)) z_lab else self$z_lab
         
         if (private$.layer_primary == "surface") {
           # For 3D surface plots
-          private$.plot <- private$.plot %>%
+          private$.plot = private$.plot %>%
             plotly::layout(
               title = list(text = final_title, font = list(size = title_size)),
               scene = list(
@@ -404,7 +432,7 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
             )
         } else {
           # For 2D contour plots
-          private$.plot <- private$.plot %>%
+          private$.plot = private$.plot %>%
             plotly::layout(
               title = list(text = final_title, font = list(size = title_size)),
               xaxis = list(
@@ -422,23 +450,20 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
       
       # Apply additional layout options if provided
       if (!is.null(layout)) {
-        private$.plot <- do.call(plotly::layout, c(list(private$.plot), layout))
+        private$.plot = do.call(plotly::layout, c(list(private$.plot), layout))
       }
       
       # Apply scene options if provided (only for surface plots)
       if (!is.null(scene) && private$.layer_primary == "surface") {
-        private$.plot <- private$.plot %>% plotly::layout(scene = scene)
+        private$.plot = private$.plot %>% plotly::layout(scene = scene)
       }
       
       # Add points from add_points() method
       if (private$.layer_primary == "surface") {
-        private$.plot <- private$add_points_to_plotly(private$.plot, "surface")
+        private$.plot = private$add_points_to_plotly(private$.plot, "surface")
       } else {
-        private$.plot <- private$add_points_to_plotly(private$.plot, "contour")
+        private$.plot = private$add_points_to_plotly(private$.plot, "contour")
       }
-      
-      # Add stored layers (training data, boundaries, etc.)
-      private$render_stored_layers()
       
       return(private$.plot)
     }
@@ -489,128 +514,32 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
     # Override infer_z_values to use the surface's zmat
     infer_z_values = function(points_data) {
       # Use bilinear interpolation to estimate z values from the surface
-      x_vals <- points_data$x
-      y_vals <- points_data$y
+      x_vals = points_data$x
+      y_vals = points_data$y
       
       # Get grid ranges
-      x1_range <- self$grid$x1
-      x2_range <- self$grid$x2
+      x1_range = self$grid$x1
+      x2_range = self$grid$x2
       
-      z_vals <- numeric(length(x_vals))
+      z_vals = numeric(length(x_vals))
       
       for (i in seq_along(x_vals)) {
-        x <- x_vals[i]
-        y <- y_vals[i]
+        x = x_vals[i]
+        y = y_vals[i]
         
         # Find closest grid points
-        x1_idx <- which.min(abs(x1_range - x))
-        x2_idx <- which.min(abs(x2_range - y))
+        x1_idx = which.min(abs(x1_range - x))
+        x2_idx = which.min(abs(x2_range - y))
         
         # Clamp to grid boundaries
-        x1_idx <- max(1, min(length(x1_range), x1_idx))
-        x2_idx <- max(1, min(length(x2_range), x2_idx))
+        x1_idx = max(1, min(length(x1_range), x1_idx))
+        x2_idx = max(1, min(length(x2_range), x2_idx))
         
         # Use the closest grid point value
-        z_vals[i] <- self$zmat[x1_idx, x2_idx]
+        z_vals[i] = self$zmat[x1_idx, x2_idx]
       }
       
       return(z_vals)
-    },
-    
-    # Render stored layers (training data, boundaries, etc.)
-    render_stored_layers = function() {
-      # Render training data if any
-      if (length(private$.layers_to_add) > 0) {
-        training_logical <- sapply(private$.layers_to_add, function(x) x$type == "training_data")
-        training_indices <- which(training_logical)
-      } else {
-        training_indices <- integer(0)
-      }
-      for (idx in training_indices) {
-        data <- private$.layers_to_add[[idx]]$spec
-        
-        if (private$.layer_primary == "contour") {
-          private$.plot <- private$.plot %>%
-            plotly::add_trace(
-              x = data$x1,
-              y = data$x2,
-              type = "scatter",
-              mode = "markers",
-              marker = list(
-                size = 10,
-                color = data$z,
-                cmin = min(self$zmat),
-                cmax = max(self$zmat),
-                colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")),
-                line = list(color = "black", width = 2),
-                showscale = FALSE
-              ),
-              text = ~ paste("x:", data$x1, "\ny:", data$x2, " \nz:", data$z),
-              hoverinfo = "text"
-            )
-        } else {
-          private$.plot <- private$.plot %>%
-            plotly::add_trace(
-              x = data$x1,
-              y = data$x2,
-              z = data$z,
-              type = "scatter3d",
-              mode = "markers",
-              marker = list(size = data$size, color = data$color)
-            )
-        }
-      }
-      
-      # Render boundary layers if any
-      if (length(private$.layers_to_add) > 0) {
-        boundary_logical <- sapply(private$.layers_to_add, function(x) x$type == "boundary")
-        boundary_indices <- which(boundary_logical)
-      } else {
-        boundary_indices <- integer(0)
-      }
-      for (idx in boundary_indices) {
-        boundary <- private$.layers_to_add[[idx]]$spec
-        
-        for (value in boundary$values) {
-          z <- matrix(value, nrow = nrow(self$zmat), ncol = ncol(self$zmat), byrow = TRUE)
-
-          if (private$.layer_primary == "contour") {
-            llp <- list(x = self$grid$x1, y = self$grid$x2, z = self$zmat)
-            private$.plot <- private$.plot %>%
-              plotly::add_trace(
-                name = paste("boundary", value),
-                autocontour = FALSE,
-                showlegend = FALSE,
-                showscale = FALSE,
-                x = llp$x,
-                y = llp$y,
-                z = t(llp$z),
-                type = "contour",
-                colorscale = list(c(0, 1), c("rgb(0,0,0)", "rgb(0,0,0)")),
-                ncontours = 1,
-                contours = list(
-                  start = value,
-                  end = value,
-                  coloring = "lines"
-                ),
-                line = list(
-                  color = "black",
-                  width = 3
-                )
-              )
-          } else {
-            private$.plot <- private$.plot %>%
-              plotly::add_surface(
-                x = self$grid$x1,
-                y = self$grid$x2,
-                z = z,
-                colorscale = boundary$color,
-                showscale = FALSE,
-                name = paste("boundary", value)
-              )
-          }
-        }
-      }
     }
   )
 )
@@ -620,18 +549,18 @@ VisualizerSurface <- R6::R6Class("VisualizerSurface",
 #' @param alpha (`numeric(1)`) The alpha value. If `!is.null` the used prefix is 'rgba' instead of 'rgb'.
 #' @return A character of length one containing the RGB color.
 #' @export
-colSampler <- function(alpha = NULL) {
+colSampler = function(alpha = NULL) {
   checkmate::assertNumber(alpha, lower = 0, upper = 1, null.ok = TRUE)
-  r <- sample(seq(0, 255), 1)
-  g <- sample(seq(0, 255), 1)
-  b <- sample(seq(0, 255), 1)
+  r = sample(seq(0, 255), 1)
+  g = sample(seq(0, 255), 1)
+  b = sample(seq(0, 255), 1)
 
   if (is.null(alpha)) {
-    rgb <- "rgb"
+    rgb = "rgb"
   } else {
-    rgb <- "rgba"
+    rgb = "rgba"
   }
-  clr <- sprintf("%s(%s)", rgb, paste(c(r, g, b, alpha), collapse = ", "))
+  clr = sprintf("%s(%s)", rgb, paste(c(r, g, b, alpha), collapse = ", "))
   return(clr)
 }
 
@@ -644,10 +573,10 @@ colSampler <- function(alpha = NULL) {
 #' @param index (`integer(1)`)\cr
 #'   Index of the color to retrieve from the palette.
 #' @return A character string containing the color in hex format.
-get_consistent_color <- function(index) {
+get_consistent_color = function(index) {
   # Same color palette as used in Visualizer2DObj
-  colors <- c("#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", 
+  colors = c("#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", 
              "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf")
-  color_index <- ((index - 1) %% length(colors)) + 1
+  color_index = ((index - 1) %% length(colors)) + 1
   return(colors[color_index])
 }

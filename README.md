@@ -55,15 +55,15 @@ the `pima` task included in `mlr3`:
 
 ``` r
 # Create an example task, add missing data imputation and select 2 features
-task <- tsk("pima")
-task <- po("imputemean")$train(list(task))[[1]]
+task = tsk("pima")
+task = po("imputemean")$train(list(task))[[1]]
 task$select(c("insulin", "mass"))
 
 # Select example learner
-learner <- lrn("classif.svm", predict_type = "prob")
+learner = lrn("classif.svm", predict_type = "prob")
 
-# Create 2D ggplot2 visualization (default for 2-feature tasks)
-vis_2d <- as_visualizer(task, learner) # or explicitly: type = "2d"
+# Create 2D ggplot2 visualization
+vis_2d = as_visualizer(task, learner = learner)
 vis_2d$plot()
 ```
 
@@ -74,7 +74,7 @@ For interactive exploration, you can create surface visualizations with
 
 ``` r
 # Create surface visualization for interactive plotly surface plot
-vis_surface <- as_visualizer(task, learner, type = "surface")
+vis_surface = as_visualizer(task, learner = learner, type = "surface")
 
 # Define a 3D scene
 vis_surface$set_scene(x = 1.4, y = 1.4, z = 1.4)

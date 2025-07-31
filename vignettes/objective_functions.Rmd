@@ -37,13 +37,13 @@ as.data.table(dict_objective)
 To retrieve an objective function:
 
 ```{r}
-obj_branin <- obj("TF_branin")
+obj_branin = obj("TF_branin")
 ```
 
 You can evaluate the objective, gradient, and Hessian at a point:
 
 ```{r}
-x <- c(0.9, 1)
+x = c(0.9, 1)
 obj_branin$eval(x)
 obj_branin$grad(x)
 obj_branin$hess(x)
@@ -54,14 +54,14 @@ obj_branin$hess(x)
 Use `as_visualizer()` to create a visualizer for an objective. For 1D and 2D objectives, the appropriate visualizer is selected automatically.
 
 ```{r, out.width='100%', out.height='700px'}
-viz <- as_visualizer(obj_branin)
+viz = as_visualizer(obj_branin)
 viz$plot()
 ```
 
 For interactive surface visualization (2D objectives):
 
 ```{r, out.width='100%', out.height='700px'}
-viz_surface <- as_visualizer(obj_branin, type = "surface")
+viz_surface = as_visualizer(obj_branin, type = "surface")
 viz_surface$plot()
 ```
 
@@ -78,9 +78,9 @@ Let's define a loss for a linear model on the iris data with target `Sepal.Width
 
 ```{r}
 # Define the linear model loss function as SSE:
-l2norm <- function(x) sqrt(sum(crossprod(x)))
+l2norm = function(x) sqrt(sum(crossprod(x)))
 
-mylm <- function(x, Xmat, y) {
+mylm = function(x, Xmat, y) {
   l2norm(y - Xmat %*% x)
 }
 ```
@@ -91,11 +91,11 @@ These arguments must be specified just once:
 
 ```{r}
 # Use the iris dataset with response `Sepal.Width` and feature `Petal.Width`:
-Xmat <- model.matrix(~Petal.Width, data = iris)
-y <- iris$Sepal.Width
+Xmat = model.matrix(~Petal.Width, data = iris)
+y = iris$Sepal.Width
 
 # Create a new object:
-obj_lm <- Objective$new(id = "iris LM", fun = mylm, xdim = 2, Xmat = Xmat, y = y, minimize = TRUE)
+obj_lm = Objective$new(id = "iris LM", fun = mylm, xdim = 2, Xmat = Xmat, y = y, minimize = TRUE)
 
 obj_lm$evalStore(c(1, 2))
 obj_lm$evalStore(c(2, 3))
@@ -107,7 +107,7 @@ obj_lm$archive
 Visualize the custom objective:
 
 ```{r, out.width='100%', out.height='700px'}
-viz_lm <- as_visualizer(obj_lm, x1_limits = c(-0.5, 5), x2_limits = c(-3.2, 2.8))
+viz_lm = as_visualizer(obj_lm, x1_limits = c(-0.5, 5), x2_limits = c(-3.2, 2.8))
 viz_lm$plot()
 ```
 
@@ -115,7 +115,7 @@ You can also add custom points directly to the visualizer using `$add_points()`,
 For adding actual optimization traces, see the [Optimization & Traces vignette](optimization_traces.html).
 
 ```{r, out.width='100%', out.height='700px'}
-archive_data <- data.frame(
+archive_data = data.frame(
   x = sapply(obj_lm$archive$x, function(x) x[1]),
   y = sapply(obj_lm$archive$x, function(x) x[2])
 )
@@ -124,7 +124,7 @@ viz_lm$add_points(archive_data, color = "orange", size = 3, shape = 17, alpha = 
 
 ```{r, out.width='100%', out.height='700px'}
 # Add a labeled point to the surface (plotly) visualizer
-viz_lm_surface <- as_visualizer(obj_lm, x1_limits = c(-0.5, 5), x2_limits = c(-3.2, 2.8), type = "surface")
+viz_lm_surface = as_visualizer(obj_lm, x1_limits = c(-0.5, 5), x2_limits = c(-3.2, 2.8), type = "surface")
 viz_lm_surface$add_points(base::data.frame(x = 2, y = 0), color = "orange", size = 8, shape = "diamond", alpha = 0.9, annotations = "The z values are inferred!")$plot()
 ```
 
@@ -138,12 +138,12 @@ From the package `mlr3misc`.
 library(plotly)
 library(ggsci)
 
-tab <- as.data.table(dict_objective)
-keys <- tab[list(2), key, on = "xdim"]
+tab = as.data.table(dict_objective)
+keys = tab[list(2), key, on = "xdim"]
 
-visualizers <- map(keys, function(key) {
-  objective <- obj(key)
-  vis <- as_visualizer(objective, type = "surface", show_title = FALSE)
+visualizers = map(keys, function(key) {
+  objective = obj(key)
+  vis = as_visualizer(objective, type = "surface", show_title = FALSE)
   vis$plot(flatten = TRUE) %>%
     add_annotations(
       text = objective$label,

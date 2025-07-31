@@ -36,7 +36,7 @@ We subset the data set to only use the features `median_income` and `housing_med
 The `median_income` feature is the median income in block group and `housing_median_age` is the median age of a house within a block.
 
 ```{r}
-task <- tsk("california_housing")
+task = tsk("california_housing")
 task$select(c("median_income", "housing_median_age"))
 task$filter(rows = sample(task$nrow, 2000))
 ```
@@ -44,13 +44,13 @@ task$filter(rows = sample(task$nrow, 2000))
 We load the support vector machine learner for regression.
 
 ```{r}
-learner <- lrn("regr.svm")
+learner = lrn("regr.svm")
 ```
 
 Now we create a visualizer object, using the `plotly` backend (`type = "surface"`).
 
 ```{r}
-vis <- as_visualizer(task, learner = learner, type = "surface")
+vis = as_visualizer(task, learner = learner, type = "surface")
 ```
 
 First, the learner is trained on the entire task.
@@ -76,7 +76,7 @@ vis$plot(flatten = FALSE)
 Draw with contour lines above z dimension.
 
 ```{r, out.width='100%', out.height='700px'}
-vis <- as_visualizer(task, learner = learner, type = "surface")
+vis = as_visualizer(task, learner = learner, type = "surface")
 vis$add_contours()$plot()
 ```
 
@@ -91,16 +91,16 @@ We use the `pima` data set and impute the missing values.
 We select the features `insulin` and `mass` and train a support vector machine for classification.
 
 ```{r}
-task <- tsk("pima")
-task <- po("imputemean")$train(list(task))[[1]]
+task = tsk("pima")
+task = po("imputemean")$train(list(task))[[1]]
 task$select(c("insulin", "mass"))
-learner <- lrn("classif.svm", predict_type = "prob")
+learner = lrn("classif.svm", predict_type = "prob")
 ```
 
 We create a visualizer object, using the default `ggplot2` backend, and plot the predictions.
 
 ```{r}
-vis <- as_visualizer(task, learner = learner)
+vis = as_visualizer(task, learner = learner)
 vis$plot()
 ```
 
