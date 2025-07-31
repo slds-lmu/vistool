@@ -10,7 +10,7 @@
 #' @template param_n_points
 #'
 #' @export
-VisualizerSurfaceModel <- R6::R6Class("VisualizerSurfaceModel",
+VisualizerSurfaceModel = R6::R6Class("VisualizerSurfaceModel",
   inherit = VisualizerSurface,
   public = list(
 
@@ -38,12 +38,9 @@ VisualizerSurfaceModel <- R6::R6Class("VisualizerSurfaceModel",
     #' @template param_colorscale
     #' @template param_show_title
     initialize = function(task, learner, x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L,
-                          opacity = 0.8, colorscale = list(
-                            c(0, "#440154"), c(0.25, "#3b528b"), c(0.5, "#21908c"), 
-                            c(0.75, "#5dc863"), c(1, "#fde725")
-                          ), show_title = TRUE) {
-      self$task <- mlr3::assert_task(task)
-      self$learner <- mlr3::assert_learner(learner, task = self$task)
+                          opacity = 0.8, colorscale = "auto", show_title = TRUE) {
+      self$task = mlr3::assert_task(task)
+      self$learner = mlr3::assert_learner(learner, task = self$task)
       checkmate::assert_numeric(x1_limits, len = 2, null.ok = TRUE)
       checkmate::assert_numeric(x2_limits, len = 2, null.ok = TRUE)
       checkmate::assert_count(n_points)
@@ -56,34 +53,34 @@ VisualizerSurfaceModel <- R6::R6Class("VisualizerSurfaceModel",
         )
       }
 
-      x1 <- self$task$feature_names[1]
-      x2 <- self$task$feature_names[2]
-      data <- task$data()
+      x1 = self$task$feature_names[1]
+      x2 = self$task$feature_names[2]
+      data = task$data()
       self$learner$train(task)
 
-      x1_limits <- range(data[, x1, with = FALSE])
-      x2_limits <- range(data[, x2, with = FALSE])
+      x1_limits = range(data[, x1, with = FALSE])
+      x2_limits = range(data[, x2, with = FALSE])
 
-      grid <- list(
+      grid = list(
         x1 = seq(x1_limits[1] - padding, x1_limits[2] + padding, length.out = n_points),
         x2 = seq(x2_limits[1] - padding, x2_limits[2] + padding, length.out = n_points)
       )
 
-      newdata <- CJ(grid$x1, grid$x2)
+      newdata = CJ(grid$x1, grid$x2)
       setnames(newdata, self$task$feature_names)
 
-      original_types <- sapply(self$task$data()[, self$task$feature_names, with = FALSE], class)
+      original_types = sapply(self$task$data()[, self$task$feature_names, with = FALSE], class)
       for (col in names(original_types)) {
         if (original_types[col] == "integer") {
-          newdata[[col]] <- as.integer(round(newdata[[col]]))
+          newdata[[col]] = as.integer(round(newdata[[col]]))
         }
       }
-      z <- self$learner$predict_newdata(newdata)[[self$learner$predict_type]]
+      z = self$learner$predict_newdata(newdata)[[self$learner$predict_type]]
       if (self$learner$predict_type == "prob") {
-        pos_class <- self$task$positive
-        z <- z[, pos_class]
+        pos_class = self$task$positive
+        z = z[, pos_class]
       }
-      zmat <- matrix(z, nrow = n_points, ncol = n_points, byrow = TRUE)
+      zmat = matrix(z, nrow = n_points, ncol = n_points, byrow = TRUE)
 
       super$initialize(
         grid = grid,
@@ -111,11 +108,11 @@ VisualizerSurfaceModel <- R6::R6Class("VisualizerSurfaceModel",
     #'   Further arguments passed to `add_trace(...)`.
     add_training_data = function(size = 5, color = "grey", ...) {
       if (is.null(private$.plot)) private$.init_default_plot()
-      data <- self$task$data()
-      x1 <- data[, self$task$feature_names[1], with = FALSE][[1]]
-      x2 <- data[, self$task$feature_names[2], with = FALSE][[1]]
-      z <- data[, self$task$target_names, with = FALSE][[1]]
-      if (self$learner$predict_type == "prob") z <- as.integer(z) - 1
+      data = self$task$data()
+      x1 = data[, self$task$feature_names[1], with = FALSE][[1]]
+      x2 = data[, self$task$feature_names[2], with = FALSE][[1]]
+      z = data[, self$task$target_names, with = FALSE][[1]]
+      if (self$learner$predict_type == "prob") z = as.integer(z) - 1
 
       # Store training data specification without resolving colors yet
       private$store_layer("training_data", list(
@@ -148,15 +145,15 @@ VisualizerSurfaceModel <- R6::R6Class("VisualizerSurfaceModel",
       # Determine default values based on prediction type
       if (is.null(values)) {
         if (self$learner$predict_type == "prob") {
-          values <- 0.5
+          values = 0.5
         } else {
           # For regression or response predictions, use median (single central tendency)
-          values <- median(self$zmat, na.rm = TRUE)
+          values = median(self$zmat, na.rm = TRUE)
         }
       } else {
         # Validate that boundary values are within the prediction range
-        z_range <- range(self$zmat, na.rm = TRUE)
-        invalid_values <- values[values < z_range[1] | values > z_range[2]]
+        z_range = range(self$zmat, na.rm = TRUE)
+        invalid_values = values[values < z_range[1] | values > z_range[2]]
         if (length(invalid_values) > 0) {
           warning(sprintf(
             "Boundary values %s are outside the prediction range [%.3f, %.3f] and will not generate visible surfaces.",
@@ -168,7 +165,7 @@ VisualizerSurfaceModel <- R6::R6Class("VisualizerSurfaceModel",
       
       # Default color scheme
       if (is.null(color)) {
-        color <- list(c(0, "rgba(176,196,222,0.5)"), c(1, "rgba(160,82,45,0.5)"))
+        color = list(c(0, "rgba(176,196,222,0.5)"), c(1, "rgba(160,82,45,0.5)"))
       }
 
       # Store boundary specification without resolving colors yet
@@ -200,7 +197,7 @@ VisualizerSurfaceModel <- R6::R6Class("VisualizerSurfaceModel",
   private = list(
     # Render stored training data layers
     render_training_data_layers = function() {
-      training_layers <- private$get_layers_by_type("training_data")
+      training_layers = private$get_layers_by_type("training_data")
       
       if (length(training_layers) == 0) {
         return()
@@ -214,14 +211,14 @@ VisualizerSurfaceModel <- R6::R6Class("VisualizerSurfaceModel",
     # Render a single training data layer
     render_training_data_layer = function(layer_spec) {
       # Resolve color at plot time
-      resolved_color <- if (layer_spec$color == "auto") {
+      resolved_color = if (layer_spec$color == "auto") {
         private$get_auto_color_with_palette()
       } else {
-        process_color(layer_spec$color, self)
+        validate_color(layer_spec$color)
       }
       
       if (private$.layer_primary == "contour") {
-        private$.plot <- private$.plot %>%
+        private$.plot = private$.plot %>%
           plotly::add_trace(
             x = layer_spec$x1,
             y = layer_spec$x2,
@@ -240,7 +237,7 @@ VisualizerSurfaceModel <- R6::R6Class("VisualizerSurfaceModel",
             hoverinfo = "text"
           )
       } else {
-        private$.plot <- private$.plot %>%
+        private$.plot = private$.plot %>%
           plotly::add_trace(
             x = layer_spec$x1,
             y = layer_spec$x2,
@@ -254,7 +251,7 @@ VisualizerSurfaceModel <- R6::R6Class("VisualizerSurfaceModel",
     
     # Render stored boundary layers
     render_boundary_layers = function() {
-      boundary_layers <- private$get_layers_by_type("boundary")
+      boundary_layers = private$get_layers_by_type("boundary")
       
       if (length(boundary_layers) == 0) {
         return()
@@ -268,11 +265,11 @@ VisualizerSurfaceModel <- R6::R6Class("VisualizerSurfaceModel",
     # Render a single boundary layer
     render_boundary_layer = function(layer_spec) {
       for (value in layer_spec$values) {
-        z <- matrix(value, nrow = nrow(self$zmat), ncol = ncol(self$zmat), byrow = TRUE)
+        z = matrix(value, nrow = nrow(self$zmat), ncol = ncol(self$zmat), byrow = TRUE)
 
         if (private$.layer_primary == "contour") {
-          llp <- list(x = self$grid$x1, y = self$grid$x2, z = self$zmat)
-          private$.plot <- private$.plot %>%
+          llp = list(x = self$grid$x1, y = self$grid$x2, z = self$zmat)
+          private$.plot = private$.plot %>%
             plotly::add_trace(
               name = paste("boundary", value),
               autocontour = FALSE,
@@ -295,7 +292,7 @@ VisualizerSurfaceModel <- R6::R6Class("VisualizerSurfaceModel",
               )
             )
         } else {
-          private$.plot <- private$.plot %>%
+          private$.plot = private$.plot %>%
             plotly::add_surface(
               x = self$grid$x1,
               y = self$grid$x2,

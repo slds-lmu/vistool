@@ -1,13 +1,14 @@
 #' @title Color Management for vistool
 #'
 #' @description
-#' Internal color management system to ensure consistent colors across
-#' ggplot2 and plotly visualizations.
+#' Unified color management system for consistent colors across
+#' ggplot2 and plotly visualizations. Supports both discrete colors 
+#' (for points, traces, lines) and continuous colorscales (for surfaces).
 #'
 #' @keywords internal
 
 # Global color palettes and settings
-.vistool_colors <- list(
+.vistool_colors = list(
   # Default discrete color palette for traces, points, etc.
   discrete = c("#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", 
                "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf"),
@@ -58,23 +59,23 @@
 #'   discrete colors from when palette is "discrete". Optional.
 #' @return A character string containing the color in hex format.
 #' @export
-get_vistool_color <- function(index, palette = "discrete", base_palette = NULL) {
+get_vistool_color = function(index, palette = "discrete", base_palette = NULL) {
   checkmate::assert_int(index, lower = 1)
   checkmate::assert_choice(palette, choices = names(.vistool_colors))
   
   # For discrete palettes, we can derive the palette name from base_palette
   if (palette == "discrete" && !is.null(base_palette)) {
-    discrete_palette_name <- paste0("discrete_", base_palette)
+    discrete_palette_name = paste0("discrete_", base_palette)
     if (discrete_palette_name %in% names(.vistool_colors)) {
-      palette <- discrete_palette_name
+      palette = discrete_palette_name
     }
   }
   
-  colors <- .vistool_colors[[palette]]
+  colors = .vistool_colors[[palette]]
   
   if (grepl("^discrete", palette)) {
     # For discrete colors, cycle through the palette
-    color_index <- ((index - 1) %% length(colors)) + 1
+    color_index = ((index - 1) %% length(colors)) + 1
     return(colors[color_index])
   } else {
     # For continuous scales, return the full scale definition
@@ -93,76 +94,33 @@ get_vistool_color <- function(index, palette = "discrete", base_palette = NULL) 
 #'   Alpha transparency value between 0 and 1.
 #' @return A character string in RGBA format.
 #' @keywords internal
-hex_to_rgba <- function(hex_color, alpha = 1) {
+hex_to_rgba = function(hex_color, alpha = 1) {
   checkmate::assert_string(hex_color)
   checkmate::assert_number(alpha, lower = 0, upper = 1)
   
   # Remove # if present
-  hex_color <- gsub("^#", "", hex_color)
+  hex_color = gsub("^#", "", hex_color)
   
   # Convert to RGB
-  r <- as.numeric(paste0("0x", substr(hex_color, 1, 2)))
-  g <- as.numeric(paste0("0x", substr(hex_color, 3, 4)))
-  b <- as.numeric(paste0("0x", substr(hex_color, 5, 6)))
+  r = as.numeric(paste0("0x", substr(hex_color, 1, 2)))
+  g = as.numeric(paste0("0x", substr(hex_color, 3, 4)))
+  b = as.numeric(paste0("0x", substr(hex_color, 5, 6)))
   
   return(sprintf("rgba(%d,%d,%d,%.2f)", r, g, b, alpha))
 }
 
-#' Generate auto color for new trace/element
+#' Validate color specification
 #' 
 #' @description
-#' Automatically assigns a color from the discrete palette and increments
-#' the color index. Used internally by add_* methods when color = "auto".
-#' 
-#' @param visualizer (`Visualizer`)\cr
-#'   The visualizer object to get and update color index.
-#' @return A character string containing the hex color.
-#' @keywords internal
-get_auto_color <- function(visualizer) {
-  checkmate::assert_r6(visualizer, "Visualizer")
-  
-  # Get current color index, initialize if not set
-  if (is.null(visualizer$.__enclos_env__$private$.color_index)) {
-    visualizer$.__enclos_env__$private$.color_index <- 1
-  }
-  color_index <- visualizer$.__enclos_env__$private$.color_index
-  
-  # Get color from discrete palette
-  color <- get_vistool_color(color_index, "discrete")
-  
-  # Increment color index for next use
-  visualizer$.__enclos_env__$private$.color_index <- color_index + 1
-  
-  return(color)
-}
-
-#' Validate and process color specification
-#' 
-#' @description
-#' Processes color input, handling "auto" assignment and validation.
+#' Validates color input, ensuring it's a valid hex code or named color.
 #' 
 #' @param color (`character(1)`)\cr
-#'   Color specification. Can be "auto", hex code, or named color.
-#' @param visualizer (`Visualizer`)\cr
-#'   The visualizer object for auto color assignment.
-#' @return A character string containing the processed color.
+#'   Color specification. Can be hex code or named color.
+#' @return A character string containing the validated color.
 #' @importFrom grDevices colors
 #' @keywords internal
-process_color <- function(color, visualizer = NULL) {
+validate_color = function(color) {
   checkmate::assert_string(color)
-  
-  if (color == "auto") {
-    if (is.null(visualizer)) {
-      stop("Cannot use 'auto' color without visualizer object")
-    }
-    # Check if we should use the new palette-aware approach
-    if (!is.null(visualizer$.__enclos_env__$private$get_auto_color_with_palette)) {
-      return(visualizer$.__enclos_env__$private$get_auto_color_with_palette())
-    } else {
-      # Fallback to old behavior for backward compatibility
-      return(get_auto_color(visualizer))
-    }
-  }
   
   # Validate color (basic check for hex or named colors)
   if (grepl("^#[0-9A-Fa-f]{6}$", color) || color %in% colors()) {
@@ -170,4 +128,26 @@ process_color <- function(color, visualizer = NULL) {
   }
   
   stop("Invalid color specification: ", color)
+}
+
+#' Get continuous colorscale for surface plots
+#' 
+#' @description
+#' Returns a continuous colorscale definition suitable for plotly surface plots
+#' based on the specified color palette.
+#' 
+#' @param palette (`character(1)`)\cr
+#'   Name of the color palette. One of "viridis", "plasma", "grayscale".
+#' @return A list defining the colorscale for plotly.
+#' @export
+get_continuous_colorscale = function(palette = "viridis") {
+  checkmate::assert_choice(palette, choices = c("viridis", "plasma", "grayscale"))
+  
+  if (palette %in% names(.vistool_colors)) {
+    return(.vistool_colors[[palette]])
+  } else {
+    # Fallback to viridis if palette not found
+    warning("Palette '", palette, "' not found, using 'viridis'")
+    return(.vistool_colors[["viridis"]])
+  }
 }

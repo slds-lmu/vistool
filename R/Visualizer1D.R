@@ -9,7 +9,7 @@
 #' @template param_n_points
 #'
 #' @export
-Visualizer1D <- R6::R6Class("Visualizer1D",
+Visualizer1D = R6::R6Class("Visualizer1D",
   inherit = Visualizer,
   public = list(
 
@@ -80,14 +80,14 @@ Visualizer1D <- R6::R6Class("Visualizer1D",
                           title = NULL,
                           lab_x = "x",
                           lab_y = "y") {
-      self$fun_x <- checkmate::assert_numeric(fun_x)
-      self$fun_y <- checkmate::assert_numeric(fun_y)
-      self$title <- checkmate::assert_character(title, null.ok = TRUE)
-      self$lab_x <- checkmate::assert_character(lab_x)
-      self$lab_y <- checkmate::assert_character(lab_y)
-      self$line_type <- "solid"
-      self$line_col <- "red"
-      self$line_width <- 3
+      self$fun_x = checkmate::assert_numeric(fun_x)
+      self$fun_y = checkmate::assert_numeric(fun_y)
+      self$title = checkmate::assert_character(title, null.ok = TRUE)
+      self$lab_x = checkmate::assert_character(lab_x)
+      self$lab_y = checkmate::assert_character(lab_y)
+      self$line_type = "solid"
+      self$line_col = "auto"
+      self$line_width = 3
     },
 
     # FIXME: set better defaults here to make plot nicer, maybe ask lukas
@@ -140,7 +140,7 @@ Visualizer1D <- R6::R6Class("Visualizer1D",
       checkmate::assert_flag(show_title)
       
       # Store plot settings and resolve layer colors
-      private$.plot_settings <- list(
+      private$.plot_settings = list(
         text_size = text_size,
         title_size = title_size,
         theme = theme,
@@ -163,38 +163,47 @@ Visualizer1D <- R6::R6Class("Visualizer1D",
       # Resolve layer colors now that we have plot settings
       private$resolve_layer_colors()
       
-      # Set default title size
-      if (is.null(title_size)) title_size <- text_size + 2
+      # Always resolve line color based on current palette (don't cache)
+      if (self$line_col == "auto") {
+        # Reset color index to ensure consistent first color
+        private$.color_index = 1
+        line_color = private$get_auto_color_with_palette()
+      } else {
+        line_color = self$line_col
+      }
       
-      dd <- data.frame(x = self$fun_x, y = self$fun_y)
-      pl <- ggplot(data = dd, aes(x = x, y = y))
-      pl <- pl + geom_line(linewidth = self$line_width, col = self$line_col, linetype = self$line_type)
+      # Set default title size
+      if (is.null(title_size)) title_size = text_size + 2
+      
+      dd = data.frame(x = self$fun_x, y = self$fun_y)
+      pl = ggplot(data = dd, aes(x = x, y = y))
+      pl = pl + geom_line(linewidth = self$line_width, col = line_color, linetype = self$line_type)
       
       # use specified axis labels and legend title
-      final_title <- if (show_title) {
+      final_title = if (show_title) {
         if (!is.null(plot_title)) plot_title else self$title
       } else {
         NULL
       }
-      final_x_lab <- if (!is.null(x_lab)) x_lab else self$lab_x
-      final_y_lab <- if (!is.null(y_lab)) y_lab else self$lab_y
+      final_x_lab = if (!is.null(x_lab)) x_lab else self$lab_x
+      final_y_lab = if (!is.null(y_lab)) y_lab else self$lab_y
       
-      pl <- pl + labs(title = final_title, subtitle = plot_subtitle, x = final_x_lab, y = final_y_lab)
+      pl = pl + labs(title = final_title, subtitle = plot_subtitle, x = final_x_lab, y = final_y_lab)
       
       # Apply axis limits if specified
       if (!is.null(x_limits)) {
-        pl <- pl + ggplot2::xlim(x_limits[1], x_limits[2])
+        pl = pl + ggplot2::xlim(x_limits[1], x_limits[2])
       }
       if (!is.null(y_limits)) {
-        pl <- pl + ggplot2::ylim(y_limits[1], y_limits[2])
+        pl = pl + ggplot2::ylim(y_limits[1], y_limits[2])
       }
       
       
       # Add points from add_points() method
-      pl <- private$add_points_to_ggplot(pl, "1D")
+      pl = private$add_points_to_ggplot(pl, "1D")
       
       # apply theme
-      theme_fun <- switch(theme,
+      theme_fun = switch(theme,
         "minimal" = ggplot2::theme_minimal,
         "bw" = ggplot2::theme_bw,
         "classic" = ggplot2::theme_classic,
@@ -203,7 +212,7 @@ Visualizer1D <- R6::R6Class("Visualizer1D",
         "dark" = ggplot2::theme_dark,
         "void" = ggplot2::theme_void
       )
-      pl <- pl + theme_fun(base_size = text_size) + 
+      pl = pl + theme_fun(base_size = text_size) + 
             theme(
               plot.title = ggplot2::element_text(hjust = 0.5, size = title_size),
               panel.background = ggplot2::element_rect(fill = background, color = NA),
@@ -220,18 +229,18 @@ Visualizer1D <- R6::R6Class("Visualizer1D",
       # For 1D visualizers, we might need to infer y values from the function
       if (all(is.na(points_data$y)) && "x" %in% names(points_data)) {
         # Try to interpolate y values from the existing function data
-        points_data$y <- stats::approx(self$fun_x, self$fun_y, points_data$x, rule = 2)$y
+        points_data$y = stats::approx(self$fun_x, self$fun_y, points_data$x, rule = 2)$y
       }
       return(points_data$y)
     },
 
     # Override prepare_points_data to handle 1D-specific y value inference
     prepare_points_data = function(points, visualizer_type) {
-      points_data <- super$prepare_points_data(points, visualizer_type)
+      points_data = super$prepare_points_data(points, visualizer_type)
       
       # For 1D visualizers, try to infer y values if not provided
       if (visualizer_type == "1D" && all(is.na(points_data$y))) {
-        points_data$y <- private$infer_z_values(points_data)
+        points_data$y = private$infer_z_values(points_data)
       }
       
       return(points_data)

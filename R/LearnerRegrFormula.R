@@ -7,7 +7,7 @@
 #' Calls [stats::lm()].
 #'
 #' @export
-LearnerRegrLMFormula <- R6Class("LearnerRegrLMFormula",
+LearnerRegrLMFormula = R6Class("LearnerRegrLMFormula",
   inherit = mlr3::LearnerRegr,
   public = list(
     #' @description
@@ -41,19 +41,19 @@ LearnerRegrLMFormula <- R6Class("LearnerRegrLMFormula",
   ),
   private = list(
     .train = function(task) {
-      pv <- self$param_set$get_values(tags = "train")
+      pv = self$param_set$get_values(tags = "train")
 
       if ("weights" %in% task$properties) {
-        pv <- insert_named(pv, list(weights = task$weights$weight))
+        pv = insert_named(pv, list(weights = task$weights$weight))
       }
 
       invoke(stats::lm, data = task$data(), .args = pv, .opts = list(contrasts = c("contr.treatment", "contr.poly")))
     },
     .predict = function(task) {
-      pv <- self$param_set$get_values(tags = "predict")
-      newdata <- ordered_features(task, self)
-      se_fit <- self$predict_type == "se"
-      prediction <- invoke(predict, object = self$model, newdata = newdata, se.fit = se_fit, .args = pv)
+      pv = self$param_set$get_values(tags = "predict")
+      newdata = ordered_features(task, self)
+      se_fit = self$predict_type == "se"
+      prediction = invoke(predict, object = self$model, newdata = newdata, se.fit = se_fit, .args = pv)
 
       if (se_fit) {
         list(response = unname(prediction$fit), se = unname(prediction$se.fit))
@@ -64,7 +64,7 @@ LearnerRegrLMFormula <- R6Class("LearnerRegrLMFormula",
   )
 )
 
-ordered_features <- function(task, learner) {
-  cols <- names(learner$state$data_prototype) %??% learner$state$feature_names
+ordered_features = function(task, learner) {
+  cols = names(learner$state$data_prototype) %??% learner$state$feature_names
   task$data(cols = intersect(cols, task$feature_names))
 }

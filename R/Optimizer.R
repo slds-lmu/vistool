@@ -4,7 +4,7 @@
 #' This class defines the optimization technique.
 #'
 #' @export
-Optimizer <- R6::R6Class("Optimizer",
+Optimizer = R6::R6Class("Optimizer",
   public = list(
 
     #' @template field_id
@@ -19,11 +19,11 @@ Optimizer <- R6::R6Class("Optimizer",
     #' @template param_id
     #' @template param_print_trace
     initialize = function(objective, x_start, id = NULL, print_trace = TRUE) {
-      private$p_objective <- checkmate::assertR6(objective$clone(deep = TRUE), "Objective")
-      private$p_x_start <- objective$assertX(x_start)
-      private$p_x <- private$p_x_start
-      self$id <- checkmate::assertString(id, null.ok = TRUE)
-      self$print_trace <- checkmate::assertLogical(print_trace, len = 1L)
+      private$p_objective = checkmate::assertR6(objective$clone(deep = TRUE), "Objective")
+      private$p_x_start = objective$assertX(x_start)
+      private$p_x = private$p_x_start
+      self$id = checkmate::assertString(id, null.ok = TRUE)
+      self$print_trace = checkmate::assertLogical(print_trace, len = 1L)
 
       return(invisible(self))
     },
@@ -41,7 +41,7 @@ Optimizer <- R6::R6Class("Optimizer",
     #' @param ... Additional objects added to the archive (e.g. `momentum`).
     #' @return `data.table()` of the input arguments.
     prepareUpdateForArchive = function(x_out, x_in, update, fval_out, fval_in, lr, step_size, objective, step, ...) {
-      out <- data.table(
+      out = data.table(
         x_out = list(x_out),
         x_in = list(x_in),
         update = list(update),
@@ -51,8 +51,8 @@ Optimizer <- R6::R6Class("Optimizer",
         step_size = as.numeric(step_size),
         objective_id = objective$id
       )
-      out <- cbind(out, do.call(data.table, list(...)))
-      out$step <- step
+      out = cbind(out, do.call(data.table, list(...)))
+      out$step = step
 
       return(out)
     },
@@ -63,10 +63,10 @@ Optimizer <- R6::R6Class("Optimizer",
     #' "fval_in", "lr", "objective", and "step".
     updateArchive = function(ain) {
       checkmate::assertDataTable(ain, min.rows = 1L)
-      batch <- ifelse(nrow(private$p_archive) == 0, 1, max(private$p_archive$batch) + 1)
+      batch = ifelse(nrow(private$p_archive) == 0, 1, max(private$p_archive$batch) + 1)
 
-      ain$batch <- batch
-      private$p_archive <- rbind(private$p_archive, ain)
+      ain$batch = batch
+      private$p_archive = rbind(private$p_archive, ain)
 
       if (self$print_trace) private$p_printer(ain)
     },
@@ -74,14 +74,14 @@ Optimizer <- R6::R6Class("Optimizer",
     #' @description Set the current input vector used as start point of `$optimize()`.
     #' @param x (`numeric()`) Input vector.
     setX = function(x) {
-      private$p_x <- private$p_objective$assertX(x)
+      private$p_x = private$p_objective$assertX(x)
     }
   ),
   active = list(
     #' @field lr (`numeric(1`) Step size of the algorithm.
     lr = function(x) {
       if (!missing(x)) {
-        private$p_lr <- checkmate::assertNumber(x, lower = 0)
+        private$p_lr = checkmate::assertNumber(x, lower = 0)
       } else {
         return(private$p_lr)
       }
@@ -112,8 +112,8 @@ Optimizer <- R6::R6Class("Optimizer",
     p_objective = NULL,
     p_x_start = NULL,
     p_printer = function(ain) {
-      xvals <- vapply(ain$x_out, function(x) sprintf("c(%s)", paste(round(x, 4), collapse = ", ")), character(1))
-      msg <- sprintf(
+      xvals = vapply(ain$x_out, function(x) sprintf("c(%s)", paste(round(x, 4), collapse = ", ")), character(1))
+      msg = sprintf(
         "%s: Batch %s step %s: f(x) = %s, x = %s", ain$objective_id, ain$batch,
         ain$step, round(ain$fval_out, 4), xvals
       )
@@ -128,7 +128,7 @@ Optimizer <- R6::R6Class("Optimizer",
 #' This class defines momentum.
 #'
 #' @export
-OptimizerMomentum <- R6::R6Class("OptimizerMomentum",
+OptimizerMomentum = R6::R6Class("OptimizerMomentum",
   inherit = Optimizer,
   public = list(
 
@@ -142,8 +142,8 @@ OptimizerMomentum <- R6::R6Class("OptimizerMomentum",
     initialize = function(objective, x_start, lr = 0.01, momentum = 0.9, id = "Momentum", print_trace = TRUE) {
       super$initialize(objective$clone(deep = TRUE), x_start, id, print_trace) # assert in super
 
-      private$p_lr <- checkmate::assertNumber(lr, lower = 0)
-      private$p_momentum <- checkmate::assertNumber(momentum, lower = 0)
+      private$p_lr = checkmate::assertNumber(lr, lower = 0)
+      private$p_momentum = checkmate::assertNumber(momentum, lower = 0)
 
       return(invisible(self))
     },
@@ -169,19 +169,19 @@ OptimizerMomentum <- R6::R6Class("OptimizerMomentum",
       checkmate::assertLogical(minimize, len = 1L, null.ok = TRUE)
 
       if (is.null(minimize)) {
-        minimize <- self$objective$minimize
+        minimize = self$objective$minimize
       }
 
-      lldt <- list()
+      lldt = list()
       for (step in seq_len(steps)) {
-        u <- self$update(private$p_lr, private$p_momentum)
-        step_size <- stepSizeControl(super$x, u, super$objective, self)
+        u = self$update(private$p_lr, private$p_momentum)
+        step_size = stepSizeControl(super$x, u, super$objective, self)
 
-        if (minimize) u <- -u
+        if (minimize) u = -u
 
-        x_new <- super$x + step_size * u
+        x_new = super$x + step_size * u
 
-        lldt <- c(lldt, list(super$prepareUpdateForArchive(x_new, super$x, u,
+        lldt = c(lldt, list(super$prepareUpdateForArchive(x_new, super$x, u,
           super$objective$eval(x_new), super$objective$eval(super$x), private$p_lr,
           step_size, super$objective, step,
           momentum = private$p_momentum
@@ -200,10 +200,10 @@ OptimizerMomentum <- R6::R6Class("OptimizerMomentum",
       checkmate::assertNumber(lr, lower = 0)
       checkmate::assertNumber(mom, lower = 0)
 
-      g <- super$objective$evalStore(super$objective$assertX(super$x))$grad[[1]]
-      u <- mom * private$p_grad_old + lr * g
+      g = super$objective$evalStore(super$objective$assertX(super$x))$grad[[1]]
+      u = mom * private$p_grad_old + lr * g
 
-      private$p_grad_old <- u
+      private$p_grad_old = u
 
       return(u)
     }
@@ -212,7 +212,7 @@ OptimizerMomentum <- R6::R6Class("OptimizerMomentum",
     #' @field momentum (`numeric(1)`) Momentum of the algorithm.
     momentum = function(x) {
       if (!missing(x)) {
-        private$p_momentum <- checkmate::assertNumber(x, lower = 0)
+        private$p_momentum = checkmate::assertNumber(x, lower = 0)
       } else {
         return(private$p_momentum)
       }
@@ -230,7 +230,7 @@ OptimizerMomentum <- R6::R6Class("OptimizerMomentum",
 #' This class defines gradient descent
 #'
 #' @export
-OptimizerGD <- R6::R6Class("OptimizerGD",
+OptimizerGD = R6::R6Class("OptimizerGD",
   inherit = OptimizerMomentum,
   public = list(
 
@@ -242,7 +242,7 @@ OptimizerGD <- R6::R6Class("OptimizerGD",
     #' @template param_print_trace
     initialize = function(objective, x_start, lr = 0.01, id = "Gradient Descent", print_trace = TRUE) {
       super$initialize(objective, x_start, lr, 0, id, print_trace) # assert in super
-      private$p_lr <- checkmate::assertNumber(lr, lower = 0)
+      private$p_lr = checkmate::assertNumber(lr, lower = 0)
 
       return(invisible(self))
     }
@@ -261,7 +261,7 @@ OptimizerGD <- R6::R6Class("OptimizerGD",
 #' This class defines Nesterovs momentum using Nesterov accelerated gradient (NAG).
 #'
 #' @export
-OptimizerNAG <- R6::R6Class("OptimizerNAG",
+OptimizerNAG = R6::R6Class("OptimizerNAG",
   inherit = Optimizer,
   public = list(
 
@@ -275,8 +275,8 @@ OptimizerNAG <- R6::R6Class("OptimizerNAG",
     initialize = function(objective, x_start, lr = 0.01, momentum = 0.9, id = "NAG", print_trace = TRUE) {
       super$initialize(objective$clone(deep = TRUE), x_start, id, print_trace) # assert in super
 
-      private$p_lr <- checkmate::assertNumber(lr, lower = 0)
-      private$p_momentum <- checkmate::assertNumber(momentum, lower = 0)
+      private$p_lr = checkmate::assertNumber(lr, lower = 0)
+      private$p_momentum = checkmate::assertNumber(momentum, lower = 0)
 
       return(invisible(self))
     },
@@ -298,19 +298,19 @@ OptimizerNAG <- R6::R6Class("OptimizerNAG",
       checkmate::assertLogical(minimize, len = 1L, null.ok = TRUE)
 
       if (is.null(minimize)) {
-        minimize <- self$objective$minimize
+        minimize = self$objective$minimize
       }
 
-      lldt <- list()
+      lldt = list()
       for (step in seq_len(steps)) {
-        u <- self$update(private$p_lr, private$p_momentum, minimize)
-        step_size <- stepSizeControl(super$x, u, super$objective)
+        u = self$update(private$p_lr, private$p_momentum, minimize)
+        step_size = stepSizeControl(super$x, u, super$objective)
 
-        if (minimize) u <- -u
+        if (minimize) u = -u
 
-        x_new <- super$x + step_size * u
+        x_new = super$x + step_size * u
 
-        lldt <- c(lldt, list(super$prepareUpdateForArchive(x_new, super$x, u,
+        lldt = c(lldt, list(super$prepareUpdateForArchive(x_new, super$x, u,
           super$objective$evalStore(x_new)$fval, super$objective$eval(super$x),
           private$p_lr, step_size, super$objective, step,
           momentum = private$p_momentum
@@ -330,15 +330,15 @@ OptimizerNAG <- R6::R6Class("OptimizerNAG",
       checkmate::assertNumber(lr, lower = 0)
       checkmate::assertNumber(mom, lower = 0)
 
-      mf <- 1
-      if (minimize) mf <- -1
+      mf = 1
+      if (minimize) mf = -1
 
-      mgo <- mom * private$p_grad_old
-      lookahead <- super$objective$assertX(super$x) + mf * mgo
-      glookahead <- super$objective$grad(lookahead)
-      u <- mgo + lr * glookahead
+      mgo = mom * private$p_grad_old
+      lookahead = super$objective$assertX(super$x) + mf * mgo
+      glookahead = super$objective$grad(lookahead)
+      u = mgo + lr * glookahead
 
-      private$p_grad_old <- u
+      private$p_grad_old = u
 
       return(u)
     }
@@ -347,7 +347,7 @@ OptimizerNAG <- R6::R6Class("OptimizerNAG",
     #' @field momentum (`numeric(1)`) Momentum of the algorithm.
     momentum = function(x) {
       if (!missing(x)) {
-        private$p_momentum <- checkmate::assertNumber(x, lower = 0)
+        private$p_momentum = checkmate::assertNumber(x, lower = 0)
       } else {
         return(private$p_momentum)
       }
@@ -368,24 +368,24 @@ OptimizerNAG <- R6::R6Class("OptimizerNAG",
 #'   Optimization objects.
 #'
 #' @export
-mergeOptimArchives <- function(...) {
-  opts <- list(...)
+mergeOptimArchives = function(...) {
+  opts = list(...)
   lapply(opts, checkmate::assertR6, classes = "Optimizer")
 
-  common_opt <- c("x_out", "x_in", "update", "fval_out", "fval_in", "lr", "step_size")
-  arxs <- do.call(rbind, lapply(opts, function(o) {
-    oa <- o$archive
-    out <- try(
+  common_opt = c("x_out", "x_in", "update", "fval_out", "fval_in", "lr", "step_size")
+  arxs = do.call(rbind, lapply(opts, function(o) {
+    oa = o$archive
+    out = try(
       {
-        ax <- as.data.table(do.call(cbind, lapply(common_opt, function(fn) {
-          v <- oa[[fn]]
-          if (is.null(v)) v <- NA
+        ax = as.data.table(do.call(cbind, lapply(common_opt, function(fn) {
+          v = oa[[fn]]
+          if (is.null(v)) v = NA
           return(v)
         })))
-        names(ax) <- common_opt
-        ax$optim_id <- o$id
-        ax$gnorm <- o$objective$archive$gnorm
-        ax$iteration <- seq_len(nrow(ax))
+        names(ax) = common_opt
+        ax$optim_id = o$id
+        ax$gnorm = o$objective$archive$gnorm
+        ax$iteration = seq_len(nrow(ax))
         ax
       },
       silent = TRUE
@@ -394,9 +394,9 @@ mergeOptimArchives <- function(...) {
       stop(sprintf("Error for optimizer '%s'\n%s", o$id, attr(out, "condition")$message))
     }
     # Ugly, but columns are returned as list otherwise ... Must be fixed.
-    cnums <- c("fval_out", "fval_in", "lr", "step_size")
+    cnums = c("fval_out", "fval_in", "lr", "step_size")
     for (cn in cnums) {
-      out[[cn]] <- as.numeric(out[[cn]])
+      out[[cn]] = as.numeric(out[[cn]])
     }
     return(out)
   }))

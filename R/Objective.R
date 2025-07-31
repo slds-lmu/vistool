@@ -4,7 +4,7 @@
 #' This class defines the objective that is used for optimization.
 #'
 #' @export
-Objective <- R6::R6Class("Objective",
+Objective = R6::R6Class("Objective",
   public = list(
     #' @template field_id
     id = NULL,
@@ -40,13 +40,13 @@ Objective <- R6::R6Class("Objective",
     #' @template return_self_invisible
     initialize = function(id, fun, label = "f", xdim, lower = NA,
                           upper = NA, xtest = NULL, minimize = FALSE, ...) {
-      self$id <- assertString(id)
-      self$label <- assertString(label)
-      self$minimize <- assertLogical(minimize, len = 1L)
-      private$p_fun <- assertFunction(fun)
-      private$p_xdim <- assertCount(xdim, na.ok = TRUE, positive = TRUE, coerce = TRUE)
+      self$id = assertString(id)
+      self$label = assertString(label)
+      self$minimize = assertLogical(minimize, len = 1L)
+      private$p_fun = assertFunction(fun)
+      private$p_xdim = assertCount(xdim, na.ok = TRUE, positive = TRUE, coerce = TRUE)
 
-      private$p_fargs <- list(...)
+      private$p_fargs = list(...)
       if ("x" %in% names(private$p_fargs)) {
         stop("`x` is reserved for the input to `fun` please use another additional argument name.")
       }
@@ -54,14 +54,14 @@ Objective <- R6::R6Class("Objective",
       # using xtest=0 that might break if origin is outofbound?
       # OTOH unlikely and we dont really consider bounds atm
       if (is.null(xtest)) {
-        xtest <- rep(0, ifelse(is.na(xdim), 2, xdim))
+        xtest = rep(0, ifelse(is.na(xdim), 2, xdim))
       }
-      private$p_xtest <- self$assertX(xtest)
+      private$p_xtest = self$assertX(xtest)
       assertNumber(self$eval(xtest)) # check that fun works as expected
 
       self$addLogFun(function(x, fval, grad) l2norm(grad), "gnorm")
-      if (!is.na(lower[1])) self$lower <- self$assertX(lower)
-      if (!is.na(upper[1])) self$upper <- self$assertX(upper)
+      if (!is.na(lower[1])) self$lower = self$assertX(lower)
+      if (!is.na(upper[1])) self$upper = self$assertX(upper)
 
       return(invisible(self))
     },
@@ -85,15 +85,15 @@ Objective <- R6::R6Class("Objective",
       if (!is.na(private$p_xdim)) {
         assertNumeric(x, len = private$p_xdim)
       }
-      fval <- self$eval(x)
-      grad <- self$grad(x)
+      fval = self$eval(x)
+      grad = self$grad(x)
 
-      dlogs <- list(x = list(x), fval = fval, grad = list(grad))
-      alogs <- lapply(private$p_log_funs, function(f) f(x, fval, grad))
-      names(alogs) <- names(private$p_log_funs)
+      dlogs = list(x = list(x), fval = fval, grad = list(grad))
+      alogs = lapply(private$p_log_funs, function(f) f(x, fval, grad))
+      names(alogs) = names(private$p_log_funs)
 
-      ilog <- c(dlogs, alogs)
-      private$p_archive <- rbind(private$p_archive, ilog)
+      ilog = c(dlogs, alogs)
+      private$p_archive = rbind(private$p_archive, ilog)
 
       return(invisible(ilog))
     },
@@ -139,17 +139,17 @@ Objective <- R6::R6Class("Objective",
     #' @param label (`character(1)`) The name of the logger.
     addLogFun = function(l, label) {
       assertFunction(l, c("x", "fval", "grad"))
-      xtest <- private$p_xtest
-      testfval <- self$eval(xtest)
-      testgrad <- self$grad(xtest)
-      e <- try(l(xtest, testfval, testgrad), silent = TRUE)
+      xtest = private$p_xtest
+      testfval = self$eval(xtest)
+      testgrad = self$grad(xtest)
+      e = try(l(xtest, testfval, testgrad), silent = TRUE)
       if (inherits(e, "try-error")) {
         stop("Error in `$addLogFun`: ", attr(e, "condition")$message)
       } else {
-        checked <- FALSE
+        checked = FALSE
         if (is.numeric(e)) {
           assertNumber(e)
-          checked <- TRUE
+          checked = TRUE
         }
         if (is.character(e) || is.factor(e)) {
           assertString(as.character(e))
@@ -158,14 +158,14 @@ Objective <- R6::R6Class("Objective",
           stop("Function did not return a single numerical value or string of length one")
         }
       }
-      il <- list(l)
-      names(il) <- label
-      private$p_log_funs <- c(private$p_log_funs, il)
+      il = list(l)
+      names(il) = label
+      private$p_log_funs = c(private$p_log_funs, il)
     },
 
     #' @description Delete the archive.
     clearArchive = function() {
-      private$p_archive <- data.table()
+      private$p_archive = data.table()
     }
   ),
   active = list(
@@ -217,18 +217,18 @@ Objective <- R6::R6Class("Objective",
   )
 )
 
-l2norm <- function(x) sqrt(sum(crossprod(x)))
+l2norm = function(x) sqrt(sum(crossprod(x)))
 
 #' @title Dictionary for test functions
 #' @examples
 #' dict_objective$get("TF_branin")
 #' @export
-dict_objective <- R6::R6Class("DictionaryObjective",
+dict_objective = R6::R6Class("DictionaryObjective",
   inherit = mlr3misc::Dictionary,
   cloneable = FALSE
 )$new()
 
-tfuns <- c(
+tfuns = c(
   list(list(minimize = TRUE, name = "branin", desc = "A function. 2 dimensional function.", xdim = 2, lower = c(-2, -2), upper = c(3, 3))),
   list(list(minimize = TRUE, name = "borehole", desc = "A function estimating water flow through a borehole. 8 dimensional function.", xdim = 2, lower = c(0, 0), upper = c(1.5, 1))),
   list(list(minimize = FALSE, name = "franke", desc = "A function. 2 dimensional function.", xdim = 2, lower = c(-0.5, -0.5), upper = c(1, 1))),
@@ -269,11 +269,11 @@ tfuns <- c(
 )
 
 for (i in seq_along(tfuns)) {
-  tf <- tfuns[[i]]
-  id <- sprintf("TF_%s", tf$name)
+  tf = tfuns[[i]]
+  id = sprintf("TF_%s", tf$name)
   # cl = sprintf("TestFunctions::%s", tf$name)
 
-  cl_fun <- tryCatch(
+  cl_fun = tryCatch(
     {
       utils::getFromNamespace(tf$name, "TestFunctions")
     },
@@ -308,14 +308,14 @@ for (i in seq_along(tfuns)) {
 #'   See [mlr3misc::dictionary_sugar_get()] for more details.
 #'
 #' @export
-obj <- function(.key, ...) {
+obj = function(.key, ...) {
   dict_objective$get(.key, ...)
 }
 
 #' @export
-as.data.table.DictionaryObjective <- function(x, ..., objects = FALSE) {
+as.data.table.DictionaryObjective = function(x, ..., objects = FALSE) {
   data.table::setkeyv(mlr3misc::map_dtr(x$keys(), function(key) {
-    t <- x$get(key)
+    t = x$get(key)
     mlr3misc::insert_named(
       c(list(
         key = key, label = t$label, xdim = t$xdim, lower = list(t$lower),

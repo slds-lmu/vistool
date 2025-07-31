@@ -8,7 +8,7 @@
 #' @template param_n_points
 #'
 #' @export
-Visualizer1DObj <- R6::R6Class("Visualizer1DObj",
+Visualizer1DObj = R6::R6Class("Visualizer1DObj",
   inherit = Visualizer1D,
   public = list(
 
@@ -23,18 +23,18 @@ Visualizer1DObj <- R6::R6Class("Visualizer1DObj",
     #'   Limits for the x-axis. If NULL, will be determined from objective bounds.
     #' @template param_n_points
     initialize = function(objective, xlim = NULL, n_points = 100L) {
-      self$objective <- checkmate::assert_r6(objective, "Objective")
+      self$objective = checkmate::assert_r6(objective, "Objective")
       if (objective$xdim != 1) {
         mlr3misc::stopf("`Visualizer1D` requires 1-dimensional inputs, but `objective$xdim = %s`", objective$xdim)
       }
-      xlim <- xlim %??% c(objective$lower, objective$upper)
+      xlim = xlim %??% c(objective$lower, objective$upper)
       if (any(is.na(xlim))) {
         stop("Limits could not be extracted from the objective. Please use `xlim`.")
       }
       checkmate::assert_numeric(xlim, len = 2)
       checkmate::assert_count(n_points)
-      x <- seq(xlim[1], xlim[2], length.out = n_points)
-      y <- sapply(x, function(x) objective$eval(x))
+      x = seq(xlim[1], xlim[2], length.out = n_points)
+      y = sapply(x, function(x) objective$eval(x))
 
       super$initialize(fun_x = x, fun_y = y, title = self$objective$label, lab_x = "x", lab_y = "y")
     },
@@ -48,13 +48,13 @@ Visualizer1DObj <- R6::R6Class("Visualizer1DObj",
     add_optimization_trace = function(optimizer) {
       checkmate::assert_r6(optimizer, "Optimizer")
 
-      archive <- optimizer$archive
+      archive = optimizer$archive
 
       # Extract x and y values from archive for plotting
       if (nrow(archive) > 0) {
         # For 1D objectives, x_in is a list of vectors, we need the first element
-        x_vals <- sapply(archive$x_in, function(x) x[1])
-        y_vals <- archive$fval_in
+        x_vals = sapply(archive$x_in, function(x) x[1])
+        y_vals = archive$fval_in
 
         # Store optimization trace specification without resolving colors yet
         private$store_layer("optimization_trace", list(
@@ -76,7 +76,7 @@ Visualizer1DObj <- R6::R6Class("Visualizer1DObj",
     #' @return A ggplot2 object.
     plot = function(...) {
       # Call parent plot method first
-      p <- super$plot(...)
+      p = super$plot(...)
       
       # Render optimization traces if any exist
       private$render_optimization_trace_layers(p)
@@ -86,14 +86,14 @@ Visualizer1DObj <- R6::R6Class("Visualizer1DObj",
     # Render stored optimization trace layers
     render_optimization_trace_layers = function(plot_obj) {
       # Get all stored optimization trace layers
-      trace_layers <- private$get_layers_by_type("optimization_trace")
+      trace_layers = private$get_layers_by_type("optimization_trace")
       
       if (length(trace_layers) == 0) {
         return(plot_obj)
       }
       
       for (trace_spec in trace_layers) {
-        plot_obj <- private$render_optimization_trace_layer(plot_obj, trace_spec)
+        plot_obj = private$render_optimization_trace_layer(plot_obj, trace_spec)
       }
       
       return(plot_obj)
@@ -101,9 +101,9 @@ Visualizer1DObj <- R6::R6Class("Visualizer1DObj",
     
     # Render a single optimization trace layer
     render_optimization_trace_layer = function(plot_obj, layer_spec) {
-      dd_trace <- data.frame(x = layer_spec$x_vals, y = layer_spec$y_vals)
+      dd_trace = data.frame(x = layer_spec$x_vals, y = layer_spec$y_vals)
       
-      plot_obj <- plot_obj + ggplot2::geom_point(
+      plot_obj = plot_obj + ggplot2::geom_point(
         data = dd_trace, 
         size = layer_spec$size, 
         color = layer_spec$color,

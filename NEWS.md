@@ -1,4 +1,10 @@
 
+# vistool 0.3.1
+
+* All classes now use the deferred rendering architecture.
+* Implemented `add_points()` for loss functions.
+* Minor fixes.
+
 # vistool 0.3.0
 
 * Polished the general workflow and unified all customization options: 1. Initialize the Visualizer object (`as_visualizer()`), 2. Layering (`add_*`) methods, 3. Rendering (`plot()`); 2. and 3. can be chained (e.g., `vis$add_*$add_*$plot()`). Global settings that affect the entire plot are set in `plot()`. Settings for specific visual elements are set in the `add_*()` methods that create them. Defaults can be set at initialization in `as_visualizer()`.

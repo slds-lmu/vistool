@@ -9,7 +9,7 @@
 #' @template param_n_points
 #'
 #' @export
-Visualizer1DModel <- R6::R6Class("Visualizer1DModel",
+Visualizer1DModel = R6::R6Class("Visualizer1DModel",
   inherit = Visualizer1D,
   public = list(
 
@@ -39,52 +39,52 @@ Visualizer1DModel <- R6::R6Class("Visualizer1DModel",
                           xlim = NULL,
                           n_points = 100) {
       # FIXME: doc complete class, not all args are doced here
-      self$task <- mlr3::assert_task(task)
-      fnames <- task$feature_names
+      self$task = mlr3::assert_task(task)
+      fnames = task$feature_names
       if (length(fnames) != 1) {
         stop("Task must have exactly 1 feature")
       }
-      self$learner <- mlr3::assert_learner(learner, task = self$task)
+      self$learner = mlr3::assert_learner(learner, task = self$task)
       checkmate::assert_count(n_points)
 
       # train learner on task
       self$learner$train(task)
 
-      x_train <- task$data()[[fnames[1]]]
-      y_train <- task$truth()
+      x_train = task$data()[[fnames[1]]]
+      y_train = task$truth()
 
       if (is.null(xlim)) {
-        xlim <- range(x_train)
+        xlim = range(x_train)
       }
-      x_pred <- seq(xlim[1], xlim[2], length.out = n_points)
-      newdata <- as.data.table(x_pred)
+      x_pred = seq(xlim[1], xlim[2], length.out = n_points)
+      newdata = as.data.table(x_pred)
       setnames(newdata, self$task$feature_names)
 
-      original_types <- sapply(self$task$data()[, self$task$feature_names, with = FALSE], class)
+      original_types = sapply(self$task$data()[, self$task$feature_names, with = FALSE], class)
       for (col in names(original_types)) {
         if (original_types[col] == "integer") {
-          newdata[[col]] <- as.integer(round(newdata[[col]]))
+          newdata[[col]] = as.integer(round(newdata[[col]]))
         }
       }
-      y_pred <- self$learner$predict_newdata(newdata)
+      y_pred = self$learner$predict_newdata(newdata)
       if (self$learner$predict_type == "prob") {
         # For binary classification, use the positive class probability
         # For multi-class, use the first class probability  
         if (length(self$task$class_names) == 2 && !is.null(self$task$positive)) {
-          y_pred <- y_pred$prob[, self$task$positive]
+          y_pred = y_pred$prob[, self$task$positive]
         } else if (self$learner$task_type == "classif") {
-          y_pred <- y_pred$prob[, 1]
+          y_pred = y_pred$prob[, 1]
         } else {
-          y_pred <- y_pred$prob
+          y_pred = y_pred$prob
         }
       } else {
-        y_pred <- y_pred$response
+        y_pred = y_pred$response
         # Convert factor response to numeric for visualization
         if (is.factor(y_pred)) {
-          y_pred <- as.numeric(y_pred) - 1 # Convert to 0-based indexing
+          y_pred = as.numeric(y_pred) - 1 # Convert to 0-based indexing
         }
       }
-      title <- sprintf("%s on %s", self$learner$id, self$task$id)
+      title = sprintf("%s on %s", self$learner$id, self$task$id)
 
 
       super$initialize(
@@ -120,15 +120,15 @@ Visualizer1DModel <- R6::R6Class("Visualizer1DModel",
       checkmate::assert_flag(show_labels)
       checkmate::assert_number(label_size, lower = 0, null.ok = TRUE)
       
-      data <- self$task$data()
-      training_x <- data[[self$task$feature_names[1]]]
-      training_y <- data[[self$task$target_names]]
+      data = self$task$data()
+      training_x = data[[self$task$feature_names[1]]]
+      training_y = data[[self$task$target_names]]
 
       # Convert factors to numeric for visualization
       if (self$learner$predict_type == "prob" && is.factor(training_y)) {
-        training_y <- as.integer(training_y) - 1
+        training_y = as.integer(training_y) - 1
       } else if (self$learner$predict_type == "response" && is.factor(training_y)) {
-        training_y <- as.integer(training_y) - 1
+        training_y = as.integer(training_y) - 1
       }
       
       # Store training data specification without resolving colors yet
@@ -171,15 +171,15 @@ Visualizer1DModel <- R6::R6Class("Visualizer1DModel",
       # Determine default values based on prediction type
       if (is.null(values)) {
         if (self$learner$predict_type == "prob") {
-          values <- 0.5
+          values = 0.5
         } else {
           # For regression or response predictions, use median of predictions
-          values <- median(self$fun_y, na.rm = TRUE)
+          values = median(self$fun_y, na.rm = TRUE)
         }
       } else {
         # Validate that boundary values are within the prediction range
-        y_range <- range(self$fun_y, na.rm = TRUE)
-        invalid_values <- values[values < y_range[1] | values > y_range[2]]
+        y_range = range(self$fun_y, na.rm = TRUE)
+        invalid_values = values[values < y_range[1] | values > y_range[2]]
         if (length(invalid_values) > 0) {
           warning(sprintf(
             "Boundary values %s are outside the prediction range [%.3f, %.3f] and will not be visible.",
@@ -213,11 +213,11 @@ Visualizer1DModel <- R6::R6Class("Visualizer1DModel",
     #' @return A ggplot2 object.
     plot = function(text_size = 11, theme = "minimal", color_palette = "viridis", ...) {
       # Call parent first to set up plot_settings and base plot
-      p <- super$plot(text_size = text_size, theme = theme, color_palette = color_palette, ...)
+      p = super$plot(text_size = text_size, theme = theme, color_palette = color_palette, ...)
       
       # Render class-specific layers
-      p <- private$render_boundary_layers(p)
-      p <- private$render_training_data_layers(p, color_palette, text_size)
+      p = private$render_boundary_layers(p)
+      p = private$render_training_data_layers(p, color_palette, text_size)
       
       return(p)
     }
@@ -225,14 +225,14 @@ Visualizer1DModel <- R6::R6Class("Visualizer1DModel",
   private = list(
     # Render stored boundary layers
     render_boundary_layers = function(plot_obj) {
-      boundary_layers <- private$get_layers_by_type("boundary")
+      boundary_layers = private$get_layers_by_type("boundary")
       
       if (length(boundary_layers) == 0) {
         return(plot_obj)
       }
       
       for (boundary_spec in boundary_layers) {
-        plot_obj <- private$render_boundary_layer(plot_obj, boundary_spec)
+        plot_obj = private$render_boundary_layer(plot_obj, boundary_spec)
       }
       
       return(plot_obj)
@@ -241,7 +241,7 @@ Visualizer1DModel <- R6::R6Class("Visualizer1DModel",
     # Render a single boundary layer
     render_boundary_layer = function(plot_obj, layer_spec) {
       for (value in layer_spec$values) {
-        plot_obj <- plot_obj + ggplot2::geom_hline(
+        plot_obj = plot_obj + ggplot2::geom_hline(
           yintercept = value,
           color = layer_spec$color,
           linetype = layer_spec$linetype,
@@ -254,14 +254,14 @@ Visualizer1DModel <- R6::R6Class("Visualizer1DModel",
     
     # Render stored training data layers
     render_training_data_layers = function(plot_obj, color_palette, text_size) {
-      training_layers <- private$get_layers_by_type("training_data")
+      training_layers = private$get_layers_by_type("training_data")
       
       if (length(training_layers) == 0) {
         return(plot_obj)
       }
       
       for (training_spec in training_layers) {
-        plot_obj <- private$render_training_data_layer(plot_obj, training_spec, color_palette, text_size)
+        plot_obj = private$render_training_data_layer(plot_obj, training_spec, color_palette, text_size)
       }
       
       return(plot_obj)
@@ -269,22 +269,22 @@ Visualizer1DModel <- R6::R6Class("Visualizer1DModel",
     
     # Render a single training data layer
     render_training_data_layer = function(plot_obj, layer_spec, color_palette, text_size) {
-      points_data <- data.frame(
+      points_data = data.frame(
         points_x = layer_spec$data$x,
         points_y = layer_spec$data$y
       )
       
-      style <- layer_spec$style
+      style = layer_spec$style
       
       # Resolve auto colors if needed
-      resolved_color <- if (style$color == "auto") {
+      resolved_color = if (style$color == "auto") {
         private$get_auto_color_with_palette()
       } else {
         style$color
       }
       
       # Add styled training data points
-      plot_obj <- plot_obj + ggplot2::geom_point(
+      plot_obj = plot_obj + ggplot2::geom_point(
         data = points_data,
         aes(x = points_x, y = points_y),
         color = resolved_color,
@@ -296,9 +296,9 @@ Visualizer1DModel <- R6::R6Class("Visualizer1DModel",
       
       # Add labels if requested
       if (style$show_labels) {
-        label_size <- if (!is.null(style$label_size)) style$label_size else text_size * 0.8 / ggplot2::.pt
+        label_size = if (!is.null(style$label_size)) style$label_size else text_size * 0.8 / ggplot2::.pt
         
-        plot_obj <- plot_obj + ggplot2::geom_text(
+        plot_obj = plot_obj + ggplot2::geom_text(
           data = points_data,
           aes(x = points_x, y = points_y, label = seq_len(nrow(points_data))),
           color = resolved_color,

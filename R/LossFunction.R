@@ -7,7 +7,7 @@
 #' Represents a loss function for regression or classification tasks.
 #'
 #' @export
-LossFunction <- R6::R6Class("LossFunction",
+LossFunction = R6::R6Class("LossFunction",
   public = list(
 
     #' @field id (`character(1)`)\cr
@@ -56,9 +56,9 @@ LossFunction <- R6::R6Class("LossFunction",
     initialize = function(id, label, task_type, fun,
                           input_default = "score",
                           input_supported = c("score")) {
-      self$id   <- checkmate::assert_character(id)
-      self$label <- checkmate::assert_character(label)
-      self$task_type <- checkmate::assert_choice(task_type, c("regr", "classif"))
+      self$id   = checkmate::assert_character(id)
+      self$label = checkmate::assert_character(label)
+      self$task_type = checkmate::assert_choice(task_type, c("regr", "classif"))
 
       checkmate::assert_choice(input_default, choices = c("score", "probability"))
       checkmate::assert_character(input_supported, min.len = 1, any.missing = FALSE)
@@ -69,13 +69,13 @@ LossFunction <- R6::R6Class("LossFunction",
         stop("'input_supported' may only contain 'score' and/or 'probability'.")
       }
 
-      self$input_default   <- input_default
-      self$input_supported <- unique(input_supported)
+      self$input_default   = input_default
+      self$input_supported = unique(input_supported)
 
       # Handle function input - can be single function or named list
       if (is.function(fun)) {
         # Single function - use for all supported input types
-        self$fun <- fun
+        self$fun = fun
       } else if (is.list(fun)) {
         # Named list of functions for different input types
         if (!all(names(fun) %in% c("score", "probability"))) {
@@ -84,7 +84,7 @@ LossFunction <- R6::R6Class("LossFunction",
         if (!all(input_supported %in% names(fun))) {
           stop("All input_supported types must have corresponding functions in the named list.")
         }
-        self$fun <- fun
+        self$fun = fun
       } else {
         stop("'fun' must be either a function or a named list of functions.")
       }
@@ -114,7 +114,7 @@ LossFunction <- R6::R6Class("LossFunction",
 #' Dictionary of loss functions.
 #'
 #' @export
-dict_loss <- R6::R6Class("DictionaryLoss", inherit = Dictionary, cloneable = FALSE)$new()
+dict_loss = R6::R6Class("DictionaryLoss", inherit = Dictionary, cloneable = FALSE)$new()
 
 #' @title Retrieve Loss Function
 #'
@@ -127,12 +127,12 @@ dict_loss <- R6::R6Class("DictionaryLoss", inherit = Dictionary, cloneable = FAL
 #' @template param_dots
 #'
 #' @export
-lss <- function(.key, ...) {
+lss = function(.key, ...) {
   # Get the base loss function from dictionary
-  base_loss <- dict_loss$get(.key)
+  base_loss = dict_loss$get(.key)
   
   # Check if additional parameters were provided
-  params <- list(...)
+  params = list(...)
   
   if (length(params) == 0) {
     # No additional parameters, return the original loss function
@@ -141,13 +141,13 @@ lss <- function(.key, ...) {
     # Additional parameters provided, create a customized loss function
     # Handle both single function and multi-function cases
     if (is.function(base_loss$fun)) {
-      original_fun <- base_loss$fun
-      new_fun <- function(r) {
+      original_fun = base_loss$fun
+      new_fun = function(r) {
         do.call(original_fun, c(list(r), params))
       }
     } else {
       # Multiple functions - apply parameters to each
-      new_fun <- lapply(base_loss$fun, function(original_fun) {
+      new_fun = lapply(base_loss$fun, function(original_fun) {
         function(r) {
           do.call(original_fun, c(list(r), params))
         }
@@ -155,8 +155,8 @@ lss <- function(.key, ...) {
     }
     
     # Create parameter string for the label
-    param_str <- paste(names(params), params, sep = "=", collapse = ", ")
-    new_label <- paste0(base_loss$label, " (", param_str, ")")
+    param_str = paste(names(params), params, sep = "=", collapse = ", ")
+    new_label = paste0(base_loss$label, " (", param_str, ")")
     
     # Create new LossFunction with custom parameters
     return(LossFunction$new(
@@ -189,7 +189,7 @@ dict_loss$add("l1_ae",
 dict_loss$add("huber",
   LossFunction$new("huber", "Huber Loss", "regr",
     function(r, delta = 1) {
-      a <- abs(r)
+      a = abs(r)
       ifelse(a <= delta, 0.5 * a^2, delta * a - delta^2 / 2)
     },
     input_default   = "score",
@@ -227,9 +227,9 @@ dict_loss$add("hinge",
 dict_loss$add("log-barrier",
   LossFunction$new("log-barrier", "Log-Barrier Loss", "regr",
     function(r, epsilon = 1) {
-      abs_res <- abs(r)
-      abs_res[abs_res > epsilon] <- Inf
-      abs_res[abs_res <= epsilon] <- -epsilon^2 * log(1 - (abs_res[abs_res <= epsilon] / epsilon)^2)
+      abs_res = abs(r)
+      abs_res[abs_res > epsilon] = Inf
+      abs_res[abs_res <= epsilon] = -epsilon^2 * log(1 - (abs_res[abs_res <= epsilon] / epsilon)^2)
       abs_res
     },
     input_default   = "score",
@@ -282,11 +282,11 @@ dict_loss$add("brier",
 #'   Whether to include the objects in the result.
 #'
 #' @export
-as.data.table.DictionaryLoss <- function(x, ..., objects = FALSE) {
+as.data.table.DictionaryLoss = function(x, ..., objects = FALSE) {
   checkmate::assert_flag(objects)
 
   setkeyv(mlr3misc::map_dtr(x$keys(), function(key) {
-    t <- x$get(key)
+    t = x$get(key)
     mlr3misc::insert_named(
       list(key = key, label = t$label, task_type = t$task_type),
       if (objects) list(object = list(t))

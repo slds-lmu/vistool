@@ -59,8 +59,7 @@ Creates a new instance of this [R6][R6::R6Class] class.
   padding = 0,
   n_points = 100L,
   opacity = 0.8,
-  colorscale = list(c(0, "#440154"), c(0.25, "#3b528b"), c(0.5, "#21908c"), c(0.75,
-    "#5dc863"), c(1, "#fde725")),
+  colorscale = "auto",
   show_title = TRUE
 )}\if{html}{\out{</div>}}
 }

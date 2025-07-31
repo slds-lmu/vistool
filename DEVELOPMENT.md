@@ -106,31 +106,99 @@ vistool/
   - `VisualizerSurface*`: Interactive surface plotting with plotly for 2D functions
 - **`as_visualizer()`**: Smart constructor that selects appropriate visualizer
 
-### Deferred Rendering
+## Deferred Rendering
 
-All visualizer classes (should) use a deferred rendering architecture:
+All visualizer classes in vistool follow a standardized `plot()` method structure that leverages the deferred rendering architecture. This ensures consistent behavior, proper color resolution, and maintainable code.
 
-- **Layer Storage**: All `add_*()` methods (e.g., `$add_points()`, `$add_contours()`, etc.) do not modify the plot directly. Instead, they call the private method `$store_layer(type, spec)` to save a specification of the layer (its type and parameters) to an internal list.
-- **Rendering**: The `$plot()` method is responsible for rendering all stored layers. It iterates over the stored layer specifications and calls a private `$render_layer(layer)` method to add each layer to the plot object. This ensures that all visual properties (such as colors, alpha, etc.) are resolved at plot time, using the current global settings.
-- **Customization**: Global settings (e.g., color palette, theme, text size) are set via `$plot()`. Layer-specific settings are passed to the relevant `add_*()` method and stored with the layer specification. Defaults are set at initialization.
-- **Benefits**: This pattern ensures that plots are always up-to-date with the latest settings, supports re-plotting with different global options, and makes it easier to add, remove, or reorder layers.
+### Standard Pattern
 
-### Color Management
+#### `Visualizer.R`
 
-vistool uses a unified color management system to ensure consistent colors across ggplot2 and plotly visualizations (`color_management.R`). The system supports both discrete colors (for points, traces, lines) and continuous color scales (for surfaces, contours).
+The base `Visualizer` class provides:
+- **Layer storage**: `private$store_layer(type, spec)` 
+- **Layer retrieval**: `private$get_layers_by_type(type)`
+- **Plot settings**: Stored in `private$.plot_settings` for color resolution
+- **Common parameters**: text_size, theme, color_palette, etc.
 
-**Integration with Deferred Rendering**: Colors marked as `"auto"` in layer specifications are resolved at plot time using the current `color_palette` setting. This ensures colors match the selected palette.
+CAREFUL: Its `plot()` method is **abstract** and needs to be implemented by `Visualizer1D.R`, `Visualizer2D.R`, `VisualizerSurface.R` (and `VisualizerLossFuns`)!
 
-### Example Workflow
+#### 2. `Visualizer1D.R`, `Visualizer2D.R`, `VisualizerSurface.R` (and `VisualizerLossFuns`)
+These implement the abstract `plot()` method from the base `Visualizer` class and methods specific for that type/dimension (e.g., `add_contours()` for all `VisualizerSurface` classes), they inherit from `Visualizer`.
+
+#### 3. Child Class `plot()` Structure
+
+Every (grand-) child class (e.g., `Visualizer1DObj`, `Visualizer2DModel`, `VisualizerSurfaceObj`) should follow this exact pattern:
 
 ```r
-viz <- as_visualizer(obj, type = "surface")
-viz$add_points(points = my_points)
-viz$add_contours(contours = my_contours)
-# No plot is created yet!
-
-viz$plot(color_palette = "grayscale")  # All layers are rendered now, also resolving colors
+plot = function(...) {
+  # 1. ALWAYS call parent first to set up plot_settings and base plot
+  p <- super$plot(...)  # or just super$plot(...) for plotly classes
+  
+  # 2. Render class-specific layers using dedicated private methods
+  private$render_layer_type_1()
+  private$render_layer_type_2()
+  # ... etc
+  
+  # 3. Return the plot object (for ggplot2 classes only)
+  return(p)  # omit for plotly classes that modify private$.plot
+}
 ```
+
+### Implementation Examples
+
+#### ggplot2-based Classes (1D, 2D)
+
+```r
+# Good Example: Visualizer2DObj
+plot = function(...) {
+  # Call parent to get base plot and set plot_settings
+  p <- super$plot(...)
+  
+  # Render stored layers
+  private$render_optimization_trace_layers(p)
+}
+
+private = list(
+  render_optimization_trace_layers = function(plot_obj) {
+    trace_layers <- private$get_layers_by_type("optimization_trace")
+    
+    if (length(trace_layers) == 0) {
+      return(plot_obj)
+    }
+    
+    for (trace_spec in trace_layers) {
+      plot_obj <- private$render_optimization_trace_layer(plot_obj, trace_spec)
+    }
+    
+    return(plot_obj)
+  }
+)
+```
+
+#### plotly-based Classes (Surface)
+
+```r
+# Good Example: VisualizerSurfaceObj  
+plot = function(...) {
+  # Call parent to set up plot_settings and resolve colors
+  super$plot(...)
+  
+  # Render stored layers (modifies private$.plot directly)
+  private$render_optimization_trace_layers()
+  private$render_taylor_layers()
+  private$render_hessian_layers()
+  
+  return(private$.plot)
+}
+
+private = list(
+  render_optimization_trace_layers = function() {
+    trace_layers <- private$get_layers_by_type("optimization_trace")
+    # ... process layers, modify private$.plot directly
+  }
+)
+```
+
 
 ## Development Workflow
 
