@@ -97,15 +97,53 @@ Visualizer1DModel <- R6::R6Class("Visualizer1DModel",
     },
 
     #' @description
-    #' Add training data points to the plot.
-    #' @return Returns the visualizer object invisibly for method chaining.
-    add_training_data = function() {
+    #' Adds the training data to the plot.
+    #'
+    #' @param color (`character(1)`)\cr
+    #'   Color of the points. Use "auto" for automatic color assignment. Default is "auto".
+    #' @param size (`numeric(1)`)\cr
+    #'   Size of the points. Default is 2.
+    #' @param shape (`integer(1)`)\cr
+    #'   Shape of the points. Default is 19.
+    #' @param alpha (`numeric(1)`)\cr
+    #'   Alpha transparency of the points. Default is 1.
+    #' @param show_labels (`logical(1)`)\cr
+    #'   Whether to show data point labels. Default is FALSE.
+    #' @param label_size (`numeric(1)`)\cr
+    #'   Size of data point labels. If NULL, defaults to smaller text.
+    add_training_data = function(color = "auto", size = 2, shape = 19, alpha = 1, 
+                                show_labels = FALSE, label_size = NULL) {
+      checkmate::assert_string(color)
+      checkmate::assert_number(size, lower = 0)
+      checkmate::assert_integerish(shape, len = 1)
+      checkmate::assert_number(alpha, lower = 0, upper = 1)
+      checkmate::assert_flag(show_labels)
+      checkmate::assert_number(label_size, lower = 0, null.ok = TRUE)
+      
       data <- self$task$data()
-      points_data <- data.frame(
-        x = data[[self$lab_x]],
-        y = data[[self$task$target_names]]
-      )
-      self$add_points(points_data)
+      training_x <- data[[self$task$feature_names[1]]]
+      training_y <- data[[self$task$target_names]]
+
+      # Convert factors to numeric for visualization
+      if (self$learner$predict_type == "prob" && is.factor(training_y)) {
+        training_y <- as.integer(training_y) - 1
+      } else if (self$learner$predict_type == "response" && is.factor(training_y)) {
+        training_y <- as.integer(training_y) - 1
+      }
+      
+      # Store training data specification without resolving colors yet
+      private$store_layer("training_data", list(
+        data = list(x = training_x, y = training_y),
+        style = list(
+          color = color,  # Keep as "auto" for later resolution
+          size = size,
+          shape = shape,
+          alpha = alpha,
+          show_labels = show_labels,
+          label_size = label_size
+        )
+      ))
+
       return(invisible(self))
     },
 
@@ -169,14 +207,17 @@ Visualizer1DModel <- R6::R6Class("Visualizer1DModel",
     #'   Base text size for plot elements. Default is 11.
     #' @param theme (`character(1)`)\cr
     #'   ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "minimal".
+    #' @param color_palette (`character(1)`)\cr
+    #'   Color palette for the fill scale. One of "viridis", "plasma", "grayscale". Default is "viridis".
     #' @param ... Additional arguments passed to the parent plot method.
     #' @return A ggplot2 object.
-    plot = function(text_size = 11, theme = "minimal", ...) {
+    plot = function(text_size = 11, theme = "minimal", color_palette = "viridis", ...) {
       # Call parent first to set up plot_settings and base plot
-      p <- super$plot(text_size = text_size, theme = theme, ...)
+      p <- super$plot(text_size = text_size, theme = theme, color_palette = color_palette, ...)
       
       # Render class-specific layers
       p <- private$render_boundary_layers(p)
+      p <- private$render_training_data_layers(p, color_palette, text_size)
       
       return(p)
     }
@@ -184,18 +225,89 @@ Visualizer1DModel <- R6::R6Class("Visualizer1DModel",
   private = list(
     # Render stored boundary layers
     render_boundary_layers = function(plot_obj) {
-      boundary_layer <- private$get_layer("boundary")
-      if (!is.null(boundary_layer)) {
-        for (value in boundary_layer$values) {
-          plot_obj <- plot_obj + ggplot2::geom_hline(
-            yintercept = value,
-            color = boundary_layer$color,
-            linetype = boundary_layer$linetype,
-            linewidth = boundary_layer$linewidth,
-            alpha = boundary_layer$alpha
-          )
-        }
+      boundary_layers <- private$get_layers_by_type("boundary")
+      
+      if (length(boundary_layers) == 0) {
+        return(plot_obj)
       }
+      
+      for (boundary_spec in boundary_layers) {
+        plot_obj <- private$render_boundary_layer(plot_obj, boundary_spec)
+      }
+      
+      return(plot_obj)
+    },
+    
+    # Render a single boundary layer
+    render_boundary_layer = function(plot_obj, layer_spec) {
+      for (value in layer_spec$values) {
+        plot_obj <- plot_obj + ggplot2::geom_hline(
+          yintercept = value,
+          color = layer_spec$color,
+          linetype = layer_spec$linetype,
+          linewidth = layer_spec$linewidth,
+          alpha = layer_spec$alpha
+        )
+      }
+      return(plot_obj)
+    },
+    
+    # Render stored training data layers
+    render_training_data_layers = function(plot_obj, color_palette, text_size) {
+      training_layers <- private$get_layers_by_type("training_data")
+      
+      if (length(training_layers) == 0) {
+        return(plot_obj)
+      }
+      
+      for (training_spec in training_layers) {
+        plot_obj <- private$render_training_data_layer(plot_obj, training_spec, color_palette, text_size)
+      }
+      
+      return(plot_obj)
+    },
+    
+    # Render a single training data layer
+    render_training_data_layer = function(plot_obj, layer_spec, color_palette, text_size) {
+      points_data <- data.frame(
+        points_x = layer_spec$data$x,
+        points_y = layer_spec$data$y
+      )
+      
+      style <- layer_spec$style
+      
+      # Resolve auto colors if needed
+      resolved_color <- if (style$color == "auto") {
+        private$get_auto_color_with_palette()
+      } else {
+        style$color
+      }
+      
+      # Add styled training data points
+      plot_obj <- plot_obj + ggplot2::geom_point(
+        data = points_data,
+        aes(x = points_x, y = points_y),
+        color = resolved_color,
+        size = style$size,
+        shape = style$shape,
+        alpha = style$alpha,
+        inherit.aes = FALSE
+      )
+      
+      # Add labels if requested
+      if (style$show_labels) {
+        label_size <- if (!is.null(style$label_size)) style$label_size else text_size * 0.8 / ggplot2::.pt
+        
+        plot_obj <- plot_obj + ggplot2::geom_text(
+          data = points_data,
+          aes(x = points_x, y = points_y, label = seq_len(nrow(points_data))),
+          color = resolved_color,
+          size = label_size,
+          vjust = -0.5,
+          inherit.aes = FALSE
+        )
+      }
+      
       return(plot_obj)
     }
   )

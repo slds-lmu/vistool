@@ -225,102 +225,127 @@ Visualizer2DModel <- R6::R6Class("Visualizer2DModel",
   private = list(
     # Render stored boundary layers
     render_boundary_layers = function(plot_obj, color_palette) {
-      boundary_layer <- private$get_layer("boundary")
-      if (!is.null(boundary_layer)) {
-        data <- data.table(
-          fun_x1 = self$fun_x1,
-          fun_x2 = self$fun_x2,
-          fun_y = self$fun_y
-        )
-        
-        # Map line_type to ggplot2 linetype
-        gg_linetype <- switch(boundary_layer$line_type,
-          "solid" = "solid",
-          "dashed" = "dashed", 
-          "dotted" = "dotted",
-          "dotdash" = "dotdash",
-          "longdash" = "longdash",
-          "twodash" = "twodash",
-          "solid"  # default fallback
-        )
-        
-        plot_obj <- plot_obj + ggplot2::geom_contour(
-          data = data,
-          aes(x = fun_x1, y = fun_x2, z = fun_y),
-          breaks = boundary_layer$values,
-          color = boundary_layer$color, 
-          linewidth = boundary_layer$line_width,
-          linetype = gg_linetype,
-          alpha = boundary_layer$alpha,
-          inherit.aes = FALSE
-        )
+      boundary_layers <- private$get_layers_by_type("boundary")
+      
+      if (length(boundary_layers) == 0) {
+        return(plot_obj)
       }
+      
+      for (boundary_spec in boundary_layers) {
+        plot_obj <- private$render_boundary_layer(plot_obj, boundary_spec)
+      }
+      
+      return(plot_obj)
+    },
+    
+    # Render a single boundary layer
+    render_boundary_layer = function(plot_obj, layer_spec) {
+      data <- data.table(
+        fun_x1 = self$fun_x1,
+        fun_x2 = self$fun_x2,
+        fun_y = self$fun_y
+      )
+      
+      # Map line_type to ggplot2 linetype
+      gg_linetype <- switch(layer_spec$line_type,
+        "solid" = "solid",
+        "dashed" = "dashed", 
+        "dotted" = "dotted",
+        "dotdash" = "dotdash",
+        "longdash" = "longdash",
+        "twodash" = "twodash",
+        "solid"  # default fallback
+      )
+      
+      plot_obj <- plot_obj + ggplot2::geom_contour(
+        data = data,
+        aes(x = fun_x1, y = fun_x2, z = fun_y),
+        breaks = layer_spec$values,
+        color = layer_spec$color, 
+        linewidth = layer_spec$line_width,
+        linetype = gg_linetype,
+        alpha = layer_spec$alpha,
+        inherit.aes = FALSE
+      )
+      
       return(plot_obj)
     },
     
     # Render stored training data layers
     render_training_data_layers = function(plot_obj, color_palette, text_size) {
-      training_layer <- private$get_layer("training_data")
-      if (!is.null(training_layer)) {
+      training_layers <- private$get_layers_by_type("training_data")
+      
+      if (length(training_layers) == 0) {
+        return(plot_obj)
+      }
+      
+      for (training_spec in training_layers) {
+        plot_obj <- private$render_training_data_layer(plot_obj, training_spec, color_palette, text_size)
+      }
+      
+      return(plot_obj)
+    },
+    
+    # Render a single training data layer
+    render_training_data_layer = function(plot_obj, layer_spec, color_palette, text_size) {
+      points_data <- data.table(
+        points_x1 = layer_spec$data$x1,
+        points_x2 = layer_spec$data$x2,
+        points_y = layer_spec$data$y
+      )
+      
+      style <- layer_spec$style
+      
+      # Add styled training data points with color mapping
+      if (self$learner$predict_type == "prob" || is.numeric(layer_spec$data$y)) {
+        # Use color aesthetic for continuous/probability data
+        color_limits <- c(min(self$fun_y), max(self$fun_y))
         
-        points_data <- data.table(
-          points_x1 = training_layer$data$x1,
-          points_x2 = training_layer$data$x2,
-          points_y = training_layer$data$y
+        plot_obj <- plot_obj + geom_point(
+          data = points_data,
+          aes(x = points_x1, y = points_x2, color = points_y),
+          size = style$size,
+          shape = style$shape,
+          alpha = style$alpha,
+          inherit.aes = FALSE,
+          show.legend = FALSE
         )
         
-        style <- training_layer$style
-        
-        # Add styled training data points with color mapping
-        if (self$learner$predict_type == "prob" || is.numeric(training_layer$data$y)) {
-          # Use color aesthetic for continuous/probability data
-          color_limits <- c(min(self$fun_y), max(self$fun_y))
-          
-          plot_obj <- plot_obj + geom_point(
-            data = points_data,
-            aes(x = points_x1, y = points_x2, color = points_y),
-            size = style$size,
-            shape = style$shape,
-            alpha = style$alpha,
-            inherit.aes = FALSE,
-            show.legend = FALSE
-          )
-          
-          # Apply matching color scale for points based on the selected palette
-          if (color_palette == "viridis") {
-            plot_obj <- plot_obj + scale_color_viridis_c(name = self$lab_y, limits = color_limits)
-          } else if (color_palette == "plasma") {
-            plot_obj <- plot_obj + scale_color_viridis_c(name = self$lab_y, option = "plasma", limits = color_limits)
-          } else if (color_palette == "grayscale") {
-            plot_obj <- plot_obj + scale_color_gradient(name = self$lab_y, low = "black", high = "white", limits = color_limits)
-          }
-        } else {
-          # Use fixed color for discrete/categorical data
-          plot_obj <- plot_obj + geom_point(
-            data = points_data,
-            aes(x = points_x1, y = points_x2),
-            color = style$color,
-            size = style$size,
-            shape = style$shape,
-            alpha = style$alpha,
-            inherit.aes = FALSE
-          )
+        # Apply matching color scale for points based on the selected palette
+        if (color_palette == "viridis") {
+          plot_obj <- plot_obj + scale_color_viridis_c(name = self$lab_y, limits = color_limits)
+        } else if (color_palette == "plasma") {
+          plot_obj <- plot_obj + scale_color_viridis_c(name = self$lab_y, option = "plasma", limits = color_limits)
+        } else if (color_palette == "grayscale") {
+          plot_obj <- plot_obj + scale_color_gradient(name = self$lab_y, low = "black", high = "white", limits = color_limits)
         }
-        
-        # Add labels if requested
-        if (style$show_labels) {
-          label_size <- if (!is.null(style$label_size)) style$label_size else text_size * 0.8 / ggplot2::.pt
-          
-          plot_obj <- plot_obj + geom_text(
-            data = points_data,
-            aes(x = points_x1, y = points_x2, label = seq_len(nrow(points_data))),
-            color = if (self$learner$predict_type == "prob" || is.numeric(training_layer$data$y)) "black" else style$color,
-            size = label_size,
-            vjust = -0.5,
-            inherit.aes = FALSE
-          )
-        }
+      } else {
+        # Use fixed color for discrete/categorical data
+        plot_obj <- plot_obj + geom_point(
+          data = points_data,
+          aes(x = points_x1, y = points_x2),
+          color = style$color,
+          size = style$size,
+          shape = style$shape,
+          alpha = style$alpha,
+          inherit.aes = FALSE
+        )
       }
+      
+      # Add labels if requested
+      if (style$show_labels) {
+        label_size <- if (!is.null(style$label_size)) style$label_size else text_size * 0.8 / ggplot2::.pt
+        
+        plot_obj <- plot_obj + geom_text(
+          data = points_data,
+          aes(x = points_x1, y = points_x2, label = seq_len(nrow(points_data))),
+          color = if (self$learner$predict_type == "prob" || is.numeric(layer_spec$data$y)) "black" else style$color,
+          size = label_size,
+          vjust = -0.5,
+          inherit.aes = FALSE
+        )
+      }
+      
       return(plot_obj)
     }
   )
