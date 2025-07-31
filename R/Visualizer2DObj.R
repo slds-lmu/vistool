@@ -186,8 +186,16 @@ Visualizer2DObj = R6::R6Class("Visualizer2DObj",
       # Call parent plot method first to set up plot_settings and resolve colors
       p = super$plot(...)
       
-      # Render optimization traces if any exist
-      private$render_optimization_trace_layers(p)
+      # render layers in the order they were added
+      if (!is.null(private$.layers_to_add)) {
+        for (layer in private$.layers_to_add) {
+          if (layer$type == "optimization_trace") {
+            p = private$render_optimization_trace_layer(p, layer$spec)
+          }
+        }
+      }
+      
+      return(p)
     }
   ),
   private = list(

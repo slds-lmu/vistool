@@ -514,13 +514,27 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
 
     # Render all stored layers
     render_stored_layers = function(plot_obj) {
-      # First add the generic points layers from base class
-      plot_obj = private$add_points_to_ggplot(plot_obj, "1D")
-      
-      # Then add loss-specific point layers
-      loss_points_layers = private$get_layers_by_type("loss_points")
-      for (point_spec in loss_points_layers) {
-        plot_obj = private$render_loss_points_layer(plot_obj, point_spec)
+      # render layers in the order they were added
+      if (!is.null(private$.layers_to_add)) {
+        for (layer in private$.layers_to_add) {
+          if (layer$type == "points") {
+            # Handle generic points from base class
+            points_data = private$prepare_points_data(layer$spec$points, "1D")
+            
+            # Add points layer
+            plot_obj = plot_obj + ggplot2::geom_point(
+              data = points_data,
+              ggplot2::aes(x = x, y = y),
+              color = layer$spec$color,
+              size = layer$spec$size,
+              shape = layer$spec$shape,
+              alpha = layer$spec$alpha,
+              inherit.aes = FALSE
+            )
+          } else if (layer$type == "loss_points") {
+            plot_obj = private$render_loss_points_layer(plot_obj, layer$spec)
+          }
+        }
       }
       
       return(plot_obj)

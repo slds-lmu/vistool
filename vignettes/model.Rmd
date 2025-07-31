@@ -61,18 +61,6 @@ The predictions are then visualized using an interactive surface plot.
 vis$plot()
 ```
 
-We can also create a 2D contour plot for the predictions by using the `flatten = TRUE` parameter.
-
-```{r, out.width='100%', out.height='700px'}
-vis$plot(flatten = TRUE)
-```
-
-To switch back to the surface plot, simply use `flatten = FALSE` (or omit the parameter since it's the default).
-
-```{r, out.width='100%', out.height='700px'}
-vis$plot(flatten = FALSE)
-```
-
 Draw with contour lines above z dimension.
 
 ```{r, out.width='100%', out.height='700px'}
@@ -85,6 +73,14 @@ We can add the training points to the plot using method chaining.
 ```{r, out.width='100%', out.height='700px'}
 vis$add_training_data()$plot()
 ```
+
+We can also flatten the surface to arrive at a 2D contour plot by using the `flatten = TRUE` parameter.
+
+```{r, out.width='100%', out.height='700px'}
+vis$plot(flatten = TRUE)
+```
+
+To switch back to the surface plot, simply use `flatten = FALSE` (or omit the parameter since it's the default).
 
 It is also possible to visualize classification tasks.
 We use the `pima` data set and impute the missing values.
@@ -108,4 +104,18 @@ We can add (potential) decision boundaries to the plot using method chaining.
 
 ```{r, out.width='100%', out.height='700px'}
 vis$add_boundary(values = c(0.3, 0.5, 0.7))$plot()
+```
+
+For classification tasks, `add_training_data()` supports setting different colors and shapes for the different classes.
+```{r, out.width='100%', out.height='700px'}
+vis$add_training_data(color = c(pos = "red", neg = "blue"), 
+                       shape = c(pos = 17, neg = 19))$plot()
+```
+
+For surface plots, the same class-specific styling is supported.
+
+```{r, out.width='100%', out.height='700px'}
+vis_surface = as_visualizer(task, learner = learner, type = "surface")
+vis_surface$add_training_data(color = c(pos = "red", neg = "blue"),
+                              shape = c(pos = 0, neg = 1))$plot()
 ```

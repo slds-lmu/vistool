@@ -125,7 +125,7 @@ viz_lm$add_points(archive_data, color = "orange", size = 3, shape = 17, alpha = 
 ```{r, out.width='100%', out.height='700px'}
 # Add a labeled point to the surface (plotly) visualizer
 viz_lm_surface = as_visualizer(obj_lm, x1_limits = c(-0.5, 5), x2_limits = c(-3.2, 2.8), type = "surface")
-viz_lm_surface$add_points(base::data.frame(x = 2, y = 0), color = "orange", size = 8, shape = "diamond", alpha = 0.9, annotations = "The z values are inferred!")$plot()
+viz_lm_surface$add_points(base::data.frame(x = 2, y = 0), color = "orange", size = 8, alpha = 0.9, annotations = "The z values are inferred!")$plot()
 ```
 
 *Customization options include: `points` (as data.frame/matrix/list), `color`, `size`, `shape`, `alpha`, `annotations`, `ordered`, and more. See the documentation for all arguments.*

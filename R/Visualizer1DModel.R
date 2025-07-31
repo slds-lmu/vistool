@@ -99,12 +99,18 @@ Visualizer1DModel = R6::R6Class("Visualizer1DModel",
     #' @description
     #' Adds the training data to the plot.
     #'
-    #' @param color (`character(1)`)\cr
-    #'   Color of the points. Use "auto" for automatic color assignment. Default is "auto".
+    #' @param color (`character(1)` or named `character`)\cr
+    #'   Color of the points. For classification tasks:
+    #'   - `character(1)`: A single color for all points (e.g., `"blue"`) or `"auto"` for automatic color assignment.
+    #'   - `named character`: A vector mapping class labels to colors (e.g., `c(pos = "red", neg = "blue")`).
+    #'   For regression tasks, only single colors are supported. Default is `"auto"`.
     #' @param size (`numeric(1)`)\cr
     #'   Size of the points. Default is 2.
-    #' @param shape (`integer(1)`)\cr
-    #'   Shape of the points. Default is 19.
+    #' @param shape (`numeric(1)` or named `numeric`)\cr
+    #'   Shape of the points. For classification tasks:
+    #'   - `numeric(1)`: A single shape for all points (e.g., `19`).
+    #'   - `named numeric`: A vector mapping class labels to shapes (e.g., `c(pos = 17, neg = 19)`).
+    #'   For regression tasks, only single shapes are supported. Default is 19.
     #' @param alpha (`numeric(1)`)\cr
     #'   Alpha transparency of the points. Default is 1.
     #' @param show_labels (`logical(1)`)\cr
@@ -113,9 +119,17 @@ Visualizer1DModel = R6::R6Class("Visualizer1DModel",
     #'   Size of data point labels. If NULL, defaults to smaller text.
     add_training_data = function(color = "auto", size = 2, shape = 19, alpha = 1, 
                                 show_labels = FALSE, label_size = NULL) {
-      checkmate::assert_string(color)
+      # Validate arguments - color can be string or named character vector
+      checkmate::assert(
+        checkmate::check_string(color),
+        checkmate::check_character(color, names = "named", min.len = 1)
+      )
       checkmate::assert_number(size, lower = 0)
-      checkmate::assert_integerish(shape, len = 1)
+      # Validate arguments - shape can be numeric or named numeric vector  
+      checkmate::assert(
+        checkmate::check_number(shape),
+        checkmate::check_numeric(shape, names = "named", min.len = 1)
+      )
       checkmate::assert_number(alpha, lower = 0, upper = 1)
       checkmate::assert_flag(show_labels)
       checkmate::assert_number(label_size, lower = 0, null.ok = TRUE)
@@ -123,6 +137,7 @@ Visualizer1DModel = R6::R6Class("Visualizer1DModel",
       data = self$task$data()
       training_x = data[[self$task$feature_names[1]]]
       training_y = data[[self$task$target_names]]
+      training_y_original = training_y  # Store original for class mapping
 
       # Convert factors to numeric for visualization
       if (self$learner$predict_type == "prob" && is.factor(training_y)) {
@@ -133,7 +148,7 @@ Visualizer1DModel = R6::R6Class("Visualizer1DModel",
       
       # Store training data specification without resolving colors yet
       private$store_layer("training_data", list(
-        data = list(x = training_x, y = training_y),
+        data = list(x = training_x, y = training_y, y_original = training_y_original),
         style = list(
           color = color,  # Keep as "auto" for later resolution
           size = size,
@@ -215,9 +230,16 @@ Visualizer1DModel = R6::R6Class("Visualizer1DModel",
       # Call parent first to set up plot_settings and base plot
       p = super$plot(text_size = text_size, theme = theme, color_palette = color_palette, ...)
       
-      # Render class-specific layers
-      p = private$render_boundary_layers(p)
-      p = private$render_training_data_layers(p, color_palette, text_size)
+      # render layers in the order they were added
+      if (!is.null(private$.layers_to_add)) {
+        for (layer in private$.layers_to_add) {
+          if (layer$type == "boundary") {
+            p = private$render_boundary_layer(p, layer$spec)
+          } else if (layer$type == "training_data") {
+            p = private$render_training_data_layer(p, layer$spec, color_palette, text_size)
+          }
+        }
+      }
       
       return(p)
     }
@@ -275,33 +297,89 @@ Visualizer1DModel = R6::R6Class("Visualizer1DModel",
       )
       
       style = layer_spec$style
+      is_classification = self$task$task_type == "classif"
       
-      # Resolve auto colors if needed
-      resolved_color = if (style$color == "auto") {
-        private$get_auto_color_with_palette()
+      # Handle class-specific styling for classification tasks
+      if (is_classification && (length(style$color) > 1 || length(style$shape) > 1 || style$color[1] == "auto")) {
+        # Add original class labels for color/shape mapping
+        points_data$class = as.character(layer_spec$data$y_original)
+        
+        # Determine what aesthetics to map
+        use_color_aes = length(style$color) > 1 || style$color[1] == "auto"
+        use_shape_aes = length(style$shape) > 1
+        
+        # Create the base geom with appropriate aesthetic mappings
+        if (use_color_aes && use_shape_aes) {
+          plot_obj = plot_obj + ggplot2::geom_point(
+            data = points_data,
+            aes(x = points_x, y = points_y, color = class, shape = class),
+            size = style$size,
+            alpha = style$alpha,
+            inherit.aes = FALSE
+          )
+        } else if (use_color_aes) {
+          plot_obj = plot_obj + ggplot2::geom_point(
+            data = points_data,
+            aes(x = points_x, y = points_y, color = class),
+            size = style$size,
+            shape = if (length(style$shape) == 1) style$shape else 19,
+            alpha = style$alpha,
+            inherit.aes = FALSE
+          )
+        } else if (use_shape_aes) {
+          plot_obj = plot_obj + ggplot2::geom_point(
+            data = points_data,
+            aes(x = points_x, y = points_y, shape = class),
+            color = if (length(style$color) == 1 && style$color[1] != "auto") style$color[1] else "black",
+            size = style$size,
+            alpha = style$alpha,
+            inherit.aes = FALSE
+          )
+        }
+        
+        # Add manual scales if needed
+        if (length(style$color) > 1) {
+          plot_obj = plot_obj + ggplot2::scale_color_manual(values = style$color, name = self$task$target_names)
+        }
+        if (length(style$shape) > 1) {
+          plot_obj = plot_obj + ggplot2::scale_shape_manual(values = style$shape, name = self$task$target_names)
+        }
+        
       } else {
-        style$color
+        # Single color/shape for all points (regression or single-styled classification)
+        resolved_color = if (style$color[1] == "auto") {
+          private$get_auto_color_with_palette()
+        } else {
+          style$color[1]
+        }
+        
+        plot_obj = plot_obj + ggplot2::geom_point(
+          data = points_data,
+          aes(x = points_x, y = points_y),
+          color = resolved_color,
+          size = style$size,
+          shape = if (length(style$shape) > 1) style$shape[1] else style$shape,
+          alpha = style$alpha,
+          inherit.aes = FALSE
+        )
       }
-      
-      # Add styled training data points
-      plot_obj = plot_obj + ggplot2::geom_point(
-        data = points_data,
-        aes(x = points_x, y = points_y),
-        color = resolved_color,
-        size = style$size,
-        shape = style$shape,
-        alpha = style$alpha,
-        inherit.aes = FALSE
-      )
       
       # Add labels if requested
       if (style$show_labels) {
         label_size = if (!is.null(style$label_size)) style$label_size else text_size * 0.8 / ggplot2::.pt
         
+        label_color = if (is_classification && length(style$color) > 1) {
+          "black"  # Use neutral color when points have different colors
+        } else if (style$color[1] == "auto") {
+          private$get_auto_color_with_palette()
+        } else {
+          style$color[1]
+        }
+        
         plot_obj = plot_obj + ggplot2::geom_text(
           data = points_data,
           aes(x = points_x, y = points_y, label = seq_len(nrow(points_data))),
-          color = resolved_color,
+          color = label_color,
           size = label_size,
           vjust = -0.5,
           inherit.aes = FALSE

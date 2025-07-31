@@ -114,14 +114,20 @@ Adds the training data to the plot.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{color}}{(`character(1)`)\cr
-Color of the points. Use "auto" for automatic color assignment. Default is "auto".}
+\item{\code{color}}{(`character(1)` or named `character`)\cr
+Color of the points. For classification tasks:
+- `character(1)`: A single color for all points (e.g., `"blue"`) or `"auto"` for automatic color assignment.
+- `named character`: A vector mapping class labels to colors (e.g., `c(pos = "red", neg = "blue")`).
+For regression tasks, only single colors are supported. Default is `"auto"`.}
 
 \item{\code{size}}{(`numeric(1)`)\cr
 Size of the points. Default is 2.}
 
-\item{\code{shape}}{(`integer(1)`)\cr
-Shape of the points. Default is 19.}
+\item{\code{shape}}{(`numeric(1)` or named `numeric`)\cr
+Shape of the points. For classification tasks:
+- `numeric(1)`: A single shape for all points (e.g., `19`).
+- `named numeric`: A vector mapping class labels to shapes (e.g., `c(pos = 17, neg = 19)`).
+For regression tasks, only single shapes are supported. Default is 19.}
 
 \item{\code{alpha}}{(`numeric(1)`)\cr
 Alpha transparency of the points. Default is 1.}

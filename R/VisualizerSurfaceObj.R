@@ -152,14 +152,18 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
       # Call parent plot method first to set up plot_settings and resolve colors
       super$plot(...)
       
-      # Process stored optimization trace layers
-      private$render_optimization_trace_layers()
-      
-      # Process stored Taylor approximation layers
-      private$render_taylor_layers()
-      
-      # Process stored Hessian eigenvector layers
-      private$render_hessian_layers()
+      # render layers in the order they were added
+      if (!is.null(private$.layers_to_add)) {
+        for (layer in private$.layers_to_add) {
+          if (layer$type == "optimization_trace") {
+            private$render_optimization_trace_layer(layer$spec)
+          } else if (layer$type == "taylor") {
+            private$render_taylor_layer(layer$spec)
+          } else if (layer$type == "hessian") {
+            private$render_hessian_layer(layer$spec)
+          }
+        }
+      }
       
       return(private$.plot)
     },
