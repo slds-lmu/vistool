@@ -125,17 +125,31 @@ Indicator whether to show the title of the plot.}
 \subsection{Method \code{add_training_data()}}{
 Adds the training data to the plot.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{VisualizerSurfaceModel$add_training_data(size = 5, color = "grey", ...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{VisualizerSurfaceModel$add_training_data(
+  size = 5,
+  color = "auto",
+  shape = 0,
+  ...
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{size}}{(`numeric(1)`)\cr
-Size of the points.}
+Size of the points. Default is 5.}
 
-\item{\code{color}}{(`character(1)`)\cr
-Color of the points.}
+\item{\code{color}}{(`character(1)` or named `character`)\cr
+Color of the points. For classification tasks:
+- `character(1)`: A single color for all points (e.g., `"blue"`) or `"auto"` for automatic color assignment.
+- `named character`: A vector mapping class labels to colors (e.g., `c(pos = "red", neg = "blue")`).
+For regression tasks, only single colors are supported. Default is `"auto"`.}
+
+\item{\code{shape}}{(`numeric(1)` or named `numeric`)\cr
+Shape/symbol of the points. For classification tasks:
+- `numeric(1)`: A single symbol for all points (e.g., `0` for circle).
+- `named numeric`: A vector mapping class labels to symbols (e.g., `c(pos = 0, neg = 1)`).
+For regression tasks, only single symbols are supported. Default is 0 (circle).}
 
 \item{\code{...}}{(`any`)\cr
 Further arguments passed to `add_trace(...)`.}

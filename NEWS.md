@@ -1,4 +1,9 @@
 
+# vistool 0.3.2
+
+* Can now specify color and shape for training data of classification tasks.
+* Added layers are now rendered in the order they were added.
+
 # vistool 0.3.1
 
 * All classes now use the deferred rendering architecture.

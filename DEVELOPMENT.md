@@ -154,8 +154,17 @@ plot = function(...) {
   # Call parent to get base plot and set plot_settings
   p <- super$plot(...)
   
-  # Render stored layers
-  private$render_optimization_trace_layers(p)
+  # render layers in the order they were added
+  if (!is.null(private$.layers_to_add)) {
+    for (layer in private$.layers_to_add) {
+      if (layer$type == "optimization_trace") {
+        p = private$render_optimization_trace_layer(p, layer$spec)
+      } else if (layer$type == "layer_type_2") {
+        # render layer_type_2
+      }
+      # ... handle other layer types
+    }
+  }
 }
 
 private = list(
