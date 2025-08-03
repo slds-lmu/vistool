@@ -89,11 +89,9 @@ as_visualizer.Task = function(x, type = "auto", x1_limits = NULL, x2_limits = NU
   }
   
   # Create appropriate visualizer
-  if (vis_type == "1d") {
-    vis = Visualizer1DModel$new(x, learner, xlim = x1_limits, n_points = n_points, ...)
-  } else if (vis_type == "2d") {
-    vis = Visualizer2DModel$new(x, learner, x1_limits = x1_limits, x2_limits = x2_limits, 
-                                padding = padding, n_points = n_points, ...)
+  if (vis_type %in% c("1d", "2d")) {
+    vis = VisualizerModel$new(x, learner, x1_limits = x1_limits, x2_limits = x2_limits, 
+                              padding = padding, n_points = n_points, ...)
   } else if (vis_type == "surface") {
     vis = VisualizerSurfaceModel$new(x, learner, x1_limits = x1_limits, x2_limits = x2_limits, 
                                      padding = padding, n_points = n_points, ...)
@@ -121,7 +119,9 @@ as_visualizer.Objective = function(x, type = "auto", x1_limits = NULL, x2_limits
   
   # Determine visualization type
   if (type == "auto") {
-    if (n_dim == 1) {
+    if (is.na(n_dim)) {
+      stop("Auto visualization type detection not supported for variable-dimension objectives. Please specify type explicitly (1d, 2d, or surface).")
+    } else if (n_dim == 1) {
       vis_type = "1d"
     } else if (n_dim == 2) {
       vis_type = "2d"  # Default to ggplot2 for 2D
@@ -132,19 +132,22 @@ as_visualizer.Objective = function(x, type = "auto", x1_limits = NULL, x2_limits
     vis_type = type
   }
   
-  # Validate type against dimensions
-  if (vis_type == "1d" && n_dim != 1) {
-    stop("1D visualization requires an objective with exactly 1 dimension.")
+  # Validate type against dimensions 
+  if (!is.na(n_dim)) {
+    # For known dimensions, validate the type makes sense
+    if (vis_type == "1d" && n_dim != 1) {
+      stop("1D visualization requires an objective with exactly 1 dimension.")
+    }
+    if (vis_type %in% c("2d", "surface") && n_dim != 2) {
+      stop("2D and surface visualizations require an objective with exactly 2 dimensions.")
+    }
   }
-  if (vis_type %in% c("2d", "surface") && n_dim != 2) {
-    stop("2D and surface visualizations require an objective with exactly 2 dimensions.")
-  }
+  # For unknown dimensions (NA), trust the user's explicit type specification
   
   # Create appropriate visualizer
-  if (vis_type == "1d") {
-    return(Visualizer1DObj$new(x, xlim = x1_limits, n_points = n_points, ...))
-  } else if (vis_type == "2d") {
-    return(Visualizer2DObj$new(x, x1_limits = x1_limits, x2_limits = x2_limits, padding = padding, n_points = n_points, ...))
+  if (vis_type %in% c("1d", "2d")) {
+    return(VisualizerObj$new(x, x1_limits = x1_limits, x2_limits = x2_limits, 
+                             padding = padding, n_points = n_points, type = vis_type, ...))
   } else if (vis_type == "surface") {
     return(VisualizerSurfaceObj$new(x, x1_limits = x1_limits, x2_limits = x2_limits, padding = padding, n_points = n_points, ...))
   } else {

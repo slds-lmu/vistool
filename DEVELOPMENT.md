@@ -2,8 +2,6 @@
 
 ## Essential Commands
 
-### Package Development (`devtools`)
-
 ```r
 # Load package for development
 devtools::load_all()
@@ -22,11 +20,10 @@ devtools::test_active_file('tests/testthat/test-plot-customization.R')
 
 # Install package locally
 devtools::install()
-```
 
-### Documentation
+# Build source tarball
+devtools::build()
 
-```r
 # Generate function documentation from roxygen2 comments
 devtools::document()
 
@@ -37,42 +34,13 @@ devtools::build_readme()
 devtools::build_vignettes()
 
 # Build a specific vignette
-R -e "devtools::load_all(); rmarkdown::render('vignettes/loss_functions.Rmd')"
+devtools::load_all(); rmarkdown::render('vignettes/loss_functions.Rmd')
 
 # Build package website
 pkgdown::build_site()
 
 # Preview website locally
 pkgdown::preview_site()
-```
-
-### Testing
-
-```r
-# Run all tests
-devtools::test()
-
-# Run specific test file
-testthat::test_file("tests/testthat/test-Objective.R")
-
-# Test with coverage report
-covr::package_coverage()
-
-# Interactive test debugging
-testthat::test_file("tests/testthat/test-Objective.R", reporter = "tap")
-```
-
-### Building
-
-```r
-# Build source tarball
-devtools::build()
-
-# Build binary package
-devtools::build(binary = TRUE)
-
-# Quick build without vignettes
-devtools::build(vignettes = FALSE)
 ```
 
 ## Structure
@@ -100,34 +68,43 @@ vistool/
 
 ## Core Architecture (Visualization)
 
+```
+Visualizer
+├── VisualizerModel      # Handles both 1D and 2D
+├── VisualizerObj        # Handles both 1D and 2D  
+├── VisualizerLossFuns
+└── VisualizerSurface    # plotly-based
+    ├── VisualizerSurfaceModel
+    └── VisualizerSurfaceObj
+```
+
 - **`Visualizer`**: Base visualization class
-  - `Visualizer1D*`: 1D plotting with ggplot2
-  - `Visualizer2D*`: 2D plotting with ggplot2  
-  - `VisualizerSurface*`: Interactive surface plotting with plotly for 2D functions
+  - `VisualizerLossFuns`: Plotting loss functions with ggplot2
+  - `VisualizerModel`: Plotting model predictions with ggplot2
+  - `VisualizerObj`: Plotting objective functions with ggplot2
+  - `VisualizerSurface*`: Interactive surface plotting with plotly for 2D functions *only*
 - **`as_visualizer()`**: Smart constructor that selects appropriate visualizer
 
 ## Deferred Rendering
 
-All visualizer classes in vistool follow a standardized `plot()` method structure that leverages the deferred rendering architecture. This ensures consistent behavior, proper color resolution, and maintainable code.
+All visualizer classes in vistool follow a standardized `plot()` method structure that leverages the deferred rendering architecture.
+This ensures consistent behavior, proper color resolution, and maintainable code.
 
 ### Standard Pattern
 
-#### `Visualizer.R`
+#### 1. `Visualizer.R`
 
 The base `Visualizer` class provides:
 - **Layer storage**: `private$store_layer(type, spec)` 
 - **Layer retrieval**: `private$get_layers_by_type(type)`
 - **Plot settings**: Stored in `private$.plot_settings` for color resolution
-- **Common parameters**: text_size, theme, color_palette, etc.
 
-CAREFUL: Its `plot()` method is **abstract** and needs to be implemented by `Visualizer1D.R`, `Visualizer2D.R`, `VisualizerSurface.R` (and `VisualizerLossFuns`)!
+CAREFUL: Its `plot()` method needs to be called by all child classes (`VisualizerSurface`, `VisualizerModel`, ...) to store common customization parameters.
 
-#### 2. `Visualizer1D.R`, `Visualizer2D.R`, `VisualizerSurface.R` (and `VisualizerLossFuns`)
+#### 2. Child classes
 These implement the abstract `plot()` method from the base `Visualizer` class and methods specific for that type/dimension (e.g., `add_contours()` for all `VisualizerSurface` classes), they inherit from `Visualizer`.
 
-#### 3. Child Class `plot()` Structure
-
-Every (grand-) child class (e.g., `Visualizer1DObj`, `Visualizer2DModel`, `VisualizerSurfaceObj`) should follow this exact pattern:
+`VisualizerLossFuns`, `VisualizerModel`, `VisualizerObj`, `VisualizerSurfaceModel`, `VisualizerSurfaceObj` should all follow this patter:
 
 ```r
 plot = function(...) {
@@ -139,6 +116,8 @@ plot = function(...) {
   private$render_layer_type_2()
   # ... etc
   
+  super$resolve_layer_colors()
+
   # 3. Return the plot object (for ggplot2 classes only)
   return(p)  # omit for plotly classes that modify private$.plot
 }
@@ -149,7 +128,6 @@ plot = function(...) {
 #### ggplot2-based Classes (1D, 2D)
 
 ```r
-# Good Example: Visualizer2DObj
 plot = function(...) {
   # Call parent to get base plot and set plot_settings
   p <- super$plot(...)

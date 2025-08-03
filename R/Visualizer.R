@@ -4,6 +4,7 @@
 #' Base class for all visualizers. Provides a common interface for creating
 #' and saving plots across different plotting backends (ggplot2 for 1D/2D, plotly for 3D).
 #'
+#' @importFrom rlang .data
 #' @export
 Visualizer = R6::R6Class("Visualizer",
   public = list(
@@ -71,6 +72,7 @@ Visualizer = R6::R6Class("Visualizer",
                     plot_title = NULL, plot_subtitle = NULL, x_lab = NULL, y_lab = NULL, z_lab = NULL,
                     x_limits = NULL, y_limits = NULL, z_limits = NULL, show_grid = TRUE, grid_color = "gray90",
                     show_legend = TRUE, legend_position = "right", legend_title = NULL, show_title = TRUE) {
+      #TODO: checkmate
       
       # Store plot settings for layer resolution
       private$.plot_settings = list(
@@ -95,6 +97,7 @@ Visualizer = R6::R6Class("Visualizer",
         show_title = show_title
       )
       
+      #TODO: should no longer be label abstract, but be called by child classes (super$plot())
       # Resolve layer colors now that we have plot settings
       private$resolve_layer_colors()
       
@@ -642,6 +645,90 @@ Visualizer = R6::R6Class("Visualizer",
         }
       }
       return(layers)
+    },
+
+    #TODO: should not be private??
+    # Initialize a base ggplot2 object (for 1D/2D visualizers)
+    init_ggplot = function(data, x_col = "x", y_col = "y") {
+      # Create base ggplot object
+      if (missing(data) || is.null(data)) {
+        p = ggplot2::ggplot()
+      } else {
+        aes_mapping = ggplot2::aes(.data[[x_col]], .data[[y_col]])
+        p = ggplot2::ggplot(data = data, mapping = aes_mapping)
+      }
+      
+      return(p)
+    },
+
+    # Apply theme and styling to ggplot2 object
+    #TODO: should not be private??
+    apply_ggplot_theme = function(plot_obj, text_size = 11, title_size = NULL, theme = "minimal", 
+                                  background = "white", show_grid = TRUE, grid_color = "gray90") {
+      # Set title size
+      if (is.null(title_size)) {
+        title_size = text_size + 2
+      }
+      
+      # Apply theme
+      theme_func = switch(theme,
+        "minimal" = ggplot2::theme_minimal,
+        "bw" = ggplot2::theme_bw,
+        "classic" = ggplot2::theme_classic,
+        "gray" = ggplot2::theme_gray,
+        "grey" = ggplot2::theme_grey,
+        "light" = ggplot2::theme_light,
+        "dark" = ggplot2::theme_dark,
+        "void" = ggplot2::theme_void,
+        ggplot2::theme_minimal  # default fallback
+      )
+      
+      plot_obj = plot_obj + theme_func(base_size = text_size)
+      
+      # Apply additional theme customizations
+      plot_obj = plot_obj + ggplot2::theme(
+        plot.title = ggplot2::element_text(size = title_size, hjust = 0.5),
+        plot.background = ggplot2::element_rect(fill = background, color = NA),
+        panel.background = ggplot2::element_rect(fill = background, color = NA)
+      )
+      
+      # Handle grid display
+      if (!show_grid) {
+        plot_obj = plot_obj + ggplot2::theme(
+          panel.grid.major = ggplot2::element_blank(),
+          panel.grid.minor = ggplot2::element_blank()
+        )
+      } else if (!is.null(grid_color)) {
+        plot_obj = plot_obj + ggplot2::theme(
+          panel.grid.major = ggplot2::element_line(color = grid_color),
+          panel.grid.minor = ggplot2::element_line(color = grid_color, linewidth = 0.5)
+        )
+      }
+      
+      return(plot_obj)
+    },
+
+    # Apply color scales to ggplot2 object
+    apply_ggplot_color_scale = function(plot_obj, color_palette = "viridis", scale_type = "fill") {
+      if (scale_type == "fill") {
+        if (color_palette == "viridis") {
+          plot_obj = plot_obj + ggplot2::scale_fill_viridis_c()
+        } else if (color_palette == "plasma") {
+          plot_obj = plot_obj + ggplot2::scale_fill_viridis_c(option = "plasma")
+        } else if (color_palette == "grayscale") {
+          plot_obj = plot_obj + ggplot2::scale_fill_gradient(low = "black", high = "white")
+        }
+      } else if (scale_type == "color") {
+        if (color_palette == "viridis") {
+          plot_obj = plot_obj + ggplot2::scale_color_viridis_c()
+        } else if (color_palette == "plasma") {
+          plot_obj = plot_obj + ggplot2::scale_color_viridis_c(option = "plasma")
+        } else if (color_palette == "grayscale") {
+          plot_obj = plot_obj + ggplot2::scale_color_gradient(low = "black", high = "white")
+        }
+      }
+      
+      return(plot_obj)
     }
   )
 )

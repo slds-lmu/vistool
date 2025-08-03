@@ -2,12 +2,12 @@ test_that("as_visualizer works for Objective with auto type selection", {
   # Test 1D objective (create a custom one since most TF functions are 2D)
   obj_1d = Objective$new(id = "test_1d", fun = function(x) x^2, xdim = 1, lower = -5, upper = 5)
   vis_1d = as_visualizer(obj_1d)
-  expect_s3_class(vis_1d, "Visualizer1DObj")
+  expect_s3_class(vis_1d, "VisualizerObj")
 
   # Test 2D objective (auto should default to ggplot2)
   obj_2d = obj("TF_branin")
   vis_2d = as_visualizer(obj_2d)
-  expect_s3_class(vis_2d, "Visualizer2DObj")
+  expect_s3_class(vis_2d, "VisualizerObj")
 
   # For objectives with 3D+ dimensions, auto selection should error
   obj_3d = Objective$new(
@@ -22,7 +22,7 @@ test_that("as_visualizer works for Objective with explicit type selection", {
 
   # Test explicit 2D (ggplot2)
   vis_2d = as_visualizer(obj_2d, type = "2d")
-  expect_s3_class(vis_2d, "Visualizer2DObj")
+  expect_s3_class(vis_2d, "VisualizerObj")
 
   # Test explicit surface for 2D objective (plotly)
   vis_surface = as_visualizer(obj_2d, type = "surface")
@@ -38,14 +38,14 @@ test_that("as_visualizer works for Task with auto type selection", {
   learner = lrn("regr.lm")
 
   vis_1d = as_visualizer(task_1d, learner = learner)
-  expect_s3_class(vis_1d, "Visualizer1DModel")
+  expect_s3_class(vis_1d, "VisualizerModel")
 
   # Test 2D task (auto should default to ggplot2)
   task_2d = tsk("mtcars")
   task_2d$select(c("gear", "cyl"))
 
   vis_2d = as_visualizer(task_2d, learner = learner)
-  expect_s3_class(vis_2d, "Visualizer2DModel")
+  expect_s3_class(vis_2d, "VisualizerModel")
 
   # Test task with >2 features (auto should error)
   task_3d = tsk("mtcars")
@@ -63,7 +63,7 @@ test_that("as_visualizer works for Task with explicit type selection", {
 
   # Test explicit 2D (ggplot2)
   vis_2d = as_visualizer(task_2d, learner = learner, type = "2d")
-  expect_s3_class(vis_2d, "Visualizer2DModel")
+  expect_s3_class(vis_2d, "VisualizerModel")
 
   # Test explicit surface for 2D task (plotly)
   vis_surface = as_visualizer(task_2d, learner = learner, type = "surface")
@@ -91,7 +91,7 @@ test_that("as_visualizer parameter passing works correctly", {
     n_points = 50L
   )
 
-  expect_s3_class(vis, "Visualizer2DObj")
+  expect_s3_class(vis, "VisualizerObj")
   # We can't easily test the internal parameters without accessing private fields
   # but we can at least verify the object was created successfully
 })
@@ -126,19 +126,19 @@ test_that("as_visualizer error handling works", {
 
 test_that("as_visualizer automatic type selection follows documented behavior", {
   # Test that auto selection follows the documented rules:
-  # 1D -> Visualizer1DObj (ggplot2)
-  # 2D -> Visualizer2DObj (ggplot2)
+  # 1D -> VisualizerObj (ggplot2)
+  # 2D -> VisualizerObj (ggplot2)
   # 3D+ -> Error (must specify type explicitly)
 
   # 1D objective
   obj_1d = Objective$new(id = "test_1d", fun = function(x) x^2, xdim = 1, lower = -5, upper = 5)
   vis_1d_auto = as_visualizer(obj_1d) # type = "auto" is default
-  expect_s3_class(vis_1d_auto, "Visualizer1DObj")
+  expect_s3_class(vis_1d_auto, "VisualizerObj")
 
   # 2D objective (should default to ggplot2, not plotly)
   obj_2d = obj("TF_branin")
   vis_2d_auto = as_visualizer(obj_2d) # type = "auto" is default
-  expect_s3_class(vis_2d_auto, "Visualizer2DObj") # Should be 2D ggplot2, not surface plotly
+  expect_s3_class(vis_2d_auto, "VisualizerObj") # Should be 2D ggplot2, not surface plotly
 })
 
 test_that("as_visualizer backend selection works correctly", {
@@ -147,7 +147,7 @@ test_that("as_visualizer backend selection works correctly", {
 
   # Test default 2D (ggplot2)
   vis_2d_ggplot = as_visualizer(obj_2d) # defaults to type = "2d"
-  expect_s3_class(vis_2d_ggplot, "Visualizer2DObj")
+  expect_s3_class(vis_2d_ggplot, "VisualizerObj")
   plot_2d = vis_2d_ggplot$plot()
   expect_s3_class(plot_2d, "ggplot")
 
@@ -161,7 +161,7 @@ test_that("as_visualizer backend selection works correctly", {
   # Test 1D objective (always ggplot2)
   obj_1d = Objective$new(id = "test_1d", fun = function(x) x^2, xdim = 1, lower = -5, upper = 5)
   vis_1d = as_visualizer(obj_1d)
-  expect_s3_class(vis_1d, "Visualizer1DObj")
+  expect_s3_class(vis_1d, "VisualizerObj")
   plot_1d = vis_1d$plot()
   expect_s3_class(plot_1d, "ggplot")
 })

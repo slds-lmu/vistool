@@ -334,6 +334,7 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
       checkmate::assert_list(layout, null.ok = TRUE)
       checkmate::assert_list(scene, null.ok = TRUE)
       
+      #TODO: call parent instead (Visualizer.R)
       # Store plot settings for layer resolution
       private$.plot_settings = list(
         text_size = text_size,
@@ -357,6 +358,7 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
         show_title = show_title
       )
       
+      #TODO: call parent instead
       # Resolve layer colors now that we have plot settings
       private$resolve_layer_colors()
       
