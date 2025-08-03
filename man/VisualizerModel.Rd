@@ -193,19 +193,23 @@ Create and return the plot with model-specific features.
   theme = "minimal",
   background = "white",
   color_palette = "viridis",
+  flatten = FALSE,
+  layout = NULL,
+  scene = NULL,
   plot_title = NULL,
   plot_subtitle = NULL,
   show_title = TRUE,
   x_lab = NULL,
   y_lab = NULL,
+  z_lab = NULL,
   x_limits = NULL,
   y_limits = NULL,
+  z_limits = NULL,
   show_grid = TRUE,
   grid_color = "gray90",
   show_legend = TRUE,
   legend_position = "right",
-  legend_title = NULL,
-  ...
+  legend_title = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -227,6 +231,15 @@ Background color. Default is "white".}
 \item{\code{color_palette}}{(`character(1)`)\cr
 Color palette for the fill scale. One of "viridis", "plasma", "grayscale". Default is "viridis".}
 
+\item{\code{flatten}}{(`logical(1)`)\cr
+For surface visualizers: if TRUE, display as 2D contour plot. Ignored for model visualizers. Default is FALSE.}
+
+\item{\code{layout}}{(`list()`)\cr
+For surface visualizers: layout options. Ignored for model visualizers. Default is NULL.}
+
+\item{\code{scene}}{(`list()`)\cr
+For surface visualizers: scene options for 3D plots. Ignored for model visualizers. Default is NULL.}
+
 \item{\code{plot_title}}{(`character(1)`)\cr
 Custom plot title. If NULL, uses default title.}
 
@@ -242,11 +255,17 @@ Custom x-axis label. If NULL, uses feature name.}
 \item{\code{y_lab}}{(`character(1)`)\cr
 Custom y-axis label. If NULL, uses target name.}
 
+\item{\code{z_lab}}{(`character(1)`)\cr
+Z-axis label (for surface plots). If NULL, uses the visualizer's default label. Default is NULL.}
+
 \item{\code{x_limits}}{(`numeric(2)`)\cr
 X-axis limits as c(min, max). If NULL, uses default limits.}
 
 \item{\code{y_limits}}{(`numeric(2)`)\cr
 Y-axis limits as c(min, max). If NULL, uses default limits.}
+
+\item{\code{z_limits}}{(`numeric(2)`)\cr
+Z-axis limits as c(min, max) (for surface plots). If NULL, uses automatic limits. Default is NULL.}
 
 \item{\code{show_grid}}{(`logical(1)`)\cr
 Whether to show grid lines. Default is TRUE.}
@@ -262,8 +281,6 @@ Legend position: "top", "right", "bottom", "left", "none". Default is "right".}
 
 \item{\code{legend_title}}{(`character(1)`)\cr
 Custom legend title. If NULL, uses default.}
-
-\item{\code{...}}{Additional arguments (currently unused).}
 }
 \if{html}{\out{</div>}}
 }

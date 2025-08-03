@@ -44,8 +44,6 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
     #' Color scale for the surface plot.
     colorscale = NULL,
 
-
-
     #' @field show_title (`logical(1)`)\cr
     #' Whether to show the plot title.
     show_title = TRUE,
@@ -277,103 +275,48 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
       return(invisible(self))
     },
 
-    #' @description Return the plot and hence plot it or do further processing.
-    #' @param text_size (`numeric(1)`)\cr
-    #'   Base text size for plot elements. Default is 12. For 3D plotly calls, this controls axis labels and title sizes.
-    #' @param title_size (`numeric(1)`)\cr
-    #'   Title text size. If NULL, defaults to text_size + 2.
-    #' @param theme (`character(1)`)\cr
-    #'   Theme parameter for compatibility with ggplot2-based visualizers. Ignored for 3D plotly plots.
-    #' @param background (`character(1)`)\cr
-    #'   Background color parameter for compatibility. Ignored for 3D plotly plots.
-    #' @param color_palette (`character(1)`)\cr
-    #'   Color palette for the surface. One of "viridis", "plasma", "grayscale". Default is "viridis".
+    #' @description
+    #' Create and return the plotly plot with model-specific layers.
     #' @param flatten (`logical(1)`)\cr
-    #'   If TRUE, display as 2D contour plot. If FALSE (default), display as 3D surface plot.
+    #'   If TRUE, display as 2D contour plot. If FALSE, display as 3D surface plot. 
     #' @param layout (`list()`)\cr
-    #'   Layout options passed directly to `plotly::layout()`. If NULL, no additional layout modifications are applied.
+    #'   Layout options passed to `plotly::layout()`. Ignored by other visualizer types. Default is NULL.
     #' @param scene (`list()`)\cr
-    #'   Scene options for 3D surface plots. Should contain camera settings like `list(camera = list(eye = list(x = 1.1, y = 1.2, z = 1.3)))`. 
-    #'   Only applies to surface plots, ignored for contour plots. If NULL, no scene modifications are applied.
-    #' @template param_plot_title
-    #' @template param_plot_subtitle
-    #' @template param_x_lab
-    #' @template param_y_lab
-    #' @template param_z_lab_custom
-    #' @template param_x_limits
-    #' @template param_y_limits
-    #' @template param_z_limits
-    #' @template param_show_legend
-    #' @template param_legend_title
-    #' @template param_show_title
+    #'   Scene options for 3D plots. Ignored by other visualizer types. Default is NULL.
+    #' @param ... Additional arguments passed to the parent plot method.
     #' @return A plotly object.
-    plot = function(text_size = 12, title_size = NULL, theme = "minimal", background = "white", 
-                    color_palette = "viridis", flatten = FALSE, layout = NULL, scene = NULL,
-                    plot_title = NULL, plot_subtitle = NULL, x_lab = NULL, y_lab = NULL, z_lab = NULL,
-                    x_limits = NULL, y_limits = NULL, z_limits = NULL, show_legend = TRUE, legend_title = NULL, show_title = TRUE) {
-      checkmate::assert_number(text_size, lower = 1)
-      checkmate::assert_number(title_size, lower = 1, null.ok = TRUE)
-      checkmate::assert_choice(theme, choices = c("minimal", "bw", "classic", "gray", "light", "dark", "void"))
-      checkmate::assert_string(background)
-      checkmate::assert_choice(color_palette, choices = c("viridis", "plasma", "grayscale"))
+    plot = function(flatten = FALSE, layout = NULL, scene = NULL, ...) {
       checkmate::assert_flag(flatten)
       checkmate::assert_list(layout, null.ok = TRUE)
       checkmate::assert_list(scene, null.ok = TRUE)
-      checkmate::assert_string(plot_title, null.ok = TRUE)
-      checkmate::assert_string(plot_subtitle, null.ok = TRUE)
-      checkmate::assert_string(x_lab, null.ok = TRUE)
-      checkmate::assert_string(y_lab, null.ok = TRUE)
-      checkmate::assert_string(z_lab, null.ok = TRUE)
-      checkmate::assert_numeric(x_limits, len = 2, null.ok = TRUE)
-      checkmate::assert_numeric(y_limits, len = 2, null.ok = TRUE)
-      checkmate::assert_numeric(z_limits, len = 2, null.ok = TRUE)
-      checkmate::assert_flag(show_legend)
-      checkmate::assert_string(legend_title, null.ok = TRUE)
-      checkmate::assert_flag(show_title)
-      checkmate::assert_flag(flatten)
-      checkmate::assert_list(layout, null.ok = TRUE)
-      checkmate::assert_list(scene, null.ok = TRUE)
-      
-      #TODO: call parent instead (Visualizer.R)
-      # Store plot settings for layer resolution
-      private$.plot_settings = list(
-        text_size = text_size,
-        title_size = title_size,
-        theme = theme,
-        background = background,
-        color_palette = color_palette,
-        flatten = flatten,
-        layout = layout,
-        scene = scene,
-        plot_title = plot_title,
-        plot_subtitle = plot_subtitle,
-        x_lab = x_lab,
-        y_lab = y_lab,
-        z_lab = z_lab,
-        x_limits = x_limits,
-        y_limits = y_limits,
-        z_limits = z_limits,
-        show_legend = show_legend,
-        legend_title = legend_title,
-        show_title = show_title
-      )
-      
-      #TODO: call parent instead
-      # Resolve layer colors now that we have plot settings
-      self$resolve_layer_colors()
-      
-      # Resolve colorscale if it's "auto"
-      if (is.character(self$colorscale) && self$colorscale == "auto") {
-        self$colorscale = get_continuous_colorscale(color_palette)
-      }
-      
-      # Set default title size
-      if (is.null(title_size)) title_size = text_size + 2
       
       # Validate scene parameter is only used for surface plots
       if (!is.null(scene) && flatten) {
         stop("Scene parameter can only be used for surface plots (flatten = FALSE)")
       }
+      
+      # Store VisualizerSurface-specific parameters before calling super$plot()
+      private$.surface_plot_settings = list(
+        flatten = flatten,
+        layout = layout,
+        scene = scene
+      )
+
+      # Call parent method for common parameter validation and setup
+      super$plot(...)
+      
+      # Merge surface-specific settings with common plot settings
+      settings = c(private$.plot_settings, private$.surface_plot_settings)
+
+      self$resolve_layer_colors() # Resolve layer colors now that we have plot settings
+      
+      # Resolve colorscale if it's "auto"
+      if (is.character(self$colorscale) && self$colorscale == "auto") {
+        self$colorscale = get_continuous_colorscale(settings$color_palette)
+      }
+      
+      # Set default title size
+      if (is.null(settings$title_size)) settings$title_size = settings$text_size + 2
       
       # Get the appropriate colorscale based on current settings
       plot_colorscale = self$colorscale
@@ -385,14 +328,14 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
       current_has_contours = !is.null(private$.vbase) && !is.null(private$.vbase$contours)
       
       needs_reinit = is.null(private$.plot) || 
-                     (flatten && private$.layer_primary != "contour") ||
-                     (!flatten && private$.layer_primary != "surface") ||
+                     (settings$flatten && private$.layer_primary != "contour") ||
+                     (!settings$flatten && private$.layer_primary != "surface") ||
                      (!identical(private$.vbase$colorscale, plot_colorscale)) ||
                      (has_contours != current_has_contours)
       
       # Initialize appropriate plot type based on flatten parameter
       if (needs_reinit) {
-        if (flatten) {
+        if (settings$flatten) {
           self$init_layer_contour(colorscale = plot_colorscale)
         } else {
           self$init_layer_surface(colorscale = plot_colorscale)
@@ -402,62 +345,62 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
       # apply text size to plotly layout
       if (!is.null(private$.plot)) {
         # Determine final labels
-        final_title = if (show_title) {
-          if (!is.null(plot_title)) plot_title else self$plot_lab
+        final_title = if (settings$show_title) {
+          if (!is.null(settings$plot_title)) settings$plot_title else self$plot_lab
         } else {
           ""  # Empty string instead of NULL for plotly
         }
-        final_x_lab = if (!is.null(x_lab)) x_lab else self$x1_lab
-        final_y_lab = if (!is.null(y_lab)) y_lab else self$x2_lab
-        final_z_lab = if (!is.null(z_lab)) z_lab else self$z_lab
+        final_x_lab = if (!is.null(settings$x_lab)) settings$x_lab else self$x1_lab
+        final_y_lab = if (!is.null(settings$y_lab)) settings$y_lab else self$x2_lab
+        final_z_lab = if (!is.null(settings$z_lab)) settings$z_lab else self$z_lab
         
         if (private$.layer_primary == "surface") {
           # For 3D surface plots
           private$.plot = private$.plot %>%
             plotly::layout(
-              title = list(text = final_title, font = list(size = title_size)),
+              title = list(text = final_title, font = list(size = settings$title_size)),
               scene = list(
                 xaxis = list(
-                  title = list(text = final_x_lab, font = list(size = text_size)),
-                  range = x_limits
+                  title = list(text = final_x_lab, font = list(size = settings$text_size)),
+                  range = settings$x_limits
                 ),
                 yaxis = list(
-                  title = list(text = final_y_lab, font = list(size = text_size)),
-                  range = y_limits
+                  title = list(text = final_y_lab, font = list(size = settings$text_size)),
+                  range = settings$y_limits
                 ),
                 zaxis = list(
-                  title = list(text = final_z_lab, font = list(size = text_size)),
-                  range = z_limits
+                  title = list(text = final_z_lab, font = list(size = settings$text_size)),
+                  range = settings$z_limits
                 )
               ),
-              showlegend = show_legend
+              showlegend = settings$show_legend
             )
         } else {
           # For 2D contour plots
           private$.plot = private$.plot %>%
             plotly::layout(
-              title = list(text = final_title, font = list(size = title_size)),
+              title = list(text = final_title, font = list(size = settings$title_size)),
               xaxis = list(
-                title = list(text = final_x_lab, font = list(size = text_size)),
-                range = x_limits
+                title = list(text = final_x_lab, font = list(size = settings$text_size)),
+                range = settings$x_limits
               ),
               yaxis = list(
-                title = list(text = final_y_lab, font = list(size = text_size)),
-                range = y_limits
+                title = list(text = final_y_lab, font = list(size = settings$text_size)),
+                range = settings$y_limits
               ),
-              showlegend = show_legend
+              showlegend = settings$show_legend
             )
         }
       }
       
       # Apply additional layout options if provided
-      if (!is.null(layout)) {
-        private$.plot = do.call(plotly::layout, c(list(private$.plot), layout))
+      if (!is.null(settings$layout)) {
+        private$.plot = do.call(plotly::layout, c(list(private$.plot), settings$layout))
       }
       
       # Apply scene options if provided (only for surface plots)
-      if (!is.null(scene) && private$.layer_primary == "surface") {
-        private$.plot = private$.plot %>% plotly::layout(scene = scene)
+      if (!is.null(settings$scene) && private$.layer_primary == "surface") {
+        private$.plot = private$.plot %>% plotly::layout(scene = settings$scene)
       }
       
       # Add points from add_points() method
@@ -491,6 +434,9 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
 
     # @field .freeze_plot (`logical(1)`) Indicator whether to freeze saving the plot elements.
     .freeze_plot = FALSE,
+    
+    # @field .surface_plot_settings (`list`) Store VisualizerSurface-specific plot settings
+    .surface_plot_settings = list(),
     
     # Initialize default surface plot (called automatically by plot())
     .init_default_plot = function() {

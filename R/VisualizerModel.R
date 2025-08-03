@@ -169,101 +169,12 @@ VisualizerModel = R6::R6Class("VisualizerModel",
     },
 
     #' @description
-    #' Create and return the plot with model-specific features.
-    #' @param text_size (`numeric(1)`)\cr
-    #'   Base text size for plot elements. Default is 11.
-    #' @param title_size (`numeric(1)`)\cr
-    #'   Title text size. If NULL, defaults to text_size + 2.
-    #' @param theme (`character(1)`)\cr
-    #'   ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "minimal".
-    #' @param background (`character(1)`)\cr
-    #'   Background color. Default is "white".
-    #' @param color_palette (`character(1)`)\cr
-    #'   Color palette for the fill scale. One of "viridis", "plasma", "grayscale". Default is "viridis".
-    #' @param plot_title (`character(1)`)\cr
-    #'   Custom plot title. If NULL, uses default title.
-    #' @param plot_subtitle (`character(1)`)\cr
-    #'   Plot subtitle. Default is NULL.
-    #' @param show_title (`logical(1)`)\cr
-    #'   Whether to show the plot title. Default is TRUE.
-    #' @param x_lab (`character(1)`)\cr
-    #'   Custom x-axis label. If NULL, uses feature name.
-    #' @param y_lab (`character(1)`)\cr
-    #'   Custom y-axis label. If NULL, uses target name.
-    #' @param x_limits (`numeric(2)`)\cr
-    #'   X-axis limits as c(min, max). If NULL, uses default limits.
-    #' @param y_limits (`numeric(2)`)\cr
-    #'   Y-axis limits as c(min, max). If NULL, uses default limits.
-    #' @param show_grid (`logical(1)`)\cr
-    #'   Whether to show grid lines. Default is TRUE.
-    #' @param grid_color (`character(1)`)\cr
-    #'   Grid line color. Default is "gray90".
-    #' @param show_legend (`logical(1)`)\cr
-    #'   Whether to show the legend. Default is TRUE.
-    #' @param legend_position (`character(1)`)\cr
-    #'   Legend position: "top", "right", "bottom", "left", "none". Default is "right".
-    #' @param legend_title (`character(1)`)\cr
-    #'   Custom legend title. If NULL, uses default.
-    #' @param ... Additional arguments (currently unused).
+    #' Create and return the ggplot2 plot with model-specific layers.
+    #' @param ... Additional arguments passed to the parent plot method.
     #' @return A ggplot2 object.
-    plot = function(text_size = 11, title_size = NULL, theme = "minimal", background = "white",
-                   color_palette = "viridis", plot_title = NULL, plot_subtitle = NULL, 
-                   show_title = TRUE, x_lab = NULL, y_lab = NULL, x_limits = NULL, 
-                   y_limits = NULL, show_grid = TRUE, grid_color = "gray90", 
-                   show_legend = TRUE, legend_position = "right", legend_title = NULL, ...) {
-      
-      # Validate arguments
-      checkmate::assert_number(text_size, lower = 0)
-      checkmate::assert_number(title_size, lower = 0, null.ok = TRUE)
-      checkmate::assert_choice(theme, c("minimal", "bw", "classic", "gray", "light", "dark", "void"))
-      checkmate::assert_string(background)
-      checkmate::assert_choice(color_palette, c("viridis", "plasma", "grayscale"))
-      checkmate::assert_string(plot_title, null.ok = TRUE)
-      checkmate::assert_string(plot_subtitle, null.ok = TRUE)
-      checkmate::assert_flag(show_title)
-      checkmate::assert_string(x_lab, null.ok = TRUE)
-      checkmate::assert_string(y_lab, null.ok = TRUE)
-      checkmate::assert_numeric(x_limits, len = 2, null.ok = TRUE)
-      checkmate::assert_numeric(y_limits, len = 2, null.ok = TRUE)
-      checkmate::assert_flag(show_grid)
-      checkmate::assert_string(grid_color)
-      checkmate::assert_flag(show_legend)
-      checkmate::assert_choice(legend_position, c("top", "right", "bottom", "left", "none"))
-      checkmate::assert_string(legend_title, null.ok = TRUE)
-      
-      # Set title size default
-      if (is.null(title_size)) {
-        title_size = text_size + 2
-      }
-      
-      # Store plot settings for layer resolution
-      private$.plot_settings = list(
-        text_size = text_size,
-        title_size = title_size,
-        theme = theme,
-        background = background,
-        color_palette = color_palette,
-        plot_title = plot_title,
-        plot_subtitle = plot_subtitle,
-        show_title = show_title,
-        x_lab = x_lab,
-        y_lab = y_lab,
-        x_limits = x_limits,
-        y_limits = y_limits,
-        show_grid = show_grid,
-        grid_color = grid_color,
-        show_legend = show_legend,
-        legend_position = legend_position,
-        legend_title = legend_title,
-        ...
-      )
-      
-      # Call parent plot method to store settings
-      super$plot(text_size = text_size, title_size = title_size, theme = theme, background = background,
-                 color_palette = color_palette, plot_title = plot_title, plot_subtitle = plot_subtitle,
-                 x_lab = x_lab, y_lab = y_lab, x_limits = x_limits, y_limits = y_limits,
-                 show_grid = show_grid, grid_color = grid_color, show_legend = show_legend,
-                 legend_position = legend_position, legend_title = legend_title, show_title = show_title)
+    plot = function(...) {
+      # Call parent plot method for validation and settings storage
+      super$plot(...)
       
       # Initialize the base plot based on dimensionality
       if (private$.dimensionality == "1d") {

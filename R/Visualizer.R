@@ -73,7 +73,26 @@ Visualizer = R6::R6Class("Visualizer",
                     plot_title = NULL, plot_subtitle = NULL, x_lab = NULL, y_lab = NULL, z_lab = NULL,
                     x_limits = NULL, y_limits = NULL, z_limits = NULL, show_grid = TRUE, grid_color = "gray90",
                     show_legend = TRUE, legend_position = "right", legend_title = NULL, show_title = TRUE) {
-      #TODO: checkmate
+      # Validate common parameters
+      checkmate::assert_number(text_size, lower = 1)
+      checkmate::assert_number(title_size, lower = 1, null.ok = TRUE)
+      checkmate::assert_choice(theme, choices = c("minimal", "bw", "classic", "gray", "light", "dark", "void"))
+      checkmate::assert_string(background)
+      checkmate::assert_choice(color_palette, choices = c("viridis", "plasma", "grayscale"))
+      checkmate::assert_string(plot_title, null.ok = TRUE)
+      checkmate::assert_string(plot_subtitle, null.ok = TRUE)
+      checkmate::assert_string(x_lab, null.ok = TRUE)
+      checkmate::assert_string(y_lab, null.ok = TRUE)
+      checkmate::assert_string(z_lab, null.ok = TRUE)
+      checkmate::assert_numeric(x_limits, len = 2, null.ok = TRUE)
+      checkmate::assert_numeric(y_limits, len = 2, null.ok = TRUE)
+      checkmate::assert_numeric(z_limits, len = 2, null.ok = TRUE)
+      checkmate::assert_flag(show_grid)
+      checkmate::assert_string(grid_color)
+      checkmate::assert_flag(show_legend)
+      checkmate::assert_choice(legend_position, choices = c("top", "right", "bottom", "left", "none"))
+      checkmate::assert_string(legend_title, null.ok = TRUE)
+      checkmate::assert_flag(show_title)
       
       # Store plot settings for layer resolution
       private$.plot_settings = list(
@@ -663,7 +682,6 @@ Visualizer = R6::R6Class("Visualizer",
     },
 
     # Apply theme and styling to ggplot2 object
-    #TODO: should not be private??
     apply_ggplot_theme = function(plot_obj, text_size = 11, title_size = NULL, theme = "minimal", 
                                   background = "white", show_grid = TRUE, grid_color = "gray90") {
       # Set title size

@@ -160,14 +160,21 @@ curve for the positive class (`"y1"`), the negative class (`"y0"`), or
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{VisualizerLossFuns$plot(
   text_size = NULL,
+  title_size = NULL,
   theme = NULL,
+  background = "white",
   color_palette = "viridis",
+  flatten = FALSE,
+  layout = NULL,
+  scene = NULL,
   plot_title = NULL,
   plot_subtitle = NULL,
   x_lab = NULL,
   y_lab = NULL,
+  z_lab = NULL,
   x_limits = NULL,
   y_limits = NULL,
+  z_limits = NULL,
   show_grid = TRUE,
   grid_color = "gray90",
   show_legend = TRUE,
@@ -183,12 +190,27 @@ curve for the positive class (`"y1"`), the negative class (`"y0"`), or
 \item{\code{text_size}}{(`numeric(1)`)\cr
 Base text size for plot elements. Default is 11.}
 
+\item{\code{title_size}}{(`numeric(1)`)\cr
+Title text size. If NULL, defaults to text_size + 2.}
+
 \item{\code{theme}}{(`character(1)`)\cr
 ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light",
 "dark", "void". Default is "bw".}
 
+\item{\code{background}}{(`character(1)`)\cr
+Background color. Default is "white".}
+
 \item{\code{color_palette}}{(`character(1)`)\cr
 Color palette for visualizations. One of "viridis", "plasma", "grayscale". Default is "viridis".}
+
+\item{\code{flatten}}{(`logical(1)`)\cr
+For surface visualizers: if TRUE, display as 2D contour plot. Ignored for loss function visualizers. Default is FALSE.}
+
+\item{\code{layout}}{(`list()`)\cr
+For surface visualizers: layout options. Ignored for loss function visualizers. Default is NULL.}
+
+\item{\code{scene}}{(`list()`)\cr
+For surface visualizers: scene options for 3D plots. Ignored for loss function visualizers. Default is NULL.}
 
 \item{\code{plot_title}}{(`character(1)`)\cr
 Main plot title. If NULL, uses the visualizer's default title. Default is NULL.}
@@ -202,11 +224,17 @@ X-axis label. If NULL, uses the visualizer's default label. Default is NULL.}
 \item{\code{y_lab}}{(`character(1)`)\cr
 Y-axis label. If NULL, uses the visualizer's default label. Default is NULL.}
 
+\item{\code{z_lab}}{(`character(1)`)\cr
+Z-axis label (for surface plots). If NULL, uses the visualizer's default label. Default is NULL.}
+
 \item{\code{x_limits}}{(`numeric(2)`)\cr
 X-axis limits as c(min, max). If NULL, uses automatic limits. Default is NULL.}
 
 \item{\code{y_limits}}{(`numeric(2)`)\cr
 Y-axis limits as c(min, max). If NULL, uses automatic limits. Default is NULL.}
+
+\item{\code{z_limits}}{(`numeric(2)`)\cr
+Z-axis limits as c(min, max) (for surface plots). If NULL, uses automatic limits. Default is NULL.}
 
 \item{\code{show_grid}}{(`logical(1)`)\cr
 Whether to show axis grid lines. Default is TRUE.}

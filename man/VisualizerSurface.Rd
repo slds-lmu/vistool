@@ -343,7 +343,10 @@ Return the plot and hence plot it or do further processing.
   x_limits = NULL,
   y_limits = NULL,
   z_limits = NULL,
+  show_grid = TRUE,
+  grid_color = "gray90",
   show_legend = TRUE,
+  legend_position = "right",
   legend_title = NULL,
   show_title = TRUE
 )}\if{html}{\out{</div>}}
@@ -404,8 +407,17 @@ Y-axis limits as c(min, max). If NULL, uses automatic limits. Default is NULL.}
 \item{\code{z_limits}}{(`numeric(2)`)\cr
 Z-axis limits as c(min, max) (for surface plots). If NULL, uses automatic limits. Default is NULL.}
 
+\item{\code{show_grid}}{(`logical(1)`)\cr
+Whether to show axis grid lines. Default is TRUE.}
+
+\item{\code{grid_color}}{(`character(1)`)\cr
+Color of grid lines. Default is "gray90".}
+
 \item{\code{show_legend}}{(`logical(1)`)\cr
 Whether to show the legend. Default is TRUE.}
+
+\item{\code{legend_position}}{(`character(1)`)\cr
+Position of the legend. One of "top", "right", "bottom", "left", "none". Default is "right".}
 
 \item{\code{legend_title}}{(`character(1)`)\cr
 Title for the legend. If NULL, uses default based on visualizer type. Default is NULL.}

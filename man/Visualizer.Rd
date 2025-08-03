@@ -79,6 +79,9 @@ This method should be called by all child classes via `super$plot(...)`.
   theme = "minimal",
   background = "white",
   color_palette = "viridis",
+  flatten = FALSE,
+  layout = NULL,
+  scene = NULL,
   plot_title = NULL,
   plot_subtitle = NULL,
   x_lab = NULL,
@@ -113,6 +116,16 @@ Background color for the plot. Default is "white".}
 
 \item{\code{color_palette}}{(`character(1)`)\cr
 Default color palette to use. One of "viridis", "plasma", "grayscale". Default is "viridis".}
+
+\item{\code{flatten}}{(`logical(1)`)\cr
+For surface visualizers: if TRUE, display as 2D contour plot. If FALSE, display as 3D surface plot. 
+Ignored by other visualizer types. Default is FALSE.}
+
+\item{\code{layout}}{(`list()`)\cr
+For surface visualizers: layout options passed to `plotly::layout()`. Ignored by other visualizer types. Default is NULL.}
+
+\item{\code{scene}}{(`list()`)\cr
+For surface visualizers: scene options for 3D plots. Ignored by other visualizer types. Default is NULL.}
 
 \item{\code{plot_title}}{(`character(1)`)\cr
 Main plot title. If NULL, uses the visualizer's default title. Default is NULL.}
