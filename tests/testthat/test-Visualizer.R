@@ -40,9 +40,14 @@ test_that("Unified save method works for all visualizers", {
 })
 
 test_that("Base Visualizer class methods work correctly", {
-  # Test that the base class cannot be instantiated directly for plot
+  # Test that the base class plot method works (sets up plot settings and returns self)
   base_vis = Visualizer$new()
-  expect_error(base_vis$plot(), "Abstract method 'plot' must be implemented by subclass")
+  result = base_vis$plot()
+  expect_true(inherits(result, "Visualizer"))  # Returns self for method chaining
+  expect_identical(result, base_vis)  # Should return the same object
+  
+  # Test that plot settings are stored
+  expect_false(is.null(base_vis$.__enclos_env__$private$.plot_settings))
 
   # Test inheritance structure with unified visualizers
   obj_1d = obj("TF_gaussian1", xdim = 1)

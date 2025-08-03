@@ -102,9 +102,9 @@ The base `Visualizer` class provides:
 CAREFUL: Its `plot()` method needs to be called by all child classes (`VisualizerSurface`, `VisualizerModel`, ...) to store common customization parameters.
 
 #### 2. Child classes
-These implement the abstract `plot()` method from the base `Visualizer` class and methods specific for that type/dimension (e.g., `add_contours()` for all `VisualizerSurface` classes), they inherit from `Visualizer`.
+These extend the `plot()` method from the base `Visualizer` class and add methods specific for that type (e.g., `add_contours()` for all `VisualizerSurface` classes, `add_optimization_trace` for `Visualizer*Obj`), they inherit from `Visualizer` or `VisualizerSurface`.
 
-`VisualizerLossFuns`, `VisualizerModel`, `VisualizerObj`, `VisualizerSurfaceModel`, `VisualizerSurfaceObj` should all follow this patter:
+`VisualizerLossFuns`, `VisualizerModel`, `VisualizerObj`, `VisualizerSurfaceModel`, `VisualizerSurfaceObj` should all follow this pattern:
 
 ```r
 plot = function(...) {

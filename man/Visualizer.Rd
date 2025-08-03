@@ -20,6 +20,7 @@ Default settings for plotting and visual elements.}
 \itemize{
 \item \href{#method-Visualizer-initialize_defaults}{\code{Visualizer$initialize_defaults()}}
 \item \href{#method-Visualizer-plot}{\code{Visualizer$plot()}}
+\item \href{#method-Visualizer-resolve_layer_colors}{\code{Visualizer$resolve_layer_colors()}}
 \item \href{#method-Visualizer-save}{\code{Visualizer$save()}}
 \item \href{#method-Visualizer-add_points}{\code{Visualizer$add_points()}}
 \item \href{#method-Visualizer-clone}{\code{Visualizer$clone()}}
@@ -69,7 +70,8 @@ Default point size. Default is 2.}
 \if{html}{\out{<a id="method-Visualizer-plot"></a>}}
 \if{latex}{\out{\hypertarget{method-Visualizer-plot}{}}}
 \subsection{Method \code{plot()}}{
-Abstract method to be implemented by subclasses.
+Base plot method that sets up common plot settings and resolves layer colors.
+This method should be called by all child classes via `super$plot(...)`.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Visualizer$plot(
   text_size = 11,
@@ -157,8 +159,19 @@ Indicator whether to show the title of the plot.}
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-The plot object.
+Invisible self for method chaining (child classes handle actual plot creation).
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Visualizer-resolve_layer_colors"></a>}}
+\if{latex}{\out{\hypertarget{method-Visualizer-resolve_layer_colors}{}}}
+\subsection{Method \code{resolve_layer_colors()}}{
+Resolve automatic color assignments in stored layers.
+This method should be called by child classes after rendering layers.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer$resolve_layer_colors()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Visualizer-save"></a>}}

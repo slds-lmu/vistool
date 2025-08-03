@@ -42,7 +42,8 @@ Visualizer = R6::R6Class("Visualizer",
     },
 
     #' @description
-    #' Abstract method to be implemented by subclasses.
+    #' Base plot method that sets up common plot settings and resolves layer colors.
+    #' This method should be called by all child classes via `super$plot(...)`.
     #' @param text_size (`numeric(1)`)\cr
     #'   Base text size for plot elements. Default is 11.
     #' @param title_size (`numeric(1)`)\cr
@@ -67,7 +68,7 @@ Visualizer = R6::R6Class("Visualizer",
     #' @template param_legend_position
     #' @template param_legend_title
     #' @template param_show_title
-    #' @return The plot object.
+    #' @return Invisible self for method chaining (child classes handle actual plot creation).
     plot = function(text_size = 11, title_size = NULL, theme = "minimal", background = "white", color_palette = "viridis", 
                     plot_title = NULL, plot_subtitle = NULL, x_lab = NULL, y_lab = NULL, z_lab = NULL,
                     x_limits = NULL, y_limits = NULL, z_limits = NULL, show_grid = TRUE, grid_color = "gray90",
@@ -97,11 +98,26 @@ Visualizer = R6::R6Class("Visualizer",
         show_title = show_title
       )
       
-      #TODO: should no longer be label abstract, but be called by child classes (super$plot())
-      # Resolve layer colors now that we have plot settings
-      private$resolve_layer_colors()
+      # Return self invisibly - child classes will handle the actual plot creation
+      return(invisible(self))
+    },
+
+    #' @description
+    #' Resolve automatic color assignments in stored layers.
+    #' This method should be called by child classes after rendering layers.
+    resolve_layer_colors = function() {
+      # Initialize layers_to_add if it doesn't exist
+      if (is.null(private$.layers_to_add)) {
+        private$.layers_to_add = list()
+      }
       
-      stop("Abstract method 'plot' must be implemented by subclass")
+      # Reset color index for consistent color assignment
+      private$.color_index = 1
+      
+      # Resolve colors in any stored layer specifications
+      private$resolve_all_layer_colors()
+      
+      return(invisible(self))
     },
 
     #' @description
@@ -529,20 +545,6 @@ Visualizer = R6::R6Class("Visualizer",
       return(rep(0, nrow(points_data)))
     },
 
-    # Resolve layer colors based on current plot settings
-    resolve_layer_colors = function() {
-      # Initialize layers_to_add if it doesn't exist
-      if (is.null(private$.layers_to_add)) {
-        private$.layers_to_add = list()
-      }
-      
-      # Reset color index for consistent color assignment
-      private$.color_index = 1
-      
-      # Resolve colors in any stored layer specifications
-      private$resolve_all_layer_colors()
-    },
-
     # Resolve colors in all stored layers
     resolve_all_layer_colors = function() {
       # Initialize layers_to_add if it doesn't exist
@@ -647,7 +649,6 @@ Visualizer = R6::R6Class("Visualizer",
       return(layers)
     },
 
-    #TODO: should not be private??
     # Initialize a base ggplot2 object (for 1D/2D visualizers)
     init_ggplot = function(data, x_col = "x", y_col = "y") {
       # Create base ggplot object

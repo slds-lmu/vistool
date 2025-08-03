@@ -360,7 +360,7 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
       
       #TODO: call parent instead
       # Resolve layer colors now that we have plot settings
-      private$resolve_layer_colors()
+      self$resolve_layer_colors()
       
       # Resolve colorscale if it's "auto"
       if (is.character(self$colorscale) && self$colorscale == "auto") {

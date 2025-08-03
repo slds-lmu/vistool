@@ -42,6 +42,7 @@ Learner used to train the model.}
 <ul>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="add_points"><a href='../../vistool/html/Visualizer.html#method-Visualizer-add_points'><code>vistool::Visualizer$add_points()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="initialize_defaults"><a href='../../vistool/html/Visualizer.html#method-Visualizer-initialize_defaults'><code>vistool::Visualizer$initialize_defaults()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="resolve_layer_colors"><a href='../../vistool/html/Visualizer.html#method-Visualizer-resolve_layer_colors'><code>vistool::Visualizer$resolve_layer_colors()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href='../../vistool/html/Visualizer.html#method-Visualizer-save'><code>vistool::Visualizer$save()</code></a></span></li>
 </ul>
 </details>

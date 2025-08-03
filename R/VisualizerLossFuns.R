@@ -246,7 +246,7 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
       )
       
       # Resolve layer colors now that we have plot settings
-      private$resolve_layer_colors()
+      self$resolve_layer_colors()
       
       # Render the plot
       return(private$render_plot())

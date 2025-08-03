@@ -258,19 +258,12 @@ VisualizerModel = R6::R6Class("VisualizerModel",
         ...
       )
       
-      # Call parent plot method to store settings and resolve layer colors
-      tryCatch({
-        super$plot(text_size = text_size, title_size = title_size, theme = theme, background = background,
-                   color_palette = color_palette, plot_title = plot_title, plot_subtitle = plot_subtitle,
-                   x_lab = x_lab, y_lab = y_lab, x_limits = x_limits, y_limits = y_limits,
-                   show_grid = show_grid, grid_color = grid_color, show_legend = show_legend,
-                   legend_position = legend_position, legend_title = legend_title, show_title = show_title)
-      }, error = function(e) {
-        # Expected error from abstract method - we just wanted the setup
-        if (!grepl("Abstract method", e$message)) {
-          stop(e)
-        }
-      })
+      # Call parent plot method to store settings
+      super$plot(text_size = text_size, title_size = title_size, theme = theme, background = background,
+                 color_palette = color_palette, plot_title = plot_title, plot_subtitle = plot_subtitle,
+                 x_lab = x_lab, y_lab = y_lab, x_limits = x_limits, y_limits = y_limits,
+                 show_grid = show_grid, grid_color = grid_color, show_legend = show_legend,
+                 legend_position = legend_position, legend_title = legend_title, show_title = show_title)
       
       # Initialize the base plot based on dimensionality
       if (private$.dimensionality == "1d") {
@@ -279,16 +272,11 @@ VisualizerModel = R6::R6Class("VisualizerModel",
         private$init_2d_plot()
       }
       
-      # Render stored layers in order
-      if (!is.null(private$.layers_to_add)) {
-        for (layer in private$.layers_to_add) {
-          if (layer$type == "training_data") {
-            private$render_training_data_layer(layer$spec)
-          } else if (layer$type == "boundary") {
-            private$render_boundary_layer(layer$spec)
-          }
-        }
-      }
+      # Render stored layers in the order they were added
+      private$render_all_layers()
+      
+      # Resolve layer colors after rendering
+      self$resolve_layer_colors()
       
       return(private$.plot)
     }
@@ -298,6 +286,24 @@ VisualizerModel = R6::R6Class("VisualizerModel",
     .dimensionality = NULL,    # "1d" or "2d"
     .data_structure = NULL,    # Unified data container
     .plot = NULL,              # The actual ggplot2 object
+    
+    # Render all stored layers in the order they were added
+    render_all_layers = function() {
+      if (is.null(private$.layers_to_add)) {
+        return()
+      }
+      
+      for (layer in private$.layers_to_add) {
+        if (layer$type == "training_data") {
+          private$render_training_data_layer(layer$spec)
+        } else if (layer$type == "boundary") {
+          private$render_boundary_layer(layer$spec)
+        } else if (layer$type == "points") {
+          # Handle points layer using the base class method
+          private$.plot = private$add_points_to_ggplot(private$.plot, private$.dimensionality)
+        }
+      }
+    },
     
     # Initialize 1D plot with function line
     init_1d_plot = function() {
