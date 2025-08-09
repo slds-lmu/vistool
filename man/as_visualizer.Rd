@@ -20,12 +20,6 @@ as_visualizer(
   input_type = "auto",
   y_curves = "both",
   learner = NULL,
-  default_color_palette = "viridis",
-  default_text_size = 11,
-  default_theme = "bw",
-  default_alpha = 0.8,
-  default_line_width = 1.2,
-  default_point_size = 2,
   ...
 )
 
@@ -41,12 +35,6 @@ as_visualizer(
   input_type = "auto",
   y_curves = "both",
   learner = NULL,
-  default_color_palette = "viridis",
-  default_text_size = 11,
-  default_theme = "bw",
-  default_alpha = 0.8,
-  default_line_width = 1.2,
-  default_point_size = 2,
   ...
 )
 
@@ -62,12 +50,6 @@ as_visualizer(
   input_type = "auto",
   y_curves = "both",
   learner = NULL,
-  default_color_palette = "viridis",
-  default_text_size = 11,
-  default_theme = "minimal",
-  default_alpha = 0.8,
-  default_line_width = 1.2,
-  default_point_size = 2,
   ...
 )
 
@@ -83,12 +65,6 @@ as_visualizer(
   input_type = "auto",
   y_curves = "both",
   learner = NULL,
-  default_color_palette = "viridis",
-  default_text_size = 11,
-  default_theme = "bw",
-  default_alpha = 0.8,
-  default_line_width = 1.2,
-  default_point_size = 2,
   ...
 )
 
@@ -104,12 +80,6 @@ as_visualizer(
   input_type = "auto",
   y_curves = "both",
   learner = NULL,
-  default_color_palette = "viridis",
-  default_text_size = 11,
-  default_theme = "minimal",
-  default_alpha = 0.8,
-  default_line_width = 1.2,
-  default_point_size = 2,
   ...
 )
 }
@@ -152,24 +122,6 @@ One of `"both"`, `"y1"`, or `"y0"`.}
 
 \item{learner}{(`mlr3::Learner`)\cr
 The learner to train the model with.}
-
-\item{default_color_palette}{(`character(1)`)\cr
-Default color palette for visualizations. One of "viridis", "plasma", "grayscale". Default is "viridis".}
-
-\item{default_text_size}{(`numeric(1)`)\cr
-Default base text size for plot elements. Default is 11.}
-
-\item{default_theme}{(`character(1)`)\cr
-Default ggplot2 theme. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "minimal".}
-
-\item{default_alpha}{(`numeric(1)`)\cr
-Default alpha transparency for visual elements. Default is 0.8.}
-
-\item{default_line_width}{(`numeric(1)`)\cr
-Default line width for traces and boundaries. Default is 1.2.}
-
-\item{default_point_size}{(`numeric(1)`)\cr
-Default point size for markers and training data. Default is 2.}
 
 \item{...}{(`any`)\cr
 Additional arguments.}

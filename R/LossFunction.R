@@ -56,7 +56,7 @@ LossFunction = R6::R6Class("LossFunction",
     initialize = function(id, label, task_type, fun,
                           input_default = "score",
                           input_supported = c("score")) {
-      self$id   = checkmate::assert_character(id)
+      self$id = checkmate::assert_character(id)
       self$label = checkmate::assert_character(label)
       self$task_type = checkmate::assert_choice(task_type, c("regr", "classif"))
 
@@ -69,7 +69,7 @@ LossFunction = R6::R6Class("LossFunction",
         stop("'input_supported' may only contain 'score' and/or 'probability'.")
       }
 
-      self$input_default   = input_default
+      self$input_default = input_default
       self$input_supported = unique(input_supported)
 
       # Handle function input - can be single function or named list
@@ -98,7 +98,7 @@ LossFunction = R6::R6Class("LossFunction",
     #' @return A function for the specified input type.
     get_fun = function(input_type = self$input_default) {
       checkmate::assert_choice(input_type, choices = self$input_supported)
-      
+
       if (is.function(self$fun)) {
         return(self$fun)
       } else {
@@ -130,10 +130,10 @@ dict_loss = R6::R6Class("DictionaryLoss", inherit = Dictionary, cloneable = FALS
 lss = function(.key, ...) {
   # Get the base loss function from dictionary
   base_loss = dict_loss$get(.key)
-  
+
   # Check if additional parameters were provided
   params = list(...)
-  
+
   if (length(params) == 0) {
     # No additional parameters, return the original loss function
     return(base_loss)
@@ -153,11 +153,11 @@ lss = function(.key, ...) {
         }
       })
     }
-    
+
     # Create parameter string for the label
     param_str = paste(names(params), params, sep = "=", collapse = ", ")
     new_label = paste0(base_loss$label, " (", param_str, ")")
-    
+
     # Create new LossFunction with custom parameters
     return(LossFunction$new(
       id = paste0(base_loss$id, "_custom"),
@@ -170,7 +170,8 @@ lss = function(.key, ...) {
   }
 }
 
-dict_loss$add("l2_se",
+dict_loss$add(
+  "l2_se",
   LossFunction$new("l2", "L2 Squared Error", "regr",
     function(r) (r)^2,
     input_default   = "score",
@@ -178,7 +179,8 @@ dict_loss$add("l2_se",
   )
 )
 
-dict_loss$add("l1_ae",
+dict_loss$add(
+  "l1_ae",
   LossFunction$new("l1", "L1 Absolute Error", "regr",
     function(r) abs(r),
     input_default   = "score",
@@ -186,18 +188,20 @@ dict_loss$add("l1_ae",
   )
 )
 
-dict_loss$add("huber",
+dict_loss$add(
+  "huber",
   LossFunction$new("huber", "Huber Loss", "regr",
     function(r, delta = 1) {
       a = abs(r)
       ifelse(a <= delta, 0.5 * a^2, delta * a - delta^2 / 2)
     },
-    input_default   = "score",
+    input_default = "score",
     input_supported = "score"
   )
 )
 
-dict_loss$add("log-cosh",
+dict_loss$add(
+  "log-cosh",
   LossFunction$new("logcosh", "Log-Cosh Loss", "regr",
     function(r) log(cosh(r)),
     input_default   = "score",
@@ -205,18 +209,20 @@ dict_loss$add("log-cosh",
   )
 )
 
-dict_loss$add("cross-entropy",
+dict_loss$add(
+  "cross-entropy",
   LossFunction$new("logloss", "Logistic Loss", "classif",
     fun = list(
       score = function(r) log(1 + exp(-r)),
       probability = function(pi) -log(pi)
     ),
-    input_default   = "score",
+    input_default = "score",
     input_supported = c("score", "probability")
   )
 )
 
-dict_loss$add("hinge",
+dict_loss$add(
+  "hinge",
   LossFunction$new("hinge", "Hinge Loss", "classif",
     function(r) pmax(1 - r, 0),
     input_default   = "score",
@@ -224,7 +230,8 @@ dict_loss$add("hinge",
   )
 )
 
-dict_loss$add("log-barrier",
+dict_loss$add(
+  "log-barrier",
   LossFunction$new("log-barrier", "Log-Barrier Loss", "regr",
     function(r, epsilon = 1) {
       abs_res = abs(r)
@@ -232,36 +239,40 @@ dict_loss$add("log-barrier",
       abs_res[abs_res <= epsilon] = -epsilon^2 * log(1 - (abs_res[abs_res <= epsilon] / epsilon)^2)
       abs_res
     },
-    input_default   = "score",
+    input_default = "score",
     input_supported = "score"
   )
 )
 
-dict_loss$add("epsilon-insensitive",
+dict_loss$add(
+  "epsilon-insensitive",
   LossFunction$new("epsilon-insensitive", "Epsilon-Insensitive Loss", "regr",
     function(r, epsilon = 1) ifelse(abs(r) > epsilon, abs(r) - epsilon, 0),
-    input_default   = "score",
+    input_default = "score",
     input_supported = "score"
   )
 )
 
-dict_loss$add("pinball",
+dict_loss$add(
+  "pinball",
   LossFunction$new("pinball", "Pinball Loss", "regr",
     function(r, quantile = 0.5) ifelse(r < 0, (1 - quantile) * (-r), quantile * r),
-    input_default   = "score",
+    input_default = "score",
     input_supported = "score"
   )
 )
 
-dict_loss$add("cauchy",
+dict_loss$add(
+  "cauchy",
   LossFunction$new("cauchy", "Cauchy Loss", "regr",
     function(r, epsilon = 1) 0.5 * epsilon^2 * log(1 + (r / epsilon)^2),
-    input_default   = "score",
+    input_default = "score",
     input_supported = "score"
   )
 )
 
-dict_loss$add("brier",
+dict_loss$add(
+  "brier",
   LossFunction$new("brier", "Brier Score", "classif",
     function(pi) (1 - pi)^2,
     input_default   = "probability",

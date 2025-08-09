@@ -12,9 +12,21 @@
 #' @importFrom ggplot2 scale_fill_viridis_c scale_fill_gradient scale_color_viridis_c theme_minimal theme_bw ggsave
 #' @importFrom ggplot2 theme_classic theme_gray theme_light theme_dark theme_void element_text
 #' @importFrom plotly plot_ly add_trace add_surface layout save_image schema
+#' @importFrom data.table between
 #' @importFrom magrittr %>%
 #' @importFrom R6 R6Class
 #' @importFrom stats optimize
 #' @importFrom stringr str_pad
 #' @importFrom ggsci pal_npg
 NULL
+
+.onLoad = function(libname, pkgname) {
+  # Initialize default theme if not set
+  if (is.null(getOption("vistool.theme"))) {
+    options(vistool.theme = vistool_theme())
+  }
+}
+
+.onUnload = function(libpath) {
+  options(vistool.theme = NULL)
+}

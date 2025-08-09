@@ -41,7 +41,7 @@ test_that("VisualizerLossFuns with prediction data works", {
 
 test_that("VisualizerLossFuns input validation works", {
   loss1 = lss("l2_se") # regression
-  
+
   # Basic test - single loss function should work
   vis1 = VisualizerLossFuns$new(list(loss1))
   expect_s3_class(vis1, "VisualizerLossFuns")
@@ -49,12 +49,15 @@ test_that("VisualizerLossFuns input validation works", {
 
   # Try to create VisualizerLossFuns with mixed task types if possible
   classif_keys = dict_loss$keys()[sapply(dict_loss$keys(), function(k) {
-    tryCatch({
-      loss = dict_loss$get(k)
-      loss$task_type == "classif"
-    }, error = function(e) FALSE)
+    tryCatch(
+      {
+        loss = dict_loss$get(k)
+        loss$task_type == "classif"
+      },
+      error = function(e) FALSE
+    )
   })]
-  
+
   if (length(classif_keys) > 0) {
     loss2 = lss(classif_keys[1]) # classification
 
@@ -72,14 +75,9 @@ test_that("VisualizerLossFuns customization works", {
 
   vis = VisualizerLossFuns$new(list(loss1, loss2))
 
-  # Test direct color assignment and plot generation
-  vis$line_col = c("red", "blue")
-  
-  p = vis$plot()
+  # Test customization through plot parameters
+  p = vis$plot(line_col = c("red", "blue"))
   expect_s3_class(p, "ggplot")
-  
-  # Test that line_col field is properly set
-  expect_equal(vis$line_col, c("red", "blue"))
 })
 
 test_that("VisualizerLossFuns single loss function works", {
@@ -90,9 +88,9 @@ test_that("VisualizerLossFuns single loss function works", {
   p = vis$plot()
   expect_s3_class(p, "ggplot")
 
-  # Check labels
-  expect_equal(vis$lab_x, expression(y - f)) # Regression
-  expect_equal(vis$lab_y, "Loss")
+  # Test that the task_type and input_type are correctly set
+  expect_equal(vis$task_type, "regr")
+  expect_equal(vis$input_type, "score")
 })
 
 test_that("VisualizerLossFuns with classification task works", {
@@ -112,9 +110,9 @@ test_that("VisualizerLossFuns with classification task works", {
       p = vis$plot()
       expect_s3_class(p, "ggplot")
 
-      # Check labels for classification with score input
-      expect_equal(vis$lab_x, expression(y * f)) # Classification with score input
-      expect_equal(vis$lab_y, "Loss")
+      # Test that the task_type and input_type are correctly set
+      expect_equal(vis$task_type, "classif")
+      expect_equal(vis$input_type, "score")
     }
   }
 })
@@ -134,10 +132,9 @@ test_that("VisualizerLossFuns with classification probability-based task works",
     p = vis$plot()
     expect_s3_class(p, "ggplot")
 
-    # Check labels for classification with probability input
-    expect_equal(vis$lab_x, expression(pi)) # Classification with probability input
-    expect_equal(vis$lab_y, "Loss")
-    expect_equal(vis$x_range, c(0, 1))
+    # Test that the task_type and input_type are correctly set
+    expect_equal(vis$task_type, "classif")
+    expect_equal(vis$input_type, "probability")
   }
 })
 
@@ -146,14 +143,13 @@ test_that("VisualizerLossFuns range setting works", {
 
   vis = VisualizerLossFuns$new(list(loss))
 
-  # Test default range
-  expect_equal(vis$x_range, c(-5, 5))
+  # Test plotting with custom x-axis limits
+  p1 = vis$plot(x_limits = c(-10, 10))
+  expect_s3_class(p1, "ggplot")
 
-  # Modify range
-  vis$x_range = c(-10, 10)
-
-  p = vis$plot()
-  expect_s3_class(p, "ggplot")
+  # Test plotting with default limits
+  p2 = vis$plot()
+  expect_s3_class(p2, "ggplot")
 })
 
 test_that("VisualizerLossFuns line styling works", {
@@ -162,11 +158,8 @@ test_that("VisualizerLossFuns line styling works", {
 
   vis = VisualizerLossFuns$new(list(loss1, loss2))
 
-  # Customize line properties
-  vis$line_width = c(1, 2)
-  vis$line_type = c("solid", "dashed")
-
-  p = vis$plot()
+  # Test customization through plot parameters
+  p = vis$plot(line_width = c(1, 2), line_type = c("solid", "dashed"))
   expect_s3_class(p, "ggplot")
 })
 

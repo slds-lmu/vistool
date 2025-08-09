@@ -12,7 +12,7 @@ An object of class \code{list} of length 7.
 }
 \description{
 Unified color management system for consistent colors across
-ggplot2 and plotly visualizations. Supports both discrete colors 
+ggplot2 and plotly visualizations. Supports both discrete colors
 (for points, traces, lines) and continuous colorscales (for surfaces).
 }
 \keyword{internal}
