@@ -19,11 +19,11 @@ test_that("plot customization parameters work for Visualizer1D", {
   p3 = vis$plot(x_limits = c(-3, 3), y_limits = c(0, 10))
   expect_s3_class(p3, "ggplot")
 
-  # Test grid customization
-  p4 = vis$plot(show_grid = FALSE)
+  # Test grid customization via theme
+  p4 = vis$plot(theme = list(show_grid = FALSE))
   expect_s3_class(p4, "ggplot")
 
-  p5 = vis$plot(show_grid = TRUE, grid_color = "red")
+  p5 = vis$plot(theme = list(show_grid = TRUE, grid_color = "red"))
   expect_s3_class(p5, "ggplot")
 
   # Test legend customization
@@ -59,8 +59,8 @@ test_that("plot customization parameters work for Visualizer2D", {
   p4 = vis$plot(legend_title = "Function Value", legend_position = "bottom")
   expect_s3_class(p4, "ggplot")
 
-  # Test grid customization
-  p5 = vis$plot(show_grid = FALSE)
+  # Test grid customization via theme
+  p5 = vis$plot(theme = list(show_grid = FALSE))
   expect_s3_class(p5, "ggplot")
 })
 
@@ -117,8 +117,8 @@ test_that("plot customization parameters work for VisualizerLossFuns", {
   p4 = vis$plot(legend_position = "top", show_legend = TRUE)
   expect_s3_class(p4, "ggplot")
 
-  # Test grid customization
-  p5 = vis$plot(show_grid = FALSE)
+  # Test grid customization via theme
+  p5 = vis$plot(theme = list(show_grid = FALSE))
   expect_s3_class(p5, "ggplot")
 })
 
@@ -133,11 +133,9 @@ test_that("plot customization parameter validation works", {
   # Test invalid axis limits (wrong length)
   expect_error(vis$plot(x_limits = c(1, 2, 3)))
 
-  # Test invalid grid color (non-string)
-  expect_error(vis$plot(grid_color = 123))
-
-  # Test invalid show_grid (non-logical)
-  expect_error(vis$plot(show_grid = "yes"))
+  # Test invalid theme parameters (grid color and show_grid should be in theme)
+  expect_error(vis$plot(theme = list(grid_color = 123))) # non-string grid_color
+  expect_error(vis$plot(theme = list(show_grid = "yes"))) # non-logical show_grid
 
   # Test invalid show_legend (non-logical)
   expect_error(vis$plot(show_legend = "true"))
@@ -154,7 +152,7 @@ test_that("parameter inheritance works in specialized visualizer classes", {
   vis_model = as_visualizer(task, learner = learner, type = "1d")
 
   # Test that custom parameters are passed through
-  p1 = vis_model$plot(plot_title = "Model Plot", x_lab = "Weight", show_grid = FALSE)
+  p1 = vis_model$plot(plot_title = "Model Plot", x_lab = "Weight", theme = list(show_grid = FALSE))
   expect_s3_class(p1, "ggplot")
   expect_true(grepl("Model Plot", p1$labels$title))
   expect_equal(p1$labels$x, "Weight")

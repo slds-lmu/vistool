@@ -62,7 +62,7 @@ test_that("plot() methods work without parameters", {
   p2 = vis_model$plot()
   expect_s3_class(p2, "ggplot")
 
-  # Test VisualizerLossFuns backward compatibility
+  # Test VisualizerLossFuns
   loss = lss("l2_se")
   vis_loss = VisualizerLossFuns$new(list(loss))
   p3 = vis_loss$plot()

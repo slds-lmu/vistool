@@ -29,11 +29,11 @@ Most of this section is a placeholder and will be expanded in future versions.
 
 ## Surface Visualization Options
 
-You can customize the appearance directly when running `plot()`:
+You can customize the appearance using the theme system:
 
 ```{r, out.width='100%', out.height='700px'}
 viz = as_visualizer(obj("TF_franke"), type = "surface")
-viz$plot(color_palette = "grayscale")
+viz$plot(theme = list(palette = "grayscale"))
 ```
 
 The `add_contours()` method allows you to add custom contour lines to the surface:
@@ -45,7 +45,7 @@ ssize = (lupper - llower) / 10
 
 viz$add_contours(contours = list(
   y = list(show = TRUE, start = llower[2], end = lupper[2], size = ssize[2], color = "red")
-))$plot(color_palette = "grayscale")
+))$plot(theme = list(palette = "grayscale"))
 ```
 
 ## Setting the layout and scene
@@ -84,7 +84,8 @@ viz$plot()
 
 ```{r, out.width='100%', out.height='700px'}
 obj = obj("TF_banana")
-viz = as_visualizer(obj, type = "surface", opacity = 0.5)
+viz = as_visualizer(obj, type = "surface")
+viz$set_theme(vistool_theme(alpha = 0.4))
 p = viz$plot()
 class(p)
 

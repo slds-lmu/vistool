@@ -39,16 +39,11 @@ Visualizer = R6::R6Class("Visualizer",
     #' @template param_legend_position
     #' @template param_legend_title
     #' @template param_show_title
-    #' @param show_grid (`logical(1)`)\cr
-    #'   Whether to show grid lines. If NULL, uses theme default.
-    #' @param grid_color (`character(1)`)\cr
-    #'   Color of grid lines. If NULL, uses theme default.
     #' @return Invisible self for method chaining (child classes handle actual plot creation).
     plot = function(theme = NULL,
                     plot_title = NULL, plot_subtitle = NULL, x_lab = NULL, y_lab = NULL, z_lab = NULL,
                     x_limits = NULL, y_limits = NULL, z_limits = NULL,
-                    show_legend = TRUE, legend_position = "right", legend_title = NULL, show_title = TRUE,
-                    show_grid = NULL, grid_color = NULL) {
+                    show_legend = TRUE, legend_position = "right", legend_title = NULL, show_title = TRUE) {
       # Validate and store render params
       checkmate::assert_string(plot_title, null.ok = TRUE)
       checkmate::assert_string(plot_subtitle, null.ok = TRUE)
@@ -63,16 +58,6 @@ Visualizer = R6::R6Class("Visualizer",
       checkmate::assert_string(legend_title, null.ok = TRUE)
       checkmate::assert_flag(show_title)
       if (!is.null(theme)) assert_vistool_theme(theme)
-      # Backward-compat: allow passing show_grid/grid_color directly to plot(); merge into theme override
-      if (!is.null(show_grid) || !is.null(grid_color)) {
-        checkmate::assert_flag(show_grid, null.ok = TRUE)
-        if (!is.null(grid_color)) checkmate::assert_string(grid_color)
-        theme_extra = list()
-        if (!is.null(show_grid)) theme_extra$show_grid = show_grid
-        if (!is.null(grid_color)) theme_extra$grid_color = grid_color
-        theme_base = if (is.null(theme)) list() else theme
-        theme = merge_theme(theme_base, theme_extra)
-      }
 
       # Resolve effective theme and store render params
       base = get_pkg_theme_default()

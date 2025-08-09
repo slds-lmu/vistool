@@ -143,8 +143,8 @@ keys = tab[list(2), key, on = "xdim"]
 
 visualizers = map(keys, function(key) {
   objective = obj(key)
-  vis = as_visualizer(objective, type = "surface", show_title = FALSE)
-  vis$plot(flatten = TRUE) %>%
+  vis = as_visualizer(objective, type = "surface")
+  vis$plot(flatten = TRUE, show_title = FALSE) %>%
     add_annotations(
       text = objective$label,
       x = 0.5,

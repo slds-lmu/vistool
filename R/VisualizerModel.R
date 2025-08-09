@@ -180,6 +180,9 @@ VisualizerModel = R6::R6Class("VisualizerModel",
       # Call parent plot method for validation and settings storage
       super$plot(...)
 
+      # Resolve layer colors before rendering
+      self$resolve_layer_colors()
+
       # Initialize the base plot based on dimensionality
       if (private$.dimensionality == "1d") {
         private$init_1d_plot()
@@ -189,9 +192,6 @@ VisualizerModel = R6::R6Class("VisualizerModel",
 
       # Render stored layers in the order they were added
       private$render_all_layers()
-
-      # Resolve layer colors after rendering
-      self$resolve_layer_colors()
 
       private$.last_plot = private$.plot
       return(private$.plot)

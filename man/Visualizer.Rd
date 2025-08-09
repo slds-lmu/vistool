@@ -69,9 +69,7 @@ This method should be called by all child classes via `super$plot(...)`.
   show_legend = TRUE,
   legend_position = "right",
   legend_title = NULL,
-  show_title = TRUE,
-  show_grid = NULL,
-  grid_color = NULL
+  show_title = TRUE
 )}\if{html}{\out{</div>}}
 }
 
@@ -116,12 +114,6 @@ Title for the legend. If NULL, uses default based on visualizer type. Default is
 
 \item{\code{show_title}}{(`logical(1)`)\cr
 Indicator whether to show the title of the plot.}
-
-\item{\code{show_grid}}{(`logical(1)`)\cr
-Whether to show grid lines. If NULL, uses theme default.}
-
-\item{\code{grid_color}}{(`character(1)`)\cr
-Color of grid lines. If NULL, uses theme default.}
 }
 \if{html}{\out{</div>}}
 }

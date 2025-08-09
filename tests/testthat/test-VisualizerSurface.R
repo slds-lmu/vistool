@@ -186,7 +186,7 @@ test_that("VisualizerSurface add_contours method works", {
   expect_s3_class(p, "plotly")
 })
 
-test_that("VisualizerSurface explicit init_layer_surface still works for backward compatibility", {
+test_that("VisualizerSurface explicit init_layer_surface works", {
   skip_if_not_installed("plotly")
 
   # Create simple data

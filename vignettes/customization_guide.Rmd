@@ -18,134 +18,200 @@ knitr::opts_chunk$set(
 )
 ```
 
-The three-step workflow,
-
-1. **Initialize** the Visualizer using `as_visualizer()`,
-2. **Add** visualization layers (e.g., contours, training_data, boundaries, optimization traces),
-3. **Plot** using `plot()` and optionally `save()` or `animate()`,
-
-offers consistent customization options across all visualization types.
-In particular, all visual elements support automatic color assignment using `color = "auto"`:
-
-- Colors are automatically assigned from a consistent discrete palette
-- Each visualizer tracks its color index to ensure distinct colors
-- Manual colors can still be specified using hex codes or named colors
-
-For convenience, three pre-defined color palettes are available:
-
-- **viridis** (default): Perceptually uniform, colorblind-friendly
-- **plasma**: High contrast alternative to viridis
-- **grayscale**: For monochrome plots
-
-## Global Settings (`plot()`)
-
-These parameters affect the entire plot appearance:
-
-```r
-plot(
-  # General settings
-  text_size = 11,            # Base text size for all elements
-  title_size = NULL,         # Title size (defaults to text_size + 2)
-  theme = "minimal",         # ggplot2 theme
-  background = "white",      # Background color
-  color_palette = "viridis", # Color palette for continuous scales
-  flatten = FALSE,           # Surface only: 2D vs 3D view
-  layout = NULL,             # plotly: custom layout options
-  scene = NULL,              # plotly: 3D scene settings
-  
-  # Title and Subtitle Customization
-  plot_title = NULL,         # Override plot title
-  plot_subtitle = NULL,      # Add subtitle to plot
-  show_title = TRUE,         # Show/hide plot title completely
-  
-  # Axis Customization
-  x_lab = NULL,              # Custom x-axis label
-  y_lab = NULL,              # Custom y-axis label  
-  z_lab = NULL,              # Custom z-axis label (surface plots)
-  x_limits = NULL,           # X-axis limits: c(min, max)
-  y_limits = NULL,           # Y-axis limits: c(min, max)
-  z_limits = NULL,           # Z-axis limits: c(min, max) (surface plots)
-  show_grid = TRUE,          # Show/hide grid lines
-  grid_color = "gray90",     # Grid line color
-  
-  # Legend Customization
-  show_legend = TRUE,        # Show/hide legend
-  legend_position = "right", # "top", "right", "bottom", "left", "none"
-  legend_title = NULL        # Custom legend title
-)
+```{r, message=FALSE}
+library(vistool)
+library(mlr3)
+library(mlr3learners)
 ```
 
-## Layer-Specific Settings (in `add_*()` methods)
+The vistool package provides a flexible theme system that separates **what to plot** from **how to plot**. The three-step workflow:
+
+1. **Initialize** the Visualizer using `as_visualizer()` (computational setup only - the **what**),
+2. **Add** visualization layers with automatic color management,
+3. **Plot** using `plot()` with optional theme customization, and optionally `save()`,
+
+supports consistent customization across all visualization types with a clear precedence hierarchy.
+
+## Theme System Overview
+
+### Theme Precedence (Highest to Lowest)
+
+1. **Layer-specific style**: `add_points(color = "red", size = 3)`
+2. **Plot theme override**: `plot(theme = list(palette = "plasma"))`  
+3. **Instance theme**: `vis$set_theme(vistool_theme(...))`
+4. **Package default**: `options(vistool.theme = vistool_theme(...))`
+
+### Creating and Using Themes
+
+```{r, eval=FALSE}
+my_theme <- vistool_theme(
+  palette = "plasma",      # Color palette: "viridis", "plasma", "grayscale" 
+  text_size = 14,          # Base text size
+  theme = "bw",            # ggplot2 theme: "minimal", "bw", "classic", etc.
+  alpha = 0.7,             # Default transparency
+  line_width = 1.5,        # Default line width
+  point_size = 3,          # Default point size
+  legend_position = "top", # Legend position
+  show_grid = TRUE,        # Show grid lines
+  grid_color = "gray95",   # Grid color
+  background = "white"     # Background color
+)
+
+obj <- obj("TF_branin")
+vis <- as_visualizer(obj, type = "2d")
+
+# setting the theme
+vis$set_theme(my_theme)
+
+# adding layers
+vis$add_contours(color = "auto")
+
+# override the theme for specific plots
+vis$plot(theme = list(text_size = 12, alpha = 0.9))
+```
+
+## Layer-Specific Customization
+
+All `add_*()` methods support style parameters that override theme defaults:
 
 ### `add_points()`
-```r
-add_points(
+```{r, eval=FALSE}
+vis$add_points(
   points,                   # Point data
-  color = "auto",           # Auto-assign or specify color
-  size = 2,                 # Point size
-  shape = 19,               # Point shape (ggplot2) or "circle" (plotly)
-  alpha = 1,                # Transparency
+  color = "auto",           # "auto" uses theme palette, or specify color
+  size = NULL,              # Point size (NULL uses theme default)
+  shape = 19,               # Point shape 
+  alpha = NULL,             # Transparency (NULL uses theme default)
   annotations = NULL,       # Text labels for points
   annotation_size = NULL,   # Size of annotations
   ordered = FALSE,          # Draw arrows between consecutive points
-  arrow_color = NULL,       # Color of arrows (defaults to point color)
-  arrow_size = 0.3          # Size/length of arrows
+  arrow_color = NULL,       # Color of arrows
+  arrow_size = 0.3          # Size of arrows
 )
 ```
 
 ### `add_training_data()`
-```r
-add_training_data(
-  color = "auto",          # Auto-assign color
-  size = 2,                # Point size
+```{r, eval=FALSE}
+vis$add_training_data(
+  color = "auto",          # Auto-assign from theme palette
+  size = NULL,             # Uses theme$point_size if NULL
   shape = 19,              # Point shape
-  alpha = 1,               # Transparency
+  alpha = NULL,            # Uses theme$alpha if NULL
   show_labels = FALSE,     # Show data point indices
-  label_size = NULL        # Size of labels
-)
-```
-
-### `add_boundary()`
-```r
-add_boundary(
-  values = NULL,           # Boundary values (auto-determined if NULL)
-  color = "black",         # Line color
-  line_width = 1.5,        # Line width
-  line_type = "solid",     # Line type: "solid", "dashed", "dotted", etc.
-  alpha = 0.8              # Transparency
+  label_size = NULL        # Label text size
 )
 ```
 
 ### `add_optimization_trace()`
-```r
-add_optimization_trace(
+```{r, eval=FALSE}
+vis$add_optimization_trace(
   optimizer,                # Optimizer object with trace data
-  line_color = "auto",      # Auto-assign line color
-  line_width = 1.2,         # Line width
-  line_type = "solid",      # Line type
+  line_color = "auto",      # Auto-assign from theme palette
+  line_width = NULL,        # Uses theme$line_width if NULL
+  line_type = "solid",      # Line type: "solid", "dashed", "dotted"
   marker_color = NULL,      # Marker color (defaults to line color)
-  marker_size = 3,          # Marker size
-  marker_shape = 16,        # Marker shape
+  marker_size = NULL,       # Uses theme$point_size if NULL
+  alpha = NULL,             # Uses theme$alpha if NULL
   show_start_end = TRUE,    # Highlight start/end points
-  start_marker_size = NULL, # Custom start marker size
-  end_marker_size = NULL,   # Custom end marker size
-  alpha = 0.8,              # Overall transparency
-  name = NULL,              # Trace name for legend
-  npoints = NULL,           # Limit number of points shown
-  npmax = NULL              # Alternative point limit
+  name = NULL               # Trace name for legend
 )
 ```
 
-## (Setting) Defaults at Initialization
-```r
-as_visualizer(
-  x,                       # Task, Objective, or LossFunction
-  ...,                     # Type-specific parameters
-  default_color_palette = "viridis",
-  default_text_size = 11,
-  default_theme = "minimal",
-  default_alpha = 0.8,
-  default_line_width = 1.2,
-  default_point_size = 2
+## Plot-Level Customization
+
+The `plot()` method accepts theme overrides and functional parameters:
+
+```{r, eval=FALSE}
+vis$plot(
+  # Theme override (merged with instance theme)
+  theme = list(
+    palette = "grayscale",     # Override palette for this plot
+    text_size = 16,            # Override text size
+    alpha = 0.5,               # Override default alpha
+    theme = "classic"          # Override ggplot2 theme
+  ),
+  
+  # Functional parameters (not part of theme)
+  plot_title = "My Plot",      # Custom title
+  plot_subtitle = "Subtitle",  # Add subtitle
+  x_lab = "X Variable",        # Custom axis labels
+  y_lab = "Y Variable",        
+  z_lab = "Z Variable",        # For surface plots
+  x_limits = c(-2, 2),         # Custom axis limits
+  y_limits = c(-1, 1),
+  z_limits = c(0, 100),        # For surface plots
+  show_legend = TRUE,          # Show/hide legend
+  legend_position = "bottom",  # Legend position
+  legend_title = "Legend",     # Custom legend title
+  show_title = TRUE            # Show/hide title
 )
+```
+
+## Automatic Color Management
+
+All visual elements support automatic color assignment using `color = "auto"`:
+
+- Colors are automatically assigned from the effective theme palette
+- Each visualizer tracks its color index to ensure distinct colors for multiple layers
+- The color index resets on each `plot()` call
+- Manual colors override automatic assignment
+
+```{r, eval=FALSE}
+# Example: Multiple traces with auto colors
+vis <- as_visualizer(obj("TF_branin"), type = "2d")
+vis$set_theme(vistool_theme(palette = "plasma"))
+
+vis$add_optimization_trace(optimizer1, line_color = "auto")  # Gets first color
+vis$add_optimization_trace(optimizer2, line_color = "auto")  # Gets second color
+vis$add_points(custom_points, color = "auto")               # Gets third color
+
+# Plot and colors will be consistent with plasma palette
+p <- vis$plot()
+```
+
+## Example: Complete Workflow
+
+```{r, out.width='100%', out.height='700px'}
+# 1. Create visualizer (computational setup only)
+task <- tsk("mtcars")$select(c("wt", "hp"))
+learner <- lrn("regr.lm")
+vis <- as_visualizer(task, learner = learner, n_points = 50, padding = 0.1)
+
+# 2. Set instance theme
+vis$set_theme(vistool_theme(
+  palette = "plasma",
+  text_size = 12,
+  theme = "bw",
+  alpha = 0.8
+))
+
+# 3. Add layers with automatic styling
+vis$add_training_data(color = "auto")  # Uses theme palette
+vis$add_boundary(color = "black")      # Manual override
+
+# 4. Plot with theme override for this render only
+vis$plot(theme = list(text_size = 14, legend_position = "top"))
+
+# 5. Save uses the cached plot for efficiency
+# vis$save("my_plot.png", width = 8, height = 6)
+```
+
+## Package-Level Defaults
+
+Set global defaults that apply to all new visualizers:
+
+```{r, eval=FALSE}
+# Set package default theme
+options(vistool.theme = vistool_theme(
+  palette = "plasma",
+  text_size = 12,
+  theme = "bw"
+))
+
+# All new visualizers will use this theme unless overridden
+vis1 <- as_visualizer(obj("TF_branin"))  # Uses plasma palette
+vis2 <- as_visualizer(obj("TF_gaussian1"))  # Also uses plasma palette
+
+# Instance themes still override package defaults
+vis1$set_theme(vistool_theme(palette = "grayscale"))  # Now uses grayscale
 ```
