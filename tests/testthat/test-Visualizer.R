@@ -46,9 +46,6 @@ test_that("Base Visualizer class methods work correctly", {
   expect_true(inherits(result, "Visualizer"))  # Returns self for method chaining
   expect_identical(result, base_vis)  # Should return the same object
   
-  # Test that plot settings are stored
-  expect_false(is.null(base_vis$.__enclos_env__$private$.plot_settings))
-
   # Test inheritance structure with unified visualizers
   obj_1d = obj("TF_gaussian1", xdim = 1)
   vis1d = as_visualizer(obj_1d, type = "1d")

@@ -196,8 +196,6 @@ test_that("VisualizerSurfaceObj custom contours parameter works", {
   )
   
   vis$init_layer_surface(
-    opacity = 1,
-    colorscale = list(c(0, 1), c("white", "black")),
     contours = custom_contours
   )
   

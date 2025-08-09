@@ -32,13 +32,7 @@ VisualizerSurfaceModel = R6::R6Class("VisualizerSurfaceModel",
     #' @template param_x2_limits
     #' @template param_padding
     #' @template param_n_points
-    #' @template param_opacity
-    #' @template param_colorscale
-    #' @template param_opacity
-    #' @template param_colorscale
-    #' @template param_show_title
-    initialize = function(task, learner, x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L,
-                          opacity = 0.8, colorscale = "auto", show_title = TRUE) {
+  initialize = function(task, learner, x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L) {
       self$task = mlr3::assert_task(task)
       self$learner = mlr3::assert_learner(learner, task = self$task)
       checkmate::assert_numeric(x1_limits, len = 2, null.ok = TRUE)
@@ -88,10 +82,7 @@ VisualizerSurfaceModel = R6::R6Class("VisualizerSurfaceModel",
         plot_lab = paste(self$learner$id, "on", self$task$id),
         x1_lab = self$task$feature_names[1],
         x2_lab = self$task$feature_names[2],
-        z_lab = self$task$target_names,
-        opacity = opacity,
-        colorscale = colorscale,
-        show_title = show_title
+        z_lab = self$task$target_names
       )
 
       return(invisible(self))
@@ -230,7 +221,7 @@ VisualizerSurfaceModel = R6::R6Class("VisualizerSurfaceModel",
           }
         }
       }
-      
+      private$.last_plot <- private$.plot
       return(private$.plot)
     }
   ),

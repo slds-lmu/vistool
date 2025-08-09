@@ -230,8 +230,7 @@ test_that("VisualizerSurface new workflow - direct plotting like ggplot2", {
   # Test with initial parameters
   vis2 = VisualizerSurface$new(
     grid = list(x1 = x1, x2 = x2),
-    zmat = z_matrix,
-    opacity = 0.5
+  zmat = z_matrix
   )
   
   # Add contours using new method

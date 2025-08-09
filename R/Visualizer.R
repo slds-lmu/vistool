@@ -9,51 +9,28 @@
 Visualizer = R6::R6Class("Visualizer",
   public = list(
 
-    #' @field defaults (`list`)\cr
-    #' Default settings for plotting and visual elements.
-    defaults = list(),
-
-    #' @description
-    #' Initialize default settings for the visualizer.
-    #' @param default_color_palette (`character(1)`)\cr
-    #'   Default color palette. Default is "viridis".
-    #' @param default_text_size (`numeric(1)`)\cr
-    #'   Default text size. Default is 11.
-    #' @param default_theme (`character(1)`)\cr
-    #'   Default theme. Default is "minimal".
-    #' @param default_alpha (`numeric(1)`)\cr
-    #'   Default alpha transparency. Default is 0.8.
-    #' @param default_line_width (`numeric(1)`)\cr
-    #'   Default line width. Default is 1.2.
-    #' @param default_point_size (`numeric(1)`)\cr
-    #'   Default point size. Default is 2.
-    initialize_defaults = function(default_color_palette = "viridis", default_text_size = 11,
-                                  default_theme = "minimal", default_alpha = 0.8,
-                                  default_line_width = 1.2, default_point_size = 2) {
-      self$defaults = list(
-        color_palette = default_color_palette,
-        text_size = default_text_size,
-        theme = default_theme,
-        alpha = default_alpha,
-        line_width = default_line_width,
-        point_size = default_point_size
-      )
+    #' @description Set the instance theme (partial override merged with package default)
+    #' @param theme (`list`) Partial theme created with vistool_theme() or a named list
+    #' @return Invisible self
+    set_theme = function(theme) {
+      assert_vistool_theme(theme)
+      private$.theme = merge_theme(get_pkg_theme_default(), theme)
       invisible(self)
+    },
+
+    #' @description Get the instance theme (merged with package default)
+    theme = function() {
+      {
+        inst <- if (is.null(private$.theme)) list() else private$.theme
+        merge_theme(get_pkg_theme_default(), inst)
+      }
     },
 
     #' @description
     #' Base plot method that sets up common plot settings and resolves layer colors.
     #' This method should be called by all child classes via `super$plot(...)`.
-    #' @param text_size (`numeric(1)`)\cr
-    #'   Base text size for plot elements. Default is 11.
-    #' @param title_size (`numeric(1)`)\cr
-    #'   Title text size. If NULL, defaults to text_size + 2.
-    #' @param theme (`character(1)`)\cr
-    #'   ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "minimal".
-    #' @param background (`character(1)`)\cr
-    #'   Background color for the plot. Default is "white".
-    #' @param color_palette (`character(1)`)\cr
-    #'   Default color palette to use. One of "viridis", "plasma", "grayscale". Default is "viridis".
+    #' @param theme (`list`)\cr
+    #'   Partial theme override for this render; see vistool_theme().
     #' @template param_plot_title
     #' @template param_plot_subtitle
     #' @template param_x_lab
@@ -62,23 +39,21 @@ Visualizer = R6::R6Class("Visualizer",
     #' @template param_x_limits
     #' @template param_y_limits
     #' @template param_z_limits
-    #' @template param_show_grid
-    #' @template param_grid_color
     #' @template param_show_legend
     #' @template param_legend_position
     #' @template param_legend_title
     #' @template param_show_title
+    #' @param show_grid (`logical(1)`)\cr
+    #'   Whether to show grid lines. If NULL, uses theme default.
+    #' @param grid_color (`character(1)`)\cr
+    #'   Color of grid lines. If NULL, uses theme default.
     #' @return Invisible self for method chaining (child classes handle actual plot creation).
-    plot = function(text_size = 11, title_size = NULL, theme = "minimal", background = "white", color_palette = "viridis", 
-                    plot_title = NULL, plot_subtitle = NULL, x_lab = NULL, y_lab = NULL, z_lab = NULL,
-                    x_limits = NULL, y_limits = NULL, z_limits = NULL, show_grid = TRUE, grid_color = "gray90",
-                    show_legend = TRUE, legend_position = "right", legend_title = NULL, show_title = TRUE) {
-      # Validate common parameters
-      checkmate::assert_number(text_size, lower = 1)
-      checkmate::assert_number(title_size, lower = 1, null.ok = TRUE)
-      checkmate::assert_choice(theme, choices = c("minimal", "bw", "classic", "gray", "light", "dark", "void"))
-      checkmate::assert_string(background)
-      checkmate::assert_choice(color_palette, choices = c("viridis", "plasma", "grayscale"))
+  plot = function(theme = NULL,
+          plot_title = NULL, plot_subtitle = NULL, x_lab = NULL, y_lab = NULL, z_lab = NULL,
+          x_limits = NULL, y_limits = NULL, z_limits = NULL,
+          show_legend = TRUE, legend_position = "right", legend_title = NULL, show_title = TRUE,
+          show_grid = NULL, grid_color = NULL) {
+      # Validate and store render params
       checkmate::assert_string(plot_title, null.ok = TRUE)
       checkmate::assert_string(plot_subtitle, null.ok = TRUE)
       checkmate::assert_string(x_lab, null.ok = TRUE)
@@ -87,20 +62,31 @@ Visualizer = R6::R6Class("Visualizer",
       checkmate::assert_numeric(x_limits, len = 2, null.ok = TRUE)
       checkmate::assert_numeric(y_limits, len = 2, null.ok = TRUE)
       checkmate::assert_numeric(z_limits, len = 2, null.ok = TRUE)
-      checkmate::assert_flag(show_grid)
-      checkmate::assert_string(grid_color)
       checkmate::assert_flag(show_legend)
       checkmate::assert_choice(legend_position, choices = c("top", "right", "bottom", "left", "none"))
       checkmate::assert_string(legend_title, null.ok = TRUE)
       checkmate::assert_flag(show_title)
+      if (!is.null(theme)) assert_vistool_theme(theme)
+      # Backward-compat: allow passing show_grid/grid_color directly to plot(); merge into theme override
+      if (!is.null(show_grid) || !is.null(grid_color)) {
+        checkmate::assert_flag(show_grid, null.ok = TRUE)
+        if (!is.null(grid_color)) checkmate::assert_string(grid_color)
+        theme_extra = list()
+        if (!is.null(show_grid)) theme_extra$show_grid = show_grid
+        if (!is.null(grid_color)) theme_extra$grid_color = grid_color
+  theme_base <- if (is.null(theme)) list() else theme
+  theme = merge_theme(theme_base, theme_extra)
+      }
       
-      # Store plot settings for layer resolution
-      private$.plot_settings = list(
-        text_size = text_size,
-        title_size = title_size,
-        theme = theme,
-        background = background,
-        color_palette = color_palette,
+      # Resolve effective theme and store render params
+  base = get_pkg_theme_default()
+  inst = if (is.null(private$.theme)) list() else private$.theme
+  eff = merge_theme(base, inst)
+  eff = merge_theme(eff, theme)
+  private$.effective_theme = eff
+  # Title size derived if needed
+  private$.effective_theme$title_size = if (is.null(eff$title_size)) (eff$text_size + 2) else eff$title_size
+      private$.render_params = list(
         plot_title = plot_title,
         plot_subtitle = plot_subtitle,
         x_lab = x_lab,
@@ -109,15 +95,12 @@ Visualizer = R6::R6Class("Visualizer",
         x_limits = x_limits,
         y_limits = y_limits,
         z_limits = z_limits,
-        show_grid = show_grid,
-        grid_color = grid_color,
         show_legend = show_legend,
         legend_position = legend_position,
         legend_title = legend_title,
         show_title = show_title
       )
       
-      # Return self invisibly - child classes will handle the actual plot creation
       return(invisible(self))
     },
 
@@ -156,8 +139,12 @@ Visualizer = R6::R6Class("Visualizer",
       checkmate::assert_number(height, null.ok = TRUE)
       checkmate::assert_number(dpi, lower = 1)
 
-      # Get the plot object
-      plot_obj = self$plot()
+      # Use cached last plot if available; otherwise render now
+      plot_obj = private$.last_plot
+      if (is.null(plot_obj)) {
+        # try to render via subclass plot() with current instance theme
+        plot_obj = tryCatch(self$plot(), error = function(e) NULL)
+      }
 
       # Check if it's a ggplot2 or plotly object and save accordingly
       if (inherits(plot_obj, "ggplot")) {
@@ -214,7 +201,10 @@ Visualizer = R6::R6Class("Visualizer",
 
     .layers_to_add = list(),  # General storage for all layer types
     .color_index = 1,  # Track next color index for auto assignment
-    .plot_settings = NULL,  # Store plot settings for layer resolution
+  .theme = NULL,          # Instance theme (partial)
+  .effective_theme = NULL, # per-render effective theme
+  .render_params = NULL,   # per-render non-style params
+  .last_plot = NULL,       # last built plot object
 
     # save a ggplot2 object
     save_ggplot = function(plot_obj, filename, width, height, dpi, ...) {
@@ -257,22 +247,25 @@ Visualizer = R6::R6Class("Visualizer",
 
       for (point_spec in points_layers) {
         points_data = private$prepare_points_data(point_spec$points, visualizer_type)
+  eff = if (is.null(private$.effective_theme)) get_pkg_theme_default() else private$.effective_theme
+  size = if (is.null(point_spec$size)) eff$point_size else point_spec$size
+  alpha = if (is.null(point_spec$alpha)) eff$alpha else point_spec$alpha
         
         # Add points layer
         plot_obj = plot_obj + ggplot2::geom_point(
           data = points_data,
           ggplot2::aes(x = x, y = y),
           color = point_spec$color,
-          size = point_spec$size,
+          size = size,
           shape = point_spec$shape,
-          alpha = point_spec$alpha,
+          alpha = alpha,
           inherit.aes = FALSE
         )
         
         # Add annotations if provided
         if (!is.null(point_spec$annotations)) {
           # Use annotation_size if provided, otherwise default to smaller text
-          ann_size = if (!is.null(point_spec$annotation_size)) point_spec$annotation_size else 3
+          ann_size = if (!is.null(point_spec$annotation_size)) point_spec$annotation_size else max(3, eff$text_size - 2)
           
           plot_obj = plot_obj + ggplot2::geom_text(
             data = cbind(points_data, label = point_spec$annotations),
@@ -337,7 +330,7 @@ Visualizer = R6::R6Class("Visualizer",
     },
 
     # Helper method to add points to plotly objects
-    add_points_to_plotly = function(plot_obj, visualizer_type = "surface") {
+  add_points_to_plotly = function(plot_obj, visualizer_type = "surface") {
       points_layers = private$get_layers_by_type("points")
       if (length(points_layers) == 0) {
         return(plot_obj)
@@ -345,6 +338,9 @@ Visualizer = R6::R6Class("Visualizer",
 
       for (point_spec in points_layers) {
         points_data = private$prepare_points_data(point_spec$points, visualizer_type)
+  eff = if (is.null(private$.effective_theme)) get_pkg_theme_default() else private$.effective_theme
+  size = if (is.null(point_spec$size)) eff$point_size else point_spec$size
+  alpha = if (is.null(point_spec$alpha)) eff$alpha else point_spec$alpha
         
         if (visualizer_type == "surface") {
           # For 3D surface plots, need z values
@@ -362,8 +358,8 @@ Visualizer = R6::R6Class("Visualizer",
             mode = "markers",
             marker = list(
               color = point_spec$color,
-              size = point_spec$size,
-              opacity = point_spec$alpha
+              size = size,
+              opacity = alpha
             ),
             name = "Added Points",
             showlegend = FALSE
@@ -381,7 +377,7 @@ Visualizer = R6::R6Class("Visualizer",
                 text = point_spec$annotations[i],
                 textfont = list(
                   color = point_spec$color,
-                  size = if (!is.null(point_spec$annotation_size)) point_spec$annotation_size else 12
+                  size = if (!is.null(point_spec$annotation_size)) point_spec$annotation_size else (eff$text_size + 1)
                 ),
                 showlegend = FALSE
               )
@@ -443,8 +439,8 @@ Visualizer = R6::R6Class("Visualizer",
             mode = "markers",
             marker = list(
               color = point_spec$color,
-              size = point_spec$size,
-              opacity = point_spec$alpha
+              size = size,
+              opacity = alpha
             ),
             name = "Added Points",
             showlegend = FALSE
@@ -459,7 +455,7 @@ Visualizer = R6::R6Class("Visualizer",
               showarrow = FALSE,
               font = list(
                 color = point_spec$color,
-                size = if (!is.null(point_spec$annotation_size)) point_spec$annotation_size else 12
+                size = if (!is.null(point_spec$annotation_size)) point_spec$annotation_size else (eff$text_size + 1)
               )
             )
           }
@@ -600,16 +596,13 @@ Visualizer = R6::R6Class("Visualizer",
       return(obj)
     },
 
-    # Get auto color using current plot settings
+    # Get auto color using current effective theme
     get_auto_color_with_palette = function() {
-      if (!is.null(private$.plot_settings) && !is.null(private$.plot_settings$color_palette)) {
-        color_palette = private$.plot_settings$color_palette
-      } else {
-        color_palette = "viridis"  # fallback default
-      }
+  eff = if (is.null(private$.effective_theme)) get_pkg_theme_default() else private$.effective_theme
+  color_palette = if (is.null(eff$palette)) "viridis" else eff$palette
       
       # Get color from discrete palette based on the selected color_palette
-      color = get_vistool_color(private$.color_index, "discrete", base_palette = color_palette)
+  color = get_vistool_color(private$.color_index, "discrete", base_palette = color_palette)
       
       # Increment color index for next use
       private$.color_index = private$.color_index + 1
@@ -682,12 +675,10 @@ Visualizer = R6::R6Class("Visualizer",
     },
 
     # Apply theme and styling to ggplot2 object
-    apply_ggplot_theme = function(plot_obj, text_size = 11, title_size = NULL, theme = "minimal", 
-                                  background = "white", show_grid = TRUE, grid_color = "gray90") {
-      # Set title size
-      if (is.null(title_size)) {
-        title_size = text_size + 2
-      }
+  apply_ggplot_theme = function(plot_obj, text_size = 11, title_size = NULL, theme = "minimal", 
+                  background = "white", show_grid = TRUE, grid_color = "gray90") {
+    # derive sizes
+    if (is.null(title_size)) title_size = text_size + 2
       
       # Apply theme
       theme_func = switch(theme,
@@ -712,12 +703,12 @@ Visualizer = R6::R6Class("Visualizer",
       )
       
       # Handle grid display
-      if (!show_grid) {
+  if (!show_grid) {
         plot_obj = plot_obj + ggplot2::theme(
           panel.grid.major = ggplot2::element_blank(),
           panel.grid.minor = ggplot2::element_blank()
         )
-      } else if (!is.null(grid_color)) {
+  } else if (!is.null(grid_color)) {
         plot_obj = plot_obj + ggplot2::theme(
           panel.grid.major = ggplot2::element_line(color = grid_color),
           panel.grid.minor = ggplot2::element_line(color = grid_color, linewidth = 0.5)
@@ -728,7 +719,7 @@ Visualizer = R6::R6Class("Visualizer",
     },
 
     # Apply color scales to ggplot2 object
-    apply_ggplot_color_scale = function(plot_obj, color_palette = "viridis", scale_type = "fill") {
+  apply_ggplot_color_scale = function(plot_obj, color_palette = "viridis", scale_type = "fill") {
       if (scale_type == "fill") {
         if (color_palette == "viridis") {
           plot_obj = plot_obj + ggplot2::scale_fill_viridis_c()

@@ -18,3 +18,10 @@
 #' @importFrom stringr str_pad
 #' @importFrom ggsci pal_npg
 NULL
+
+.onLoad <- function(libname, pkgname) {
+	# Initialize default theme if not set
+	if (is.null(getOption("vistool.theme"))) {
+		options(vistool.theme = vistool_theme())
+	}
+}

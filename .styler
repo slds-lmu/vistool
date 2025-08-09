@@ -1,0 +1,13 @@
+style_pkg(
+  transformers = tidyverse_style(
+    indent_by = 2,
+    reindention = reindention(scope = "line_breaks"),
+    strict = FALSE
+  ) %>%
+    # Use '=' instead of '<-' for assignments
+    style_transformers() %>%
+    set_transformers(assign = function(pd) {
+      pd$token[pd$token == "LEFT_ASSIGN"] <- "EQ_ASSIGN"
+      pd
+    })
+)

@@ -36,17 +36,7 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
     #' Label of the z axis.
     z_lab = NULL,
 
-    #' @field opacity (`numeric(1)`)\cr
-    #' Opacity of the surface plot.
-    opacity = 0.8,
-
-    #' @field colorscale (`list()`)\cr
-    #' Color scale for the surface plot.
-    colorscale = NULL,
-
-    #' @field show_title (`logical(1)`)\cr
-    #' Whether to show the plot title.
-    show_title = TRUE,
+  # theme-driven styling is resolved at plot(); keep fields for labels only
 
     #' @description
     #' Creates a new instance of this [R6][R6::R6Class] class.
@@ -59,26 +49,13 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
     #' @template param_x1_lab
     #' @template param_x2_lab
     #' @template param_z_lab
-    #' @template param_opacity
-    #' @template param_colorscale
-    #' @template param_show_title
-    initialize = function(grid, zmat, plot_lab = NULL, x1_lab = "x1", x2_lab = "x2", z_lab = "z", 
-                          opacity = 0.8, colorscale = "auto", show_title = TRUE) {
+  initialize = function(grid, zmat, plot_lab = NULL, x1_lab = "x1", x2_lab = "x2", z_lab = "z") {
       self$grid = checkmate::assert_list(grid)
       self$zmat = checkmate::assert_matrix(zmat)
       self$plot_lab = checkmate::assert_character(plot_lab, null.ok = TRUE)
       self$x1_lab = checkmate::assert_character(x1_lab)
       self$x2_lab = checkmate::assert_character(x2_lab)
       self$z_lab = checkmate::assert_character(z_lab)
-      self$opacity = checkmate::assert_number(opacity, lower = 0, upper = 1)
-      self$colorscale = if (is.character(colorscale)) {
-        checkmate::assert_string(colorscale)
-        colorscale
-      } else {
-        checkmate::assert_list(colorscale)
-        colorscale
-      }
-      self$show_title = checkmate::assert_flag(show_title)
       return(invisible(self))
     },
 
@@ -86,21 +63,19 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
     #' Initialize the plot as 2D contour.
     #' This method is called automatically by plot() and should not be called directly.
     #'
-    #' @template param_opacity
-    #' @template param_colorscale
-    #' @template param_show_title
+    #' @param opacity (`numeric(1)`)\cr
+    #'   Opacity of the contour plot (0-1). If NULL, uses theme default.
+    #' @param colorscale (`list`)\cr
+    #'   Color scale for the contour plot. If NULL or "auto", uses theme palette.
+    #' @param show_title (`logical(1)`)\cr
+    #'   Whether to show the plot title. Default is TRUE.
     #' @template param_dots_trace
-    init_layer_contour = function(opacity = self$opacity, colorscale = self$colorscale, show_title = self$show_title, ...) {
-      checkmate::assert_number(opacity, lower = 0, upper = 1)
+    init_layer_contour = function(opacity = NULL, colorscale = NULL, show_title = TRUE, ...) {
+      checkmate::assert_number(opacity, lower = 0, upper = 1, null.ok = TRUE)
       # Resolve colorscale if it's "auto"
-      if (is.character(colorscale) && colorscale == "auto") {
-        # Default to viridis if no plot settings available
-        palette = if (!is.null(private$.plot_settings)) {
-          private$.plot_settings$color_palette %||% "viridis"
-        } else {
-          "viridis"
-        }
-        colorscale = get_continuous_colorscale(palette)
+      if (is.null(colorscale) || (is.character(colorscale) && colorscale == "auto")) {
+  eff = if (is.null(private$.effective_theme)) get_pkg_theme_default() else private$.effective_theme
+        colorscale = get_continuous_colorscale(eff$palette)
       }
       checkmate::assert_list(colorscale)
       checkmate::assert_flag(show_title)
@@ -118,7 +93,7 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
           y = llp$y,
           z = t(llp$z),
           type = "contour",
-          opacity = opacity,
+          opacity = if (is.null(opacity)) (if (is.null(private$.effective_theme)) get_pkg_theme_default()$alpha else private$.effective_theme$alpha) else opacity,
           colorscale = colorscale,
           ...
         ) %>%
@@ -140,22 +115,19 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
     #' Initialize the plot as 3D surface.
     #' This method is called automatically by plot() and should not be called directly.
     #'
-    #' @template param_opacity
-    #' @template param_colorscale
-    #' @template param_show_title
+    #' @param opacity (`numeric(1)`)\cr
+    #'   Opacity of the surface plot (0-1). If NULL, uses theme default.
+    #' @param colorscale (`list`)\cr
+    #'   Color scale for the surface plot. If NULL or "auto", uses theme palette.
+    #' @param show_title (`logical(1)`)\cr
+    #'   Whether to show the plot title. Default is TRUE.
     #' @template param_dots_trace
-    init_layer_surface = function(opacity = self$opacity, colorscale = self$colorscale, 
-                                  show_title = self$show_title, ...) {
-      checkmate::assert_number(opacity, lower = 0, upper = 1)
+    init_layer_surface = function(opacity = NULL, colorscale = NULL, show_title = TRUE, ...) {
+      checkmate::assert_number(opacity, lower = 0, upper = 1, null.ok = TRUE)
       # Resolve colorscale if it's "auto"
-      if (is.character(colorscale) && colorscale == "auto") {
-        # Default to viridis if no plot settings available
-        palette = if (!is.null(private$.plot_settings)) {
-          private$.plot_settings$color_palette %||% "viridis"
-        } else {
-          "viridis"
-        }
-        colorscale = get_continuous_colorscale(palette)
+      if (is.null(colorscale) || (is.character(colorscale) && colorscale == "auto")) {
+  eff = if (is.null(private$.effective_theme)) get_pkg_theme_default() else private$.effective_theme
+        colorscale = get_continuous_colorscale(eff$palette)
       }
       checkmate::assert_list(colorscale)
       checkmate::assert_flag(show_title)
@@ -177,7 +149,7 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
         y = llp$y,
         z = t(llp$z),
         type = "surface",
-        opacity = opacity,
+  opacity = if (is.null(opacity)) (if (is.null(private$.effective_theme)) get_pkg_theme_default()$alpha else private$.effective_theme$alpha) else opacity,
         colorscale = colorscale
       )
       
@@ -285,7 +257,7 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
     #'   Scene options for 3D plots. Ignored by other visualizer types. Default is NULL.
     #' @param ... Additional arguments passed to the parent plot method.
     #' @return A plotly object.
-    plot = function(flatten = FALSE, layout = NULL, scene = NULL, ...) {
+  plot = function(flatten = FALSE, layout = NULL, scene = NULL, ...) {
       checkmate::assert_flag(flatten)
       checkmate::assert_list(layout, null.ok = TRUE)
       checkmate::assert_list(scene, null.ok = TRUE)
@@ -305,21 +277,13 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
       # Call parent method for common parameter validation and setup
       super$plot(...)
       
-      # Merge surface-specific settings with common plot settings
-      settings = c(private$.plot_settings, private$.surface_plot_settings)
-
-      self$resolve_layer_colors() # Resolve layer colors now that we have plot settings
+  # Effective theme and params
+  eff = private$.effective_theme
+  rp = private$.render_params
+  settings = c(list(), private$.surface_plot_settings)
+  self$resolve_layer_colors()
       
-      # Resolve colorscale if it's "auto"
-      if (is.character(self$colorscale) && self$colorscale == "auto") {
-        self$colorscale = get_continuous_colorscale(settings$color_palette)
-      }
-      
-      # Set default title size
-      if (is.null(settings$title_size)) settings$title_size = settings$text_size + 2
-      
-      # Get the appropriate colorscale based on current settings
-      plot_colorscale = self$colorscale
+  plot_colorscale = get_continuous_colorscale(eff$palette)
       
       # Check if we need to reinitialize the plot
       # This happens if the plot type changes, colorscale changes, or contours are added/modified
@@ -336,59 +300,59 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
       # Initialize appropriate plot type based on flatten parameter
       if (needs_reinit) {
         if (settings$flatten) {
-          self$init_layer_contour(colorscale = plot_colorscale)
+          self$init_layer_contour(colorscale = plot_colorscale, opacity = eff$alpha, show_title = rp$show_title)
         } else {
-          self$init_layer_surface(colorscale = plot_colorscale)
+          self$init_layer_surface(colorscale = plot_colorscale, opacity = eff$alpha, show_title = rp$show_title)
         }
       }
       
       # apply text size to plotly layout
       if (!is.null(private$.plot)) {
         # Determine final labels
-        final_title = if (settings$show_title) {
-          if (!is.null(settings$plot_title)) settings$plot_title else self$plot_lab
+        final_title = if (rp$show_title) {
+          if (!is.null(rp$plot_title)) rp$plot_title else self$plot_lab
         } else {
           ""  # Empty string instead of NULL for plotly
         }
-        final_x_lab = if (!is.null(settings$x_lab)) settings$x_lab else self$x1_lab
-        final_y_lab = if (!is.null(settings$y_lab)) settings$y_lab else self$x2_lab
-        final_z_lab = if (!is.null(settings$z_lab)) settings$z_lab else self$z_lab
+        final_x_lab = if (!is.null(rp$x_lab)) rp$x_lab else self$x1_lab
+        final_y_lab = if (!is.null(rp$y_lab)) rp$y_lab else self$x2_lab
+        final_z_lab = if (!is.null(rp$z_lab)) rp$z_lab else self$z_lab
         
         if (private$.layer_primary == "surface") {
           # For 3D surface plots
           private$.plot = private$.plot %>%
             plotly::layout(
-              title = list(text = final_title, font = list(size = settings$title_size)),
+              title = list(text = final_title, font = list(size = eff$title_size)),
               scene = list(
                 xaxis = list(
-                  title = list(text = final_x_lab, font = list(size = settings$text_size)),
-                  range = settings$x_limits
+                  title = list(text = final_x_lab, font = list(size = eff$text_size)),
+                  range = rp$x_limits
                 ),
                 yaxis = list(
-                  title = list(text = final_y_lab, font = list(size = settings$text_size)),
-                  range = settings$y_limits
+                  title = list(text = final_y_lab, font = list(size = eff$text_size)),
+                  range = rp$y_limits
                 ),
                 zaxis = list(
-                  title = list(text = final_z_lab, font = list(size = settings$text_size)),
-                  range = settings$z_limits
+                  title = list(text = final_z_lab, font = list(size = eff$text_size)),
+                  range = rp$z_limits
                 )
               ),
-              showlegend = settings$show_legend
+              showlegend = rp$show_legend
             )
         } else {
           # For 2D contour plots
           private$.plot = private$.plot %>%
             plotly::layout(
-              title = list(text = final_title, font = list(size = settings$title_size)),
+              title = list(text = final_title, font = list(size = eff$title_size)),
               xaxis = list(
-                title = list(text = final_x_lab, font = list(size = settings$text_size)),
-                range = settings$x_limits
+                title = list(text = final_x_lab, font = list(size = eff$text_size)),
+                range = rp$x_limits
               ),
               yaxis = list(
-                title = list(text = final_y_lab, font = list(size = settings$text_size)),
-                range = settings$y_limits
+                title = list(text = final_y_lab, font = list(size = eff$text_size)),
+                range = rp$y_limits
               ),
-              showlegend = settings$show_legend
+              showlegend = rp$show_legend
             )
         }
       }
@@ -410,7 +374,8 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
         private$.plot = private$add_points_to_plotly(private$.plot, "contour")
       }
       
-      return(private$.plot)
+  private$.last_plot <- private$.plot
+  return(private$.plot)
     }
   ),
   private = list(
@@ -430,7 +395,6 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
     .opts = list(),
     .vbase = list(),
     .layout = list(),
-    .plot_settings = NULL,  # Store plot settings for layer resolution
 
     # @field .freeze_plot (`logical(1)`) Indicator whether to freeze saving the plot elements.
     .freeze_plot = FALSE,

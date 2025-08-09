@@ -23,15 +23,6 @@
 #'   Which response curve(s) to draw when `input_type = "probability"`.
 #'   One of `"both"`, `"y1"`, or `"y0"`.
 #' @template param_learner
-#' @template param_default_color_palette
-#' @template param_default_text_size
-#' @template param_default_theme
-#' @param default_alpha (`numeric(1)`)\cr
-#'   Default alpha transparency for visual elements. Default is 0.8.
-#' @param default_line_width (`numeric(1)`)\cr
-#'   Default line width for traces and boundaries. Default is 1.2.
-#' @param default_point_size (`numeric(1)`)\cr
-#'   Default point size for markers and training data. Default is 2.
 #' @template param_dots
 #'
 #' @return An object inheriting from a Visualizer class (Visualizer1D, Visualizer2D, VisualizerSurface, etc.)
@@ -46,10 +37,7 @@
 #' @export
 as_visualizer = function(x, type = "auto", x1_limits = NULL, x2_limits = NULL, 
                          padding = 0, n_points = 100L, y_pred = NULL, y_true = NULL,
-                         input_type = "auto", y_curves = "both", learner = NULL,
-                         default_color_palette = "viridis", default_text_size = 11, 
-                         default_theme = "bw", default_alpha = 0.8, 
-                         default_line_width = 1.2, default_point_size = 2, ...) {
+                         input_type = "auto", y_curves = "both", learner = NULL, ...) {
   UseMethod("as_visualizer")
 }
 
@@ -57,10 +45,7 @@ as_visualizer = function(x, type = "auto", x1_limits = NULL, x2_limits = NULL,
 #' @export
 as_visualizer.Task = function(x, type = "auto", x1_limits = NULL, x2_limits = NULL, 
                               padding = 0, n_points = 100L, y_pred = NULL, y_true = NULL,
-                              input_type = "auto", y_curves = "both", learner = NULL,
-                              default_color_palette = "viridis", default_text_size = 11, 
-                              default_theme = "bw", default_alpha = 0.8, 
-                              default_line_width = 1.2, default_point_size = 2, ...) {
+                              input_type = "auto", y_curves = "both", learner = NULL, ...) {
   if (is.null(learner)) {
     stop("Argument 'learner' is required for Task visualizations")
   }
@@ -98,11 +83,7 @@ as_visualizer.Task = function(x, type = "auto", x1_limits = NULL, x2_limits = NU
   } else {
     stop("Unknown visualization type.")
   }
-  
-  # Initialize defaults
-  vis$initialize_defaults(default_color_palette, default_text_size, default_theme,
-                         default_alpha, default_line_width, default_point_size)
-  
+
   return(vis)
 }
 
@@ -110,10 +91,7 @@ as_visualizer.Task = function(x, type = "auto", x1_limits = NULL, x2_limits = NU
 #' @export
 as_visualizer.Objective = function(x, type = "auto", x1_limits = NULL, x2_limits = NULL, 
                                    padding = 0, n_points = 100L, y_pred = NULL, y_true = NULL,
-                                   input_type = "auto", y_curves = "both", learner = NULL,
-                                   default_color_palette = "viridis", default_text_size = 11, 
-                                   default_theme = "minimal", default_alpha = 0.8, 
-                                   default_line_width = 1.2, default_point_size = 2, ...) {
+                                   input_type = "auto", y_curves = "both", learner = NULL, ...) {
   checkmate::assert_choice(type, choices = c("auto", "1d", "2d", "surface"))
   n_dim = x$xdim
   
@@ -160,10 +138,7 @@ as_visualizer.Objective = function(x, type = "auto", x1_limits = NULL, x2_limits
 as_visualizer.LossFunction = function(x, type = "auto", x1_limits = NULL, x2_limits = NULL,
                                        padding = 0, n_points = 1000L,
                                        y_pred = NULL, y_true = NULL,
-                                       input_type = "auto", y_curves = "both", learner = NULL,
-                                       default_color_palette = "viridis", default_text_size = 11, 
-                                       default_theme = "bw", default_alpha = 0.8, 
-                                       default_line_width = 1.2, default_point_size = 2, ...) {
+                                       input_type = "auto", y_curves = "both", learner = NULL, ...) {
   checkmate::assert_choice(type, choices = c("auto", "1d"))
   checkmate::assert_choice(input_type, choices = c("auto", "score", "probability"))
   if (type != "auto" && type != "1d") {
@@ -178,10 +153,7 @@ as_visualizer.LossFunction = function(x, type = "auto", x1_limits = NULL, x2_lim
 as_visualizer.list = function(x, type = "auto", x1_limits = NULL, x2_limits = NULL,
                                 padding = 0, n_points = 1000L,
                                 y_pred = NULL, y_true = NULL,
-                                input_type = "auto", y_curves = "both", learner = NULL,
-                                default_color_palette = "viridis", default_text_size = 11, 
-                                default_theme = "minimal", default_alpha = 0.8, 
-                                default_line_width = 1.2, default_point_size = 2, ...) {
+                                input_type = "auto", y_curves = "both", learner = NULL, ...) {
   # Check all elements are LossFunction objects
   invalid_indices = which(!vapply(x, function(obj) inherits(obj, "LossFunction"), logical(1)))
   if (length(invalid_indices) > 0) {

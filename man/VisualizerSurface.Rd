@@ -30,15 +30,6 @@ Label of the x2 axis.}
 
 \item{\code{z_lab}}{(character(1)\cr
 Label of the z axis.}
-
-\item{\code{opacity}}{(`numeric(1)`)\cr
-Opacity of the surface plot.}
-
-\item{\code{colorscale}}{(`list()`)\cr
-Color scale for the surface plot.}
-
-\item{\code{show_title}}{(`logical(1)`)\cr
-Whether to show the plot title.}
 }
 \if{html}{\out{</div>}}
 }
@@ -59,9 +50,10 @@ Whether to show the plot title.}
 <details open><summary>Inherited methods</summary>
 <ul>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="add_points"><a href='../../vistool/html/Visualizer.html#method-Visualizer-add_points'><code>vistool::Visualizer$add_points()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="initialize_defaults"><a href='../../vistool/html/Visualizer.html#method-Visualizer-initialize_defaults'><code>vistool::Visualizer$initialize_defaults()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="resolve_layer_colors"><a href='../../vistool/html/Visualizer.html#method-Visualizer-resolve_layer_colors'><code>vistool::Visualizer$resolve_layer_colors()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href='../../vistool/html/Visualizer.html#method-Visualizer-save'><code>vistool::Visualizer$save()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="set_theme"><a href='../../vistool/html/Visualizer.html#method-Visualizer-set_theme'><code>vistool::Visualizer$set_theme()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="theme"><a href='../../vistool/html/Visualizer.html#method-Visualizer-theme'><code>vistool::Visualizer$theme()</code></a></span></li>
 </ul>
 </details>
 }}
@@ -77,10 +69,7 @@ Creates a new instance of this [R6][R6::R6Class] class.
   plot_lab = NULL,
   x1_lab = "x1",
   x2_lab = "x2",
-  z_lab = "z",
-  opacity = 0.8,
-  colorscale = "auto",
-  show_title = TRUE
+  z_lab = "z"
 )}\if{html}{\out{</div>}}
 }
 
@@ -104,39 +93,6 @@ Label of the x2 axis.}
 
 \item{\code{z_lab}}{(`character(1)`)\cr
 Label of the z axis.}
-
-\item{\code{z_lab}}{(`character(1)`)\cr
-Z-axis label (for surface plots). If NULL, uses the visualizer's default label. Default is NULL.}
-
-\item{\code{opacity}}{(`numeric(1)`)\cr
-Opacity of the layer.}
-
-\item{\code{opacity}}{(`numeric(1)`)\cr
-Opacity of the layer.}
-
-\item{\code{opacity}}{(`numeric(1)`)\cr
-Opacity of the layer.}
-
-\item{\code{colorscale}}{(`list()`)\cr
-The coloring of the surface/contour.}
-
-\item{\code{colorscale}}{(`list()`)\cr
-The coloring of the surface/contour.}
-
-\item{\code{colorscale}}{(`list()`)\cr
-The coloring of the surface/contour.}
-
-\item{\code{show_title}}{(`logical(1)`)\cr
-Indicator whether to show the title of the plot.}
-
-\item{\code{show_title}}{(`logical(1)`)\cr
-Indicator whether to show the title of the plot.}
-
-\item{\code{show_title}}{(`logical(1)`)\cr
-Indicator whether to show the title of the plot.}
-
-\item{\code{show_title}}{(`logical(1)`)\cr
-Indicator whether to show the title of the plot.}
 }
 \if{html}{\out{</div>}}
 }
@@ -149,9 +105,9 @@ Initialize the plot as 2D contour.
 This method is called automatically by plot() and should not be called directly.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{VisualizerSurface$init_layer_contour(
-  opacity = self$opacity,
-  colorscale = self$colorscale,
-  show_title = self$show_title,
+  opacity = NULL,
+  colorscale = NULL,
+  show_title = TRUE,
   ...
 )}\if{html}{\out{</div>}}
 }
@@ -160,34 +116,13 @@ This method is called automatically by plot() and should not be called directly.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{opacity}}{(`numeric(1)`)\cr
-Opacity of the layer.}
+Opacity of the contour plot (0-1). If NULL, uses theme default.}
 
-\item{\code{opacity}}{(`numeric(1)`)\cr
-Opacity of the layer.}
-
-\item{\code{opacity}}{(`numeric(1)`)\cr
-Opacity of the layer.}
-
-\item{\code{colorscale}}{(`list()`)\cr
-The coloring of the surface/contour.}
-
-\item{\code{colorscale}}{(`list()`)\cr
-The coloring of the surface/contour.}
-
-\item{\code{colorscale}}{(`list()`)\cr
-The coloring of the surface/contour.}
+\item{\code{colorscale}}{(`list`)\cr
+Color scale for the contour plot. If NULL or "auto", uses theme palette.}
 
 \item{\code{show_title}}{(`logical(1)`)\cr
-Indicator whether to show the title of the plot.}
-
-\item{\code{show_title}}{(`logical(1)`)\cr
-Indicator whether to show the title of the plot.}
-
-\item{\code{show_title}}{(`logical(1)`)\cr
-Indicator whether to show the title of the plot.}
-
-\item{\code{show_title}}{(`logical(1)`)\cr
-Indicator whether to show the title of the plot.}
+Whether to show the plot title. Default is TRUE.}
 
 \item{\code{...}}{(`any`)\cr
 Further arguments passed to `add_trace(...)`.}
@@ -206,9 +141,9 @@ Initialize the plot as 3D surface.
 This method is called automatically by plot() and should not be called directly.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{VisualizerSurface$init_layer_surface(
-  opacity = self$opacity,
-  colorscale = self$colorscale,
-  show_title = self$show_title,
+  opacity = NULL,
+  colorscale = NULL,
+  show_title = TRUE,
   ...
 )}\if{html}{\out{</div>}}
 }
@@ -217,34 +152,13 @@ This method is called automatically by plot() and should not be called directly.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{opacity}}{(`numeric(1)`)\cr
-Opacity of the layer.}
+Opacity of the surface plot (0-1). If NULL, uses theme default.}
 
-\item{\code{opacity}}{(`numeric(1)`)\cr
-Opacity of the layer.}
-
-\item{\code{opacity}}{(`numeric(1)`)\cr
-Opacity of the layer.}
-
-\item{\code{colorscale}}{(`list()`)\cr
-The coloring of the surface/contour.}
-
-\item{\code{colorscale}}{(`list()`)\cr
-The coloring of the surface/contour.}
-
-\item{\code{colorscale}}{(`list()`)\cr
-The coloring of the surface/contour.}
+\item{\code{colorscale}}{(`list`)\cr
+Color scale for the surface plot. If NULL or "auto", uses theme palette.}
 
 \item{\code{show_title}}{(`logical(1)`)\cr
-Indicator whether to show the title of the plot.}
-
-\item{\code{show_title}}{(`logical(1)`)\cr
-Indicator whether to show the title of the plot.}
-
-\item{\code{show_title}}{(`logical(1)`)\cr
-Indicator whether to show the title of the plot.}
-
-\item{\code{show_title}}{(`logical(1)`)\cr
-Indicator whether to show the title of the plot.}
+Whether to show the plot title. Default is TRUE.}
 
 \item{\code{...}}{(`any`)\cr
 Further arguments passed to `add_trace(...)`.}
@@ -324,115 +238,24 @@ Self (invisibly) for method chaining.
 \if{html}{\out{<a id="method-VisualizerSurface-plot"></a>}}
 \if{latex}{\out{\hypertarget{method-VisualizerSurface-plot}{}}}
 \subsection{Method \code{plot()}}{
-Return the plot and hence plot it or do further processing.
+Create and return the plotly plot with model-specific layers.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{VisualizerSurface$plot(
-  text_size = 12,
-  title_size = NULL,
-  theme = "minimal",
-  background = "white",
-  color_palette = "viridis",
-  flatten = FALSE,
-  layout = NULL,
-  scene = NULL,
-  plot_title = NULL,
-  plot_subtitle = NULL,
-  x_lab = NULL,
-  y_lab = NULL,
-  z_lab = NULL,
-  x_limits = NULL,
-  y_limits = NULL,
-  z_limits = NULL,
-  show_grid = TRUE,
-  grid_color = "gray90",
-  show_legend = TRUE,
-  legend_position = "right",
-  legend_title = NULL,
-  show_title = TRUE
-)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{VisualizerSurface$plot(flatten = FALSE, layout = NULL, scene = NULL, ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{text_size}}{(`numeric(1)`)\cr
-Base text size for plot elements. Default is 12. For 3D plotly calls, this controls axis labels and title sizes.}
-
-\item{\code{title_size}}{(`numeric(1)`)\cr
-Title text size. If NULL, defaults to text_size + 2.}
-
-\item{\code{theme}}{(`character(1)`)\cr
-Theme parameter for compatibility with ggplot2-based visualizers. Ignored for 3D plotly plots.}
-
-\item{\code{background}}{(`character(1)`)\cr
-Background color parameter for compatibility. Ignored for 3D plotly plots.}
-
-\item{\code{color_palette}}{(`character(1)`)\cr
-Color palette for the surface. One of "viridis", "plasma", "grayscale". Default is "viridis".}
-
 \item{\code{flatten}}{(`logical(1)`)\cr
-If TRUE, display as 2D contour plot. If FALSE (default), display as 3D surface plot.}
+If TRUE, display as 2D contour plot. If FALSE, display as 3D surface plot.}
 
 \item{\code{layout}}{(`list()`)\cr
-Layout options passed directly to `plotly::layout()`. If NULL, no additional layout modifications are applied.}
+Layout options passed to `plotly::layout()`. Ignored by other visualizer types. Default is NULL.}
 
 \item{\code{scene}}{(`list()`)\cr
-Scene options for 3D surface plots. Should contain camera settings like `list(camera = list(eye = list(x = 1.1, y = 1.2, z = 1.3)))`. 
-Only applies to surface plots, ignored for contour plots. If NULL, no scene modifications are applied.}
+Scene options for 3D plots. Ignored by other visualizer types. Default is NULL.}
 
-\item{\code{plot_title}}{(`character(1)`)\cr
-Main plot title. If NULL, uses the visualizer's default title. Default is NULL.}
-
-\item{\code{plot_subtitle}}{(`character(1)`)\cr
-Plot subtitle. If NULL, no subtitle is shown. Default is NULL.}
-
-\item{\code{x_lab}}{(`character(1)`)\cr
-X-axis label. If NULL, uses the visualizer's default label. Default is NULL.}
-
-\item{\code{y_lab}}{(`character(1)`)\cr
-Y-axis label. If NULL, uses the visualizer's default label. Default is NULL.}
-
-\item{\code{z_lab}}{(`character(1)`)\cr
-Label of the z axis.}
-
-\item{\code{z_lab}}{(`character(1)`)\cr
-Z-axis label (for surface plots). If NULL, uses the visualizer's default label. Default is NULL.}
-
-\item{\code{x_limits}}{(`numeric(2)`)\cr
-X-axis limits as c(min, max). If NULL, uses automatic limits. Default is NULL.}
-
-\item{\code{y_limits}}{(`numeric(2)`)\cr
-Y-axis limits as c(min, max). If NULL, uses automatic limits. Default is NULL.}
-
-\item{\code{z_limits}}{(`numeric(2)`)\cr
-Z-axis limits as c(min, max) (for surface plots). If NULL, uses automatic limits. Default is NULL.}
-
-\item{\code{show_grid}}{(`logical(1)`)\cr
-Whether to show axis grid lines. Default is TRUE.}
-
-\item{\code{grid_color}}{(`character(1)`)\cr
-Color of grid lines. Default is "gray90".}
-
-\item{\code{show_legend}}{(`logical(1)`)\cr
-Whether to show the legend. Default is TRUE.}
-
-\item{\code{legend_position}}{(`character(1)`)\cr
-Position of the legend. One of "top", "right", "bottom", "left", "none". Default is "right".}
-
-\item{\code{legend_title}}{(`character(1)`)\cr
-Title for the legend. If NULL, uses default based on visualizer type. Default is NULL.}
-
-\item{\code{show_title}}{(`logical(1)`)\cr
-Indicator whether to show the title of the plot.}
-
-\item{\code{show_title}}{(`logical(1)`)\cr
-Indicator whether to show the title of the plot.}
-
-\item{\code{show_title}}{(`logical(1)`)\cr
-Indicator whether to show the title of the plot.}
-
-\item{\code{show_title}}{(`logical(1)`)\cr
-Indicator whether to show the title of the plot.}
+\item{\code{...}}{Additional arguments passed to the parent plot method.}
 }
 \if{html}{\out{</div>}}
 }

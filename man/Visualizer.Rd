@@ -7,18 +7,11 @@
 Base class for all visualizers. Provides a common interface for creating
 and saving plots across different plotting backends (ggplot2 for 1D/2D, plotly for 3D).
 }
-\section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
-\describe{
-\item{\code{defaults}}{(`list`)\cr
-Default settings for plotting and visual elements.}
-}
-\if{html}{\out{</div>}}
-}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-Visualizer-initialize_defaults}{\code{Visualizer$initialize_defaults()}}
+\item \href{#method-Visualizer-set_theme}{\code{Visualizer$set_theme()}}
+\item \href{#method-Visualizer-theme}{\code{Visualizer$theme()}}
 \item \href{#method-Visualizer-plot}{\code{Visualizer$plot()}}
 \item \href{#method-Visualizer-resolve_layer_colors}{\code{Visualizer$resolve_layer_colors()}}
 \item \href{#method-Visualizer-save}{\code{Visualizer$save()}}
@@ -27,44 +20,34 @@ Default settings for plotting and visual elements.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Visualizer-initialize_defaults"></a>}}
-\if{latex}{\out{\hypertarget{method-Visualizer-initialize_defaults}{}}}
-\subsection{Method \code{initialize_defaults()}}{
-Initialize default settings for the visualizer.
+\if{html}{\out{<a id="method-Visualizer-set_theme"></a>}}
+\if{latex}{\out{\hypertarget{method-Visualizer-set_theme}{}}}
+\subsection{Method \code{set_theme()}}{
+Set the instance theme (partial override merged with package default)
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Visualizer$initialize_defaults(
-  default_color_palette = "viridis",
-  default_text_size = 11,
-  default_theme = "minimal",
-  default_alpha = 0.8,
-  default_line_width = 1.2,
-  default_point_size = 2
-)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer$set_theme(theme)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{default_color_palette}}{(`character(1)`)\cr
-Default color palette. Default is "viridis".}
-
-\item{\code{default_text_size}}{(`numeric(1)`)\cr
-Default text size. Default is 11.}
-
-\item{\code{default_theme}}{(`character(1)`)\cr
-Default theme. Default is "minimal".}
-
-\item{\code{default_alpha}}{(`numeric(1)`)\cr
-Default alpha transparency. Default is 0.8.}
-
-\item{\code{default_line_width}}{(`numeric(1)`)\cr
-Default line width. Default is 1.2.}
-
-\item{\code{default_point_size}}{(`numeric(1)`)\cr
-Default point size. Default is 2.}
+\item{\code{theme}}{(`list`) Partial theme created with vistool_theme() or a named list}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Returns}{
+Invisible self
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Visualizer-theme"></a>}}
+\if{latex}{\out{\hypertarget{method-Visualizer-theme}{}}}
+\subsection{Method \code{theme()}}{
+Get the instance theme (merged with package default)
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer$theme()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Visualizer-plot"></a>}}
@@ -74,14 +57,7 @@ Base plot method that sets up common plot settings and resolves layer colors.
 This method should be called by all child classes via `super$plot(...)`.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Visualizer$plot(
-  text_size = 11,
-  title_size = NULL,
-  theme = "minimal",
-  background = "white",
-  color_palette = "viridis",
-  flatten = FALSE,
-  layout = NULL,
-  scene = NULL,
+  theme = NULL,
   plot_title = NULL,
   plot_subtitle = NULL,
   x_lab = NULL,
@@ -90,42 +66,20 @@ This method should be called by all child classes via `super$plot(...)`.
   x_limits = NULL,
   y_limits = NULL,
   z_limits = NULL,
-  show_grid = TRUE,
-  grid_color = "gray90",
   show_legend = TRUE,
   legend_position = "right",
   legend_title = NULL,
-  show_title = TRUE
+  show_title = TRUE,
+  show_grid = NULL,
+  grid_color = NULL
 )}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{text_size}}{(`numeric(1)`)\cr
-Base text size for plot elements. Default is 11.}
-
-\item{\code{title_size}}{(`numeric(1)`)\cr
-Title text size. If NULL, defaults to text_size + 2.}
-
-\item{\code{theme}}{(`character(1)`)\cr
-ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "minimal".}
-
-\item{\code{background}}{(`character(1)`)\cr
-Background color for the plot. Default is "white".}
-
-\item{\code{color_palette}}{(`character(1)`)\cr
-Default color palette to use. One of "viridis", "plasma", "grayscale". Default is "viridis".}
-
-\item{\code{flatten}}{(`logical(1)`)\cr
-For surface visualizers: if TRUE, display as 2D contour plot. If FALSE, display as 3D surface plot. 
-Ignored by other visualizer types. Default is FALSE.}
-
-\item{\code{layout}}{(`list()`)\cr
-For surface visualizers: layout options passed to `plotly::layout()`. Ignored by other visualizer types. Default is NULL.}
-
-\item{\code{scene}}{(`list()`)\cr
-For surface visualizers: scene options for 3D plots. Ignored by other visualizer types. Default is NULL.}
+\item{\code{theme}}{(`list`)\cr
+Partial theme override for this render; see vistool_theme().}
 
 \item{\code{plot_title}}{(`character(1)`)\cr
 Main plot title. If NULL, uses the visualizer's default title. Default is NULL.}
@@ -151,12 +105,6 @@ Y-axis limits as c(min, max). If NULL, uses automatic limits. Default is NULL.}
 \item{\code{z_limits}}{(`numeric(2)`)\cr
 Z-axis limits as c(min, max) (for surface plots). If NULL, uses automatic limits. Default is NULL.}
 
-\item{\code{show_grid}}{(`logical(1)`)\cr
-Whether to show axis grid lines. Default is TRUE.}
-
-\item{\code{grid_color}}{(`character(1)`)\cr
-Color of grid lines. Default is "gray90".}
-
 \item{\code{show_legend}}{(`logical(1)`)\cr
 Whether to show the legend. Default is TRUE.}
 
@@ -168,6 +116,12 @@ Title for the legend. If NULL, uses default based on visualizer type. Default is
 
 \item{\code{show_title}}{(`logical(1)`)\cr
 Indicator whether to show the title of the plot.}
+
+\item{\code{show_grid}}{(`logical(1)`)\cr
+Whether to show grid lines. If NULL, uses theme default.}
+
+\item{\code{grid_color}}{(`character(1)`)\cr
+Color of grid lines. If NULL, uses theme default.}
 }
 \if{html}{\out{</div>}}
 }

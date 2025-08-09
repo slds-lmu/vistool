@@ -25,13 +25,7 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
     #' @template param_x2_limits
     #' @template param_padding
     #' @template param_n_points
-    #' @template param_opacity
-    #' @template param_colorscale
-    #' @template param_opacity
-    #' @template param_colorscale
-    #' @template param_show_title
-    initialize = function(objective, x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L,
-                          opacity = 0.8, colorscale = "auto", show_title = TRUE) {
+  initialize = function(objective, x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L) {
       self$objective = checkmate::assert_r6(objective, "Objective")
       checkmate::assert_numeric(x1_limits, len = 2, null.ok = TRUE)
       checkmate::assert_numeric(x2_limits, len = 2, null.ok = TRUE)
@@ -68,10 +62,7 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
         plot_lab = self$objective$label,
         x1_lab = "x1",
         x2_lab = "x2",
-        z_lab = "y",
-        opacity = opacity,
-        colorscale = colorscale,
-        show_title = show_title
+        z_lab = "y"
       )
 
       # Initialize trace counter for consistent coloring
@@ -148,7 +139,7 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
     #'   Additional arguments passed to the parent plot method.
     #'
     #' @return The plotly object.
-    plot = function(...) {
+  plot = function(...) {
       # Call parent plot method first to set up plot_settings and resolve colors
       super$plot(...)
       
@@ -164,8 +155,8 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
           }
         }
       }
-      
-      return(private$.plot)
+  private$.last_plot <- private$.plot
+  return(private$.plot)
     },
 
     #' @description

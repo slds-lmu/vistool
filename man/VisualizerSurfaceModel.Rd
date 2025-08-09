@@ -35,9 +35,10 @@ Learner used to train the model.}
 <details><summary>Inherited methods</summary>
 <ul>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="add_points"><a href='../../vistool/html/Visualizer.html#method-Visualizer-add_points'><code>vistool::Visualizer$add_points()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="initialize_defaults"><a href='../../vistool/html/Visualizer.html#method-Visualizer-initialize_defaults'><code>vistool::Visualizer$initialize_defaults()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="resolve_layer_colors"><a href='../../vistool/html/Visualizer.html#method-Visualizer-resolve_layer_colors'><code>vistool::Visualizer$resolve_layer_colors()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href='../../vistool/html/Visualizer.html#method-Visualizer-save'><code>vistool::Visualizer$save()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="set_theme"><a href='../../vistool/html/Visualizer.html#method-Visualizer-set_theme'><code>vistool::Visualizer$set_theme()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="theme"><a href='../../vistool/html/Visualizer.html#method-Visualizer-theme'><code>vistool::Visualizer$theme()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="add_contours"><a href='../../vistool/html/VisualizerSurface.html#method-VisualizerSurface-add_contours'><code>vistool::VisualizerSurface$add_contours()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="init_layer_contour"><a href='../../vistool/html/VisualizerSurface.html#method-VisualizerSurface-init_layer_contour'><code>vistool::VisualizerSurface$init_layer_contour()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="init_layer_surface"><a href='../../vistool/html/VisualizerSurface.html#method-VisualizerSurface-init_layer_surface'><code>vistool::VisualizerSurface$init_layer_surface()</code></a></span></li>
@@ -58,10 +59,7 @@ Creates a new instance of this [R6][R6::R6Class] class.
   x1_limits = NULL,
   x2_limits = NULL,
   padding = 0,
-  n_points = 100L,
-  opacity = 0.8,
-  colorscale = "auto",
-  show_title = TRUE
+  n_points = 100L
 )}\if{html}{\out{</div>}}
 }
 
@@ -101,21 +99,6 @@ Note that a grid of `npoints^2` values is generated and evaluated by `objective$
 \item{\code{n_points}}{(`integer(1)`)\cr
 The number of generated point per dimension.
 Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
-
-\item{\code{opacity}}{(`numeric(1)`)\cr
-Opacity of the layer.}
-
-\item{\code{opacity}}{(`numeric(1)`)\cr
-Opacity of the layer.}
-
-\item{\code{colorscale}}{(`list()`)\cr
-The coloring of the surface/contour.}
-
-\item{\code{colorscale}}{(`list()`)\cr
-The coloring of the surface/contour.}
-
-\item{\code{show_title}}{(`logical(1)`)\cr
-Indicator whether to show the title of the plot.}
 }
 \if{html}{\out{</div>}}
 }

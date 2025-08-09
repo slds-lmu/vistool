@@ -154,7 +154,7 @@ VisualizerObj = R6::R6Class("VisualizerObj",
     #' Create and return the ggplot2 plot with model-specific layers.
     #' @param ... Additional arguments passed to the parent plot method.
     #' @return A ggplot2 object.
-    plot = function(...) {
+  plot = function(...) {
       # Call parent plot method for validation and settings storage
       super$plot(...)
 
@@ -168,10 +168,11 @@ VisualizerObj = R6::R6Class("VisualizerObj",
       # Render stored layers in the order they were added
       private$render_all_layers()
 
-      # Resolve layer colors after rendering
-      self$resolve_layer_colors()
+  # Resolve layer colors after rendering
+  self$resolve_layer_colors()
       
-      return(private$.plot)
+  private$.last_plot <- private$.plot
+  return(private$.plot)
     }
   ),
   
@@ -317,8 +318,8 @@ VisualizerObj = R6::R6Class("VisualizerObj",
     
     # Initialize 1D plot with function line
     init_1d_plot = function() {
-      # Get plot settings
-      settings = private$.plot_settings
+  eff = private$.effective_theme
+  rp = private$.render_params
       
       # Create base data for the function line
       plot_data = data.frame(
@@ -330,58 +331,58 @@ VisualizerObj = R6::R6Class("VisualizerObj",
       private$.plot = private$init_ggplot(plot_data, "x", "y")
       
       # Add the function line
-      private$.plot = private$.plot + ggplot2::geom_line(color = "blue", linewidth = 1.2)
+  private$.plot = private$.plot + ggplot2::geom_line(color = "blue", linewidth = if (is.null(eff$line_width)) 1.2 else eff$line_width)
       
       # Apply theme and styling
-      private$.plot = private$apply_ggplot_theme(private$.plot, settings$text_size, NULL, settings$theme)
+  private$.plot = private$apply_ggplot_theme(private$.plot, eff$text_size, eff$title_size, eff$theme, eff$background, eff$show_grid, eff$grid_color)
       
       # Determine labels
-      title_text = if (!is.null(settings$plot_title)) settings$plot_title else private$.data_structure$labels$title
-      x_text = if (!is.null(settings$x_lab)) settings$x_lab else private$.data_structure$labels$x1
-      y_text = if (!is.null(settings$y_lab)) settings$y_lab else private$.data_structure$labels$y
+  title_text = if (!is.null(rp$plot_title)) rp$plot_title else private$.data_structure$labels$title
+  x_text = if (!is.null(rp$x_lab)) rp$x_lab else private$.data_structure$labels$x1
+  y_text = if (!is.null(rp$y_lab)) rp$y_lab else private$.data_structure$labels$y
       
       # Add labels conditionally
       private$.plot = private$.plot + ggplot2::labs(
-        title = if (settings$show_title) title_text else NULL,
-        subtitle = settings$plot_subtitle,
+  title = if (rp$show_title) title_text else NULL,
+  subtitle = rp$plot_subtitle,
         x = x_text,
         y = y_text
       )
       
       # Apply axis limits
-      if (!is.null(settings$x_limits)) {
-        private$.plot = private$.plot + ggplot2::xlim(settings$x_limits)
+      if (!is.null(rp$x_limits)) {
+        private$.plot = private$.plot + ggplot2::xlim(rp$x_limits)
       }
-      if (!is.null(settings$y_limits)) {
-        private$.plot = private$.plot + ggplot2::ylim(settings$y_limits)
+      if (!is.null(rp$y_limits)) {
+        private$.plot = private$.plot + ggplot2::ylim(rp$y_limits)
       }
       
       # Apply grid settings
-      if (!settings$show_grid) {
+    if (!eff$show_grid) {
         private$.plot = private$.plot + ggplot2::theme(panel.grid = ggplot2::element_blank())
       } else {
         private$.plot = private$.plot + ggplot2::theme(
-          panel.grid = ggplot2::element_line(color = settings$grid_color)
+      panel.grid = ggplot2::element_line(color = eff$grid_color)
         )
       }
       
       # Apply title size
       private$.plot = private$.plot + ggplot2::theme(
-        plot.title = ggplot2::element_text(size = settings$title_size)
+        plot.title = ggplot2::element_text(size = eff$title_size)
       )
       
       # Apply legend settings
-      if (!settings$show_legend) {
+      if (!rp$show_legend) {
         private$.plot = private$.plot + ggplot2::theme(legend.position = "none")
-      } else if (settings$legend_position != "right") {
-        private$.plot = private$.plot + ggplot2::theme(legend.position = settings$legend_position)
+      } else if (eff$legend_position != "right") {
+        private$.plot = private$.plot + ggplot2::theme(legend.position = eff$legend_position)
       }
     },
     
     # Initialize 2D plot with filled contour/raster
     init_2d_plot = function() {
-      # Get plot settings
-      settings = private$.plot_settings
+  eff = private$.effective_theme
+  rp = private$.render_params
       
       # Create base data for the filled contour
       plot_data = data.frame(
@@ -394,56 +395,56 @@ VisualizerObj = R6::R6Class("VisualizerObj",
       private$.plot = private$init_ggplot(plot_data, "x1", "x2")
       
       # Add filled contour or raster
-      private$.plot = private$.plot + ggplot2::geom_raster(ggplot2::aes(fill = y), alpha = 0.8)
+  private$.plot = private$.plot + ggplot2::geom_raster(ggplot2::aes(fill = y), alpha = eff$alpha)
       
       # Apply color scale
-      private$.plot = private$apply_ggplot_color_scale(private$.plot, settings$color_palette, "fill")
+  private$.plot = private$apply_ggplot_color_scale(private$.plot, eff$palette, "fill")
       
       # Apply theme and styling
-      private$.plot = private$apply_ggplot_theme(private$.plot, settings$text_size, NULL, settings$theme)
+  private$.plot = private$apply_ggplot_theme(private$.plot, eff$text_size, eff$title_size, eff$theme, eff$background, eff$show_grid, eff$grid_color)
       
       # Determine labels
-      title_text = if (!is.null(settings$plot_title)) settings$plot_title else private$.data_structure$labels$title
-      x_text = if (!is.null(settings$x_lab)) settings$x_lab else private$.data_structure$labels$x1
-      y_text = if (!is.null(settings$y_lab)) settings$y_lab else private$.data_structure$labels$x2
-      fill_text = if (!is.null(settings$legend_title)) settings$legend_title else private$.data_structure$labels$y
+  title_text = if (!is.null(rp$plot_title)) rp$plot_title else private$.data_structure$labels$title
+  x_text = if (!is.null(rp$x_lab)) rp$x_lab else private$.data_structure$labels$x1
+  y_text = if (!is.null(rp$y_lab)) rp$y_lab else private$.data_structure$labels$x2
+  fill_text = if (!is.null(rp$legend_title)) rp$legend_title else private$.data_structure$labels$y
       
       # Add labels conditionally
       private$.plot = private$.plot + ggplot2::labs(
-        title = if (settings$show_title) title_text else NULL,
-        subtitle = settings$plot_subtitle,
+  title = if (rp$show_title) title_text else NULL,
+  subtitle = rp$plot_subtitle,
         x = x_text,
         y = y_text,
         fill = fill_text
       )
       
       # Apply axis limits
-      if (!is.null(settings$x_limits)) {
-        private$.plot = private$.plot + ggplot2::xlim(settings$x_limits)
+      if (!is.null(rp$x_limits)) {
+        private$.plot = private$.plot + ggplot2::xlim(rp$x_limits)
       }
-      if (!is.null(settings$y_limits)) {
-        private$.plot = private$.plot + ggplot2::ylim(settings$y_limits)
+      if (!is.null(rp$y_limits)) {
+        private$.plot = private$.plot + ggplot2::ylim(rp$y_limits)
       }
       
       # Apply grid settings
-      if (!settings$show_grid) {
+    if (!eff$show_grid) {
         private$.plot = private$.plot + ggplot2::theme(panel.grid = ggplot2::element_blank())
       } else {
         private$.plot = private$.plot + ggplot2::theme(
-          panel.grid = ggplot2::element_line(color = settings$grid_color)
+      panel.grid = ggplot2::element_line(color = eff$grid_color)
         )
       }
       
       # Apply title size
       private$.plot = private$.plot + ggplot2::theme(
-        plot.title = ggplot2::element_text(size = settings$title_size)
+        plot.title = ggplot2::element_text(size = eff$title_size)
       )
       
       # Apply legend settings
-      if (!settings$show_legend) {
+      if (!rp$show_legend) {
         private$.plot = private$.plot + ggplot2::theme(legend.position = "none")
-      } else if (settings$legend_position != "right") {
-        private$.plot = private$.plot + ggplot2::theme(legend.position = settings$legend_position)
+      } else if (eff$legend_position != "right") {
+        private$.plot = private$.plot + ggplot2::theme(legend.position = eff$legend_position)
       }
     },
     

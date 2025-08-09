@@ -41,35 +41,15 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
     #'   Desired input scale. One of `"auto"`, `"score"`, `"probability"`.
     #'   `"auto"` (default) chooses the common `input_default` of the supplied
     #'   losses.
-    #' @template param_default_color_palette
-    #' @template param_default_text_size
-    #' @template param_default_theme
-    #' @param default_alpha (`numeric(1)`)\cr
-    #'   Default alpha transparency. Default is 0.8.
-    #' @param default_line_width (`numeric(1)`)\cr
-    #'   Default line width. Default is 1.2.
-    #' @param default_point_size (`numeric(1)`)\cr
-    #'   Default point size. Default is 2.
-    #' @param ... Additional arguments (currently unused).
-    initialize = function(losses, y_pred = NULL, y_true = NULL,
-                          input_type = "auto", 
-                          default_color_palette = "viridis", default_text_size = 11, 
-                          default_theme = "bw", default_alpha = 0.8, 
-                          default_line_width = 1.2, default_point_size = 2, ...) {
+  #' @param ... Additional arguments (currently unused).
+  initialize = function(losses, y_pred = NULL, y_true = NULL,
+              input_type = "auto", ...) {
       checkmate::assert_list(losses, "LossFunction")
       checkmate::assert_numeric(y_pred, null.ok = TRUE)
       checkmate::assert_numeric(y_true, null.ok = TRUE)
       checkmate::assert_choice(input_type, choices = c("auto", "score", "probability"))
 
-      # Initialize parent defaults
-      self$initialize_defaults(
-        default_color_palette = default_color_palette,
-        default_text_size = default_text_size,
-        default_theme = default_theme,
-        default_alpha = default_alpha,
-        default_line_width = default_line_width,
-        default_point_size = default_point_size
-      )
+  # Theme defaults are handled by base Visualizer via set_theme()/plot(theme=...)
 
       tts = unique(sapply(losses, function(x) x$task_type))
       if (length(tts) > 1) {
@@ -173,13 +153,15 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
       if (is.null(dots$legend_title)) dots$legend_title = "Loss Function"
       if (is.null(dots$plot_title)) dots$plot_title = ""
       
-      do.call(super$plot, dots)
+  do.call(super$plot, dots)
       
-      # Resolve layer colors now that we have plot settings
-      self$resolve_layer_colors()
+  # Resolve layer colors now that we have plot settings
+  self$resolve_layer_colors()
       
-      # Render the plot
-      return(private$render_plot())
+  # Render the plot
+  p <- private$render_plot()
+  private$.last_plot <- p
+  return(p)
     },
 
     #' @description
@@ -262,7 +244,8 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
 
     # Render the complete plot using stored settings and layers
     render_plot = function() {
-      settings = private$.plot_settings
+  eff = if (is.null(private$.effective_theme)) get_pkg_theme_default() else private$.effective_theme
+  settings = private$.render_params
       loss_settings = private$.loss_plot_settings
       
       # Determine final labels
@@ -297,7 +280,7 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
       pl = private$render_stored_layers(pl)
       
       # Apply final styling
-      theme_fun = switch(settings$theme,
+    theme_fun = switch(eff$theme,
         "minimal" = ggplot2::theme_minimal,
         "bw"      = ggplot2::theme_bw,
         "classic" = ggplot2::theme_classic,
@@ -306,11 +289,11 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
         "dark"    = ggplot2::theme_dark,
         "void"    = ggplot2::theme_void
       )
-      pl = pl + theme_fun(base_size = settings$text_size) +
+    pl = pl + theme_fun(base_size = eff$text_size) +
         ggplot2::theme(
           plot.title = ggplot2::element_text(hjust = 0.5),
-          legend.position = if (settings$show_legend && settings$legend_position != "none") settings$legend_position else "none",
-          panel.grid = if (settings$show_grid) ggplot2::element_line(color = settings$grid_color) else ggplot2::element_blank()
+      legend.position = if (settings$show_legend && settings$legend_position != "none") settings$legend_position else "none",
+      panel.grid = if (eff$show_grid) ggplot2::element_line(color = eff$grid_color) else ggplot2::element_blank()
         )
 
       pl = pl + ggplot2::labs(title = final_title, subtitle = settings$plot_subtitle, x = final_x_lab, y = final_y_lab)
@@ -328,7 +311,7 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
 
     # Render the base loss function curves
     render_loss_curves = function() {
-      settings = private$.plot_settings
+  settings = private$.render_params
       loss_settings = private$.loss_plot_settings
       final_legend_title = settings$legend_title
       loss_labels = sapply(self$losses, function(x) x$label)
@@ -340,7 +323,9 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
           p_max = min(max(self$y_pred), 1)
           r_seq = seq(p_min, p_max, length.out = loss_settings$n_points)
         } else {
-          r_seq = seq(settings$x_limits[1], settings$x_limits[2], length.out = loss_settings$n_points)
+          xlim <- settings$x_limits
+          if (is.null(xlim)) xlim <- c(0, 1)
+          r_seq = seq(xlim[1], xlim[2], length.out = loss_settings$n_points)
         }
 
         y_set = switch(loss_settings$y_curves,
@@ -389,7 +374,9 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
           }
           r_seq = seq(min(residuals), max(residuals), length.out = loss_settings$n_points)
         } else {
-          r_seq = seq(settings$x_limits[1], settings$x_limits[2], length.out = loss_settings$n_points)
+          xlim <- settings$x_limits
+          if (is.null(xlim)) xlim <- c(-5, 5)
+          r_seq = seq(xlim[1], xlim[2], length.out = loss_settings$n_points)
         }
 
         loss_seqs = data.table::as.data.table(lapply(self$losses, function(ll) {
