@@ -3,6 +3,17 @@
 #' @description
 #' Lightweight theme model and helpers to manage plotting style in a single place.
 #'
+#' @param palette Character. Color palette to use. One of "viridis", "plasma", or "grayscale".
+#' @param text_size Numeric. Base text size for plots.
+#' @param theme Character. ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "grey", "light", "dark", or "void".
+#' @param alpha Numeric. Transparency level (0-1).
+#' @param line_width Numeric. Default line width for plots.
+#' @param point_size Numeric. Default point size for plots.
+#' @param legend_position Character. Position of legend. One of "top", "right", "bottom", "left", or "none".
+#' @param show_grid Logical. Whether to show grid lines.
+#' @param grid_color Character. Color of grid lines.
+#' @param background Character. Background color of plots.
+#'
 #' @examples
 #' th = vistool_theme(palette = "plasma", text_size = 12)
 #' @export

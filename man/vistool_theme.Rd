@@ -17,6 +17,27 @@ vistool_theme(
   background = "white"
 )
 }
+\arguments{
+\item{palette}{Character. Color palette to use. One of "viridis", "plasma", or "grayscale".}
+
+\item{text_size}{Numeric. Base text size for plots.}
+
+\item{theme}{Character. ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "grey", "light", "dark", or "void".}
+
+\item{alpha}{Numeric. Transparency level (0-1).}
+
+\item{line_width}{Numeric. Default line width for plots.}
+
+\item{point_size}{Numeric. Default point size for plots.}
+
+\item{legend_position}{Character. Position of legend. One of "top", "right", "bottom", "left", or "none".}
+
+\item{show_grid}{Logical. Whether to show grid lines.}
+
+\item{grid_color}{Character. Color of grid lines.}
+
+\item{background}{Character. Background color of plots.}
+}
 \description{
 Lightweight theme model and helpers to manage plotting style in a single place.
 }

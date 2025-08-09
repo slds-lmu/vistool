@@ -4,7 +4,6 @@
 #' Base class for all visualizers. Provides a common interface for creating
 #' and saving plots across different plotting backends (ggplot2 for 1D/2D, plotly for 3D).
 #'
-#' @importFrom rlang .data
 #' @export
 Visualizer = R6::R6Class("Visualizer",
   public = list(
@@ -652,7 +651,7 @@ Visualizer = R6::R6Class("Visualizer",
       if (missing(data) || is.null(data)) {
         p = ggplot2::ggplot()
       } else {
-        aes_mapping = ggplot2::aes(.data[[x_col]], .data[[y_col]])
+        aes_mapping = do.call(ggplot2::aes, setNames(list(as.name(x_col), as.name(y_col)), c("x", "y")))
         p = ggplot2::ggplot(data = data, mapping = aes_mapping)
       }
 
