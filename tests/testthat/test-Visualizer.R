@@ -43,9 +43,9 @@ test_that("Base Visualizer class methods work correctly", {
   # Test that the base class plot method works (sets up plot settings and returns self)
   base_vis = Visualizer$new()
   result = base_vis$plot()
-  expect_true(inherits(result, "Visualizer"))  # Returns self for method chaining
-  expect_identical(result, base_vis)  # Should return the same object
-  
+  expect_true(inherits(result, "Visualizer")) # Returns self for method chaining
+  expect_identical(result, base_vis) # Should return the same object
+
   # Test inheritance structure with unified visualizers
   obj_1d = obj("TF_gaussian1", xdim = 1)
   vis1d = as_visualizer(obj_1d, type = "1d")

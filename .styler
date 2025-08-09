@@ -1,13 +1,34 @@
-style_pkg(
-  transformers = tidyverse_style(
-    indent_by = 2,
-    reindention = reindention(scope = "line_breaks"),
-    strict = FALSE
-  ) %>%
-    # Use '=' instead of '<-' for assignments
-    style_transformers() %>%
-    set_transformers(assign = function(pd) {
-      pd$token[pd$token == "LEFT_ASSIGN"] <- "EQ_ASSIGN"
-      pd
-    })
-)
+# source(".styler")
+equals_assign_style <- function(
+  indent_by = 2L,
+  strict = FALSE,
+  reindention = styler::tidyverse_reindention()
+) {
+  # start from tidyverse style
+  tr <- styler::tidyverse_style(
+    indent_by = indent_by,
+    strict = strict,
+    reindention = reindention
+  )
+
+  # stop styler's default "=` -> `<-`" rewrite
+  # (this rule is called force_assignment_op in styler)
+  tr$token$force_assignment_op <- NULL
+
+  # add a rule to rewrite "<-" to "="
+  tr$token$force_eq_assign_op <- function(pd) {
+    to_replace <- pd$token == "LEFT_ASSIGN"
+    if (any(to_replace)) {
+      pd$token[to_replace] <- "EQ_ASSIGN"
+      pd$text[to_replace]  <- "="
+    }
+    pd
+  }
+
+  # ensure spaces (not tabs) are used for indentation
+  tr$indent_character <- " "
+
+  tr
+}
+
+styler::style_pkg(style = equals_assign_style)

@@ -12,7 +12,7 @@ test_that("VisualizerModel with 1D regression task works", {
   expect_s3_class(vis, "Visualizer")
   expect_identical(vis$task, task)
   expect_identical(vis$learner, learner)
-  
+
   p = vis$plot()
   expect_s3_class(p, "ggplot")
 })
@@ -31,7 +31,7 @@ test_that("VisualizerModel with 2D regression task works", {
   expect_s3_class(vis, "Visualizer")
   expect_identical(vis$task, task)
   expect_identical(vis$learner, learner)
-  
+
   p = vis$plot()
   expect_s3_class(p, "ggplot")
 })
@@ -47,7 +47,7 @@ test_that("VisualizerModel with 1D classification task works", {
   vis = VisualizerModel$new(task, learner)
 
   expect_s3_class(vis, "VisualizerModel")
-  
+
   p = vis$plot()
   expect_s3_class(p, "ggplot")
 })
@@ -63,7 +63,7 @@ test_that("VisualizerModel with 2D classification task works", {
   vis = VisualizerModel$new(task, learner)
 
   expect_s3_class(vis, "VisualizerModel")
-  
+
   p = vis$plot()
   expect_s3_class(p, "ggplot")
 })
@@ -81,7 +81,7 @@ test_that("VisualizerModel add_training_data works for 1D", {
 
   p = vis$plot()
   expect_s3_class(p, "ggplot")
-  
+
   # Should have training points layer
   expect_true(length(p$layers) >= 2) # function line + training points
 })
@@ -99,7 +99,7 @@ test_that("VisualizerModel add_training_data works for 2D", {
 
   p = vis$plot()
   expect_s3_class(p, "ggplot")
-  
+
   # Should have additional layers for training data
   expect_true(length(p$layers) >= 2)
 })
@@ -113,7 +113,7 @@ test_that("VisualizerModel add_boundary works for 1D", {
   learner = lrn("regr.svm")
 
   vis = VisualizerModel$new(task, learner)
-  vis$add_boundary()  # Default boundary
+  vis$add_boundary() # Default boundary
 
   p = vis$plot()
   expect_s3_class(p, "ggplot")
@@ -129,11 +129,11 @@ test_that("VisualizerModel add_boundary works for 2D", {
   learner = lrn("classif.svm", predict_type = "prob")
 
   vis = VisualizerModel$new(task, learner)
-  vis$add_boundary()  # Should default to 0.5 for probability predictions
+  vis$add_boundary() # Should default to 0.5 for probability predictions
 
   p = vis$plot()
   expect_s3_class(p, "ggplot")
-  # Should have raster + contour layers for boundary  
+  # Should have raster + contour layers for boundary
   expect_true(length(p$layers) >= 2)
 })
 
@@ -161,7 +161,7 @@ test_that("VisualizerModel fails with >2D task", {
   skip_if_not_installed("mlr3learners")
 
   task = tsk("mtcars")
-  task$select(c("gear", "cyl", "carb"))  # 3 features
+  task$select(c("gear", "cyl", "carb")) # 3 features
 
   learner = lrn("regr.svm")
 
@@ -195,7 +195,7 @@ test_that("VisualizerModel classification with custom colors works", {
   learner = lrn("classif.svm", predict_type = "response")
 
   vis = VisualizerModel$new(task, learner)
-  
+
   # Custom colors for classification
   vis$add_training_data(color = c("spam" = "red", "nonspam" = "blue"))
 

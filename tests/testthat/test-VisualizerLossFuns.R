@@ -41,7 +41,7 @@ test_that("VisualizerLossFuns with prediction data works", {
 
 test_that("VisualizerLossFuns input validation works", {
   loss1 = lss("l2_se") # regression
-  
+
   # Basic test - single loss function should work
   vis1 = VisualizerLossFuns$new(list(loss1))
   expect_s3_class(vis1, "VisualizerLossFuns")
@@ -49,12 +49,15 @@ test_that("VisualizerLossFuns input validation works", {
 
   # Try to create VisualizerLossFuns with mixed task types if possible
   classif_keys = dict_loss$keys()[sapply(dict_loss$keys(), function(k) {
-    tryCatch({
-      loss = dict_loss$get(k)
-      loss$task_type == "classif"
-    }, error = function(e) FALSE)
+    tryCatch(
+      {
+        loss = dict_loss$get(k)
+        loss$task_type == "classif"
+      },
+      error = function(e) FALSE
+    )
   })]
-  
+
   if (length(classif_keys) > 0) {
     loss2 = lss(classif_keys[1]) # classification
 
@@ -143,7 +146,7 @@ test_that("VisualizerLossFuns range setting works", {
   # Test plotting with custom x-axis limits
   p1 = vis$plot(x_limits = c(-10, 10))
   expect_s3_class(p1, "ggplot")
-  
+
   # Test plotting with default limits
   p2 = vis$plot()
   expect_s3_class(p2, "ggplot")

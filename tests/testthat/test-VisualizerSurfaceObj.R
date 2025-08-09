@@ -181,24 +181,24 @@ test_that("VisualizerSurfaceObj multiple optimization traces work", {
 
 test_that("VisualizerSurfaceObj custom contours parameter works", {
   skip_if_not_installed("plotly")
-  
+
   obj = obj("TF_franke")
   vis = VisualizerSurfaceObj$new(obj, n_points = 10L)
-  
+
   # Test custom contours with objective limits
   llower = vis$objective$limits_lower
   lupper = vis$objective$limits_upper
   ssize = (lupper - llower) / 10
-  
+
   custom_contours = list(
     x = list(show = TRUE, start = llower[1], end = lupper[1], size = ssize[1], color = "red"),
     y = list(show = TRUE, start = llower[2], end = lupper[2], size = ssize[2], color = "blue")
   )
-  
+
   vis$init_layer_surface(
     contours = custom_contours
   )
-  
+
   # Should have a plot now
   p = vis$plot()
   expect_s3_class(p, "plotly")
@@ -206,16 +206,16 @@ test_that("VisualizerSurfaceObj custom contours parameter works", {
 
 test_that("VisualizerSurfaceObj add_contours parameter validation", {
   skip_if_not_installed("plotly")
-  
+
   obj = obj("TF_branin")
   vis = VisualizerSurfaceObj$new(obj, n_points = 5L)
-  
+
   # Test that invalid contours parameter is caught
   expect_error(vis$add_contours(contours = "invalid"), class = "simpleError")
-  
+
   # Test that NULL contours works (default behavior)
   expect_silent(vis$add_contours(contours = NULL))
-  
+
   # Test that empty list contours works
   expect_silent(vis$add_contours(contours = list()))
 })
@@ -227,14 +227,14 @@ test_that("VisualizerSurfaceObj layer methods use deferred rendering", {
   # Test that add_taylor works with deferred rendering
   x0 = c(2.5, 7.5)
   expect_silent(vis$add_taylor(x0, degree = 1))
-  
+
   # Test that add_hessian works with deferred rendering
   expect_silent(vis$add_hessian(x0))
-  
+
   # Verify layers are stored but plot isn't created until plot() is called
   layers = vis$.__enclos_env__$private$.layers_to_add
-  expect_true(length(layers) >= 2)  # Should have stored the taylor and hessian layers
-  
+  expect_true(length(layers) >= 2) # Should have stored the taylor and hessian layers
+
   # Now verify plot renders correctly
   expect_silent(vis$plot())
   p = vis$plot()

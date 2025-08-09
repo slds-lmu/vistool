@@ -36,7 +36,7 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
     #' Label of the z axis.
     z_lab = NULL,
 
-  # theme-driven styling is resolved at plot(); keep fields for labels only
+    # theme-driven styling is resolved at plot(); keep fields for labels only
 
     #' @description
     #' Creates a new instance of this [R6][R6::R6Class] class.
@@ -49,7 +49,7 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
     #' @template param_x1_lab
     #' @template param_x2_lab
     #' @template param_z_lab
-  initialize = function(grid, zmat, plot_lab = NULL, x1_lab = "x1", x2_lab = "x2", z_lab = "z") {
+    initialize = function(grid, zmat, plot_lab = NULL, x1_lab = "x1", x2_lab = "x2", z_lab = "z") {
       self$grid = checkmate::assert_list(grid)
       self$zmat = checkmate::assert_matrix(zmat)
       self$plot_lab = checkmate::assert_character(plot_lab, null.ok = TRUE)
@@ -74,7 +74,7 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
       checkmate::assert_number(opacity, lower = 0, upper = 1, null.ok = TRUE)
       # Resolve colorscale if it's "auto"
       if (is.null(colorscale) || (is.character(colorscale) && colorscale == "auto")) {
-  eff = if (is.null(private$.effective_theme)) get_pkg_theme_default() else private$.effective_theme
+        eff = if (is.null(private$.effective_theme)) get_pkg_theme_default() else private$.effective_theme
         colorscale = get_continuous_colorscale(eff$palette)
       }
       checkmate::assert_list(colorscale)
@@ -126,7 +126,7 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
       checkmate::assert_number(opacity, lower = 0, upper = 1, null.ok = TRUE)
       # Resolve colorscale if it's "auto"
       if (is.null(colorscale) || (is.character(colorscale) && colorscale == "auto")) {
-  eff = if (is.null(private$.effective_theme)) get_pkg_theme_default() else private$.effective_theme
+        eff = if (is.null(private$.effective_theme)) get_pkg_theme_default() else private$.effective_theme
         colorscale = get_continuous_colorscale(eff$palette)
       }
       checkmate::assert_list(colorscale)
@@ -136,10 +136,10 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
       private$.layer_primary = "surface"
 
       llp = list(x = self$grid$x1, y = self$grid$x2, z = self$zmat)
-      
+
       # Check if contours layer is stored and include it in the base surface
       contours_layer = private$get_layer("contours")
-      
+
       # Build trace arguments
       trace_args = list(
         name = self$plot_lab,
@@ -149,18 +149,18 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
         y = llp$y,
         z = t(llp$z),
         type = "surface",
-  opacity = if (is.null(opacity)) (if (is.null(private$.effective_theme)) get_pkg_theme_default()$alpha else private$.effective_theme$alpha) else opacity,
+        opacity = if (is.null(opacity)) (if (is.null(private$.effective_theme)) get_pkg_theme_default()$alpha else private$.effective_theme$alpha) else opacity,
         colorscale = colorscale
       )
-      
+
       # Add contours if available
       if (!is.null(contours_layer)) {
         trace_args$contours = contours_layer$contours
       }
-      
+
       # Add additional arguments
       trace_args = c(trace_args, list(...))
-      
+
       plot_obj = plot_ly()
       private$.plot = do.call(plotly::add_trace, c(list(plot_obj), trace_args)) %>%
         layout(
@@ -222,7 +222,7 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
     #' @return Self (invisibly) for method chaining.
     add_contours = function(contours = NULL, ...) {
       checkmate::assert_list(contours, null.ok = TRUE)
-      
+
       # Handle contours: custom contours or default z-projected contours
       if (is.null(contours)) {
         # Use default z-projected contours
@@ -237,7 +237,7 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
         # Use provided custom contours
         contours_final = contours
       }
-      
+
       # Store contours specification for deferred rendering
       private$store_layer("contours", list(
         contours = contours_final,
@@ -250,23 +250,23 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
     #' @description
     #' Create and return the plotly plot with model-specific layers.
     #' @param flatten (`logical(1)`)\cr
-    #'   If TRUE, display as 2D contour plot. If FALSE, display as 3D surface plot. 
+    #'   If TRUE, display as 2D contour plot. If FALSE, display as 3D surface plot.
     #' @param layout (`list()`)\cr
     #'   Layout options passed to `plotly::layout()`. Ignored by other visualizer types. Default is NULL.
     #' @param scene (`list()`)\cr
     #'   Scene options for 3D plots. Ignored by other visualizer types. Default is NULL.
     #' @param ... Additional arguments passed to the parent plot method.
     #' @return A plotly object.
-  plot = function(flatten = FALSE, layout = NULL, scene = NULL, ...) {
+    plot = function(flatten = FALSE, layout = NULL, scene = NULL, ...) {
       checkmate::assert_flag(flatten)
       checkmate::assert_list(layout, null.ok = TRUE)
       checkmate::assert_list(scene, null.ok = TRUE)
-      
+
       # Validate scene parameter is only used for surface plots
       if (!is.null(scene) && flatten) {
         stop("Scene parameter can only be used for surface plots (flatten = FALSE)")
       }
-      
+
       # Store VisualizerSurface-specific parameters before calling super$plot()
       private$.surface_plot_settings = list(
         flatten = flatten,
@@ -276,27 +276,27 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
 
       # Call parent method for common parameter validation and setup
       super$plot(...)
-      
-  # Effective theme and params
-  eff = private$.effective_theme
-  rp = private$.render_params
-  settings = c(list(), private$.surface_plot_settings)
-  self$resolve_layer_colors()
-      
-  plot_colorscale = get_continuous_colorscale(eff$palette)
-      
+
+      # Effective theme and params
+      eff = private$.effective_theme
+      rp = private$.render_params
+      settings = c(list(), private$.surface_plot_settings)
+      self$resolve_layer_colors()
+
+      plot_colorscale = get_continuous_colorscale(eff$palette)
+
       # Check if we need to reinitialize the plot
       # This happens if the plot type changes, colorscale changes, or contours are added/modified
       contours_layer = private$get_layer("contours")
       has_contours = !is.null(contours_layer)
       current_has_contours = !is.null(private$.vbase) && !is.null(private$.vbase$contours)
-      
-      needs_reinit = is.null(private$.plot) || 
-                     (settings$flatten && private$.layer_primary != "contour") ||
-                     (!settings$flatten && private$.layer_primary != "surface") ||
-                     (!identical(private$.vbase$colorscale, plot_colorscale)) ||
-                     (has_contours != current_has_contours)
-      
+
+      needs_reinit = is.null(private$.plot) ||
+        (settings$flatten && private$.layer_primary != "contour") ||
+        (!settings$flatten && private$.layer_primary != "surface") ||
+        (!identical(private$.vbase$colorscale, plot_colorscale)) ||
+        (has_contours != current_has_contours)
+
       # Initialize appropriate plot type based on flatten parameter
       if (needs_reinit) {
         if (settings$flatten) {
@@ -305,19 +305,19 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
           self$init_layer_surface(colorscale = plot_colorscale, opacity = eff$alpha, show_title = rp$show_title)
         }
       }
-      
+
       # apply text size to plotly layout
       if (!is.null(private$.plot)) {
         # Determine final labels
         final_title = if (rp$show_title) {
           if (!is.null(rp$plot_title)) rp$plot_title else self$plot_lab
         } else {
-          ""  # Empty string instead of NULL for plotly
+          "" # Empty string instead of NULL for plotly
         }
         final_x_lab = if (!is.null(rp$x_lab)) rp$x_lab else self$x1_lab
         final_y_lab = if (!is.null(rp$y_lab)) rp$y_lab else self$x2_lab
         final_z_lab = if (!is.null(rp$z_lab)) rp$z_lab else self$z_lab
-        
+
         if (private$.layer_primary == "surface") {
           # For 3D surface plots
           private$.plot = private$.plot %>%
@@ -356,26 +356,26 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
             )
         }
       }
-      
+
       # Apply additional layout options if provided
       if (!is.null(settings$layout)) {
         private$.plot = do.call(plotly::layout, c(list(private$.plot), settings$layout))
       }
-      
+
       # Apply scene options if provided (only for surface plots)
       if (!is.null(settings$scene) && private$.layer_primary == "surface") {
         private$.plot = private$.plot %>% plotly::layout(scene = settings$scene)
       }
-      
+
       # Add points from add_points() method
       if (private$.layer_primary == "surface") {
         private$.plot = private$add_points_to_plotly(private$.plot, "surface")
       } else {
         private$.plot = private$add_points_to_plotly(private$.plot, "contour")
       }
-      
-  private$.last_plot <- private$.plot
-  return(private$.plot)
+
+      private$.last_plot = private$.plot
+      return(private$.plot)
     }
   ),
   private = list(
@@ -398,15 +398,14 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
 
     # @field .freeze_plot (`logical(1)`) Indicator whether to freeze saving the plot elements.
     .freeze_plot = FALSE,
-    
+
     # @field .surface_plot_settings (`list`) Store VisualizerSurface-specific plot settings
     .surface_plot_settings = list(),
-    
+
     # Initialize default surface plot (called automatically by plot())
     .init_default_plot = function() {
       self$init_layer_surface()
     },
-    
     checkInit = function() {
       if (is.null(private$.plot)) {
         private$.init_default_plot()
@@ -422,35 +421,35 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
       }
       stop("Error in `$checkInput()`")
     },
-    
+
     # Override infer_z_values to use the surface's zmat
     infer_z_values = function(points_data) {
       # Use bilinear interpolation to estimate z values from the surface
       x_vals = points_data$x
       y_vals = points_data$y
-      
+
       # Get grid ranges
       x1_range = self$grid$x1
       x2_range = self$grid$x2
-      
+
       z_vals = numeric(length(x_vals))
-      
+
       for (i in seq_along(x_vals)) {
         x = x_vals[i]
         y = y_vals[i]
-        
+
         # Find closest grid points
         x1_idx = which.min(abs(x1_range - x))
         x2_idx = which.min(abs(x2_range - y))
-        
+
         # Clamp to grid boundaries
         x1_idx = max(1, min(length(x1_range), x1_idx))
         x2_idx = max(1, min(length(x2_range), x2_idx))
-        
+
         # Use the closest grid point value
         z_vals[i] = self$zmat[x1_idx, x2_idx]
       }
-      
+
       return(z_vals)
     }
   )
@@ -477,18 +476,20 @@ colSampler = function(alpha = NULL) {
 }
 
 #' Get consistent color palette
-#' 
+#'
 #' @description
 #' Returns a consistent color palette that matches the ggplot2 implementation.
 #' This ensures visual consistency between ggplot2 and plotly visualizations.
-#' 
+#'
 #' @param index (`integer(1)`)\cr
 #'   Index of the color to retrieve from the palette.
 #' @return A character string containing the color in hex format.
 get_consistent_color = function(index) {
   # Same color palette as used in Visualizer2DObj
-  colors = c("#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", 
-             "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf")
+  colors = c(
+    "#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd",
+    "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf"
+  )
   color_index = ((index - 1) %% length(colors)) + 1
   return(colors[color_index])
 }

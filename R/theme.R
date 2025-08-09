@@ -7,17 +7,16 @@
 #' th = vistool_theme(palette = "plasma", text_size = 12)
 #' @export
 vistool_theme = function(
-  palette = "viridis",
-  text_size = 11,
-  theme = "minimal",
-  alpha = 0.8,
-  line_width = 1.2,
-  point_size = 2,
-  legend_position = "right",
-  show_grid = TRUE,
-  grid_color = "gray90",
-  background = "white"
-) {
+    palette = "viridis",
+    text_size = 11,
+    theme = "minimal",
+    alpha = 0.8,
+    line_width = 1.2,
+    point_size = 2,
+    legend_position = "right",
+    show_grid = TRUE,
+    grid_color = "gray90",
+    background = "white") {
   th = list(
     palette = palette,
     text_size = text_size,
@@ -54,7 +53,9 @@ assert_vistool_theme = function(theme) {
 #' Merge two themes (override onto base)
 #' @keywords internal
 merge_theme = function(base, override) {
-  if (is.null(override)) return(base)
+  if (is.null(override)) {
+    return(base)
+  }
   assert_vistool_theme(base)
   assert_vistool_theme(override)
   mlr3misc::insert_named(base, override)

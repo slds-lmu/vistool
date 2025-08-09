@@ -70,7 +70,7 @@ vis_combined = as_visualizer(
   list(loss_huber, loss_l2, loss_l1, loss_logcosh),
   y_pred = seq(-4, 4),
   y_true = 0,
-  n_points = 5000L  # higher resolution for smooth curves
+  n_points = 5000L # higher resolution for smooth curves
 )
 vis_combined$plot()
 ```
@@ -142,7 +142,7 @@ vis_with_points$add_points(
   alpha = 0.8
 )$add_points(
   x = c(-2, 2),
-  loss_id = "l1",  # Specify the L1 loss
+  loss_id = "l1", # Specify the L1 loss
   show_line = FALSE,
   color = "blue",
   size = 2.5,

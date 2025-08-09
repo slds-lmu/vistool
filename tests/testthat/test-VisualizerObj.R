@@ -10,7 +10,7 @@ test_that("VisualizerObj basic functionality works", {
   vis = VisualizerObj$new(obj)
   expect_s3_class(vis, "VisualizerObj")
   expect_s3_class(vis, "Visualizer")
-  
+
   p = vis$plot()
   expect_s3_class(p, "ggplot")
 })
@@ -21,10 +21,10 @@ test_that("VisualizerObj handles missing bounds with defaults", {
     fun = function(x) x^2,
     xdim = 1
   )
-
+  vis = VisualizerObj$new(obj)
   expect_message(
-    vis <- VisualizerObj$new(obj),
-    "Objective bounds not available"
+    VisualizerObj$new(obj),
+    pattern = "Objective bounds not available"
   )
   expect_s3_class(vis, "VisualizerObj")
 })

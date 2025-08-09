@@ -41,15 +41,15 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
     #'   Desired input scale. One of `"auto"`, `"score"`, `"probability"`.
     #'   `"auto"` (default) chooses the common `input_default` of the supplied
     #'   losses.
-  #' @param ... Additional arguments (currently unused).
-  initialize = function(losses, y_pred = NULL, y_true = NULL,
-              input_type = "auto", ...) {
+    #' @param ... Additional arguments (currently unused).
+    initialize = function(losses, y_pred = NULL, y_true = NULL,
+                          input_type = "auto", ...) {
       checkmate::assert_list(losses, "LossFunction")
       checkmate::assert_numeric(y_pred, null.ok = TRUE)
       checkmate::assert_numeric(y_true, null.ok = TRUE)
       checkmate::assert_choice(input_type, choices = c("auto", "score", "probability"))
 
-  # Theme defaults are handled by base Visualizer via set_theme()/plot(theme=...)
+      # Theme defaults are handled by base Visualizer via set_theme()/plot(theme=...)
 
       tts = unique(sapply(losses, function(x) x$task_type))
       if (length(tts) > 1) {
@@ -76,7 +76,7 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
       names(losses) = ids
       self$losses = losses
       self$task_type = unique(tts)
-      
+
       self$input_type = input_type
       self$y_pred = y_pred
       self$y_true = y_true
@@ -102,7 +102,7 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
       checkmate::assert_numeric(line_width, null.ok = TRUE)
       checkmate::assert_character(line_col, null.ok = TRUE)
       checkmate::assert_character(line_type, null.ok = TRUE)
-      
+
       # Store VisualizerLossFuns-specific parameters before calling super$plot()
       private$.loss_plot_settings = list(
         n_points = as.integer(n_points),
@@ -111,7 +111,7 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
         line_col = line_col,
         line_type = line_type
       )
-      
+
       # Set up default plot labels and limits based on task type and input type
       default_x_lab = if (self$task_type == "classif") {
         if (self$input_type == "score") {
@@ -122,7 +122,7 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
       } else {
         "y - f"
       }
-      
+
       # Set default x_limits based on task type, input type, and available data
       default_x_limits = if (self$task_type == "classif" && self$input_type == "probability") {
         if (!is.null(self$y_pred)) {
@@ -137,13 +137,13 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
           } else {
             residuals = self$y_true - self$y_pred
           }
-          range_extend = diff(range(residuals)) * 0.1  # Add 10% padding
+          range_extend = diff(range(residuals)) * 0.1 # Add 10% padding
           c(min(residuals) - range_extend, max(residuals) + range_extend)
         } else {
           c(-5, 5)
         }
       }
-      
+
       # Call parent method for common parameter validation and setup
       # Pass default labels and limits if not explicitly provided
       dots = list(...)
@@ -152,16 +152,16 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
       if (is.null(dots$x_limits)) dots$x_limits = default_x_limits
       if (is.null(dots$legend_title)) dots$legend_title = "Loss Function"
       if (is.null(dots$plot_title)) dots$plot_title = ""
-      
-  do.call(super$plot, dots)
-      
-  # Resolve layer colors now that we have plot settings
-  self$resolve_layer_colors()
-      
-  # Render the plot
-  p <- private$render_plot()
-  private$.last_plot <- p
-  return(p)
+
+      do.call(super$plot, dots)
+
+      # Resolve layer colors now that we have plot settings
+      self$resolve_layer_colors()
+
+      # Render the plot
+      p = private$render_plot()
+      private$.last_plot = p
+      return(p)
     },
 
     #' @description
@@ -191,7 +191,7 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
     #'   Alpha transparency of vertical lines. If NULL, uses alpha * 0.7.
     #' @param ... Additional arguments passed to point and line geoms.
     add_points = function(x, loss_id = NULL, show_line = TRUE, color = "red", size = 3, alpha = 0.8,
-                         line_color = NULL, line_alpha = NULL, ...) {
+                          line_color = NULL, line_alpha = NULL, ...) {
       checkmate::assert_numeric(x)
       checkmate::assert_string(loss_id, null.ok = TRUE)
       checkmate::assert_flag(show_line)
@@ -200,7 +200,7 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
       checkmate::assert_number(alpha, lower = 0, upper = 1)
       checkmate::assert_string(line_color, null.ok = TRUE)
       checkmate::assert_number(line_alpha, lower = 0, upper = 1, null.ok = TRUE)
-      
+
       # Store layer specification using layer system
       private$store_layer("loss_points", list(
         x = x, loss_id = loss_id, show_line = show_line, color = color, size = size, alpha = alpha,
@@ -210,8 +210,8 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
     }
   ),
   private = list(
-    .loss_plot_settings = NULL,  # Store loss-specific plot settings
-    
+    .loss_plot_settings = NULL, # Store loss-specific plot settings
+
     # Override infer_z_values to handle loss function evaluation
     infer_z_values = function(points_data) {
       # For loss function visualizers, we can evaluate the loss at given points
@@ -233,28 +233,28 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
     # Override prepare_points_data to handle loss function-specific point preparation
     prepare_points_data = function(points, visualizer_type) {
       points_data = super$prepare_points_data(points, visualizer_type)
-      
+
       # For loss function visualizers, try to infer y values if not provided
       if (visualizer_type == "1D" && all(is.na(points_data$y))) {
         points_data$y = private$infer_z_values(points_data)
       }
-      
+
       return(points_data)
     },
 
     # Render the complete plot using stored settings and layers
     render_plot = function() {
-  eff = if (is.null(private$.effective_theme)) get_pkg_theme_default() else private$.effective_theme
-  settings = private$.render_params
+      eff = if (is.null(private$.effective_theme)) get_pkg_theme_default() else private$.effective_theme
+      settings = private$.render_params
       loss_settings = private$.loss_plot_settings
-      
+
       # Determine final labels
       final_title = if (settings$show_title) {
         if (!is.null(settings$plot_title)) settings$plot_title else ""
       } else {
         NULL
       }
-      
+
       # Convert string labels back to expressions for proper mathematical notation
       final_x_lab = if (!is.null(settings$x_lab)) {
         if (settings$x_lab == "y - f") {
@@ -264,23 +264,23 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
         } else if (settings$x_lab == "π") {
           expression(pi)
         } else {
-          settings$x_lab  # Use as-is if it's a custom label
+          settings$x_lab # Use as-is if it's a custom label
         }
       } else {
         NULL
       }
-      
+
       final_y_lab = settings$y_lab
       final_legend_title = settings$legend_title
-      
+
       # Create the base plot with loss function curves
       pl = private$render_loss_curves()
-      
+
       # Add stored layers
       pl = private$render_stored_layers(pl)
-      
+
       # Apply final styling
-    theme_fun = switch(eff$theme,
+      theme_fun = switch(eff$theme,
         "minimal" = ggplot2::theme_minimal,
         "bw"      = ggplot2::theme_bw,
         "classic" = ggplot2::theme_classic,
@@ -289,15 +289,15 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
         "dark"    = ggplot2::theme_dark,
         "void"    = ggplot2::theme_void
       )
-    pl = pl + theme_fun(base_size = eff$text_size) +
+      pl = pl + theme_fun(base_size = eff$text_size) +
         ggplot2::theme(
           plot.title = ggplot2::element_text(hjust = 0.5),
-      legend.position = if (settings$show_legend && settings$legend_position != "none") settings$legend_position else "none",
-      panel.grid = if (eff$show_grid) ggplot2::element_line(color = eff$grid_color) else ggplot2::element_blank()
+          legend.position = if (settings$show_legend && settings$legend_position != "none") settings$legend_position else "none",
+          panel.grid = if (eff$show_grid) ggplot2::element_line(color = eff$grid_color) else ggplot2::element_blank()
         )
 
       pl = pl + ggplot2::labs(title = final_title, subtitle = settings$plot_subtitle, x = final_x_lab, y = final_y_lab)
-      
+
       # Apply axis limits if specified
       if (!is.null(settings$x_limits)) {
         pl = pl + ggplot2::xlim(settings$x_limits[1], settings$x_limits[2])
@@ -311,7 +311,7 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
 
     # Render the base loss function curves
     render_loss_curves = function() {
-  settings = private$.render_params
+      settings = private$.render_params
       loss_settings = private$.loss_plot_settings
       final_legend_title = settings$legend_title
       loss_labels = sapply(self$losses, function(x) x$label)
@@ -323,8 +323,8 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
           p_max = min(max(self$y_pred), 1)
           r_seq = seq(p_min, p_max, length.out = loss_settings$n_points)
         } else {
-          xlim <- settings$x_limits
-          if (is.null(xlim)) xlim <- c(0, 1)
+          xlim = settings$x_limits
+          if (is.null(xlim)) xlim = c(0, 1)
           r_seq = seq(xlim[1], xlim[2], length.out = loss_settings$n_points)
         }
 
@@ -358,12 +358,13 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
 
         pl = ggplot2::ggplot(
           data = dd,
-          ggplot2::aes(x = r, y = loss_val,
-                       col = loss_fun,
-                       linetype = y_val)
+          ggplot2::aes(
+            x = r, y = loss_val,
+            col = loss_fun,
+            linetype = y_val
+          )
         ) +
           ggplot2::geom_line(linewidth = if (!is.null(loss_settings$line_width)) loss_settings$line_width[1] else 1.2)
-
       } else {
         # ---- regression or score/margin classification ----
         if (!is.null(self$y_pred) && !is.null(self$y_true)) {
@@ -374,8 +375,8 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
           }
           r_seq = seq(min(residuals), max(residuals), length.out = loss_settings$n_points)
         } else {
-          xlim <- settings$x_limits
-          if (is.null(xlim)) xlim <- c(-5, 5)
+          xlim = settings$x_limits
+          if (is.null(xlim)) xlim = c(-5, 5)
           r_seq = seq(xlim[1], xlim[2], length.out = loss_settings$n_points)
         }
 
@@ -393,17 +394,21 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
         if (!is.null(loss_settings$line_type)) {
           pl = ggplot2::ggplot(
             data = dd,
-            ggplot2::aes(x = r, y = loss_val,
-                         col = loss_fun,
-                         linetype = loss_fun)
+            ggplot2::aes(
+              x = r, y = loss_val,
+              col = loss_fun,
+              linetype = loss_fun
+            )
           ) +
             ggplot2::geom_line(linewidth = if (!is.null(loss_settings$line_width)) loss_settings$line_width[1] else 1.2)
         } else {
           # Don't map linetype to avoid duplicate legend
           pl = ggplot2::ggplot(
             data = dd,
-            ggplot2::aes(x = r, y = loss_val,
-                         col = loss_fun)
+            ggplot2::aes(
+              x = r, y = loss_val,
+              col = loss_fun
+            )
           ) +
             ggplot2::geom_line(linewidth = if (!is.null(loss_settings$line_width)) loss_settings$line_width[1] else 1.2)
         }
@@ -439,10 +444,12 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
         if (self$task_type == "classif" && self$input_type == "probability") {
           pl = ggplot2::ggplot(
             data = dd,
-            ggplot2::aes(x = r, y = loss_val,
-                         col = loss_fun,
-                         linetype = y_val,
-                         linewidth = loss_fun)
+            ggplot2::aes(
+              x = r, y = loss_val,
+              col = loss_fun,
+              linetype = y_val,
+              linewidth = loss_fun
+            )
           ) +
             ggplot2::geom_line() +
             ggplot2::scale_color_manual(values = color_values, labels = loss_labels, name = final_legend_title) +
@@ -452,10 +459,12 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
           if (!is.null(loss_settings$line_type)) {
             pl = ggplot2::ggplot(
               data = dd,
-              ggplot2::aes(x = r, y = loss_val,
-                           col = loss_fun,
-                           linetype = loss_fun,
-                           linewidth = loss_fun)
+              ggplot2::aes(
+                x = r, y = loss_val,
+                col = loss_fun,
+                linetype = loss_fun,
+                linewidth = loss_fun
+              )
             ) +
               ggplot2::geom_line() +
               ggplot2::scale_color_manual(values = color_values, labels = loss_labels, name = final_legend_title) +
@@ -463,9 +472,11 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
           } else {
             pl = ggplot2::ggplot(
               data = dd,
-              ggplot2::aes(x = r, y = loss_val,
-                           col = loss_fun,
-                           linewidth = loss_fun)
+              ggplot2::aes(
+                x = r, y = loss_val,
+                col = loss_fun,
+                linewidth = loss_fun
+              )
             ) +
               ggplot2::geom_line() +
               ggplot2::scale_color_manual(values = color_values, labels = loss_labels, name = final_legend_title) +
@@ -485,7 +496,7 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
           pl = pl + ggplot2::scale_linetype_manual(values = "solid", labels = unique(dd$y_val), name = "Class")
         } else {
           # Get the unique y_val levels in the order they will appear as factor levels
-          y_levels = sort(unique(dd$y_val))  # This gives alphabetical order like factor()
+          y_levels = sort(unique(dd$y_val)) # This gives alphabetical order like factor()
           # Create corresponding line types: solid for y=1, dashed for y=0
           line_types = ifelse(y_levels == "y = 1", "solid", "dashed")
           pl = pl + ggplot2::scale_linetype_manual(values = line_types, labels = y_levels, name = "Class")
@@ -503,7 +514,7 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
           if (layer$type == "points") {
             # Handle generic points from base class
             points_data = private$prepare_points_data(layer$spec$points, "1D")
-            
+
             # Add points layer
             plot_obj = plot_obj + ggplot2::geom_point(
               data = points_data,
@@ -519,7 +530,7 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
           }
         }
       }
-      
+
       return(plot_obj)
     },
 
@@ -537,16 +548,16 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
         }
         loss_fun = self$losses[[point_spec$loss_id]]$get_fun(self$input_type)
       }
-      
+
       # Calculate y-values by evaluating the loss function
       y_vals = loss_fun(point_spec$x)
-      
+
       # Create points data
       points_data = data.frame(
         x = point_spec$x,
         y = y_vals
       )
-      
+
       # Add points
       plot_obj = plot_obj + ggplot2::geom_point(
         data = points_data,
@@ -554,17 +565,17 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
         color = point_spec$color,
         size = point_spec$size,
         alpha = point_spec$alpha,
-        shape = 21,  # Circle with border and fill
-        fill = "white",  # Hollow center
-        stroke = 1,  # Border thickness
+        shape = 21, # Circle with border and fill
+        fill = "white", # Hollow center
+        stroke = 1, # Border thickness
         inherit.aes = FALSE
       )
-      
+
       # Add vertical lines if requested
       if (point_spec$show_line) {
         line_color = if (is.null(point_spec$line_color)) point_spec$color else point_spec$line_color
         line_alpha = if (is.null(point_spec$line_alpha)) point_spec$alpha * 0.7 else point_spec$line_alpha
-        
+
         # Create line segments from points to x-axis
         line_data = data.frame(
           x = point_spec$x,
@@ -572,7 +583,7 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
           xend = point_spec$x,
           yend = 0
         )
-        
+
         plot_obj = plot_obj + ggplot2::geom_segment(
           data = line_data,
           ggplot2::aes(x = x, y = y, xend = xend, yend = yend),
@@ -582,7 +593,7 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
           inherit.aes = FALSE
         )
       }
-      
+
       return(plot_obj)
     }
   )

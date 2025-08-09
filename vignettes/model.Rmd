@@ -108,14 +108,18 @@ vis$add_boundary(values = c(0.3, 0.5, 0.7))$plot()
 
 For classification tasks, `add_training_data()` supports setting different colors and shapes for the different classes.
 ```{r, out.width='100%', out.height='700px'}
-vis$add_training_data(color = c(pos = "red", neg = "blue"), 
-                       shape = c(pos = 17, neg = 19))$plot()
+vis$add_training_data(
+  color = c(pos = "red", neg = "blue"),
+  shape = c(pos = 17, neg = 19)
+)$plot()
 ```
 
 For surface plots, the same class-specific styling is supported.
 
 ```{r, out.width='100%', out.height='700px'}
 vis_surface = as_visualizer(task, learner = learner, type = "surface")
-vis_surface$add_training_data(color = c(pos = "red", neg = "blue"),
-                              shape = c(pos = 0, neg = 1))$plot()
+vis_surface$add_training_data(
+  color = c(pos = "red", neg = "blue"),
+  shape = c(pos = 0, neg = 1)
+)$plot()
 ```

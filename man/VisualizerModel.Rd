@@ -10,7 +10,7 @@ Returns self invisibly.
 }
 \description{
 This class provides a unified interface for visualizing machine learning models
-on both 1D and 2D tasks. It automatically detects the dimensionality and 
+on both 1D and 2D tasks. It automatically detects the dimensionality and
 creates appropriate visualizations using ggplot2.
 }
 \section{Super class}{

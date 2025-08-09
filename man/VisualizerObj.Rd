@@ -8,7 +8,7 @@ Returns self invisibly.
 }
 \description{
 This class provides a unified interface for visualizing objective functions
-and optimization traces on both 1D and 2D objectives. It automatically detects 
+and optimization traces on both 1D and 2D objectives. It automatically detects
 the dimensionality and creates appropriate visualizations using ggplot2.
 }
 \section{Super class}{

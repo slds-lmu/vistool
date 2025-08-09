@@ -25,7 +25,7 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
     #' @template param_x2_limits
     #' @template param_padding
     #' @template param_n_points
-  initialize = function(objective, x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L) {
+    initialize = function(objective, x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L) {
       self$objective = checkmate::assert_r6(objective, "Objective")
       checkmate::assert_numeric(x1_limits, len = 2, null.ok = TRUE)
       checkmate::assert_numeric(x2_limits, len = 2, null.ok = TRUE)
@@ -107,13 +107,13 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
       checkmate::assert_count(npoints, null.ok = TRUE)
       checkmate::assert_count(npmax, null.ok = TRUE)
       checkmate::assert_string(line_color, null.ok = TRUE)
-      
+
       # Store layer specification without immediately resolving colors
       # Colors will be resolved in plot() when color_palette is known
       if (is.null(line_color)) {
-        line_color = "auto"  # Mark for automatic color assignment
+        line_color = "auto" # Mark for automatic color assignment
       }
-      
+
       # Store the optimization trace layer for later processing
       private$store_layer("optimization_trace", list(
         optimizer = opt,
@@ -128,7 +128,7 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
         marker_color = marker_color,
         args = list(...)
       ))
-      
+
       return(invisible(self))
     },
 
@@ -139,10 +139,10 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
     #'   Additional arguments passed to the parent plot method.
     #'
     #' @return The plotly object.
-  plot = function(...) {
+    plot = function(...) {
       # Call parent plot method first to set up plot_settings and resolve colors
       super$plot(...)
-      
+
       # render layers in the order they were added
       if (!is.null(private$.layers_to_add)) {
         for (layer in private$.layers_to_add) {
@@ -155,8 +155,8 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
           }
         }
       }
-  private$.last_plot <- private$.plot
-  return(private$.plot)
+      private$.last_plot = private$.plot
+      return(private$.plot)
     },
 
     #' @description
@@ -195,7 +195,7 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
         zlim = zlim,
         args = list(...)
       ))
-      
+
       return(invisible(self))
     },
 
@@ -222,7 +222,7 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
         x2length = x2length,
         args = list(...)
       ))
-      
+
       return(invisible(self))
     },
 
@@ -306,21 +306,21 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
   ),
   private = list(
     .trace_count = 0,
-    
+
     # Render stored optimization trace layers
     render_optimization_trace_layers = function() {
       # Get all stored optimization trace layers
       trace_layers = private$get_layers_by_type("optimization_trace")
-      
+
       if (length(trace_layers) == 0) {
         return()
       }
-      
+
       for (trace_spec in trace_layers) {
         private$render_optimization_trace_layer(trace_spec)
       }
     },
-    
+
     # Render a single optimization trace layer
     render_optimization_trace_layer = function(layer_spec) {
       opt = layer_spec$optimizer
@@ -340,7 +340,7 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
         private$.trace_count = private$.trace_count + 1
         line_color = private$get_auto_color_with_palette()
       }
-      
+
       if (is.null(private$.plot)) private$.init_default_plot()
 
       if (nrow(opt$archive) == 0) {
@@ -463,21 +463,21 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
       }
       private$.plot = do.call(plotly::add_trace, c(list(private$.plot), pargs))
     },
-    
+
     # Render stored Taylor approximation layers
     render_taylor_layers = function() {
       # Get all stored Taylor layers
       taylor_layers = private$get_layers_by_type("taylor")
-      
+
       if (length(taylor_layers) == 0) {
         return()
       }
-      
+
       for (taylor_spec in taylor_layers) {
         private$render_taylor_layer(taylor_spec)
       }
     },
-    
+
     # Render a single Taylor approximation layer
     render_taylor_layer = function(layer_spec) {
       x0 = layer_spec$x0
@@ -487,14 +487,14 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
       npoints_per_dim = layer_spec$npoints_per_dim
       zlim = layer_spec$zlim
       aargs = layer_spec$args
-      
+
       if (is.null(private$.plot)) private$.init_default_plot()
-      
+
       # Check if this is only available for surface mode
       if (private$.layer_primary != "surface") {
         stop("Taylor approximation is currently only available for surface plots")
       }
-      
+
       f0 = self$objective$eval(x0)
       g = self$objective$grad(x0)
       h = self$objective$hess(x0)
@@ -534,28 +534,28 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
 
       private$.plot = do.call(plotly::add_surface, c(list(private$.plot, x = grid[, 1], y = grid[, 2], z = t(z), showscale = FALSE), aargs))
     },
-    
+
     # Render stored Hessian eigenvector layers
     render_hessian_layers = function() {
       # Get all stored Hessian layers
       hessian_layers = private$get_layers_by_type("hessian")
-      
+
       if (length(hessian_layers) == 0) {
         return()
       }
-      
+
       for (hessian_spec in hessian_layers) {
         private$render_hessian_layer(hessian_spec)
       }
     },
-    
+
     # Render a single Hessian eigenvector layer
     render_hessian_layer = function(layer_spec) {
       x0 = layer_spec$x0
       x1length = layer_spec$x1length
       x2length = layer_spec$x2length
       aargs = layer_spec$args
-      
+
       if (is.null(private$.plot)) private$.init_default_plot()
 
       f0 = self$objective$eval(x0)

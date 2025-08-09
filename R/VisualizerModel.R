@@ -2,7 +2,7 @@
 #'
 #' @description
 #' This class provides a unified interface for visualizing machine learning models
-#' on both 1D and 2D tasks. It automatically detects the dimensionality and 
+#' on both 1D and 2D tasks. It automatically detects the dimensionality and
 #' creates appropriate visualizations using ggplot2.
 #'
 #' @template param_x1_limits
@@ -37,8 +37,8 @@ VisualizerModel = R6::R6Class("VisualizerModel",
     #'   If NULL, will be determined from task data.
     #' @template param_padding
     #' @template param_n_points
-    initialize = function(task, learner, x1_limits = NULL, x2_limits = NULL, 
-                         padding = 0, n_points = 100L) {
+    initialize = function(task, learner, x1_limits = NULL, x2_limits = NULL,
+                          padding = 0, n_points = 100L) {
       # Validate inputs
       self$task = mlr3::assert_task(task)
       self$learner = mlr3::assert_learner(learner, task = self$task)
@@ -46,16 +46,20 @@ VisualizerModel = R6::R6Class("VisualizerModel",
       checkmate::assert_numeric(x2_limits, len = 2, null.ok = TRUE)
       checkmate::assert_number(padding, lower = 0)
       checkmate::assert_count(n_points)
-      
+
       # Determine dimensionality
       n_features = length(task$feature_names)
-      private$.dimensionality = if (n_features == 1) "1d" else if (n_features == 2) "2d" else {
+      private$.dimensionality = if (n_features == 1) {
+        "1d"
+      } else if (n_features == 2) {
+        "2d"
+      } else {
         stop("VisualizerModel supports only 1D and 2D tasks.")
       }
-      
+
       # Train the learner
       self$learner$train(task)
-      
+
       # Initialize appropriate data structure
       if (private$.dimensionality == "1d") {
         private$initialize_1d_data(x1_limits, n_points)
@@ -84,8 +88,8 @@ VisualizerModel = R6::R6Class("VisualizerModel",
     #' @param label_size (`numeric(1)`)\cr
     #'   Size of data point labels. If NULL, defaults to smaller text.
     #' @template return_self_invisible
-    add_training_data = function(color = "auto", size = 2, shape = 19, alpha = 1, 
-                                show_labels = FALSE, label_size = NULL) {
+    add_training_data = function(color = "auto", size = 2, shape = 19, alpha = 1,
+                                 show_labels = FALSE, label_size = NULL) {
       # Validate arguments
       checkmate::assert(
         checkmate::check_string(color),
@@ -99,10 +103,10 @@ VisualizerModel = R6::R6Class("VisualizerModel",
       checkmate::assert_number(alpha, lower = 0, upper = 1)
       checkmate::assert_flag(show_labels)
       checkmate::assert_number(label_size, lower = 0, null.ok = TRUE)
-      
+
       # Get training data in dimension-appropriate format
       training_data = private$get_training_data()
-      
+
       # Store training data specification without resolving colors yet
       private$store_layer("training_data", list(
         data = training_data,
@@ -135,14 +139,14 @@ VisualizerModel = R6::R6Class("VisualizerModel",
     #' @param alpha (`numeric(1)`)\cr
     #'   Alpha transparency of boundary lines. Default is 0.8.
     #' @template return_self_invisible
-    add_boundary = function(values = NULL, color = "black", linetype = "dashed", 
-                           linewidth = 1, alpha = 0.8) {
+    add_boundary = function(values = NULL, color = "black", linetype = "dashed",
+                            linewidth = 1, alpha = 0.8) {
       checkmate::assert_numeric(values, null.ok = TRUE)
       checkmate::assert_string(color)
       checkmate::assert_string(linetype)
       checkmate::assert_number(linewidth, lower = 0)
       checkmate::assert_number(alpha, lower = 0, upper = 1)
-      
+
       # Determine default values based on dimensionality and prediction type
       if (is.null(values)) {
         if (self$learner$predict_type == "prob") {
@@ -152,10 +156,10 @@ VisualizerModel = R6::R6Class("VisualizerModel",
           values = median(private$.data_structure$coordinates$y, na.rm = TRUE)
         }
       }
-      
+
       # Validate boundary values are reasonable
       private$validate_boundary_values(values)
-      
+
       # Store boundary specification
       private$store_layer("boundary", list(
         values = values,
@@ -172,39 +176,38 @@ VisualizerModel = R6::R6Class("VisualizerModel",
     #' Create and return the ggplot2 plot with model-specific layers.
     #' @param ... Additional arguments passed to the parent plot method.
     #' @return A ggplot2 object.
-  plot = function(...) {
+    plot = function(...) {
       # Call parent plot method for validation and settings storage
       super$plot(...)
-      
+
       # Initialize the base plot based on dimensionality
       if (private$.dimensionality == "1d") {
         private$init_1d_plot()
       } else {
         private$init_2d_plot()
       }
-      
+
       # Render stored layers in the order they were added
       private$render_all_layers()
-      
-  # Resolve layer colors after rendering
-  self$resolve_layer_colors()
-      
-  private$.last_plot <- private$.plot
-  return(private$.plot)
+
+      # Resolve layer colors after rendering
+      self$resolve_layer_colors()
+
+      private$.last_plot = private$.plot
+      return(private$.plot)
     }
   ),
-  
   private = list(
-    .dimensionality = NULL,    # "1d" or "2d"
-    .data_structure = NULL,    # Unified data container
-    .plot = NULL,              # The actual ggplot2 object
-    
+    .dimensionality = NULL, # "1d" or "2d"
+    .data_structure = NULL, # Unified data container
+    .plot = NULL, # The actual ggplot2 object
+
     # Render all stored layers in the order they were added
     render_all_layers = function() {
       if (is.null(private$.layers_to_add)) {
         return()
       }
-      
+
       for (layer in private$.layers_to_add) {
         if (layer$type == "training_data") {
           private$render_training_data_layer(layer$spec)
@@ -216,41 +219,41 @@ VisualizerModel = R6::R6Class("VisualizerModel",
         }
       }
     },
-    
+
     # Initialize 1D plot with function line
     init_1d_plot = function() {
-  # Resolve theme and render params
-  eff = private$.effective_theme
-  rp = private$.render_params
-      
+      # Resolve theme and render params
+      eff = private$.effective_theme
+      rp = private$.render_params
+
       # Create base data for the function line
       plot_data = data.frame(
         x = private$.data_structure$coordinates$x1,
         y = private$.data_structure$coordinates$y
       )
-      
+
       # Create base ggplot
       private$.plot = private$init_ggplot(plot_data, "x", "y")
-      
+
       # Add the function line
-  private$.plot = private$.plot + ggplot2::geom_line(color = "blue", linewidth = if (is.null(eff$line_width)) 1.2 else eff$line_width)
-      
+      private$.plot = private$.plot + ggplot2::geom_line(color = "blue", linewidth = if (is.null(eff$line_width)) 1.2 else eff$line_width)
+
       # Apply theme and styling
-  private$.plot = private$apply_ggplot_theme(private$.plot, eff$text_size, eff$title_size, eff$theme, eff$background, eff$show_grid, eff$grid_color)
-      
+      private$.plot = private$apply_ggplot_theme(private$.plot, eff$text_size, eff$title_size, eff$theme, eff$background, eff$show_grid, eff$grid_color)
+
       # Determine labels
-  title_text = if (!is.null(rp$plot_title)) rp$plot_title else private$.data_structure$labels$title
-  x_text = if (!is.null(rp$x_lab)) rp$x_lab else private$.data_structure$labels$x1
-  y_text = if (!is.null(rp$y_lab)) rp$y_lab else private$.data_structure$labels$y
-      
+      title_text = if (!is.null(rp$plot_title)) rp$plot_title else private$.data_structure$labels$title
+      x_text = if (!is.null(rp$x_lab)) rp$x_lab else private$.data_structure$labels$x1
+      y_text = if (!is.null(rp$y_lab)) rp$y_lab else private$.data_structure$labels$y
+
       # Add labels conditionally
       private$.plot = private$.plot + ggplot2::labs(
-  title = if (rp$show_title) title_text else NULL,
-  subtitle = rp$plot_subtitle,
+        title = if (rp$show_title) title_text else NULL,
+        subtitle = rp$plot_subtitle,
         x = x_text,
         y = y_text
       )
-      
+
       # Apply axis limits
       if (!is.null(rp$x_limits)) {
         private$.plot = private$.plot + ggplot2::xlim(rp$x_limits)
@@ -258,21 +261,21 @@ VisualizerModel = R6::R6Class("VisualizerModel",
       if (!is.null(rp$y_limits)) {
         private$.plot = private$.plot + ggplot2::ylim(rp$y_limits)
       }
-      
+
       # Apply grid settings
-    if (!eff$show_grid) {
+      if (!eff$show_grid) {
         private$.plot = private$.plot + ggplot2::theme(panel.grid = ggplot2::element_blank())
       } else {
         private$.plot = private$.plot + ggplot2::theme(
-      panel.grid = ggplot2::element_line(color = eff$grid_color)
+          panel.grid = ggplot2::element_line(color = eff$grid_color)
         )
       }
-      
+
       # Apply title size
       private$.plot = private$.plot + ggplot2::theme(
         plot.title = ggplot2::element_text(size = eff$title_size)
       )
-      
+
       # Apply legend settings
       if (!rp$show_legend) {
         private$.plot = private$.plot + ggplot2::theme(legend.position = "none")
@@ -280,46 +283,46 @@ VisualizerModel = R6::R6Class("VisualizerModel",
         private$.plot = private$.plot + ggplot2::theme(legend.position = eff$legend_position)
       }
     },
-    
+
     # Initialize 2D plot with filled contour/raster
     init_2d_plot = function() {
-  eff = private$.effective_theme
-  rp = private$.render_params
-      
+      eff = private$.effective_theme
+      rp = private$.render_params
+
       # Create base data for the filled contour
       plot_data = data.frame(
         x1 = private$.data_structure$coordinates$x1,
         x2 = private$.data_structure$coordinates$x2,
         y = private$.data_structure$coordinates$y
       )
-      
+
       # Create base ggplot
       private$.plot = private$init_ggplot(plot_data, "x1", "x2")
-      
+
       # Add filled contour or raster
-  private$.plot = private$.plot + ggplot2::geom_raster(ggplot2::aes(fill = y), alpha = eff$alpha)
-      
+      private$.plot = private$.plot + ggplot2::geom_raster(ggplot2::aes(fill = y), alpha = eff$alpha)
+
       # Apply color scale
-  private$.plot = private$apply_ggplot_color_scale(private$.plot, eff$palette, "fill")
-      
+      private$.plot = private$apply_ggplot_color_scale(private$.plot, eff$palette, "fill")
+
       # Apply theme and styling
-  private$.plot = private$apply_ggplot_theme(private$.plot, eff$text_size, eff$title_size, eff$theme, eff$background, eff$show_grid, eff$grid_color)
-      
+      private$.plot = private$apply_ggplot_theme(private$.plot, eff$text_size, eff$title_size, eff$theme, eff$background, eff$show_grid, eff$grid_color)
+
       # Determine labels
-  title_text = if (!is.null(rp$plot_title)) rp$plot_title else private$.data_structure$labels$title
-  x_text = if (!is.null(rp$x_lab)) rp$x_lab else private$.data_structure$labels$x1
-  y_text = if (!is.null(rp$y_lab)) rp$y_lab else private$.data_structure$labels$x2
-  fill_text = if (!is.null(rp$legend_title)) rp$legend_title else private$.data_structure$labels$y
-      
+      title_text = if (!is.null(rp$plot_title)) rp$plot_title else private$.data_structure$labels$title
+      x_text = if (!is.null(rp$x_lab)) rp$x_lab else private$.data_structure$labels$x1
+      y_text = if (!is.null(rp$y_lab)) rp$y_lab else private$.data_structure$labels$x2
+      fill_text = if (!is.null(rp$legend_title)) rp$legend_title else private$.data_structure$labels$y
+
       # Add labels conditionally
       private$.plot = private$.plot + ggplot2::labs(
-  title = if (rp$show_title) title_text else NULL,
-  subtitle = rp$plot_subtitle,
+        title = if (rp$show_title) title_text else NULL,
+        subtitle = rp$plot_subtitle,
         x = x_text,
         y = y_text,
         fill = fill_text
       )
-      
+
       # Apply axis limits
       if (!is.null(rp$x_limits)) {
         private$.plot = private$.plot + ggplot2::xlim(rp$x_limits)
@@ -327,21 +330,21 @@ VisualizerModel = R6::R6Class("VisualizerModel",
       if (!is.null(rp$y_limits)) {
         private$.plot = private$.plot + ggplot2::ylim(rp$y_limits)
       }
-      
+
       # Apply grid settings
-    if (!eff$show_grid) {
+      if (!eff$show_grid) {
         private$.plot = private$.plot + ggplot2::theme(panel.grid = ggplot2::element_blank())
       } else {
         private$.plot = private$.plot + ggplot2::theme(
-      panel.grid = ggplot2::element_line(color = eff$grid_color)
+          panel.grid = ggplot2::element_line(color = eff$grid_color)
         )
       }
-      
+
       # Apply title size
       private$.plot = private$.plot + ggplot2::theme(
         plot.title = ggplot2::element_text(size = eff$title_size)
       )
-      
+
       # Apply legend settings
       if (!rp$show_legend) {
         private$.plot = private$.plot + ggplot2::theme(legend.position = "none")
@@ -349,26 +352,26 @@ VisualizerModel = R6::R6Class("VisualizerModel",
         private$.plot = private$.plot + ggplot2::theme(legend.position = eff$legend_position)
       }
     },
-    
+
     # Render training data layer
     render_training_data_layer = function(layer_spec) {
       training_data = layer_spec$data
       style = layer_spec$style
       is_classification = self$task$task_type == "classif"
-      
+
       if (private$.dimensionality == "1d") {
         points_data = data.frame(
           x = training_data$x,
           y = training_data$y
         )
-        
+
         # Handle class-specific styling for classification
         if (is_classification && (length(style$color) > 1 || length(style$shape) > 1 || style$color[1] == "auto")) {
           points_data$class = as.character(training_data$y_original)
-          
+
           use_color_aes = length(style$color) > 1 || style$color[1] == "auto"
           use_shape_aes = length(style$shape) > 1
-          
+
           if (use_color_aes && use_shape_aes) {
             private$.plot = private$.plot + ggplot2::geom_point(
               data = points_data,
@@ -390,7 +393,7 @@ VisualizerModel = R6::R6Class("VisualizerModel",
               size = style$size, alpha = style$alpha, inherit.aes = FALSE
             )
           }
-          
+
           # Add manual scales if needed
           if (length(style$color) > 1) {
             private$.plot = private$.plot + ggplot2::scale_color_manual(values = style$color, name = self$task$target_names)
@@ -408,7 +411,6 @@ VisualizerModel = R6::R6Class("VisualizerModel",
             alpha = style$alpha, inherit.aes = FALSE
           )
         }
-        
       } else {
         # 2D case
         points_data = data.frame(
@@ -416,13 +418,13 @@ VisualizerModel = R6::R6Class("VisualizerModel",
           x2 = training_data$x2,
           y = training_data$y
         )
-        
+
         if (is_classification && (length(style$color) > 1 || length(style$shape) > 1 || style$color[1] == "auto")) {
           points_data$class = as.character(training_data$y_original)
-          
+
           use_color_aes = length(style$color) > 1 || style$color[1] == "auto"
           use_shape_aes = length(style$shape) > 1
-          
+
           if (use_color_aes && use_shape_aes) {
             private$.plot = private$.plot + ggplot2::geom_point(
               data = points_data,
@@ -444,8 +446,8 @@ VisualizerModel = R6::R6Class("VisualizerModel",
               size = style$size, alpha = style$alpha, inherit.aes = FALSE
             )
           }
-          
-          # Add manual scales if needed  
+
+          # Add manual scales if needed
           if (length(style$color) > 1) {
             private$.plot = private$.plot + ggplot2::scale_color_manual(values = style$color, name = self$task$target_names)
           }
@@ -463,7 +465,7 @@ VisualizerModel = R6::R6Class("VisualizerModel",
           )
         }
       }
-      
+
       # Add labels if requested
       if (style$show_labels) {
         label_size = if (!is.null(style$label_size)) style$label_size else 3
@@ -484,7 +486,7 @@ VisualizerModel = R6::R6Class("VisualizerModel",
         }
       }
     },
-    
+
     # Render boundary layer
     render_boundary_layer = function(layer_spec) {
       if (private$.dimensionality == "1d") {
@@ -505,7 +507,7 @@ VisualizerModel = R6::R6Class("VisualizerModel",
           x2 = private$.data_structure$coordinates$x2,
           y = private$.data_structure$coordinates$y
         )
-        
+
         private$.plot = private$.plot + ggplot2::geom_contour(
           data = contour_data,
           ggplot2::aes(x = x1, y = x2, z = y),
@@ -518,33 +520,33 @@ VisualizerModel = R6::R6Class("VisualizerModel",
         )
       }
     },
-    
+
     # Initialize data structure for 1D tasks
     initialize_1d_data = function(x1_limits, n_points) {
       # Get feature and target information
       feature_name = self$task$feature_names[1]
       target_name = self$task$target_names
-      
+
       # Determine x limits
       if (is.null(x1_limits)) {
         x1_limits = range(self$task$data()[[feature_name]])
       }
-      
+
       # Generate prediction grid
       x_pred = seq(x1_limits[1], x1_limits[2], length.out = n_points)
       newdata = as.data.table(x_pred)
       setnames(newdata, feature_name)
-      
+
       # Handle integer features
       original_types = sapply(self$task$data()[, feature_name, with = FALSE], class)
       if (original_types[feature_name] == "integer") {
         newdata[[feature_name]] = as.integer(round(newdata[[feature_name]]))
       }
-      
+
       # Generate predictions
       y_pred = self$learner$predict_newdata(newdata)
       y_values = private$process_predictions(y_pred)
-      
+
       # Store in unified data structure
       private$.data_structure = list(
         dimensionality = "1d",
@@ -565,14 +567,14 @@ VisualizerModel = R6::R6Class("VisualizerModel",
         )
       )
     },
-    
+
     # Initialize data structure for 2D tasks
     initialize_2d_data = function(x1_limits, x2_limits, padding, n_points) {
       # Get feature and target information
       feature_names = self$task$feature_names
       target_name = self$task$target_names
       data = self$task$data()
-      
+
       # Determine limits
       if (is.null(x1_limits)) {
         x1_limits = range(data[, feature_names[1], with = FALSE])
@@ -580,17 +582,17 @@ VisualizerModel = R6::R6Class("VisualizerModel",
       if (is.null(x2_limits)) {
         x2_limits = range(data[, feature_names[2], with = FALSE])
       }
-      
+
       # Apply padding
       x1_pad = (x1_limits[2] - x1_limits[1]) * padding
       x2_pad = (x2_limits[2] - x2_limits[1]) * padding
-      
+
       # Generate prediction grid
       x1 = seq(x1_limits[1] - x1_pad, x1_limits[2] + x1_pad, length.out = n_points)
       x2 = seq(x2_limits[1] - x2_pad, x2_limits[2] + x2_pad, length.out = n_points)
       newdata = CJ(x1, x2)
       setnames(newdata, feature_names)
-      
+
       # Handle integer features
       original_types = sapply(self$task$data()[, feature_names, with = FALSE], class)
       for (col in names(original_types)) {
@@ -598,11 +600,11 @@ VisualizerModel = R6::R6Class("VisualizerModel",
           newdata[[col]] = as.integer(round(newdata[[col]]))
         }
       }
-      
+
       # Generate predictions
       y_pred = self$learner$predict_newdata(newdata)
       y_values = private$process_predictions(y_pred)
-      
+
       # Store in unified data structure
       private$.data_structure = list(
         dimensionality = "2d",
@@ -623,7 +625,7 @@ VisualizerModel = R6::R6Class("VisualizerModel",
         )
       )
     },
-    
+
     # Process predictions to extract appropriate values for visualization
     process_predictions = function(y_pred) {
       if (self$learner$predict_type == "prob") {
@@ -642,57 +644,56 @@ VisualizerModel = R6::R6Class("VisualizerModel",
         y_values = y_pred$response
         if (is.factor(y_values)) {
           # Convert factor response to numeric for visualization
-          return(as.numeric(y_values) - 1)  # 0-based indexing
+          return(as.numeric(y_values) - 1) # 0-based indexing
         }
         return(y_values)
       }
     },
-    
+
     # Get training data in appropriate format for dimensionality
     get_training_data = function() {
       data = self$task$data()
-      
+
       if (private$.dimensionality == "1d") {
         feature_name = self$task$feature_names[1]
         target_name = self$task$target_names
-        
+
         training_x = data[[feature_name]]
         training_y = data[[target_name]]
         training_y_original = training_y
-        
+
         # Convert factors to numeric for visualization
         if (self$learner$predict_type == "prob" && is.factor(training_y)) {
           training_y = as.integer(training_y) - 1
         } else if (self$learner$predict_type == "response" && is.factor(training_y)) {
           training_y = as.integer(training_y) - 1
         }
-        
+
         return(list(x = training_x, y = training_y, y_original = training_y_original))
-        
       } else {
         feature_names = self$task$feature_names
         target_name = self$task$target_names
-        
+
         training_x1 = data[[feature_names[1]]]
         training_x2 = data[[feature_names[2]]]
         training_y = data[[target_name]]
         training_y_original = training_y
-        
+
         # Convert factors to numeric for visualization
         if (self$learner$predict_type == "prob" && is.factor(training_y)) {
           training_y = as.integer(training_y) - 1
         } else if (self$learner$predict_type == "response" && is.factor(training_y)) {
           training_y = as.integer(training_y) - 1
         }
-        
+
         return(list(x1 = training_x1, x2 = training_x2, y = training_y, y_original = training_y_original))
       }
     },
-    
+
     # Validate boundary values are within reasonable range
     validate_boundary_values = function(values) {
       y_range = range(private$.data_structure$coordinates$y, na.rm = TRUE)
-      
+
       if (private$.dimensionality == "1d") {
         # For 1D, check if boundary values are within the prediction range
         invalid_values = values[values < y_range[1] | values > y_range[2]]
