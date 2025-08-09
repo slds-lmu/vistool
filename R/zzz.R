@@ -25,3 +25,7 @@ NULL
     options(vistool.theme = vistool_theme())
   }
 }
+
+.onUnload = function(libpath) {
+  options(vistool.theme = NULL)
+}
