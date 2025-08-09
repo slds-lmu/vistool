@@ -37,6 +37,7 @@ VisualizerSurfaceModel = R6::R6Class("VisualizerSurfaceModel",
       self$learner = mlr3::assert_learner(learner, task = self$task)
       checkmate::assert_numeric(x1_limits, len = 2, null.ok = TRUE)
       checkmate::assert_numeric(x2_limits, len = 2, null.ok = TRUE)
+      checkmate::assert_number(padding, lower = 0)
       checkmate::assert_count(n_points)
 
       # Validate that task has exactly 2 features
@@ -52,12 +53,21 @@ VisualizerSurfaceModel = R6::R6Class("VisualizerSurfaceModel",
       data = task$data()
       self$learner$train(task)
 
-      x1_limits = range(data[, x1, with = FALSE])
-      x2_limits = range(data[, x2, with = FALSE])
+      # Determine limits - respect user-provided limits, fall back to data range
+      if (is.null(x1_limits)) {
+        x1_limits = range(data[, x1, with = FALSE][[1]])
+      }
+      if (is.null(x2_limits)) {
+        x2_limits = range(data[, x2, with = FALSE][[1]])
+      }
+
+      # Apply padding as proportion of range (consistent with other visualizers)
+      x1_pad = (x1_limits[2] - x1_limits[1]) * padding
+      x2_pad = (x2_limits[2] - x2_limits[1]) * padding
 
       grid = list(
-        x1 = seq(x1_limits[1] - padding, x1_limits[2] + padding, length.out = n_points),
-        x2 = seq(x2_limits[1] - padding, x2_limits[2] + padding, length.out = n_points)
+        x1 = seq(x1_limits[1] - x1_pad, x1_limits[2] + x1_pad, length.out = n_points),
+        x2 = seq(x2_limits[1] - x2_pad, x2_limits[2] + x2_pad, length.out = n_points)
       )
 
       newdata = CJ(grid$x1, grid$x2)
@@ -92,7 +102,7 @@ VisualizerSurfaceModel = R6::R6Class("VisualizerSurfaceModel",
     #' Adds the training data to the plot.
     #'
     #' @param size (`numeric(1)`)\cr
-    #'   Size of the points. Default is 5.
+    #'   Size of the points. If NULL, uses theme$point_size. Default is NULL.
     #' @param color (`character(1)` or named `character`)\cr
     #'   Color of the points. For classification tasks:
     #'   - `character(1)`: A single color for all points (e.g., `"blue"`) or `"auto"` for automatic color assignment.
@@ -105,13 +115,13 @@ VisualizerSurfaceModel = R6::R6Class("VisualizerSurfaceModel",
     #'   For regression tasks, only single symbols are supported. Default is 0 (circle).
     #' @param ... (`any`)\cr
     #'   Further arguments passed to `add_trace(...)`.
-    add_training_data = function(size = 5, color = "auto", shape = 0, ...) {
+    add_training_data = function(size = NULL, color = "auto", shape = 0, ...) {
       # Validate arguments - color can be string or named character vector
       checkmate::assert(
         checkmate::check_string(color),
         checkmate::check_character(color, names = "named", min.len = 1)
       )
-      checkmate::assert_number(size, lower = 0)
+      checkmate::assert_number(size, lower = 0, null.ok = TRUE)
       # Validate arguments - shape can be numeric or named numeric vector
       checkmate::assert(
         checkmate::check_number(shape),
@@ -188,15 +198,11 @@ VisualizerSurfaceModel = R6::R6Class("VisualizerSurfaceModel",
         }
       }
 
-      # Default color scheme
-      if (is.null(color)) {
-        color = list(c(0, "rgba(176,196,222,0.5)"), c(1, "rgba(160,82,45,0.5)"))
-      }
-
       # Store boundary specification without resolving colors yet
+      # Color will be resolved at plot time when effective theme is available
       private$store_layer("boundary", list(
         values = values,
-        color = color, # Keep for later resolution
+        color = color, # Keep for later resolution (NULL means use theme default)
         args = list(...)
       ))
 
@@ -242,6 +248,10 @@ VisualizerSurfaceModel = R6::R6Class("VisualizerSurfaceModel",
     # Render a single training data layer
     render_training_data_layer = function(layer_spec) {
       is_classification = self$task$task_type == "classif"
+      
+      # Resolve style defaults from effective theme
+      eff = private$.effective_theme
+      resolved_size = if (is.null(layer_spec$size)) eff$point_size else layer_spec$size
 
       # Helper function to map ggplot2 shapes to plotly symbols
       map_shape_to_plotly_symbol = function(shape_num) {
@@ -281,9 +291,9 @@ VisualizerSurfaceModel = R6::R6Class("VisualizerSurfaceModel",
           class_color = if (length(layer_spec$color) > 1) {
             layer_spec$color[class_name]
           } else if (layer_spec$color[1] == "auto") {
-            # Use default plotly colors
-            plotly_colors = c("#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b")
-            plotly_colors[((which(unique_classes == class_name) - 1) %% length(plotly_colors)) + 1]
+            # Use theme-based colors instead of hard-coded plotly colors
+            eff = private$.effective_theme
+            get_vistool_color(which(unique_classes == class_name), "discrete", base_palette = eff$palette)
           } else {
             layer_spec$color[1]
           }
@@ -298,16 +308,16 @@ VisualizerSurfaceModel = R6::R6Class("VisualizerSurfaceModel",
 
           if (private$.layer_primary == "contour") {
             private$.plot = private$.plot %>%
-              plotly::add_trace(
+              add_trace(
                 x = layer_spec$x1[class_indices],
                 y = layer_spec$x2[class_indices],
                 type = "scatter",
                 mode = "markers",
                 marker = list(
-                  size = 10,
+                  size = resolved_size,
                   color = class_color,
                   symbol = class_symbol,
-                  line = list(color = "black", width = 1)
+                  line = list(color = class_color, width = 1)
                 ),
                 name = paste("Class:", class_name),
                 text = ~ paste("x1:", layer_spec$x1[class_indices], "\nx2:", layer_spec$x2[class_indices], "\nClass:", class_name),
@@ -315,14 +325,14 @@ VisualizerSurfaceModel = R6::R6Class("VisualizerSurfaceModel",
               )
           } else {
             private$.plot = private$.plot %>%
-              plotly::add_trace(
+              add_trace(
                 x = layer_spec$x1[class_indices],
                 y = layer_spec$x2[class_indices],
                 z = layer_spec$z[class_indices],
                 type = "scatter3d",
                 mode = "markers",
                 marker = list(
-                  size = layer_spec$size,
+                  size = resolved_size,
                   color = class_color,
                   symbol = class_symbol
                 ),
@@ -342,19 +352,23 @@ VisualizerSurfaceModel = R6::R6Class("VisualizerSurfaceModel",
         resolved_symbol = map_shape_to_plotly_symbol(resolved_shape_num)
 
         if (private$.layer_primary == "contour") {
+          # For contour plots, use color mapping based on z values with theme colorscale
+          eff = private$.effective_theme
+          colorscale = get_continuous_colorscale(eff$palette)
+          
           private$.plot = private$.plot %>%
-            plotly::add_trace(
+            add_trace(
               x = layer_spec$x1,
               y = layer_spec$x2,
               type = "scatter",
               mode = "markers",
               marker = list(
-                size = 10,
+                size = resolved_size,
                 color = layer_spec$z,
                 cmin = min(self$zmat),
                 cmax = max(self$zmat),
-                colorscale = list(c(0, 1), c("rgb(176,196,222)", "rgb(160,82,45)")),
-                line = list(color = "black", width = 2),
+                colorscale = colorscale,
+                line = list(color = resolved_color, width = 2),
                 showscale = FALSE,
                 symbol = resolved_symbol
               ),
@@ -363,14 +377,14 @@ VisualizerSurfaceModel = R6::R6Class("VisualizerSurfaceModel",
             )
         } else {
           private$.plot = private$.plot %>%
-            plotly::add_trace(
+            add_trace(
               x = layer_spec$x1,
               y = layer_spec$x2,
               z = layer_spec$z,
               type = "scatter3d",
               mode = "markers",
               marker = list(
-                size = layer_spec$size,
+                size = resolved_size,
                 color = resolved_color,
                 symbol = resolved_symbol
               )
@@ -394,13 +408,31 @@ VisualizerSurfaceModel = R6::R6Class("VisualizerSurfaceModel",
 
     # Render a single boundary layer
     render_boundary_layer = function(layer_spec) {
+      # Resolve boundary colors from effective theme if not provided
+      eff = private$.effective_theme
+      boundary_colors = if (is.null(layer_spec$color)) {
+        # Use theme-aware colors instead of hard-coded ones
+        boundary_color = get_vistool_color(1, "discrete", base_palette = eff$palette)
+        boundary_rgba = hex_to_rgba(boundary_color, eff$alpha * 0.6) # Semi-transparent
+        list(c(0, boundary_rgba), c(1, boundary_rgba))
+      } else {
+        layer_spec$color
+      }
+      
+      # Get boundary line color for contours
+      boundary_line_color = if (is.null(layer_spec$color)) {
+        get_vistool_color(1, "discrete", base_palette = eff$palette)
+      } else {
+        "black" # Keep existing behavior when explicitly set
+      }
+
       for (value in layer_spec$values) {
         z = matrix(value, nrow = nrow(self$zmat), ncol = ncol(self$zmat), byrow = TRUE)
 
         if (private$.layer_primary == "contour") {
           llp = list(x = self$grid$x1, y = self$grid$x2, z = self$zmat)
           private$.plot = private$.plot %>%
-            plotly::add_trace(
+            add_trace(
               name = paste("boundary", value),
               autocontour = FALSE,
               showlegend = FALSE,
@@ -409,7 +441,7 @@ VisualizerSurfaceModel = R6::R6Class("VisualizerSurfaceModel",
               y = llp$y,
               z = t(llp$z),
               type = "contour",
-              colorscale = list(c(0, 1), c("rgb(0,0,0)", "rgb(0,0,0)")),
+              colorscale = list(c(0, boundary_line_color), c(1, boundary_line_color)),
               ncontours = 1,
               contours = list(
                 start = value,
@@ -417,17 +449,17 @@ VisualizerSurfaceModel = R6::R6Class("VisualizerSurfaceModel",
                 coloring = "lines"
               ),
               line = list(
-                color = "black",
+                color = boundary_line_color,
                 width = 3
               )
             )
         } else {
           private$.plot = private$.plot %>%
-            plotly::add_surface(
+            add_surface(
               x = self$grid$x1,
               y = self$grid$x2,
               z = z,
-              colorscale = layer_spec$color,
+              colorscale = boundary_colors,
               showscale = FALSE,
               name = paste("boundary", value)
             )

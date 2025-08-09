@@ -227,7 +227,7 @@ test_that("show_title parameter works for all visualizer types", {
 test_that("show_title parameter works for model visualizers", {
   skip_if_not_installed("mlr3learners")
   skip_if_not_installed("rpart")
-  # Test Visualizer1DModel via inherited functionality
+  # Test VisualizerModel (1D) via inherited functionality
   task_1d = tsk("mtcars")$select("wt") # 1D regression task
   learner = lrn("regr.rpart") # Using rpart instead of lm
   learner$train(task_1d)
@@ -244,7 +244,7 @@ test_that("show_title parameter works for model visualizers", {
   expect_s3_class(p2, "ggplot")
   expect_true(is.null(p2$labels$title))
 
-  # Test Visualizer2DModel
+  # Test VisualizerModel (2D)
   task_2d = tsk("mtcars")$select(c("wt", "hp")) # 2D regression task
   learner$train(task_2d)
   vis_model_2d = as_visualizer(task_2d, learner = learner, type = "2d")

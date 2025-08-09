@@ -49,12 +49,13 @@ test_that("set_theme and theme methods work", {
   expect_equal(retrieved_theme$palette, "plasma")
   expect_equal(retrieved_theme$alpha, 0.5)
   
-  # Test partial theme update
+  # Test partial theme update preserves previous instance settings
   vis$set_theme(list(text_size = 18))
   updated_theme = vis$theme()
   expect_equal(updated_theme$text_size, 18)
-  # Note: partial updates merge with package defaults, not previous instance theme
-  expect_equal(updated_theme$palette, "viridis") # Should be package default
+  # With fix: partial updates should preserve previous instance theme settings
+  expect_equal(updated_theme$palette, "plasma") # Should preserve previous instance setting
+  expect_equal(updated_theme$alpha, 0.5) # Should preserve previous instance setting
 })
 
 test_that("Auto color resolution respects theme changes", {

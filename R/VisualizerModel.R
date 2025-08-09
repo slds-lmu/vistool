@@ -77,30 +77,30 @@ VisualizerModel = R6::R6Class("VisualizerModel",
     #'   - `named character`: A vector mapping class labels to colors (e.g., `c(pos = "red", neg = "blue")`).
     #'   For regression tasks, only single colors are supported. Default is `"auto"`.
     #' @param size (`numeric(1)`)\cr
-    #'   Size of the points. Default is 2.
+    #'   Size of the points. If NULL, uses theme$point_size. Default is NULL.
     #' @param shape (`numeric(1)` or named `numeric`)\cr
     #'   Shape of the points. For classification tasks, can be a named vector mapping class labels to shapes.
     #'   Default is 19 (filled circle).
     #' @param alpha (`numeric(1)`)\cr
-    #'   Alpha transparency of the points. Default is 1.
+    #'   Alpha transparency of the points. If NULL, uses theme$alpha. Default is NULL.
     #' @param show_labels (`logical(1)`)\cr
     #'   Whether to show data point labels. Default is FALSE.
     #' @param label_size (`numeric(1)`)\cr
     #'   Size of data point labels. If NULL, defaults to smaller text.
     #' @template return_self_invisible
-    add_training_data = function(color = "auto", size = 2, shape = 19, alpha = 1,
+    add_training_data = function(color = "auto", size = NULL, shape = 19, alpha = NULL,
                                  show_labels = FALSE, label_size = NULL) {
       # Validate arguments
       checkmate::assert(
         checkmate::check_string(color),
         checkmate::check_character(color, names = "named", min.len = 1)
       )
-      checkmate::assert_number(size, lower = 0)
+      checkmate::assert_number(size, lower = 0, null.ok = TRUE)
       checkmate::assert(
         checkmate::check_number(shape),
         checkmate::check_numeric(shape, names = "named", min.len = 1)
       )
-      checkmate::assert_number(alpha, lower = 0, upper = 1)
+      checkmate::assert_number(alpha, lower = 0, upper = 1, null.ok = TRUE)
       checkmate::assert_flag(show_labels)
       checkmate::assert_number(label_size, lower = 0, null.ok = TRUE)
 
@@ -222,135 +222,22 @@ VisualizerModel = R6::R6Class("VisualizerModel",
 
     # Initialize 1D plot with function line
     init_1d_plot = function() {
-      # Resolve theme and render params
-      eff = private$.effective_theme
-      rp = private$.render_params
-
-      # Create base data for the function line
-      plot_data = data.frame(
-        x = private$.data_structure$coordinates$x1,
-        y = private$.data_structure$coordinates$y
-      )
-
-      # Create base ggplot
-      private$.plot = private$init_ggplot(plot_data, "x", "y")
-
-      # Add the function line
-      private$.plot = private$.plot + ggplot2::geom_line(color = "blue", linewidth = if (is.null(eff$line_width)) 1.2 else eff$line_width)
-
-      # Apply theme and styling
-      private$.plot = private$apply_ggplot_theme(private$.plot, eff$text_size, eff$title_size, eff$theme, eff$background, eff$show_grid, eff$grid_color)
-
-      # Determine labels
-      title_text = if (!is.null(rp$plot_title)) rp$plot_title else private$.data_structure$labels$title
-      x_text = if (!is.null(rp$x_lab)) rp$x_lab else private$.data_structure$labels$x1
-      y_text = if (!is.null(rp$y_lab)) rp$y_lab else private$.data_structure$labels$y
-
-      # Add labels conditionally
-      private$.plot = private$.plot + ggplot2::labs(
-        title = if (rp$show_title) title_text else NULL,
-        subtitle = rp$plot_subtitle,
-        x = x_text,
-        y = y_text
-      )
-
-      # Apply axis limits
-      if (!is.null(rp$x_limits)) {
-        private$.plot = private$.plot + ggplot2::xlim(rp$x_limits)
-      }
-      if (!is.null(rp$y_limits)) {
-        private$.plot = private$.plot + ggplot2::ylim(rp$y_limits)
-      }
-
-      # Apply grid settings
-      if (!eff$show_grid) {
-        private$.plot = private$.plot + ggplot2::theme(panel.grid = ggplot2::element_blank())
-      } else {
-        private$.plot = private$.plot + ggplot2::theme(
-          panel.grid = ggplot2::element_line(color = eff$grid_color)
-        )
-      }
-
-      # Apply title size
-      private$.plot = private$.plot + ggplot2::theme(
-        plot.title = ggplot2::element_text(size = eff$title_size)
-      )
-
-      # Apply legend settings
-      if (!rp$show_legend) {
-        private$.plot = private$.plot + ggplot2::theme(legend.position = "none")
-      } else if (eff$legend_position != "right") {
-        private$.plot = private$.plot + ggplot2::theme(legend.position = eff$legend_position)
-      }
+      # Use helper method with model-specific geom layer
+      private$gg_init_1d(private$.data_structure, function(plot_obj, plot_data, eff) {
+        line_color = get_vistool_color(1, "discrete", base_palette = eff$palette)
+        plot_obj + ggplot2::geom_line(color = line_color, linewidth = if (is.null(eff$line_width)) 1.2 else eff$line_width)
+      })
     },
 
     # Initialize 2D plot with filled contour/raster
     init_2d_plot = function() {
-      eff = private$.effective_theme
-      rp = private$.render_params
-
-      # Create base data for the filled contour
-      plot_data = data.frame(
-        x1 = private$.data_structure$coordinates$x1,
-        x2 = private$.data_structure$coordinates$x2,
-        y = private$.data_structure$coordinates$y
-      )
-
-      # Create base ggplot
-      private$.plot = private$init_ggplot(plot_data, "x1", "x2")
-
-      # Add filled contour or raster
-      private$.plot = private$.plot + ggplot2::geom_raster(ggplot2::aes(fill = y), alpha = eff$alpha)
-
-      # Apply color scale
-      private$.plot = private$apply_ggplot_color_scale(private$.plot, eff$palette, "fill")
-
-      # Apply theme and styling
-      private$.plot = private$apply_ggplot_theme(private$.plot, eff$text_size, eff$title_size, eff$theme, eff$background, eff$show_grid, eff$grid_color)
-
-      # Determine labels
-      title_text = if (!is.null(rp$plot_title)) rp$plot_title else private$.data_structure$labels$title
-      x_text = if (!is.null(rp$x_lab)) rp$x_lab else private$.data_structure$labels$x1
-      y_text = if (!is.null(rp$y_lab)) rp$y_lab else private$.data_structure$labels$x2
-      fill_text = if (!is.null(rp$legend_title)) rp$legend_title else private$.data_structure$labels$y
-
-      # Add labels conditionally
-      private$.plot = private$.plot + ggplot2::labs(
-        title = if (rp$show_title) title_text else NULL,
-        subtitle = rp$plot_subtitle,
-        x = x_text,
-        y = y_text,
-        fill = fill_text
-      )
-
-      # Apply axis limits
-      if (!is.null(rp$x_limits)) {
-        private$.plot = private$.plot + ggplot2::xlim(rp$x_limits)
-      }
-      if (!is.null(rp$y_limits)) {
-        private$.plot = private$.plot + ggplot2::ylim(rp$y_limits)
-      }
-
-      # Apply grid settings
-      if (!eff$show_grid) {
-        private$.plot = private$.plot + ggplot2::theme(panel.grid = ggplot2::element_blank())
-      } else {
-        private$.plot = private$.plot + ggplot2::theme(
-          panel.grid = ggplot2::element_line(color = eff$grid_color)
-        )
-      }
-
-      # Apply title size
-      private$.plot = private$.plot + ggplot2::theme(
-        plot.title = ggplot2::element_text(size = eff$title_size)
-      )
-
-      # Apply legend settings
-      if (!rp$show_legend) {
-        private$.plot = private$.plot + ggplot2::theme(legend.position = "none")
-      } else if (eff$legend_position != "right") {
-        private$.plot = private$.plot + ggplot2::theme(legend.position = eff$legend_position)
-      }
+      # Use helper method with model-specific geom layer
+      private$gg_init_2d(private$.data_structure, function(plot_obj, plot_data, eff) {
+        # Add filled contour or raster
+        plot_obj = plot_obj + ggplot2::geom_raster(ggplot2::aes(fill = y), alpha = eff$alpha)
+        # Apply color scale
+        private$apply_ggplot_color_scale(plot_obj, eff$palette, "fill")
+      })
     },
 
     # Render training data layer
@@ -358,6 +245,11 @@ VisualizerModel = R6::R6Class("VisualizerModel",
       training_data = layer_spec$data
       style = layer_spec$style
       is_classification = self$task$task_type == "classif"
+      
+      # Resolve style defaults from effective theme
+      eff = private$.effective_theme
+      resolved_size = if (is.null(style$size)) eff$point_size else style$size
+      resolved_alpha = if (is.null(style$alpha)) eff$alpha else style$alpha
 
       if (private$.dimensionality == "1d") {
         points_data = data.frame(
@@ -376,27 +268,30 @@ VisualizerModel = R6::R6Class("VisualizerModel",
             private$.plot = private$.plot + ggplot2::geom_point(
               data = points_data,
               ggplot2::aes(x = x, y = y, color = class, shape = class),
-              size = style$size, alpha = style$alpha, inherit.aes = FALSE
+              size = resolved_size, alpha = resolved_alpha, inherit.aes = FALSE
             )
           } else if (use_color_aes) {
             private$.plot = private$.plot + ggplot2::geom_point(
               data = points_data,
               ggplot2::aes(x = x, y = y, color = class),
-              size = style$size, shape = if (length(style$shape) == 1) style$shape else 19,
-              alpha = style$alpha, inherit.aes = FALSE
+              size = resolved_size, shape = if (length(style$shape) == 1) style$shape else 19,
+              alpha = resolved_alpha, inherit.aes = FALSE
             )
           } else if (use_shape_aes) {
             private$.plot = private$.plot + ggplot2::geom_point(
               data = points_data,
               ggplot2::aes(x = x, y = y, shape = class),
               color = if (length(style$color) == 1 && style$color[1] != "auto") style$color[1] else "black",
-              size = style$size, alpha = style$alpha, inherit.aes = FALSE
+              size = resolved_size, alpha = resolved_alpha, inherit.aes = FALSE
             )
           }
 
           # Add manual scales if needed
           if (length(style$color) > 1) {
             private$.plot = private$.plot + ggplot2::scale_color_manual(values = style$color, name = self$task$target_names)
+          } else if (style$color[1] == "auto") {
+            # Apply themed discrete color scale for automatic colors
+            private$.plot = private$apply_ggplot_color_scale(private$.plot, eff$palette, "color", discrete = TRUE)
           }
           if (length(style$shape) > 1) {
             private$.plot = private$.plot + ggplot2::scale_shape_manual(values = style$shape, name = self$task$target_names)
@@ -406,9 +301,9 @@ VisualizerModel = R6::R6Class("VisualizerModel",
           private$.plot = private$.plot + ggplot2::geom_point(
             data = points_data,
             ggplot2::aes(x = x, y = y),
-            color = style$color[1], size = style$size,
+            color = style$color[1], size = resolved_size,
             shape = if (length(style$shape) > 1) style$shape[1] else style$shape,
-            alpha = style$alpha, inherit.aes = FALSE
+            alpha = resolved_alpha, inherit.aes = FALSE
           )
         }
       } else {
@@ -429,27 +324,30 @@ VisualizerModel = R6::R6Class("VisualizerModel",
             private$.plot = private$.plot + ggplot2::geom_point(
               data = points_data,
               ggplot2::aes(x = x1, y = x2, color = class, shape = class),
-              size = style$size, alpha = style$alpha, inherit.aes = FALSE
+              size = resolved_size, alpha = resolved_alpha, inherit.aes = FALSE
             )
           } else if (use_color_aes) {
             private$.plot = private$.plot + ggplot2::geom_point(
               data = points_data,
               ggplot2::aes(x = x1, y = x2, color = class),
-              size = style$size, shape = if (length(style$shape) == 1) style$shape else 19,
-              alpha = style$alpha, inherit.aes = FALSE
+              size = resolved_size, shape = if (length(style$shape) == 1) style$shape else 19,
+              alpha = resolved_alpha, inherit.aes = FALSE
             )
           } else if (use_shape_aes) {
             private$.plot = private$.plot + ggplot2::geom_point(
               data = points_data,
               ggplot2::aes(x = x1, y = x2, shape = class),
               color = if (length(style$color) == 1 && style$color[1] != "auto") style$color[1] else "black",
-              size = style$size, alpha = style$alpha, inherit.aes = FALSE
+              size = resolved_size, alpha = resolved_alpha, inherit.aes = FALSE
             )
           }
 
           # Add manual scales if needed
           if (length(style$color) > 1) {
             private$.plot = private$.plot + ggplot2::scale_color_manual(values = style$color, name = self$task$target_names)
+          } else if (style$color[1] == "auto") {
+            # Apply themed discrete color scale for automatic colors
+            private$.plot = private$apply_ggplot_color_scale(private$.plot, eff$palette, "color", discrete = TRUE)
           }
           if (length(style$shape) > 1) {
             private$.plot = private$.plot + ggplot2::scale_shape_manual(values = style$shape, name = self$task$target_names)
@@ -459,9 +357,9 @@ VisualizerModel = R6::R6Class("VisualizerModel",
           private$.plot = private$.plot + ggplot2::geom_point(
             data = points_data,
             ggplot2::aes(x = x1, y = x2),
-            color = style$color[1], size = style$size,
+            color = style$color[1], size = resolved_size,
             shape = if (length(style$shape) > 1) style$shape[1] else style$shape,
-            alpha = style$alpha, inherit.aes = FALSE
+            alpha = resolved_alpha, inherit.aes = FALSE
           )
         }
       }

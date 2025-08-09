@@ -108,9 +108,9 @@ Adds the training data to the plot.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{VisualizerModel$add_training_data(
   color = "auto",
-  size = 2,
+  size = NULL,
   shape = 19,
-  alpha = 1,
+  alpha = NULL,
   show_labels = FALSE,
   label_size = NULL
 )}\if{html}{\out{</div>}}
@@ -126,14 +126,14 @@ Color of the points. For classification tasks:
 For regression tasks, only single colors are supported. Default is `"auto"`.}
 
 \item{\code{size}}{(`numeric(1)`)\cr
-Size of the points. Default is 2.}
+Size of the points. If NULL, uses theme$point_size. Default is NULL.}
 
 \item{\code{shape}}{(`numeric(1)` or named `numeric`)\cr
 Shape of the points. For classification tasks, can be a named vector mapping class labels to shapes.
 Default is 19 (filled circle).}
 
 \item{\code{alpha}}{(`numeric(1)`)\cr
-Alpha transparency of the points. Default is 1.}
+Alpha transparency of the points. If NULL, uses theme$alpha. Default is NULL.}
 
 \item{\code{show_labels}}{(`logical(1)`)\cr
 Whether to show data point labels. Default is FALSE.}

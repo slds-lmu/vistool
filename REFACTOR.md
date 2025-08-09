@@ -72,7 +72,7 @@ The goal is minimal churn with a clean, composable API that preserves the deferr
 - Add public methods:
   - set_theme(theme), theme() getter
 - plot():
-  - New signature: plot(theme = NULL, plot_title = NULL, plot_subtitle = NULL, x_lab = NULL, y_lab = NULL, z_lab = NULL, x_limits = NULL, y_limits = NULL, z_limits = NULL, show_legend = TRUE, show_title = TRUE, legend_position = c("right","top","bottom","left","none"))
+  - New signature: plot(theme = NULL, plot_title = NULL, plot_subtitle = NULL, x_lab = NULL, y_lab = NULL, z_lab = NULL, x_limits = NULL, y_limits = NULL, z_limits = NULL, show_legend = TRUE, show_title = TRUE, legend_position = c("right","top","bottom","left"))
   - At start: resolve private$.effective_theme from package default, instance theme, and theme override
   - Store non-style render params (labels/limits/toggles) in private$.render_params
 - Color resolution:
@@ -206,7 +206,7 @@ The goal is minimal churn with a clean, composable API that preserves the deferr
 - Large n_points: performance unchanged; no extra allocations in theme resolution
 - Missing labels: use sensible defaults already in data structure
 - Surface colorscale when theme$palette is invalid: fallback to "viridis"
-- Legend position "none": hide legend in both ggplot2 and plotly
+- Legend visibility: controlled by show_legend parameter, legend_position only controls position
 - Title sizing: title_size = text_size + 2 computed inside ggplot or plotly layout
 
 

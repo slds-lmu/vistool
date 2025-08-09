@@ -320,134 +320,22 @@ VisualizerObj = R6::R6Class("VisualizerObj",
 
     # Initialize 1D plot with function line
     init_1d_plot = function() {
-      eff = private$.effective_theme
-      rp = private$.render_params
-
-      # Create base data for the function line
-      plot_data = data.frame(
-        x = private$.data_structure$coordinates$x1,
-        y = private$.data_structure$coordinates$y
-      )
-
-      # Create base ggplot
-      private$.plot = private$init_ggplot(plot_data, "x", "y")
-
-      # Add the function line
-      private$.plot = private$.plot + ggplot2::geom_line(color = "blue", linewidth = if (is.null(eff$line_width)) 1.2 else eff$line_width)
-
-      # Apply theme and styling
-      private$.plot = private$apply_ggplot_theme(private$.plot, eff$text_size, eff$title_size, eff$theme, eff$background, eff$show_grid, eff$grid_color)
-
-      # Determine labels
-      title_text = if (!is.null(rp$plot_title)) rp$plot_title else private$.data_structure$labels$title
-      x_text = if (!is.null(rp$x_lab)) rp$x_lab else private$.data_structure$labels$x1
-      y_text = if (!is.null(rp$y_lab)) rp$y_lab else private$.data_structure$labels$y
-
-      # Add labels conditionally
-      private$.plot = private$.plot + ggplot2::labs(
-        title = if (rp$show_title) title_text else NULL,
-        subtitle = rp$plot_subtitle,
-        x = x_text,
-        y = y_text
-      )
-
-      # Apply axis limits
-      if (!is.null(rp$x_limits)) {
-        private$.plot = private$.plot + ggplot2::xlim(rp$x_limits)
-      }
-      if (!is.null(rp$y_limits)) {
-        private$.plot = private$.plot + ggplot2::ylim(rp$y_limits)
-      }
-
-      # Apply grid settings
-      if (!eff$show_grid) {
-        private$.plot = private$.plot + ggplot2::theme(panel.grid = ggplot2::element_blank())
-      } else {
-        private$.plot = private$.plot + ggplot2::theme(
-          panel.grid = ggplot2::element_line(color = eff$grid_color)
-        )
-      }
-
-      # Apply title size
-      private$.plot = private$.plot + ggplot2::theme(
-        plot.title = ggplot2::element_text(size = eff$title_size)
-      )
-
-      # Apply legend settings
-      if (!rp$show_legend) {
-        private$.plot = private$.plot + ggplot2::theme(legend.position = "none")
-      } else if (eff$legend_position != "right") {
-        private$.plot = private$.plot + ggplot2::theme(legend.position = eff$legend_position)
-      }
+      # Use helper method with objective-specific geom layer
+      private$gg_init_1d(private$.data_structure, function(plot_obj, plot_data, eff) {
+        line_color = get_vistool_color(1, "discrete", base_palette = eff$palette)
+        plot_obj + ggplot2::geom_line(color = line_color, linewidth = if (is.null(eff$line_width)) 1.2 else eff$line_width)
+      })
     },
 
     # Initialize 2D plot with filled contour/raster
     init_2d_plot = function() {
-      eff = private$.effective_theme
-      rp = private$.render_params
-
-      # Create base data for the filled contour
-      plot_data = data.frame(
-        x1 = private$.data_structure$coordinates$x1,
-        x2 = private$.data_structure$coordinates$x2,
-        y = private$.data_structure$coordinates$y
-      )
-
-      # Create base ggplot
-      private$.plot = private$init_ggplot(plot_data, "x1", "x2")
-
-      # Add filled contour or raster
-      private$.plot = private$.plot + ggplot2::geom_raster(ggplot2::aes(fill = y), alpha = eff$alpha)
-
-      # Apply color scale
-      private$.plot = private$apply_ggplot_color_scale(private$.plot, eff$palette, "fill")
-
-      # Apply theme and styling
-      private$.plot = private$apply_ggplot_theme(private$.plot, eff$text_size, eff$title_size, eff$theme, eff$background, eff$show_grid, eff$grid_color)
-
-      # Determine labels
-      title_text = if (!is.null(rp$plot_title)) rp$plot_title else private$.data_structure$labels$title
-      x_text = if (!is.null(rp$x_lab)) rp$x_lab else private$.data_structure$labels$x1
-      y_text = if (!is.null(rp$y_lab)) rp$y_lab else private$.data_structure$labels$x2
-      fill_text = if (!is.null(rp$legend_title)) rp$legend_title else private$.data_structure$labels$y
-
-      # Add labels conditionally
-      private$.plot = private$.plot + ggplot2::labs(
-        title = if (rp$show_title) title_text else NULL,
-        subtitle = rp$plot_subtitle,
-        x = x_text,
-        y = y_text,
-        fill = fill_text
-      )
-
-      # Apply axis limits
-      if (!is.null(rp$x_limits)) {
-        private$.plot = private$.plot + ggplot2::xlim(rp$x_limits)
-      }
-      if (!is.null(rp$y_limits)) {
-        private$.plot = private$.plot + ggplot2::ylim(rp$y_limits)
-      }
-
-      # Apply grid settings
-      if (!eff$show_grid) {
-        private$.plot = private$.plot + ggplot2::theme(panel.grid = ggplot2::element_blank())
-      } else {
-        private$.plot = private$.plot + ggplot2::theme(
-          panel.grid = ggplot2::element_line(color = eff$grid_color)
-        )
-      }
-
-      # Apply title size
-      private$.plot = private$.plot + ggplot2::theme(
-        plot.title = ggplot2::element_text(size = eff$title_size)
-      )
-
-      # Apply legend settings
-      if (!rp$show_legend) {
-        private$.plot = private$.plot + ggplot2::theme(legend.position = "none")
-      } else if (eff$legend_position != "right") {
-        private$.plot = private$.plot + ggplot2::theme(legend.position = eff$legend_position)
-      }
+      # Use helper method with objective-specific geom layer
+      private$gg_init_2d(private$.data_structure, function(plot_obj, plot_data, eff) {
+        # Add filled contour or raster
+        plot_obj = plot_obj + ggplot2::geom_raster(ggplot2::aes(fill = y), alpha = eff$alpha)
+        # Apply color scale
+        private$apply_ggplot_color_scale(plot_obj, eff$palette, "fill")
+      })
     },
 
     # Render optimization trace layer

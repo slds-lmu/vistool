@@ -97,7 +97,7 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
           colorscale = colorscale,
           ...
         ) %>%
-        layout(
+        plotly::layout(
           title = if (show_title) self$plot_lab else NULL,
           xaxis = list(title = self$x1_lab),
           yaxis = list(title = self$x2_lab)
@@ -156,14 +156,18 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
       # Add contours if available
       if (!is.null(contours_layer)) {
         trace_args$contours = contours_layer$contours
+        # Add contours args to the base trace, allowing args to override base values
+        if (!is.null(contours_layer$args)) {
+          trace_args = utils::modifyList(trace_args, contours_layer$args)
+        }
       }
 
       # Add additional arguments
       trace_args = c(trace_args, list(...))
 
       plot_obj = plot_ly()
-      private$.plot = do.call(plotly::add_trace, c(list(plot_obj), trace_args)) %>%
-        layout(
+      private$.plot = do.call(add_trace, c(list(plot_obj), trace_args)) %>%
+        plotly::layout(
           title = if (show_title) self$plot_lab else NULL,
           scene = list(
             xaxis = list(title = self$x1_lab),
@@ -185,7 +189,7 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
     #' @param ... Layout options directly passed to `layout(...)`.
     set_layout = function(...) {
       private$.layout = list(...)
-      private$.plot = private$.plot %>% layout(...)
+      private$.plot = private$.plot %>% plotly::layout(...)
 
       return(invisible(self))
     },
@@ -206,7 +210,7 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
       }
 
       private$.plot = private$.plot %>%
-        layout(scene = list(camera = list(eye = list(x = x, y = y, z = z))))
+        plotly::layout(scene = list(camera = list(eye = list(x = x, y = y, z = z))))
 
       return(invisible(self))
     },
@@ -438,16 +442,57 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
         x = x_vals[i]
         y = y_vals[i]
 
-        # Find closest grid points
-        x1_idx = which.min(abs(x1_range - x))
-        x2_idx = which.min(abs(x2_range - y))
+        # Find surrounding grid points for bilinear interpolation
+        x1_indices = findInterval(x, x1_range)
+        x2_indices = findInterval(y, x2_range)
 
-        # Clamp to grid boundaries
-        x1_idx = max(1, min(length(x1_range), x1_idx))
-        x2_idx = max(1, min(length(x2_range), x2_idx))
+        # Clamp to valid grid boundaries
+        x1_low = max(1, min(length(x1_range) - 1, x1_indices))
+        x1_high = x1_low + 1
+        x2_low = max(1, min(length(x2_range) - 1, x2_indices))
+        x2_high = x2_low + 1
 
-        # Use the closest grid point value
-        z_vals[i] = self$zmat[x1_idx, x2_idx]
+        # Handle edge cases where point is outside grid
+        if (x1_low < 1 || x1_high > length(x1_range) || 
+            x2_low < 1 || x2_high > length(x2_range)) {
+          # Fall back to nearest neighbor for points outside grid
+          x1_idx = which.min(abs(x1_range - x))
+          x2_idx = which.min(abs(x2_range - y))
+          x1_idx = max(1, min(length(x1_range), x1_idx))
+          x2_idx = max(1, min(length(x2_range), x2_idx))
+          z_vals[i] = self$zmat[x1_idx, x2_idx]
+        } else {
+          # Perform bilinear interpolation
+          x1_low_val = x1_range[x1_low]
+          x1_high_val = x1_range[x1_high]
+          x2_low_val = x2_range[x2_low]
+          x2_high_val = x2_range[x2_high]
+
+          # Get the four corner z values
+          z11 = self$zmat[x1_low, x2_low]
+          z12 = self$zmat[x1_low, x2_high]
+          z21 = self$zmat[x1_high, x2_low]
+          z22 = self$zmat[x1_high, x2_high]
+
+          # Calculate interpolation weights
+          if (x1_high_val == x1_low_val) {
+            wx = 0  # Avoid division by zero
+          } else {
+            wx = (x - x1_low_val) / (x1_high_val - x1_low_val)
+          }
+          
+          if (x2_high_val == x2_low_val) {
+            wy = 0  # Avoid division by zero
+          } else {
+            wy = (y - x2_low_val) / (x2_high_val - x2_low_val)
+          }
+
+          # Bilinear interpolation formula
+          z_vals[i] = z11 * (1 - wx) * (1 - wy) +
+                      z21 * wx * (1 - wy) +
+                      z12 * (1 - wx) * wy +
+                      z22 * wx * wy
+        }
       }
 
       return(z_vals)

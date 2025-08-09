@@ -239,3 +239,40 @@ test_that("VisualizerSurface new workflow - direct plotting like ggplot2", {
   p3 = vis2$plot()
   expect_s3_class(p3, "plotly")
 })
+
+test_that("VisualizerSurface add_contours args are properly applied", {
+  skip_if_not_installed("plotly")
+
+  # Create simple data
+  x1 = seq(-1, 1, length.out = 3)
+  x2 = seq(-1, 1, length.out = 3)
+  z_matrix = outer(x1, x2, function(x, y) x^2 + y^2)
+
+  vis = VisualizerSurface$new(
+    grid = list(x1 = x1, x2 = x2),
+    zmat = z_matrix
+  )
+
+  # Test that additional args are properly applied to the surface trace
+  vis$add_contours(
+    contours = list(z = list(show = TRUE)),
+    showscale = TRUE,  # Additional arg that should be applied to trace
+    hoverinfo = "skip"  # Another additional arg
+  )
+
+  p = vis$plot()
+  expect_s3_class(p, "plotly")
+  
+  # Check that the trace has the additional arguments applied
+  # plotly stores trace data in p$x$attrs, find the surface trace
+  surface_attrs = NULL
+  for (attrs in p$x$attrs) {
+    if (!is.null(attrs$type) && attrs$type == "surface") {
+      surface_attrs = attrs
+      break
+    }
+  }
+  expect_true(!is.null(surface_attrs))
+  expect_true(surface_attrs$showscale)
+  expect_equal(surface_attrs$hoverinfo, "skip")
+})

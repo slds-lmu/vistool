@@ -139,9 +139,9 @@ selected loss function at the given x-coordinates.
   x,
   loss_id = NULL,
   show_line = TRUE,
-  color = "red",
-  size = 3,
-  alpha = 0.8,
+  color = "auto",
+  size = NULL,
+  alpha = NULL,
   line_color = NULL,
   line_alpha = NULL,
   ...
@@ -165,13 +165,13 @@ If TRUE (default), draws vertical lines from points to x-axis.}
 
 \item{\code{color}}{(`character(1)`)\cr
 Color of the points and lines. Use "auto" for automatic color assignment.
-Default is "red".}
+Default is "auto".}
 
 \item{\code{size}}{(`numeric(1)`)\cr
-Size of the points. Default is 3.}
+Size of the points. If NULL, uses theme$point_size. Default is NULL.}
 
 \item{\code{alpha}}{(`numeric(1)`)\cr
-Alpha transparency of points and lines. Default is 0.8.}
+Alpha transparency of points and lines. If NULL, uses theme$alpha. Default is NULL.}
 
 \item{\code{line_color}}{(`character(1)`)\cr
 Color of vertical lines. If NULL, uses the same color as points.}

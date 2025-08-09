@@ -117,7 +117,7 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
         if (self$input_type == "score") {
           "y * f"
         } else {
-          "π"
+          "pi"
         }
       } else {
         "y - f"
@@ -180,24 +180,24 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
     #'   If TRUE (default), draws vertical lines from points to x-axis.
     #' @param color (`character(1)`)\cr
     #'   Color of the points and lines. Use "auto" for automatic color assignment.
-    #'   Default is "red".
+    #'   Default is "auto".
     #' @param size (`numeric(1)`)\cr
-    #'   Size of the points. Default is 3.
+    #'   Size of the points. If NULL, uses theme$point_size. Default is NULL.
     #' @param alpha (`numeric(1)`)\cr
-    #'   Alpha transparency of points and lines. Default is 0.8.
+    #'   Alpha transparency of points and lines. If NULL, uses theme$alpha. Default is NULL.
     #' @param line_color (`character(1)`)\cr
     #'   Color of vertical lines. If NULL, uses the same color as points.
     #' @param line_alpha (`numeric(1)`)\cr
     #'   Alpha transparency of vertical lines. If NULL, uses alpha * 0.7.
     #' @param ... Additional arguments passed to point and line geoms.
-    add_points = function(x, loss_id = NULL, show_line = TRUE, color = "red", size = 3, alpha = 0.8,
+    add_points = function(x, loss_id = NULL, show_line = TRUE, color = "auto", size = NULL, alpha = NULL,
                           line_color = NULL, line_alpha = NULL, ...) {
       checkmate::assert_numeric(x)
       checkmate::assert_string(loss_id, null.ok = TRUE)
       checkmate::assert_flag(show_line)
       checkmate::assert_string(color)
-      checkmate::assert_number(size, lower = 0)
-      checkmate::assert_number(alpha, lower = 0, upper = 1)
+      checkmate::assert_number(size, lower = 0, null.ok = TRUE)
+      checkmate::assert_number(alpha, lower = 0, upper = 1, null.ok = TRUE)
       checkmate::assert_string(line_color, null.ok = TRUE)
       checkmate::assert_number(line_alpha, lower = 0, upper = 1, null.ok = TRUE)
 
@@ -261,7 +261,7 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
           expression(y - f)
         } else if (settings$x_lab == "y * f") {
           expression(y * f)
-        } else if (settings$x_lab == "π") {
+        } else if (settings$x_lab == "pi") {
           expression(pi)
         } else {
           settings$x_lab # Use as-is if it's a custom label
@@ -292,7 +292,7 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
       pl = pl + theme_fun(base_size = eff$text_size) +
         ggplot2::theme(
           plot.title = ggplot2::element_text(hjust = 0.5),
-          legend.position = if (settings$show_legend && settings$legend_position != "none") settings$legend_position else "none",
+          legend.position = if (settings$show_legend) settings$legend_position else "none",
           panel.grid = if (eff$show_grid) ggplot2::element_line(color = eff$grid_color) else ggplot2::element_blank()
         )
 
@@ -315,6 +315,7 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
       loss_settings = private$.loss_plot_settings
       final_legend_title = settings$legend_title
       loss_labels = sapply(self$losses, function(x) x$label)
+      eff = if (is.null(private$.effective_theme)) get_pkg_theme_default() else private$.effective_theme
 
       if (self$task_type == "classif" && self$input_type == "probability") {
         # ---- probability based visualisation ----
@@ -364,7 +365,7 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
             linetype = y_val
           )
         ) +
-          ggplot2::geom_line(linewidth = if (!is.null(loss_settings$line_width)) loss_settings$line_width[1] else 1.2)
+          ggplot2::geom_line(linewidth = if (!is.null(loss_settings$line_width)) loss_settings$line_width[1] else eff$line_width)
       } else {
         # ---- regression or score/margin classification ----
         if (!is.null(self$y_pred) && !is.null(self$y_true)) {
@@ -400,7 +401,7 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
               linetype = loss_fun
             )
           ) +
-            ggplot2::geom_line(linewidth = if (!is.null(loss_settings$line_width)) loss_settings$line_width[1] else 1.2)
+            ggplot2::geom_line(linewidth = if (!is.null(loss_settings$line_width)) loss_settings$line_width[1] else eff$line_width)
         } else {
           # Don't map linetype to avoid duplicate legend
           pl = ggplot2::ggplot(
@@ -410,7 +411,7 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
               col = loss_fun
             )
           ) +
-            ggplot2::geom_line(linewidth = if (!is.null(loss_settings$line_width)) loss_settings$line_width[1] else 1.2)
+            ggplot2::geom_line(linewidth = if (!is.null(loss_settings$line_width)) loss_settings$line_width[1] else eff$line_width)
         }
       }
 
@@ -419,21 +420,9 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
         color_values = loss_settings$line_col
       } else {
         n_losses = length(unique(dd$loss_fun))
-        if (n_losses == 1) {
-          color_values = "#FF8C00"
-        } else if (n_losses == 2) {
-          color_values = c("#FF8C00", "#1E90FF")
-        } else if (n_losses == 3) {
-          color_values = c("#FF8C00", "#1E90FF", "#32CD32")
-        } else if (n_losses == 4) {
-          color_values = c("#FF8C00", "#1E90FF", "#32CD32", "#DC143C")
-        } else {
-          if (requireNamespace("ggsci", quietly = TRUE)) {
-            color_values = ggsci::pal_npg("nrc")(n_losses)
-          } else {
-            color_values = grDevices::rainbow(n_losses, start = 0, end = 0.8)
-          }
-        }
+        # Use theme palette instead of hard-coded colors
+        eff = if (is.null(private$.effective_theme)) get_pkg_theme_default() else private$.effective_theme
+        color_values = sapply(1:n_losses, function(i) get_vistool_color(i, "discrete", base_palette = eff$palette))
       }
       pl = pl + ggplot2::scale_color_manual(values = color_values, labels = loss_labels, name = final_legend_title)
 
@@ -536,6 +525,11 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
 
     # Render a single loss points layer
     render_loss_points_layer = function(plot_obj, point_spec) {
+      # Resolve style defaults from effective theme
+      eff = private$.effective_theme
+      resolved_size = if (is.null(point_spec$size)) eff$point_size else point_spec$size
+      resolved_alpha = if (is.null(point_spec$alpha)) eff$alpha else point_spec$alpha
+      
       # Determine which loss function to use
       if (is.null(point_spec$loss_id)) {
         if (length(self$losses) == 0) {
@@ -563,8 +557,8 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
         data = points_data,
         ggplot2::aes(x = x, y = y),
         color = point_spec$color,
-        size = point_spec$size,
-        alpha = point_spec$alpha,
+        size = resolved_size,
+        alpha = resolved_alpha,
         shape = 21, # Circle with border and fill
         fill = "white", # Hollow center
         stroke = 1, # Border thickness
@@ -574,7 +568,7 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
       # Add vertical lines if requested
       if (point_spec$show_line) {
         line_color = if (is.null(point_spec$line_color)) point_spec$color else point_spec$line_color
-        line_alpha = if (is.null(point_spec$line_alpha)) point_spec$alpha * 0.7 else point_spec$line_alpha
+        line_alpha = if (is.null(point_spec$line_alpha)) resolved_alpha * 0.7 else point_spec$line_alpha
 
         # Create line segments from points to x-axis
         line_data = data.frame(

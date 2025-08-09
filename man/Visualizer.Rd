@@ -23,7 +23,7 @@ and saving plots across different plotting backends (ggplot2 for 1D/2D, plotly f
 \if{html}{\out{<a id="method-Visualizer-set_theme"></a>}}
 \if{latex}{\out{\hypertarget{method-Visualizer-set_theme}{}}}
 \subsection{Method \code{set_theme()}}{
-Set the instance theme (partial override merged with package default)
+Set the instance theme (partial override stored separately)
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Visualizer$set_theme(theme)}\if{html}{\out{</div>}}
 }
@@ -43,7 +43,7 @@ Invisible self
 \if{html}{\out{<a id="method-Visualizer-theme"></a>}}
 \if{latex}{\out{\hypertarget{method-Visualizer-theme}{}}}
 \subsection{Method \code{theme()}}{
-Get the instance theme (merged with package default)
+Get the instance theme (merged with current package default)
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Visualizer$theme()}\if{html}{\out{</div>}}
 }
@@ -107,7 +107,7 @@ Z-axis limits as c(min, max) (for surface plots). If NULL, uses automatic limits
 Whether to show the legend. Default is TRUE.}
 
 \item{\code{legend_position}}{(`character(1)`)\cr
-Position of the legend. One of "top", "right", "bottom", "left", "none". Default is "right".}
+Position of the legend. One of "top", "right", "bottom", "left". Default is "right".}
 
 \item{\code{legend_title}}{(`character(1)`)\cr
 Title for the legend. If NULL, uses default based on visualizer type. Default is NULL.}
@@ -170,9 +170,9 @@ Add points to the plot. This method can be called multiple times to add differen
 \if{html}{\out{<div class="r">}}\preformatted{Visualizer$add_points(
   points,
   color = "auto",
-  size = 2,
+  size = NULL,
   shape = 19,
-  alpha = 1,
+  alpha = NULL,
   annotations = NULL,
   annotation_size = NULL,
   ordered = FALSE,
@@ -194,13 +194,13 @@ The points to add.
 Color of the points. Use "auto" for automatic color assignment from palette. Default is "auto".}
 
 \item{\code{size}}{(`numeric(1)`)\cr
-Size of the points. Default is 2.}
+Size of the points. If NULL, uses theme$point_size. Default is NULL.}
 
 \item{\code{shape}}{(`integer(1)` or `character(1)`)\cr
 Shape of the points. For ggplot2: integer codes (e.g., 19 for solid circle). For plotly: shape names. Default is 19/"circle".}
 
 \item{\code{alpha}}{(`numeric(1)`)\cr
-Alpha transparency of the points. Default is 1.}
+Alpha transparency of the points. If NULL, uses theme$alpha. Default is NULL.}
 
 \item{\code{annotations}}{(`character`)\cr
 Optional text labels for each point. If provided, must be the same length as the number of points.}

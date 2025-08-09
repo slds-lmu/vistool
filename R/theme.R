@@ -39,7 +39,7 @@ assert_vistool_theme = function(theme) {
   checkmate::assert_list(theme, names = "unique")
   if (!is.null(theme$palette)) checkmate::assert_choice(theme$palette, choices = c("viridis", "plasma", "grayscale"))
   if (!is.null(theme$text_size)) checkmate::assert_number(theme$text_size, lower = 1)
-  if (!is.null(theme$theme)) checkmate::assert_choice(theme$theme, choices = c("minimal", "bw", "classic", "gray", "light", "dark", "void"))
+  if (!is.null(theme$theme)) checkmate::assert_choice(theme$theme, choices = c("minimal", "bw", "classic", "gray", "grey", "light", "dark", "void"))
   if (!is.null(theme$alpha)) checkmate::assert_number(theme$alpha, lower = 0, upper = 1)
   if (!is.null(theme$line_width)) checkmate::assert_number(theme$line_width, lower = 0)
   if (!is.null(theme$point_size)) checkmate::assert_number(theme$point_size, lower = 0)

@@ -110,7 +110,7 @@ Note that a grid of `npoints^2` values is generated and evaluated by `objective$
 Adds the training data to the plot.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{VisualizerSurfaceModel$add_training_data(
-  size = 5,
+  size = NULL,
   color = "auto",
   shape = 0,
   ...
@@ -121,7 +121,7 @@ Adds the training data to the plot.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{size}}{(`numeric(1)`)\cr
-Size of the points. Default is 5.}
+Size of the points. If NULL, uses theme$point_size. Default is NULL.}
 
 \item{\code{color}}{(`character(1)` or named `character`)\cr
 Color of the points. For classification tasks:
