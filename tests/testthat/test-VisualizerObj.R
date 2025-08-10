@@ -24,7 +24,7 @@ test_that("VisualizerObj handles missing bounds with defaults", {
   vis = VisualizerObj$new(obj)
   expect_message(
     VisualizerObj$new(obj),
-    pattern = "Objective bounds not available"
+    regexp = "Objective bounds not available"
   )
   expect_s3_class(vis, "VisualizerObj")
 })
