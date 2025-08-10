@@ -26,9 +26,9 @@ library(mlr3learners)
 
 The vistool package provides a flexible theme system that separates **what to plot** from **how to plot**. The three-step workflow:
 
-1. **Initialize** the Visualizer using `as_visualizer()` (computational setup only - the **what**),
+1. **Initialize** the Visualizer using `as_visualizer()` (computational setup only - the **what**) and set the theme,
 2. **Add** visualization layers with automatic color management,
-3. **Plot** using `plot()` with optional theme customization, and optionally `save()`,
+3. **Plot** using `plot()` with optional customization, and optionally `save()`,
 
 supports consistent customization across all visualization types with a clear precedence hierarchy.
 
@@ -37,7 +37,7 @@ supports consistent customization across all visualization types with a clear pr
 ### Theme Precedence (Highest to Lowest)
 
 1. **Layer-specific style**: `add_points(color = "red", size = 3)`
-2. **Plot theme override**: `plot(theme = list(palette = "plasma"))`  
+2. **Plot theme override**: `plot(theme = list(palette = "plasma"))`
 3. **Instance theme**: `vis$set_theme(vistool_theme(...))`
 4. **Package default**: `options(vistool.theme = vistool_theme(...))`
 

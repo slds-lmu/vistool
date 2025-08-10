@@ -563,8 +563,9 @@ Visualizer = R6::R6Class("Visualizer",
             }
 
             # For style, check if we have task information to determine if it's classification
-            if ("style" %in% names(layer$spec) && !is.null(self$task)) {
-              is_classification = self$task$task_type == "classif"
+            has_task = inherits(self, "VisualizerModel") && !is.null(self$task)
+            if ("style" %in% names(layer$spec) && has_task) {
+              is_classification = identical(self$task$task_type, "classif")
 
               # For regression tasks, resolve "auto" colors in style to avoid ggplot2 errors
               # For classification tasks, preserve "auto" for class-aware handling
