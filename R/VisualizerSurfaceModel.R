@@ -248,7 +248,7 @@ VisualizerSurfaceModel = R6::R6Class("VisualizerSurfaceModel",
     # Render a single training data layer
     render_training_data_layer = function(layer_spec) {
       is_classification = self$task$task_type == "classif"
-      
+
       # Resolve style defaults from effective theme
       eff = private$.effective_theme
       resolved_size = if (is.null(layer_spec$size)) eff$point_size else layer_spec$size
@@ -307,6 +307,7 @@ VisualizerSurfaceModel = R6::R6Class("VisualizerSurfaceModel",
           class_symbol = map_shape_to_plotly_symbol(class_shape_num)
 
           if (private$.layer_primary == "contour") {
+            eff = private$.effective_theme
             private$.plot = private$.plot %>%
               add_trace(
                 x = layer_spec$x1[class_indices],
@@ -317,7 +318,7 @@ VisualizerSurfaceModel = R6::R6Class("VisualizerSurfaceModel",
                   size = resolved_size,
                   color = class_color,
                   symbol = class_symbol,
-                  line = list(color = class_color, width = 1)
+                  line = list(color = class_color, width = if (is.null(eff$line_width)) 1.2 else eff$line_width)
                 ),
                 name = paste("Class:", class_name),
                 text = ~ paste("x1:", layer_spec$x1[class_indices], "\nx2:", layer_spec$x2[class_indices], "\nClass:", class_name),
@@ -355,7 +356,7 @@ VisualizerSurfaceModel = R6::R6Class("VisualizerSurfaceModel",
           # For contour plots, use color mapping based on z values with theme colorscale
           eff = private$.effective_theme
           colorscale = get_continuous_colorscale(eff$palette)
-          
+
           private$.plot = private$.plot %>%
             add_trace(
               x = layer_spec$x1,
@@ -368,7 +369,7 @@ VisualizerSurfaceModel = R6::R6Class("VisualizerSurfaceModel",
                 cmin = min(self$zmat),
                 cmax = max(self$zmat),
                 colorscale = colorscale,
-                line = list(color = resolved_color, width = 2),
+                line = list(color = resolved_color, width = if (is.null(eff$line_width)) 2 else eff$line_width),
                 showscale = FALSE,
                 symbol = resolved_symbol
               ),
@@ -418,7 +419,7 @@ VisualizerSurfaceModel = R6::R6Class("VisualizerSurfaceModel",
       } else {
         layer_spec$color
       }
-      
+
       # Get boundary line color for contours
       boundary_line_color = if (is.null(layer_spec$color)) {
         get_vistool_color(1, "discrete", base_palette = eff$palette)
@@ -450,7 +451,7 @@ VisualizerSurfaceModel = R6::R6Class("VisualizerSurfaceModel",
               ),
               line = list(
                 color = boundary_line_color,
-                width = 3
+                width = if (is.null(eff$line_width)) 3 else eff$line_width
               )
             )
         } else {

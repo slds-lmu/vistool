@@ -135,17 +135,17 @@ VisualizerModel = R6::R6Class("VisualizerModel",
     #'   Line type for boundaries. For 1D: ggplot2 linetypes. For 2D: contour line types.
     #'   Default is "dashed".
     #' @param linewidth (`numeric(1)`)\cr
-    #'   Width of boundary lines. Default is 1.
+    #'   Width of boundary lines. If NULL, uses theme$line_width.
     #' @param alpha (`numeric(1)`)\cr
-    #'   Alpha transparency of boundary lines. Default is 0.8.
+    #'   Alpha transparency of boundary lines. If NULL, uses theme$alpha.
     #' @template return_self_invisible
     add_boundary = function(values = NULL, color = "black", linetype = "dashed",
-                            linewidth = 1, alpha = 0.8) {
+                            linewidth = NULL, alpha = NULL) {
       checkmate::assert_numeric(values, null.ok = TRUE)
       checkmate::assert_string(color)
       checkmate::assert_string(linetype)
-      checkmate::assert_number(linewidth, lower = 0)
-      checkmate::assert_number(alpha, lower = 0, upper = 1)
+      checkmate::assert_number(linewidth, lower = 0, null.ok = TRUE)
+      checkmate::assert_number(alpha, lower = 0, upper = 1, null.ok = TRUE)
 
       # Determine default values based on dimensionality and prediction type
       if (is.null(values)) {
@@ -245,7 +245,7 @@ VisualizerModel = R6::R6Class("VisualizerModel",
       training_data = layer_spec$data
       style = layer_spec$style
       is_classification = self$task$task_type == "classif"
-      
+
       # Resolve style defaults from effective theme
       eff = private$.effective_theme
       resolved_size = if (is.null(style$size)) eff$point_size else style$size
@@ -388,17 +388,23 @@ VisualizerModel = R6::R6Class("VisualizerModel",
     # Render boundary layer
     render_boundary_layer = function(layer_spec) {
       if (private$.dimensionality == "1d") {
+        eff = private$.effective_theme
+        resolved_linewidth = if (is.null(layer_spec$linewidth)) eff$line_width else layer_spec$linewidth
+        resolved_alpha = if (is.null(layer_spec$alpha)) eff$alpha else layer_spec$alpha
         # Add horizontal lines for 1D
         for (value in layer_spec$values) {
           private$.plot = private$.plot + ggplot2::geom_hline(
             yintercept = value,
             color = layer_spec$color,
             linetype = layer_spec$linetype,
-            linewidth = layer_spec$linewidth,
-            alpha = layer_spec$alpha
+            linewidth = resolved_linewidth,
+            alpha = resolved_alpha
           )
         }
       } else {
+        eff = private$.effective_theme
+        resolved_linewidth = if (is.null(layer_spec$linewidth)) eff$line_width else layer_spec$linewidth
+        resolved_alpha = if (is.null(layer_spec$alpha)) eff$alpha else layer_spec$alpha
         # Add contour lines for 2D
         contour_data = data.frame(
           x1 = private$.data_structure$coordinates$x1,
@@ -411,9 +417,9 @@ VisualizerModel = R6::R6Class("VisualizerModel",
           ggplot2::aes(x = x1, y = x2, z = y),
           breaks = layer_spec$values,
           color = layer_spec$color,
-          linewidth = layer_spec$linewidth,
+          linewidth = resolved_linewidth,
           linetype = layer_spec$linetype,
-          alpha = layer_spec$alpha,
+          alpha = resolved_alpha,
           inherit.aes = FALSE
         )
       }

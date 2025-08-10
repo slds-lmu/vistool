@@ -262,7 +262,7 @@ test_that("VisualizerSurface add_contours args are properly applied", {
 
   p = vis$plot()
   expect_s3_class(p, "plotly")
-  
+
   # Check that the trace has the additional arguments applied
   # plotly stores trace data in p$x$attrs, find the surface trace
   surface_attrs = NULL

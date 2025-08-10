@@ -95,7 +95,7 @@ Visualizer
 
 **Styling** is handled separately via:
 - **Instance theme**: `vis$set_theme(vistool_theme(...))`
-- **Plot theme**: `vis$plot(theme = list(...))`
+- **Plot theme**: `vis$plot(theme = list(...), ...)`
 - **Layer styling**: `vis$add_points(color = "red", size = 3)`
 
 ### Example Workflow

@@ -416,23 +416,28 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
       # different default stylings (such as line width) and to recreate the layer with the stored arguments:
       if (private$.layer_primary == "surface") {
         ptype = "scatter3d"
+        eff = private$.effective_theme
+        lw = if (is.null(eff$line_width)) 1.2 else eff$line_width
         pargs = list(
           name = name,
           x = xmr$x,
           y = xmr$y,
           z = xmr$z,
-          marker = list(color = line_color, line = list(color = mcolor_out, width = 6)),
-          line = list(color = line_color, width = 8)
+          marker = list(color = line_color, line = list(color = mcolor_out, width = lw)),
+          line = list(color = line_color, width = lw)
         )
       }
       if (private$.layer_primary == "contour") {
         ptype = "scatter"
+        eff = private$.effective_theme
+        lw = if (is.null(eff$line_width)) 1.2 else eff$line_width
+        msize = if (is.null(eff$point_size)) 6 else eff$point_size
         pargs = list(
           name = name,
           x = xmr$x,
           y = xmr$y,
-          marker = list(color = line_color, size = 12, line = list(color = mcolor_out, width = 2)),
-          line = list(color = line_color, width = 2)
+          marker = list(color = line_color, size = msize, line = list(color = mcolor_out, width = lw)),
+          line = list(color = line_color, width = lw)
         )
       }
       if (is.null(ptype)) {

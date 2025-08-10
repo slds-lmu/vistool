@@ -143,8 +143,7 @@ selected loss function at the given x-coordinates.
   size = NULL,
   alpha = NULL,
   line_color = NULL,
-  line_alpha = NULL,
-  ...
+  line_alpha = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -178,8 +177,6 @@ Color of vertical lines. If NULL, uses the same color as points.}
 
 \item{\code{line_alpha}}{(`numeric(1)`)\cr
 Alpha transparency of vertical lines. If NULL, uses alpha * 0.7.}
-
-\item{\code{...}}{Additional arguments passed to point and line geoms.}
 }
 \if{html}{\out{</div>}}
 }

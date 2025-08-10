@@ -78,7 +78,7 @@ VisualizerObj = R6::R6Class("VisualizerObj",
     #' @param line_color (`character(1)`)\cr
     #'   Color of the optimization trace line. If NULL, uses automatic color.
     #' @param line_width (`numeric(1)`)\cr
-    #'   Width of the trace line. Default is 1.2.
+    #'   Width of the trace line. If NULL, uses theme$line_width.
     #' @param line_type (`character(1)`)\cr
     #'   Type of the trace line. One of "solid", "dashed", "dotted". Default is "solid".
     #' @param npoints (`integer(1)`)\cr
@@ -98,16 +98,16 @@ VisualizerObj = R6::R6Class("VisualizerObj",
     #' @param show_start_end (`logical(1)`)\cr
     #'   Whether to highlight start and end points. Default is TRUE for 2D plots.
     #' @param alpha (`numeric(1)`)\cr
-    #'   Alpha transparency. Default is 0.8.
+    #'   Alpha transparency. If NULL, uses theme$alpha.
     #' @template return_self_invisible
-    add_optimization_trace = function(optimizer, line_color = NULL, line_width = 1.2,
+    add_optimization_trace = function(optimizer, line_color = NULL, line_width = NULL,
                                       line_type = "solid", npoints = NULL, npmax = NULL,
                                       name = NULL, add_marker_at = 1, marker_size = 3,
                                       marker_shape = 16, marker_color = NULL,
-                                      show_start_end = TRUE, alpha = 0.8) {
+                                      show_start_end = TRUE, alpha = NULL) {
       checkmate::assert_r6(optimizer, "Optimizer")
       checkmate::assert_string(line_color, null.ok = TRUE)
-      checkmate::assert_number(line_width, lower = 0)
+      checkmate::assert_number(line_width, lower = 0, null.ok = TRUE)
       checkmate::assert_string(line_type)
       checkmate::assert_count(npoints, null.ok = TRUE)
       checkmate::assert_count(npmax, null.ok = TRUE)
@@ -120,7 +120,7 @@ VisualizerObj = R6::R6Class("VisualizerObj",
       )
       checkmate::assert_string(marker_color, null.ok = TRUE)
       checkmate::assert_flag(show_start_end)
-      checkmate::assert_number(alpha, lower = 0, upper = 1)
+      checkmate::assert_number(alpha, lower = 0, upper = 1, null.ok = TRUE)
 
       # Validate optimizer has been run
       if (is.null(optimizer$archive) || nrow(optimizer$archive) == 0) {
@@ -369,13 +369,16 @@ VisualizerObj = R6::R6Class("VisualizerObj",
         )
 
         # Add trace line
+        eff = private$.effective_theme
+        resolved_linewidth = if (is.null(layer_spec$line_width)) eff$line_width else layer_spec$line_width
+        resolved_alpha = if (is.null(layer_spec$alpha)) eff$alpha else layer_spec$alpha
         private$.plot = private$.plot + ggplot2::geom_path(
           data = trace_df,
           ggplot2::aes(x = x1, y = x2),
           color = layer_spec$line_color,
-          linewidth = layer_spec$line_width,
+          linewidth = resolved_linewidth,
           linetype = layer_spec$line_type,
-          alpha = layer_spec$alpha,
+          alpha = resolved_alpha,
           inherit.aes = FALSE
         )
 
@@ -389,7 +392,7 @@ VisualizerObj = R6::R6Class("VisualizerObj",
               size = layer_spec$marker_size,
               color = layer_spec$marker_color,
               shape = layer_spec$marker_shape,
-              alpha = layer_spec$alpha,
+              alpha = resolved_alpha,
               inherit.aes = FALSE
             )
           }
@@ -404,7 +407,7 @@ VisualizerObj = R6::R6Class("VisualizerObj",
             size = layer_spec$marker_size + 1,
             color = "green",
             shape = 16,
-            alpha = layer_spec$alpha,
+            alpha = resolved_alpha,
             inherit.aes = FALSE
           )
           # End point (red)
@@ -414,7 +417,7 @@ VisualizerObj = R6::R6Class("VisualizerObj",
             size = layer_spec$marker_size + 1,
             color = "red",
             shape = 17, # Triangle
-            alpha = layer_spec$alpha,
+            alpha = resolved_alpha,
             inherit.aes = FALSE
           )
         }

@@ -30,7 +30,7 @@ test_that("plot customization parameters work for Visualizer1D", {
   p6 = vis$plot(show_legend = FALSE)
   expect_s3_class(p6, "ggplot")
 
-  p7 = vis$plot(legend_position = "top", legend_title = "Custom Legend")
+  p7 = vis$plot(theme = list(legend_position = "top"), legend_title = "Custom Legend")
   expect_s3_class(p7, "ggplot")
 })
 
@@ -56,7 +56,7 @@ test_that("plot customization parameters work for Visualizer2D", {
   expect_s3_class(p3, "ggplot")
 
   # Test legend customization
-  p4 = vis$plot(legend_title = "Function Value", legend_position = "bottom")
+  p4 = vis$plot(legend_title = "Function Value", theme = list(legend_position = "bottom"))
   expect_s3_class(p4, "ggplot")
 
   # Test grid customization via theme
@@ -114,7 +114,7 @@ test_that("plot customization parameters work for VisualizerLossFuns", {
   expect_s3_class(p3, "ggplot")
 
   # Test legend customization
-  p4 = vis$plot(legend_position = "top", show_legend = TRUE)
+  p4 = vis$plot(theme = list(legend_position = "top"), show_legend = TRUE)
   expect_s3_class(p4, "ggplot")
 
   # Test grid customization via theme
@@ -127,8 +127,8 @@ test_that("plot customization parameter validation works", {
   obj = Objective$new(id = "test_val", fun = function(x) x^2, xdim = 1, lower = -5, upper = 5)
   vis = as_visualizer(obj, type = "1d", n_points = 50)
 
-  # Test invalid legend position
-  expect_error(vis$plot(legend_position = "invalid"))
+  # Test invalid legend position (must be provided via theme)
+  expect_error(vis$plot(theme = list(legend_position = "invalid")))
 
   # Test invalid axis limits (wrong length)
   expect_error(vis$plot(x_limits = c(1, 2, 3)))
@@ -161,7 +161,7 @@ test_that("parameter inheritance works in specialized visualizer classes", {
   task_2d = tsk("mtcars")$select(c("wt", "hp")) # 2D regression task
   vis_model_2d = as_visualizer(task_2d, learner = learner, type = "2d")
 
-  p2 = vis_model_2d$plot(plot_title = "2D Model", legend_position = "bottom")
+  p2 = vis_model_2d$plot(plot_title = "2D Model", theme = list(legend_position = "bottom"))
   expect_s3_class(p2, "ggplot")
   expect_true(grepl("2D Model", p2$labels$title))
 })

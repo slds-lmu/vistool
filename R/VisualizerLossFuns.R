@@ -189,9 +189,8 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
     #'   Color of vertical lines. If NULL, uses the same color as points.
     #' @param line_alpha (`numeric(1)`)\cr
     #'   Alpha transparency of vertical lines. If NULL, uses alpha * 0.7.
-    #' @param ... Additional arguments passed to point and line geoms.
     add_points = function(x, loss_id = NULL, show_line = TRUE, color = "auto", size = NULL, alpha = NULL,
-                          line_color = NULL, line_alpha = NULL, ...) {
+                          line_color = NULL, line_alpha = NULL) {
       checkmate::assert_numeric(x)
       checkmate::assert_string(loss_id, null.ok = TRUE)
       checkmate::assert_flag(show_line)
@@ -204,7 +203,7 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
       # Store layer specification using layer system
       private$store_layer("loss_points", list(
         x = x, loss_id = loss_id, show_line = show_line, color = color, size = size, alpha = alpha,
-        line_color = line_color, line_alpha = line_alpha, args = list(...)
+        line_color = line_color, line_alpha = line_alpha
       ))
       invisible(self)
     }
@@ -248,7 +247,7 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
       settings = private$.render_params
       loss_settings = private$.loss_plot_settings
 
-      # Determine final labels
+      # Determine final labels from render params
       final_title = if (settings$show_title) {
         if (!is.null(settings$plot_title)) settings$plot_title else ""
       } else {
@@ -279,23 +278,26 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
       # Add stored layers
       pl = private$render_stored_layers(pl)
 
-      # Apply final styling
-      theme_fun = switch(eff$theme,
-        "minimal" = ggplot2::theme_minimal,
-        "bw"      = ggplot2::theme_bw,
-        "classic" = ggplot2::theme_classic,
-        "gray"    = ggplot2::theme_gray,
-        "light"   = ggplot2::theme_light,
-        "dark"    = ggplot2::theme_dark,
-        "void"    = ggplot2::theme_void
+      # Apply consolidated theme from base helper
+      pl = private$apply_ggplot_theme(
+        plot_obj   = pl,
+        text_size  = eff$text_size,
+        title_size = eff$title_size,
+        theme      = eff$theme,
+        background = eff$background,
+        show_grid  = eff$show_grid,
+        grid_color = eff$grid_color
       )
-      pl = pl + theme_fun(base_size = eff$text_size) +
-        ggplot2::theme(
-          plot.title = ggplot2::element_text(hjust = 0.5),
-          legend.position = if (settings$show_legend) settings$legend_position else "none",
-          panel.grid = if (eff$show_grid) ggplot2::element_line(color = eff$grid_color) else ggplot2::element_blank()
-        )
 
+      # Legend handling consistent with base: respect show_legend and legend_position (incl. "none")
+      legend_pos = if (is.null(eff$legend_position)) "right" else eff$legend_position
+      if (!settings$show_legend || identical(legend_pos, "none")) {
+        pl = pl + ggplot2::theme(legend.position = "none")
+      } else {
+        pl = pl + ggplot2::theme(legend.position = legend_pos)
+      }
+
+      # Apply labels and subtitle
       pl = pl + ggplot2::labs(title = final_title, subtitle = settings$plot_subtitle, x = final_x_lab, y = final_y_lab)
 
       # Apply axis limits if specified
@@ -529,7 +531,7 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
       eff = private$.effective_theme
       resolved_size = if (is.null(point_spec$size)) eff$point_size else point_spec$size
       resolved_alpha = if (is.null(point_spec$alpha)) eff$alpha else point_spec$alpha
-      
+
       # Determine which loss function to use
       if (is.null(point_spec$loss_id)) {
         if (length(self$losses) == 0) {
@@ -568,6 +570,7 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
       # Add vertical lines if requested
       if (point_spec$show_line) {
         line_color = if (is.null(point_spec$line_color)) point_spec$color else point_spec$line_color
+        # Default vertical line alpha to theme alpha * 0.7 if not provided
         line_alpha = if (is.null(point_spec$line_alpha)) resolved_alpha * 0.7 else point_spec$line_alpha
 
         # Create line segments from points to x-axis

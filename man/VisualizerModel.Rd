@@ -154,8 +154,8 @@ Adds boundary lines/contours to the plot.
   values = NULL,
   color = "black",
   linetype = "dashed",
-  linewidth = 1,
-  alpha = 0.8
+  linewidth = NULL,
+  alpha = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -174,10 +174,10 @@ Line type for boundaries. For 1D: ggplot2 linetypes. For 2D: contour line types.
 Default is "dashed".}
 
 \item{\code{linewidth}}{(`numeric(1)`)\cr
-Width of boundary lines. Default is 1.}
+Width of boundary lines. If NULL, uses theme$line_width.}
 
 \item{\code{alpha}}{(`numeric(1)`)\cr
-Alpha transparency of boundary lines. Default is 0.8.}
+Alpha transparency of boundary lines. If NULL, uses theme$alpha.}
 }
 \if{html}{\out{</div>}}
 }

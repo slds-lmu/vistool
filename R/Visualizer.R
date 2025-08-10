@@ -39,14 +39,13 @@ Visualizer = R6::R6Class("Visualizer",
     #' @template param_y_limits
     #' @template param_z_limits
     #' @template param_show_legend
-    #' @template param_legend_position
     #' @template param_legend_title
     #' @template param_show_title
     #' @return Invisible self for method chaining (child classes handle actual plot creation).
     plot = function(theme = NULL,
                     plot_title = NULL, plot_subtitle = NULL, x_lab = NULL, y_lab = NULL, z_lab = NULL,
                     x_limits = NULL, y_limits = NULL, z_limits = NULL,
-                    show_legend = TRUE, legend_position = "right", legend_title = NULL, show_title = TRUE) {
+                    show_legend = TRUE, legend_title = NULL, show_title = TRUE) {
       # Validate and store render params
       checkmate::assert_string(plot_title, null.ok = TRUE)
       checkmate::assert_string(plot_subtitle, null.ok = TRUE)
@@ -57,7 +56,6 @@ Visualizer = R6::R6Class("Visualizer",
       checkmate::assert_numeric(y_limits, len = 2, null.ok = TRUE)
       checkmate::assert_numeric(z_limits, len = 2, null.ok = TRUE)
       checkmate::assert_flag(show_legend)
-      checkmate::assert_choice(legend_position, choices = c("top", "right", "bottom", "left"))
       checkmate::assert_string(legend_title, null.ok = TRUE)
       checkmate::assert_flag(show_title)
       if (!is.null(theme)) assert_vistool_theme(theme)
@@ -80,7 +78,6 @@ Visualizer = R6::R6Class("Visualizer",
         y_limits = y_limits,
         z_limits = z_limits,
         show_legend = show_legend,
-        legend_position = legend_position,
         legend_title = legend_title,
         show_title = show_title
       )
@@ -167,15 +164,14 @@ Visualizer = R6::R6Class("Visualizer",
     #'   Color of arrows when ordered = TRUE. If NULL, uses point color.
     #' @param arrow_size (`numeric(1)`)\cr
     #'   Length/size of arrows when `ordered = TRUE`. Default is 0.3 units in the coordinate system.
-    #' @param ... Additional arguments passed to the plotting layers.
     add_points = function(points, color = "auto", size = NULL, shape = 19, alpha = NULL,
                           annotations = NULL, annotation_size = NULL, ordered = FALSE,
-                          arrow_color = NULL, arrow_size = 0.3, ...) {
+                          arrow_color = NULL, arrow_size = 0.3) {
       # Store layer specification
       private$store_layer("points", list(
         points = points, color = color, size = size, shape = shape, alpha = alpha,
         annotations = annotations, annotation_size = annotation_size, ordered = ordered,
-        arrow_color = arrow_color, arrow_size = arrow_size, args = list(...)
+        arrow_color = arrow_color, arrow_size = arrow_size
       ))
       invisible(self)
     }
@@ -556,8 +552,35 @@ Visualizer = R6::R6Class("Visualizer",
       for (i in seq_along(private$.layers_to_add)) {
         layer = private$.layers_to_add[[i]]
 
-        # Recursively resolve any "auto" colors in the layer specification
-        layer = private$resolve_colors_recursive(layer)
+        # For training_data layers, handle "auto" colors context-aware for classification vs regression
+        if (layer$type == "training_data") {
+          # Resolve colors outside of style normally
+          if ("spec" %in% names(layer)) {
+            for (spec_name in names(layer$spec)) {
+              if (spec_name != "style") {
+                layer$spec[[spec_name]] = private$resolve_colors_recursive(layer$spec[[spec_name]])
+              }
+            }
+
+            # For style, check if we have task information to determine if it's classification
+            if ("style" %in% names(layer$spec) && !is.null(self$task)) {
+              is_classification = self$task$task_type == "classif"
+
+              # For regression tasks, resolve "auto" colors in style to avoid ggplot2 errors
+              # For classification tasks, preserve "auto" for class-aware handling
+              if (!is_classification) {
+                layer$spec$style = private$resolve_colors_recursive(layer$spec$style)
+              }
+              # For classification, leave style$color as "auto" if present
+            } else {
+              # If no task information available, resolve all colors to be safe
+              layer$spec$style = private$resolve_colors_recursive(layer$spec$style)
+            }
+          }
+        } else {
+          # For other layer types, recursively resolve any "auto" colors in the layer specification
+          layer = private$resolve_colors_recursive(layer)
+        }
 
         # Update the stored layer
         private$.layers_to_add[[i]] = layer
@@ -766,7 +789,7 @@ Visualizer = R6::R6Class("Visualizer",
       private$gg_apply_labels_limits_theme(data_structure)
     },
 
-    # Helper method to initialize 2D plots with common styling  
+    # Helper method to initialize 2D plots with common styling
     gg_init_2d = function(data_structure, geom_layer_func) {
       eff = private$.effective_theme
       rp = private$.render_params
@@ -826,25 +849,12 @@ Visualizer = R6::R6Class("Visualizer",
         private$.plot = private$.plot + ggplot2::ylim(rp$y_limits)
       }
 
-      # Apply grid settings
-      if (!eff$show_grid) {
-        private$.plot = private$.plot + ggplot2::theme(panel.grid = ggplot2::element_blank())
-      } else {
-        private$.plot = private$.plot + ggplot2::theme(
-          panel.grid = ggplot2::element_line(color = eff$grid_color)
-        )
-      }
-
-      # Apply title size
-      private$.plot = private$.plot + ggplot2::theme(
-        plot.title = ggplot2::element_text(size = eff$title_size)
-      )
-
-      # Apply legend settings
-      if (!rp$show_legend) {
+      # Apply legend settings: theme drives position; "none" disables legend
+      legend_pos = if (is.null(eff$legend_position)) "right" else eff$legend_position
+      if (!rp$show_legend || identical(legend_pos, "none")) {
         private$.plot = private$.plot + ggplot2::theme(legend.position = "none")
-      } else if (rp$legend_position != "right") {
-        private$.plot = private$.plot + ggplot2::theme(legend.position = rp$legend_position)
+      } else {
+        private$.plot = private$.plot + ggplot2::theme(legend.position = legend_pos)
       }
     }
   )

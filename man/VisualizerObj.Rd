@@ -104,7 +104,7 @@ Add optimization trace to the plot.
 \if{html}{\out{<div class="r">}}\preformatted{VisualizerObj$add_optimization_trace(
   optimizer,
   line_color = NULL,
-  line_width = 1.2,
+  line_width = NULL,
   line_type = "solid",
   npoints = NULL,
   npmax = NULL,
@@ -114,7 +114,7 @@ Add optimization trace to the plot.
   marker_shape = 16,
   marker_color = NULL,
   show_start_end = TRUE,
-  alpha = 0.8
+  alpha = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -128,7 +128,7 @@ The optimizer to add to the plot. Must have been run and contain archive data.}
 Color of the optimization trace line. If NULL, uses automatic color.}
 
 \item{\code{line_width}}{(`numeric(1)`)\cr
-Width of the trace line. Default is 1.2.}
+Width of the trace line. If NULL, uses theme$line_width.}
 
 \item{\code{line_type}}{(`character(1)`)\cr
 Type of the trace line. One of "solid", "dashed", "dotted". Default is "solid".}
@@ -158,7 +158,7 @@ Color of markers. If NULL, uses line color.}
 Whether to highlight start and end points. Default is TRUE for 2D plots.}
 
 \item{\code{alpha}}{(`numeric(1)`)\cr
-Alpha transparency. Default is 0.8.}
+Alpha transparency. If NULL, uses theme$alpha.}
 }
 \if{html}{\out{</div>}}
 }

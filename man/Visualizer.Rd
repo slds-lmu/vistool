@@ -67,7 +67,6 @@ This method should be called by all child classes via `super$plot(...)`.
   y_limits = NULL,
   z_limits = NULL,
   show_legend = TRUE,
-  legend_position = "right",
   legend_title = NULL,
   show_title = TRUE
 )}\if{html}{\out{</div>}}
@@ -105,9 +104,6 @@ Z-axis limits as c(min, max) (for surface plots). If NULL, uses automatic limits
 
 \item{\code{show_legend}}{(`logical(1)`)\cr
 Whether to show the legend. Default is TRUE.}
-
-\item{\code{legend_position}}{(`character(1)`)\cr
-Position of the legend. One of "top", "right", "bottom", "left". Default is "right".}
 
 \item{\code{legend_title}}{(`character(1)`)\cr
 Title for the legend. If NULL, uses default based on visualizer type. Default is NULL.}
@@ -177,8 +173,7 @@ Add points to the plot. This method can be called multiple times to add differen
   annotation_size = NULL,
   ordered = FALSE,
   arrow_color = NULL,
-  arrow_size = 0.3,
-  ...
+  arrow_size = 0.3
 )}\if{html}{\out{</div>}}
 }
 
@@ -216,8 +211,6 @@ Color of arrows when ordered = TRUE. If NULL, uses point color.}
 
 \item{\code{arrow_size}}{(`numeric(1)`)\cr
 Length/size of arrows when `ordered = TRUE`. Default is 0.3 units in the coordinate system.}
-
-\item{\code{...}}{Additional arguments passed to the plotting layers.}
 }
 \if{html}{\out{</div>}}
 }

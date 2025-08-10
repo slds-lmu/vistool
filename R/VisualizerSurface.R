@@ -289,20 +289,9 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
 
       plot_colorscale = get_continuous_colorscale(eff$palette)
 
-      # Check if we need to reinitialize the plot
-      # This happens if the plot type changes, colorscale changes, or contours are added/modified
-      contours_layer = private$get_layer("contours")
-      has_contours = !is.null(contours_layer)
-      current_has_contours = !is.null(private$.vbase) && !is.null(private$.vbase$contours)
-
-      needs_reinit = is.null(private$.plot) ||
-        (settings$flatten && private$.layer_primary != "contour") ||
-        (!settings$flatten && private$.layer_primary != "surface") ||
-        (!identical(private$.vbase$colorscale, plot_colorscale)) ||
-        (has_contours != current_has_contours)
-
-      # Initialize appropriate plot type based on flatten parameter
-      if (needs_reinit) {
+      # Always reinitialize the base plot to prevent accumulating traces
+      # This ensures clean plots on repeated plot() calls unless in freeze_plot mode
+      if (!private$.freeze_plot) {
         if (settings$flatten) {
           self$init_layer_contour(colorscale = plot_colorscale, opacity = eff$alpha, show_title = rp$show_title)
         } else {
@@ -321,6 +310,10 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
         final_x_lab = if (!is.null(rp$x_lab)) rp$x_lab else self$x1_lab
         final_y_lab = if (!is.null(rp$y_lab)) rp$y_lab else self$x2_lab
         final_z_lab = if (!is.null(rp$z_lab)) rp$z_lab else self$z_lab
+
+        # Determine legend visibility from theme and render params
+        legend_pos = if (is.null(eff$legend_position)) "right" else eff$legend_position
+        legend_on = isTRUE(rp$show_legend) && !identical(legend_pos, "none")
 
         if (private$.layer_primary == "surface") {
           # For 3D surface plots
@@ -341,7 +334,7 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
                   range = rp$z_limits
                 )
               ),
-              showlegend = rp$show_legend
+              showlegend = legend_on
             )
         } else {
           # For 2D contour plots
@@ -356,7 +349,7 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
                 title = list(text = final_y_lab, font = list(size = eff$text_size)),
                 range = rp$y_limits
               ),
-              showlegend = rp$show_legend
+              showlegend = legend_on
             )
         }
       }
@@ -453,8 +446,8 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
         x2_high = x2_low + 1
 
         # Handle edge cases where point is outside grid
-        if (x1_low < 1 || x1_high > length(x1_range) || 
-            x2_low < 1 || x2_high > length(x2_range)) {
+        if (x1_low < 1 || x1_high > length(x1_range) ||
+          x2_low < 1 || x2_high > length(x2_range)) {
           # Fall back to nearest neighbor for points outside grid
           x1_idx = which.min(abs(x1_range - x))
           x2_idx = which.min(abs(x2_range - y))
@@ -480,7 +473,7 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
           } else {
             wx = (x - x1_low_val) / (x1_high_val - x1_low_val)
           }
-          
+
           if (x2_high_val == x2_low_val) {
             wy = 0  # Avoid division by zero
           } else {
@@ -489,9 +482,9 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
 
           # Bilinear interpolation formula
           z_vals[i] = z11 * (1 - wx) * (1 - wy) +
-                      z21 * wx * (1 - wy) +
-                      z12 * (1 - wx) * wy +
-                      z22 * wx * wy
+            z21 * wx * (1 - wy) +
+            z12 * (1 - wx) * wy +
+            z22 * wx * wy
         }
       }
 
@@ -499,42 +492,3 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
     }
   )
 )
-
-#' Randomly generate colors
-#' @description Helper function to generate RGB colors.
-#' @param alpha (`numeric(1)`) The alpha value. If `!is.null` the used prefix is 'rgba' instead of 'rgb'.
-#' @return A character of length one containing the RGB color.
-#' @export
-colSampler = function(alpha = NULL) {
-  checkmate::assertNumber(alpha, lower = 0, upper = 1, null.ok = TRUE)
-  r = sample(seq(0, 255), 1)
-  g = sample(seq(0, 255), 1)
-  b = sample(seq(0, 255), 1)
-
-  if (is.null(alpha)) {
-    rgb = "rgb"
-  } else {
-    rgb = "rgba"
-  }
-  clr = sprintf("%s(%s)", rgb, paste(c(r, g, b, alpha), collapse = ", "))
-  return(clr)
-}
-
-#' Get consistent color palette
-#'
-#' @description
-#' Returns a consistent color palette that matches the ggplot2 implementation.
-#' This ensures visual consistency between ggplot2 and plotly visualizations.
-#'
-#' @param index (`integer(1)`)\cr
-#'   Index of the color to retrieve from the palette.
-#' @return A character string containing the color in hex format.
-get_consistent_color = function(index) {
-  # Same color palette as used in Visualizer2DObj
-  colors = c(
-    "#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd",
-    "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf"
-  )
-  color_index = ((index - 1) %% length(colors)) + 1
-  return(colors[color_index])
-}
