@@ -36,8 +36,8 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
         mlr3misc::stopf("`VisualizerSurface` requires 2-dimensional inputs, but `objective$xdim = %s`", objective$xdim)
       }
 
-      x1_limits = x1_limits %??% c(objective$lower[1], objective$upper[1])
-      x2_limits = x2_limits %??% c(objective$lower[2], objective$upper[2])
+      x1_limits = if (is.null(x1_limits)) c(objective$lower[1], objective$upper[1]) else x1_limits
+      x2_limits = if (is.null(x2_limits)) c(objective$lower[2], objective$upper[2]) else x2_limits
 
       if (any(is.na(x1_limits)) || any(is.na(x2_limits))) {
         stop("Limits could not be extracted from the objective. Please use `x_limits`.")

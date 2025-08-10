@@ -131,9 +131,9 @@ VisualizerObj = R6::R6Class("VisualizerObj",
       trace_data = private$process_optimization_trace(optimizer, npoints, npmax)
 
       # Set defaults - use "auto" for automatic color assignment from palette
-      line_color = line_color %??% "auto"
-      marker_color = marker_color %??% line_color
-      name = name %??% optimizer$id
+      line_color = if (is.null(line_color)) "auto" else line_color
+      marker_color = if (is.null(marker_color)) line_color else marker_color
+      name = if (is.null(name)) optimizer$id else name
 
       # Store optimization trace specification
       private$store_layer("optimization_trace", list(
@@ -203,7 +203,7 @@ VisualizerObj = R6::R6Class("VisualizerObj",
     # Initialize data structure for 1D objectives
     initialize_1d_data = function(x1_limits, n_points) {
       # Determine x limits from objective bounds
-      x1_limits = x1_limits %??% c(self$objective$lower, self$objective$upper)
+      x1_limits = if (is.null(x1_limits)) c(self$objective$lower, self$objective$upper) else x1_limits
       if (any(is.na(x1_limits))) {
         # Provide reasonable default limits when objective bounds are not available
         x1_limits = c(-5, 5)
@@ -223,7 +223,7 @@ VisualizerObj = R6::R6Class("VisualizerObj",
           y = y_vals
         ),
         labels = list(
-          title = self$objective$label %??% self$objective$id,
+          title = if (is.null(self$objective$label)) self$objective$id else self$objective$label,
           x1 = "x",
           x2 = NULL,
           y = "y"
@@ -238,8 +238,8 @@ VisualizerObj = R6::R6Class("VisualizerObj",
     # Initialize data structure for 2D objectives
     initialize_2d_data = function(x1_limits, x2_limits, padding, n_points) {
       # Determine limits from objective bounds
-      x1_limits = x1_limits %??% c(self$objective$lower[1], self$objective$upper[1])
-      x2_limits = x2_limits %??% c(self$objective$lower[2], self$objective$upper[2])
+      x1_limits = if (is.null(x1_limits)) c(self$objective$lower[1], self$objective$upper[1]) else x1_limits
+      x2_limits = if (is.null(x2_limits)) c(self$objective$lower[2], self$objective$upper[2]) else x2_limits
 
       if (any(is.na(x1_limits)) || any(is.na(x2_limits))) {
         stop("Limits could not be extracted from the objective. Please use 'x1_limits' and 'x2_limits'.")
@@ -266,7 +266,7 @@ VisualizerObj = R6::R6Class("VisualizerObj",
           y = y_vals
         ),
         labels = list(
-          title = self$objective$label %??% self$objective$id,
+          title = if (is.null(self$objective$label)) self$objective$id else self$objective$label,
           x1 = "x1",
           x2 = "x2",
           y = "y"
@@ -284,7 +284,7 @@ VisualizerObj = R6::R6Class("VisualizerObj",
 
       # Apply point limits
       if (!is.null(npmax)) {
-        npoints = min(npoints %??% nrow(archive), npmax)
+        npoints = min(if (is.null(npoints)) nrow(archive) else npoints, npmax)
       }
       if (!is.null(npoints)) {
         n_rows = min(npoints, nrow(archive))
