@@ -3,6 +3,8 @@
 
 * Added options to specify color and shape for training data of classification tasks.
 * Added layers are now rendered in the order they were added.
+* New theme system.
+* Various fixes.
 
 # vistool 0.3.1
 

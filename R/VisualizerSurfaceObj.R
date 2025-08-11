@@ -417,7 +417,7 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
       if (private$.layer_primary == "surface") {
         ptype = "scatter3d"
         eff = private$.effective_theme
-        lw = if (is.null(eff$line_width)) 1.2 else eff$line_width
+        lw = (if (is.null(eff$line_width)) 1.2 else eff$line_width) * 2
         pargs = list(
           name = name,
           x = xmr$x,
@@ -430,7 +430,7 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
       if (private$.layer_primary == "contour") {
         ptype = "scatter"
         eff = private$.effective_theme
-        lw = if (is.null(eff$line_width)) 1.2 else eff$line_width
+        lw = (if (is.null(eff$line_width)) 1.2 else eff$line_width) * 2
         msize = if (is.null(eff$point_size)) 6 else eff$point_size
         pargs = list(
           name = name,

@@ -190,10 +190,12 @@ VisualizerObj = R6::R6Class("VisualizerObj",
         return()
       }
 
+      # 1) Render optimization traces together so they share a combined legend
+      private$render_optimization_trace_layers()
+
+      # 2) Render other generic layers
       for (layer in private$.layers_to_add) {
-        if (layer$type == "optimization_trace") {
-          private$render_optimization_trace_layer(layer$spec)
-        } else if (layer$type == "points") {
+        if (layer$type == "points") {
           # Handle points layer using the base class method
           private$.plot = private$add_points_to_ggplot(private$.plot, private$.dimensionality)
         }
@@ -338,90 +340,128 @@ VisualizerObj = R6::R6Class("VisualizerObj",
       })
     },
 
-    # Render optimization trace layer
-    render_optimization_trace_layer = function(layer_spec) {
-      trace_data = layer_spec$trace_data
+    # Render all optimization trace layers with a combined legend (ggplot2 backend)
+    render_optimization_trace_layers = function() {
+      trace_layers = private$get_layers_by_type("optimization_trace")
+      if (length(trace_layers) == 0) return(invisible(NULL))
+
+      eff = private$.effective_theme
+      rp = private$.render_params
+
+      # Build combined data and scales
+      color_map = c()
+      ltype_map = c()
+      lw_map = c()
 
       if (private$.dimensionality == "1d") {
-        # Create data frame for 1D traces
-        dd_trace = data.frame(
-          x = trace_data$x_vals,
-          y = trace_data$y_vals
-        )
+        # Combine points for 1D traces
+        dd_list = list()
+        for (tl in trace_layers) {
+          td = tl$trace_data
+          nm = tl$name
+          dd = data.frame(x = td$x_vals, y = td$y_vals, .trace = nm, stringsAsFactors = FALSE)
+          dd_list[[length(dd_list) + 1L]] = dd
+          # Collect scale mappings
+          color_map[nm] = tl$line_color
+          ltype_map[nm] = if (is.null(tl$line_type)) "solid" else tl$line_type
+          lw_map[nm] = if (is.null(tl$line_width)) eff$line_width else tl$line_width
+        }
+        all_pts = do.call(rbind, dd_list)
 
-        # Add trace points
+        # Draw points mapped by color to show legend
         private$.plot = private$.plot + ggplot2::geom_point(
-          data = dd_trace,
-          ggplot2::aes(x = x, y = y),
-          size = layer_spec$marker_size,
-          color = layer_spec$line_color,
-          shape = layer_spec$marker_shape,
-          alpha = layer_spec$alpha,
+          data = all_pts,
+          ggplot2::aes(x = x, y = y, color = .trace),
+          size = max(vapply(trace_layers, function(tl) tl$marker_size, numeric(1))),
+          alpha = if (is.null(trace_layers[[1]]$alpha)) eff$alpha else trace_layers[[1]]$alpha,
           inherit.aes = FALSE
         )
+
+        # Apply manual color scale (legend title optional)
+        legend_title = if (!is.null(rp$legend_title)) rp$legend_title else "Trace"
+        private$.plot = private$.plot + ggplot2::scale_color_manual(values = color_map, name = legend_title)
+        # linewidth/linetype not applied for points; ignore in 1D
       } else {
-        # Create data frame for 2D traces
-        trace_df = data.frame(
-          x1 = trace_data$x1,
-          x2 = trace_data$x2,
-          y = trace_data$y,
-          iteration = trace_data$iteration
-        )
+        # 2D traces: combine paths and then add markers separately without affecting legend
+        line_list = list()
+        for (tl in trace_layers) {
+          td = tl$trace_data
+          nm = tl$name
+          dd = data.frame(x1 = td$x1, x2 = td$x2, iteration = td$iteration, .trace = nm, stringsAsFactors = FALSE)
+          line_list[[length(line_list) + 1L]] = dd
+          color_map[nm] = tl$line_color
+          ltype_map[nm] = if (is.null(tl$line_type)) "solid" else tl$line_type
+          lw_map[nm] = if (is.null(tl$line_width)) eff$line_width else tl$line_width
+        }
+        all_lines = do.call(rbind, line_list)
 
-        # Add trace line
-        eff = private$.effective_theme
-        resolved_linewidth = if (is.null(layer_spec$line_width)) eff$line_width else layer_spec$line_width
-        resolved_alpha = if (is.null(layer_spec$alpha)) eff$alpha else layer_spec$alpha
+        # Draw all paths with color/linetype/linewidth mapped to trace name
+        alpha_val = eff$alpha
         private$.plot = private$.plot + ggplot2::geom_path(
-          data = trace_df,
-          ggplot2::aes(x = x1, y = x2),
-          color = layer_spec$line_color,
-          linewidth = resolved_linewidth,
-          linetype = layer_spec$line_type,
-          alpha = resolved_alpha,
+          data = all_lines,
+          ggplot2::aes(x = x1, y = x2, color = .trace, linetype = .trace, linewidth = .trace),
+          alpha = alpha_val,
           inherit.aes = FALSE
         )
 
-        # Add markers at specified iterations
-        if (!is.null(layer_spec$add_marker_at)) {
-          marker_df = trace_df[trace_df$iteration %in% layer_spec$add_marker_at, , drop = FALSE]
-          if (nrow(marker_df) > 0) {
+        # Manual scales: color/linetype show in legend; linewidth hidden to avoid duplicate legends
+        legend_title = if (!is.null(rp$legend_title)) rp$legend_title else "Trace"
+        private$.plot = private$.plot +
+          ggplot2::scale_color_manual(values = color_map, name = legend_title) +
+          ggplot2::scale_linetype_manual(values = ltype_map, name = legend_title) +
+          ggplot2::scale_linewidth_manual(values = lw_map, guide = "none")
+
+        # Add markers and start/end indicators (no legend)
+        for (tl in trace_layers) {
+          td = tl$trace_data
+          nm = tl$name
+          resolved_alpha = if (is.null(tl$alpha)) eff$alpha else tl$alpha
+          # Markers at specified iterations
+          if (!is.null(tl$add_marker_at)) {
+            marker_df = data.frame(x1 = td$x1, x2 = td$x2, iteration = td$iteration, stringsAsFactors = FALSE)
+            marker_df = marker_df[marker_df$iteration %in% tl$add_marker_at, , drop = FALSE]
+            if (nrow(marker_df) > 0) {
+              private$.plot = private$.plot + ggplot2::geom_point(
+                data = marker_df,
+                ggplot2::aes(x = x1, y = x2),
+                size = tl$marker_size,
+                color = tl$marker_color,
+                shape = tl$marker_shape,
+                alpha = resolved_alpha,
+                inherit.aes = FALSE,
+                show.legend = FALSE
+              )
+            }
+          }
+
+          # Start/end markers
+          if (tl$show_start_end) {
+            se_df = data.frame(x1 = td$x1, x2 = td$x2)
             private$.plot = private$.plot + ggplot2::geom_point(
-              data = marker_df,
+              data = se_df[1, , drop = FALSE],
               ggplot2::aes(x = x1, y = x2),
-              size = layer_spec$marker_size,
-              color = layer_spec$marker_color,
-              shape = layer_spec$marker_shape,
+              size = tl$marker_size + 1,
+              color = tl$line_color,
+              shape = 16,
               alpha = resolved_alpha,
-              inherit.aes = FALSE
+              inherit.aes = FALSE,
+              show.legend = FALSE
+            )
+            private$.plot = private$.plot + ggplot2::geom_point(
+              data = se_df[nrow(se_df), , drop = FALSE],
+              ggplot2::aes(x = x1, y = x2),
+              size = tl$marker_size + 1,
+              color = tl$line_color,
+              shape = 17,
+              alpha = resolved_alpha,
+              inherit.aes = FALSE,
+              show.legend = FALSE
             )
           }
         }
-
-        # Add start/end markers if requested
-        if (layer_spec$show_start_end && nrow(trace_df) > 1) {
-          # Start point (green)
-          private$.plot = private$.plot + ggplot2::geom_point(
-            data = trace_df[1, , drop = FALSE],
-            ggplot2::aes(x = x1, y = x2),
-            size = layer_spec$marker_size + 1,
-            color = "green",
-            shape = 16,
-            alpha = resolved_alpha,
-            inherit.aes = FALSE
-          )
-          # End point (red)
-          private$.plot = private$.plot + ggplot2::geom_point(
-            data = trace_df[nrow(trace_df), , drop = FALSE],
-            ggplot2::aes(x = x1, y = x2),
-            size = layer_spec$marker_size + 1,
-            color = "red",
-            shape = 17, # Triangle
-            alpha = resolved_alpha,
-            inherit.aes = FALSE
-          )
-        }
       }
+
+      invisible(NULL)
     }
   )
 )

@@ -195,42 +195,24 @@ viz$add_optimization_trace(oo3, add_marker_at = 100, marker_shape = "diamond-ope
 viz$plot()
 ```
 
-#TODO: add_points()
-
 Using the alternative `ggplot2` backend makes sense when further customization is desired (TODO see advanced_visualization vignette):
 
 ```{r, out.width='100%', out.height='700px'}
 viz_2d = as_visualizer(obj_lm, x1_limits = c(-0.5, 5), x2_limits = c(-3.2, 2.8))
 
 viz_2d$add_optimization_trace(oo1,
-  line_color = "#1f77b4",
-  line_width = 1.5,
-  marker_size = 3,
-  add_marker_at = c(1, 25, 50, 75, 100),
   name = "Gradient Descent"
 )
 
 viz_2d$add_optimization_trace(oo2,
-  line_color = "#ff7f0e",
-  line_width = 1.5,
   line_type = "dashed",
-  marker_size = 3,
-  marker_shape = 17, # triangle
-  add_marker_at = c(1, 30, 60, 100),
   name = "Momentum"
 )
 
 viz_2d$add_optimization_trace(oo3,
-  line_color = "#2ca02c",
-  line_width = 1.5,
   line_type = "dotted",
-  marker_size = 3,
-  marker_shape = 15, # square
-  add_marker_at = c(1, 20, 40, 80, 100),
   name = "Nesterov AG"
 )
 
 viz_2d$plot()
 ```
-
-#TODO: add_points(), show with annotation and arrows
