@@ -23,8 +23,8 @@
 
   # Discrete colors for plasma-based palette
   discrete_plasma = c(
-    "#0d0887", "#7e03a8", "#cc4778", "#f89441", "#f0f921",
-    "#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd"
+    "#0d0887", "#ff7f0e", "#2ca02c", "#d62728", "#f0f921",
+    "#1f77b4", "#7e03a8", "#cc4778", "#f89441", "#9467bd"
   ),
 
   # Discrete colors for grayscale palette
