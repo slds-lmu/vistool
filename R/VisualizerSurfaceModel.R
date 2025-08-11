@@ -8,6 +8,8 @@
 #' @template param_x2_limits
 #' @template param_padding
 #' @template param_n_points
+#' @template param_hypothesis
+#' @template param_domain
 #'
 #' @export
 VisualizerSurfaceModel = R6::R6Class("VisualizerSurfaceModel",
@@ -32,33 +34,45 @@ VisualizerSurfaceModel = R6::R6Class("VisualizerSurfaceModel",
     #' @template param_x2_limits
     #' @template param_padding
     #' @template param_n_points
-    initialize = function(task, learner, x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L) {
-      self$task = mlr3::assert_task(task)
-      self$learner = mlr3::assert_learner(learner, task = self$task)
+    #' @param hypothesis (`Hypothesis`|`NULL`) Optional hypothesis used instead of a learner
+    #' @param domain (`list`|`NULL`) Domain limits when visualizing a hypothesis without a task
+    initialize = function(task, learner, x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L, hypothesis = NULL, domain = NULL) {
+      if (!is.null(learner) && !is.null(hypothesis)) stop("Provide only one of learner or hypothesis")
+      if (!is.null(task)) self$task = mlr3::assert_task(task)
+      if (!is.null(learner)) self$learner = mlr3::assert_learner(learner, task = self$task)
+      if (!is.null(hypothesis)) assertHypothesis(hypothesis)
+      private$.hypothesis = hypothesis
+      private$.domain = domain
       checkmate::assert_numeric(x1_limits, len = 2, null.ok = TRUE)
       checkmate::assert_numeric(x2_limits, len = 2, null.ok = TRUE)
       checkmate::assert_number(padding, lower = 0)
       checkmate::assert_count(n_points)
 
       # Validate that task has exactly 2 features
-      if (length(self$task$feature_names) != 2) {
+      if (!is.null(self$task) && length(self$task$feature_names) != 2) {
         mlr3misc::stopf(
           "3D Model visualization requires a task with exactly 2 features, but got %d",
           length(self$task$feature_names)
         )
       }
 
-      x1 = self$task$feature_names[1]
-      x2 = self$task$feature_names[2]
-      data = task$data()
-      self$learner$train(task)
+      if (!is.null(self$task)) {
+        x1 = self$task$feature_names[1]
+        x2 = self$task$feature_names[2]
+        data = task$data()
+      } else {
+        x1 = hypothesis$predictors[1]
+        x2 = hypothesis$predictors[2]
+        data = NULL
+      }
+      if (!is.null(self$learner)) self$learner$train(task)
 
       # Determine limits - respect user-provided limits, fall back to data range
       if (is.null(x1_limits)) {
-        x1_limits = range(data[, x1, with = FALSE][[1]])
+        x1_limits = if (!is.null(data)) range(data[, x1, with = FALSE][[1]]) else domain[[x1]]
       }
       if (is.null(x2_limits)) {
-        x2_limits = range(data[, x2, with = FALSE][[1]])
+        x2_limits = if (!is.null(data)) range(data[, x2, with = FALSE][[1]]) else domain[[x2]]
       }
 
       # Apply padding as proportion of range (consistent with other visualizers)
@@ -71,28 +85,38 @@ VisualizerSurfaceModel = R6::R6Class("VisualizerSurfaceModel",
       )
 
       newdata = CJ(grid$x1, grid$x2)
-      setnames(newdata, self$task$feature_names)
+      if (!is.null(self$task)) {
+        setnames(newdata, self$task$feature_names)
+      } else {
+        setnames(newdata, c(x1, x2))
+      }
 
-      original_types = sapply(self$task$data()[, self$task$feature_names, with = FALSE], class)
-      for (col in names(original_types)) {
-        if (original_types[col] == "integer") {
-          newdata[[col]] = as.integer(round(newdata[[col]]))
+      if (!is.null(self$task)) {
+        original_types = sapply(self$task$data()[, self$task$feature_names, with = FALSE], class)
+        for (col in names(original_types)) {
+          if (original_types[col] == "integer") {
+            newdata[[col]] = as.integer(round(newdata[[col]]))
+          }
         }
       }
-      z = self$learner$predict_newdata(newdata)[[self$learner$predict_type]]
-      if (self$learner$predict_type == "prob") {
-        pos_class = self$task$positive
-        z = z[, pos_class]
+      if (!is.null(self$learner)) {
+        z = self$learner$predict_newdata(newdata)[[self$learner$predict_type]]
+        if (self$learner$predict_type == "prob") {
+          pos_class = self$task$positive
+          z = z[, pos_class]
+        }
+      } else {
+        z = hypothesis$predict(as.data.frame(newdata))
       }
       zmat = matrix(z, nrow = n_points, ncol = n_points, byrow = TRUE)
 
       super$initialize(
         grid = grid,
         zmat = zmat,
-        plot_lab = paste(self$learner$id, "on", self$task$id),
-        x1_lab = self$task$feature_names[1],
-        x2_lab = self$task$feature_names[2],
-        z_lab = self$task$target_names
+        plot_lab = if (!is.null(self$learner)) paste(self$learner$id, "on", self$task$id) else "Hypothesis",
+        x1_lab = x1,
+        x2_lab = x2,
+        z_lab = if (!is.null(self$task)) self$task$target_names else if (hypothesis$type == "regr") "y" else "p"
       )
 
       return(invisible(self))
@@ -232,6 +256,8 @@ VisualizerSurfaceModel = R6::R6Class("VisualizerSurfaceModel",
     }
   ),
   private = list(
+    .hypothesis = NULL,
+    .domain = NULL,
     # Render stored training data layers
     render_training_data_layers = function() {
       training_layers = private$get_layers_by_type("training_data")

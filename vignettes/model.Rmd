@@ -36,9 +36,9 @@ We subset the data set to only use the features `median_income` and `housing_med
 The `median_income` feature is the median income in block group and `housing_median_age` is the median age of a house within a block.
 
 ```{r}
-task = tsk("california_housing")
-task$select(c("median_income", "housing_median_age"))
-task$filter(rows = sample(task$nrow, 2000))
+task_housing = tsk("california_housing")
+task_housing$select(c("median_income", "housing_median_age"))
+task_housing$filter(rows = sample(task_housing$nrow, 2000))
 ```
 
 We load the support vector machine learner for regression.
@@ -50,7 +50,7 @@ learner = lrn("regr.svm")
 Now we create a visualizer object, using the `plotly` backend (`type = "surface"`).
 
 ```{r}
-vis = as_visualizer(task, learner = learner, type = "surface")
+vis = as_visualizer(task_housing, learner = learner, type = "surface")
 ```
 
 First, the learner is trained on the entire task.
@@ -123,3 +123,33 @@ vis_surface$add_training_data(
   shape = c(pos = 0, neg = 1)
 )$plot()
 ```
+
+## Hypothesis-only visualization
+
+You can visualize simple functional hypotheses without a Task/Learner by providing a `Hypothesis` and a plotting domain.
+
+```{r}
+pi_fun = function(x, y) 0.7 * x + 0.2 * y + 4
+hyp = hypothesis(pi_fun, type = "classif", predictors = c("x", "y"), link = "logit", domain = list(x = c(-3, 3), y = c(-3, 3)))
+as_visualizer(hyp, type = "surface", domain = hyp$domain)$plot()
+```
+
+## Hypothesis on a real task (surface)
+
+You can also skip training a learner and visualize a hand-crafted hypothesis directly on a real 2D task. Below, we return to the California Housing task with two features and define a simple regression hypothesis over those features, then render it as an interactive surface.
+
+```{r}
+fun = function(median_income, housing_median_age) {
+  60000 + 80000 * plogis(1.5 * median_income - 0.03 * housing_median_age)
+}
+hyp_housing = hypothesis(
+  fun = fun,
+  type = "regr",
+  predictors = c("median_income", "housing_median_age")
+)
+
+vis_hsurf = as_visualizer(task_housing, hypothesis = hyp_housing, type = "surface")
+vis_hsurf$add_training_data()
+vis_hsurf$plot(z_limits = range(vis_hsurf$zmat, na.rm = TRUE))
+```
+
