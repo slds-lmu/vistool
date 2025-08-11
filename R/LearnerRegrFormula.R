@@ -65,6 +65,6 @@ LearnerRegrLMFormula = R6Class("LearnerRegrLMFormula",
 )
 
 ordered_features = function(task, learner) {
-  cols = names(learner$state$data_prototype) %??% learner$state$feature_names
+  cols = if (is.null(names(learner$state$data_prototype))) learner$state$feature_names else names(learner$state$data_prototype)
   task$data(cols = intersect(cols, task$feature_names))
 }

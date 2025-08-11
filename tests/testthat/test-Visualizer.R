@@ -1,12 +1,7 @@
 test_that("Unified save method works for all visualizers", {
-  # Test 1D visualizer save
-  x_vals = seq(-2, 2, length.out = 50)
-  y_vals = x_vals^2
-  vis1d = Visualizer1D$new(
-    fun_x = x_vals,
-    fun_y = y_vals,
-    title = "Test 1D Function"
-  )
+  # Test VisualizerObj (1D) save
+  obj_1d = obj("TF_gaussian1", xdim = 1)
+  vis1d = as_visualizer(obj_1d, type = "1d")
 
   # Create temporary file for testing
   temp_file_1d = tempfile(fileext = ".png")
@@ -14,49 +9,55 @@ test_that("Unified save method works for all visualizers", {
   expect_true(file.exists(temp_file_1d))
   unlink(temp_file_1d)
 
-  # Test 2D visualizer save
-  x1_vals = rep(seq(-1, 1, length.out = 10), each = 10)
-  x2_vals = rep(seq(-1, 1, length.out = 10), times = 10)
-  y_vals_2d = x1_vals^2 + x2_vals^2
-  vis2d = Visualizer2D$new(
-    fun_x1 = x1_vals,
-    fun_x2 = x2_vals,
-    fun_y = y_vals_2d,
-    title = "Test 2D Function"
-  )
+  # Test VisualizerObj (2D) save
+  obj_2d = obj("TF_branin")
+  vis2d = as_visualizer(obj_2d, type = "2d")
 
   temp_file_2d = tempfile(fileext = ".png")
   expect_no_error(vis2d$save(temp_file_2d, width = 8, height = 6))
   expect_true(file.exists(temp_file_2d))
   unlink(temp_file_2d)
 
+  # Test VisualizerModel save
+  task_1d = mlr3::tsk("mtcars")$select("wt")
+  learner = mlr3::lrn("regr.lm")
+  vis_model = as_visualizer(task_1d, learner = learner, type = "1d")
+
+  temp_file_model = tempfile(fileext = ".png")
+  expect_no_error(vis_model$save(temp_file_model, width = 8, height = 6))
+  expect_true(file.exists(temp_file_model))
+  unlink(temp_file_model)
+
   # Test 3D visualizer save
-  grid = list(
-    x1 = seq(-1, 1, length.out = 10),
-    x2 = seq(-1, 1, length.out = 10)
-  )
-  zmat = outer(grid$x1, grid$x2, function(x, y) x^2 + y^2)
-  vis3d = VisualizerSurface$new(
-    grid = grid,
-    zmat = zmat,
-    plot_lab = "Test 3D Function"
-  )
+  obj_2d_surface = obj("TF_branin")
+  vis3d = as_visualizer(obj_2d_surface, type = "surface")
 
   # Note: plotly save requires additional setup for headless environments
   # so we'll just test that the method exists and can be called
   expect_true("save" %in% names(vis3d))
-  expect_s3_class(vis3d, "VisualizerSurface")
+  expect_s3_class(vis3d, "VisualizerSurfaceObj")
   expect_s3_class(vis3d, "Visualizer")
 })
 
 test_that("Base Visualizer class methods work correctly", {
-  # Test that the base class cannot be instantiated directly for plot
+  # Test that the base class plot method works (sets up plot settings and returns self)
   base_vis = Visualizer$new()
-  expect_error(base_vis$plot(), "Abstract method 'plot' must be implemented by subclass")
+  result = base_vis$plot()
+  expect_true(inherits(result, "Visualizer")) # Returns self for method chaining
+  expect_identical(result, base_vis) # Should return the same object
 
-  # Test inheritance structure
-  vis1d = Visualizer1D$new(c(1, 2, 3), c(1, 4, 9))
-  expect_s3_class(vis1d, "Visualizer1D")
+  # Test inheritance structure with unified visualizers
+  obj_1d = obj("TF_gaussian1", xdim = 1)
+  vis1d = as_visualizer(obj_1d, type = "1d")
+  expect_s3_class(vis1d, "VisualizerObj")
   expect_s3_class(vis1d, "Visualizer")
   expect_true("save" %in% names(vis1d))
+
+  # Test VisualizerModel inheritance
+  task_1d = mlr3::tsk("mtcars")$select("wt")
+  learner = mlr3::lrn("regr.lm")
+  vis_model = as_visualizer(task_1d, learner = learner, type = "1d")
+  expect_s3_class(vis_model, "VisualizerModel")
+  expect_s3_class(vis_model, "Visualizer")
+  expect_true("save" %in% names(vis_model))
 })

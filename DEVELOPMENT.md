@@ -2,8 +2,6 @@
 
 ## Essential Commands
 
-### Package Development (`devtools`)
-
 ```r
 # Load package for development
 devtools::load_all()
@@ -22,11 +20,10 @@ devtools::test_active_file('tests/testthat/test-plot-customization.R')
 
 # Install package locally
 devtools::install()
-```
 
-### Documentation
+# Build source tarball
+devtools::build()
 
-```r
 # Generate function documentation from roxygen2 comments
 devtools::document()
 
@@ -37,42 +34,13 @@ devtools::build_readme()
 devtools::build_vignettes()
 
 # Build a specific vignette
-R -e "devtools::load_all(); rmarkdown::render('vignettes/loss_functions.Rmd')"
+devtools::load_all(); rmarkdown::render('vignettes/loss_functions.Rmd')
 
 # Build package website
 pkgdown::build_site()
 
 # Preview website locally
 pkgdown::preview_site()
-```
-
-### Testing
-
-```r
-# Run all tests
-devtools::test()
-
-# Run specific test file
-testthat::test_file("tests/testthat/test-Objective.R")
-
-# Test with coverage report
-covr::package_coverage()
-
-# Interactive test debugging
-testthat::test_file("tests/testthat/test-Objective.R", reporter = "tap")
-```
-
-### Building
-
-```r
-# Build source tarball
-devtools::build()
-
-# Build binary package
-devtools::build(binary = TRUE)
-
-# Quick build without vignettes
-devtools::build(vignettes = FALSE)
 ```
 
 ## Structure
@@ -100,38 +68,102 @@ vistool/
 
 ## Core Architecture (Visualization)
 
+```
+Visualizer
+├── VisualizerModel      # Handles both 1D and 2D
+├── VisualizerObj        # Handles both 1D and 2D  
+├── VisualizerLossFuns
+└── VisualizerSurface    # plotly-based
+    ├── VisualizerSurfaceModel
+    └── VisualizerSurfaceObj
+```
+
 - **`Visualizer`**: Base visualization class
-  - `Visualizer1D*`: 1D plotting with ggplot2
-  - `Visualizer2D*`: 2D plotting with ggplot2  
-  - `VisualizerSurface*`: Interactive surface plotting with plotly for 2D functions
+  - `VisualizerLossFuns`: Plotting loss functions with ggplot2
+  - `VisualizerModel`: Plotting model predictions with ggplot2
+  - `VisualizerObj`: Plotting objective functions with ggplot2
+  - `VisualizerSurface*`: Interactive surface plotting with plotly for 2D functions *only*
 - **`as_visualizer()`**: Smart constructor that selects appropriate visualizer
+
+## API Design Principles
+
+### Constructor vs. Styling Separation
+
+**Constructors** (`as_visualizer()`, `VisualizerModel$new()`, etc.) accept only:
+- **Domain objects**: tasks, learners, objectives, loss functions
+- **Computational parameters**: limits, padding, n_points, grids
+
+**Styling** is handled separately via:
+- **Instance theme**: `vis$set_theme(vistool_theme(...))`
+- **Plot theme**: `vis$plot(theme = list(...), ...)`
+- **Layer styling**: `vis$add_points(color = "red", size = 3)`
+
+### Example Workflow
+```r
+# 1. Create visualizer (computational setup only)
+vis <- as_visualizer(task, learner = learner, n_points = 200, padding = 0.1)
+
+# 2. Set styling preferences
+vis$set_theme(vistool_theme(palette = "plasma", text_size = 14))
+
+# 3. Add layers with auto colors
+vis$add_training_data(color = "auto")  # Uses theme palette
+vis$add_boundary(color = "red")        # Explicit override
+
+# 4. Plot with optional theme override
+p <- vis$plot(theme = list(alpha = 0.7))
+
+# 5. Save (uses cached plot for efficiency)
+vis$save("plot.png")
+```
+
+## Theme System
+
+vistool uses a flexible theme system that separates "what to plot" from "how to plot":
+
+### Theme Hierarchy (Precedence)
+1. **Layer-specific style** (highest): `add_points(color = "red")`
+2. **Plot theme override**: `plot(theme = list(palette = "plasma"))`
+3. **Instance theme**: `vis$set_theme(vistool_theme(...))`
+4. **Package default** (lowest): Set via `options(vistool.theme = ...)`
+
+### Theme Usage
+```r
+# Set instance theme
+vis$set_theme(vistool_theme(palette = "plasma", text_size = 14, alpha = 0.7))
+
+# Override theme for single plot
+vis$plot(theme = list(text_size = 12, theme = "bw"))
+
+# Layer-specific styling (highest precedence)
+vis$add_points(data, color = "red", size = 3)
+```
 
 ## Deferred Rendering
 
-All visualizer classes in vistool follow a standardized `plot()` method structure that leverages the deferred rendering architecture. This ensures consistent behavior, proper color resolution, and maintainable code.
+All visualizer classes in vistool follow a standardized `plot()` method structure that leverages the deferred rendering architecture.
+This ensures consistent behavior, proper color resolution, and maintainable code.
 
 ### Standard Pattern
 
-#### `Visualizer.R`
+#### 1. `Visualizer.R`
 
 The base `Visualizer` class provides:
 - **Layer storage**: `private$store_layer(type, spec)` 
 - **Layer retrieval**: `private$get_layers_by_type(type)`
-- **Plot settings**: Stored in `private$.plot_settings` for color resolution
-- **Common parameters**: text_size, theme, color_palette, etc.
+- **Theme management**: Effective theme resolution in `plot()` method
+- **Color resolution**: Auto colors resolved using effective theme palette
 
-CAREFUL: Its `plot()` method is **abstract** and needs to be implemented by `Visualizer1D.R`, `Visualizer2D.R`, `VisualizerSurface.R` (and `VisualizerLossFuns`)!
+CAREFUL: Its `plot()` method needs to be called by all child classes (`VisualizerSurface`, `VisualizerModel`, ...) to resolve effective theme and prepare rendering.
 
-#### 2. `Visualizer1D.R`, `Visualizer2D.R`, `VisualizerSurface.R` (and `VisualizerLossFuns`)
-These implement the abstract `plot()` method from the base `Visualizer` class and methods specific for that type/dimension (e.g., `add_contours()` for all `VisualizerSurface` classes), they inherit from `Visualizer`.
+#### 2. Child classes
+These extend the `plot()` method from the base `Visualizer` class and add methods specific for that type (e.g., `add_contours()` for all `VisualizerSurface` classes, `add_optimization_trace` for `Visualizer*Obj`), they inherit from `Visualizer` or `VisualizerSurface`.
 
-#### 3. Child Class `plot()` Structure
-
-Every (grand-) child class (e.g., `Visualizer1DObj`, `Visualizer2DModel`, `VisualizerSurfaceObj`) should follow this exact pattern:
+`VisualizerLossFuns`, `VisualizerModel`, `VisualizerObj`, `VisualizerSurfaceModel`, `VisualizerSurfaceObj` should all follow this pattern:
 
 ```r
 plot = function(...) {
-  # 1. ALWAYS call parent first to set up plot_settings and base plot
+  # 1. ALWAYS call parent first to resolve effective theme and setup
   p <- super$plot(...)  # or just super$plot(...) for plotly classes
   
   # 2. Render class-specific layers using dedicated private methods
@@ -139,7 +171,11 @@ plot = function(...) {
   private$render_layer_type_2()
   # ... etc
   
-  # 3. Return the plot object (for ggplot2 classes only)
+  # 3. Resolve auto colors using effective theme
+  self$resolve_layer_colors()
+
+  # 4. Cache and return the plot object (for ggplot2 classes only)
+  private$.last_plot = p  # Cache for save() method
   return(p)  # omit for plotly classes that modify private$.plot
 }
 ```
@@ -149,13 +185,28 @@ plot = function(...) {
 #### ggplot2-based Classes (1D, 2D)
 
 ```r
-# Good Example: Visualizer2DObj
 plot = function(...) {
-  # Call parent to get base plot and set plot_settings
+  # Call parent to resolve effective theme and prepare rendering
   p <- super$plot(...)
   
-  # Render stored layers
-  private$render_optimization_trace_layers(p)
+  # render layers in the order they were added
+  if (!is.null(private$.layers_to_add)) {
+    for (layer in private$.layers_to_add) {
+      if (layer$type == "optimization_trace") {
+        p = private$render_optimization_trace_layer(p, layer$spec)
+      } else if (layer$type == "layer_type_2") {
+        # render layer_type_2
+      }
+      # ... handle other layer types
+    }
+  }
+  
+  # Resolve auto colors using effective theme
+  self$resolve_layer_colors()
+  
+  # Cache and return plot
+  private$.last_plot = p
+  return(p)
 }
 
 private = list(
@@ -180,7 +231,7 @@ private = list(
 ```r
 # Good Example: VisualizerSurfaceObj  
 plot = function(...) {
-  # Call parent to set up plot_settings and resolve colors
+  # Call parent to resolve effective theme
   super$plot(...)
   
   # Render stored layers (modifies private$.plot directly)
@@ -188,6 +239,11 @@ plot = function(...) {
   private$render_taylor_layers()
   private$render_hessian_layers()
   
+  # Resolve auto colors using effective theme
+  self$resolve_layer_colors()
+  
+  # Cache and return plot
+  private$.last_plot = private$.plot
   return(private$.plot)
 }
 
@@ -195,6 +251,7 @@ private = list(
   render_optimization_trace_layers = function() {
     trace_layers <- private$get_layers_by_type("optimization_trace")
     # ... process layers, modify private$.plot directly
+    # Colors are resolved using private$.effective_theme$palette
   }
 )
 ```

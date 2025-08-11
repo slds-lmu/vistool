@@ -20,6 +20,9 @@ knitr::opts_chunk$set(
 
 ```{r, message=FALSE}
 library(vistool)
+options(vistool.theme = vistool_theme(
+  palette = "plasma"
+))
 ```
 
 Loss functions are wrapped in `LossFunction` objects.
@@ -70,7 +73,7 @@ vis_combined = as_visualizer(
   list(loss_huber, loss_l2, loss_l1, loss_logcosh),
   y_pred = seq(-4, 4),
   y_true = 0,
-  n_points = 5000L  # higher resolution for smooth curves
+  n_points = 5000L # higher resolution for smooth curves
 )
 vis_combined$plot()
 ```
@@ -117,10 +120,9 @@ When visualizing probability-based losses, you can control whether to show curve
 ```{r, echo=TRUE, message=FALSE, warning=FALSE, out.width='100%'}
 vis_y1 = as_visualizer(
   list(crossentropy_loss, brier_loss),
-  input_type = "probability",
-  y_curves = "y1"  # Only show y = 1 curve
+  input_type = "probability"
 )
-vis_y1$plot()
+vis_y1$plot(y_curves = "y1") # Only show y = 1 curve
 ```
 
 # Adding Points to Loss Function Visualizations
@@ -138,14 +140,14 @@ vis_with_points$add_points(
   x = c(-2, -1, 1, 2),
   loss_id = "l2",
   show_line = TRUE,
-  color = "red",
+  color = "blue",
   size = 3,
   alpha = 0.8
 )$add_points(
   x = c(-2, 2),
-  loss_id = "l1",  # Specify the L1 loss
+  loss_id = "l1", # Specify the L1 loss
   show_line = FALSE,
-  color = "blue",
+  color = "#febf01",
   size = 2.5,
   alpha = 0.7
 )

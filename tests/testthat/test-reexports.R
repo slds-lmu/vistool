@@ -8,14 +8,3 @@ test_that("reexported functions work", {
   expect_s3_class(dt, "data.table")
   expect_equal(nrow(dt), 3)
 })
-
-test_that("color sampler works", {
-  # Test colSampler function
-  color = colSampler()
-  expect_true(is.character(color))
-  expect_length(color, 1)
-
-  # Should generate different colors on subsequent calls
-  colors = replicate(10, colSampler())
-  expect_true(length(unique(colors)) > 1)
-})

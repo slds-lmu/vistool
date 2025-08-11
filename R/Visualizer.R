@@ -8,50 +8,28 @@
 Visualizer = R6::R6Class("Visualizer",
   public = list(
 
-    #' @field defaults (`list`)\cr
-    #' Default settings for plotting and visual elements.
-    defaults = list(),
-
-    #' @description
-    #' Initialize default settings for the visualizer.
-    #' @param default_color_palette (`character(1)`)\cr
-    #'   Default color palette. Default is "viridis".
-    #' @param default_text_size (`numeric(1)`)\cr
-    #'   Default text size. Default is 11.
-    #' @param default_theme (`character(1)`)\cr
-    #'   Default theme. Default is "minimal".
-    #' @param default_alpha (`numeric(1)`)\cr
-    #'   Default alpha transparency. Default is 0.8.
-    #' @param default_line_width (`numeric(1)`)\cr
-    #'   Default line width. Default is 1.2.
-    #' @param default_point_size (`numeric(1)`)\cr
-    #'   Default point size. Default is 2.
-    initialize_defaults = function(default_color_palette = "viridis", default_text_size = 11,
-                                  default_theme = "minimal", default_alpha = 0.8,
-                                  default_line_width = 1.2, default_point_size = 2) {
-      self$defaults = list(
-        color_palette = default_color_palette,
-        text_size = default_text_size,
-        theme = default_theme,
-        alpha = default_alpha,
-        line_width = default_line_width,
-        point_size = default_point_size
-      )
+    #' @description Set the instance theme (partial override stored separately)
+    #' @param theme (`list`) Partial theme created with vistool_theme() or a named list
+    #' @return Invisible self
+    set_theme = function(theme) {
+      assert_vistool_theme(theme)
+      # Merge with existing instance overrides, not package defaults
+      existing_overrides = if (is.null(private$.theme)) list() else private$.theme
+      private$.theme = merge_theme(existing_overrides, theme)
       invisible(self)
     },
 
+    #' @description Get the instance theme (merged with current package default)
+    theme = function() {
+      inst = if (is.null(private$.theme)) list() else private$.theme
+      merge_theme(get_pkg_theme_default(), inst)
+    },
+
     #' @description
-    #' Abstract method to be implemented by subclasses.
-    #' @param text_size (`numeric(1)`)\cr
-    #'   Base text size for plot elements. Default is 11.
-    #' @param title_size (`numeric(1)`)\cr
-    #'   Title text size. If NULL, defaults to text_size + 2.
-    #' @param theme (`character(1)`)\cr
-    #'   ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "minimal".
-    #' @param background (`character(1)`)\cr
-    #'   Background color for the plot. Default is "white".
-    #' @param color_palette (`character(1)`)\cr
-    #'   Default color palette to use. One of "viridis", "plasma", "grayscale". Default is "viridis".
+    #' Base plot method that sets up common plot settings and resolves layer colors.
+    #' This method should be called by all child classes via `super$plot(...)`.
+    #' @param theme (`list`)\cr
+    #'   Partial theme override for this render; see vistool_theme().
     #' @template param_plot_title
     #' @template param_plot_subtitle
     #' @template param_x_lab
@@ -60,25 +38,37 @@ Visualizer = R6::R6Class("Visualizer",
     #' @template param_x_limits
     #' @template param_y_limits
     #' @template param_z_limits
-    #' @template param_show_grid
-    #' @template param_grid_color
     #' @template param_show_legend
-    #' @template param_legend_position
     #' @template param_legend_title
     #' @template param_show_title
-    #' @return The plot object.
-    plot = function(text_size = 11, title_size = NULL, theme = "minimal", background = "white", color_palette = "viridis", 
+    #' @return Invisible self for method chaining (child classes handle actual plot creation).
+    plot = function(theme = NULL,
                     plot_title = NULL, plot_subtitle = NULL, x_lab = NULL, y_lab = NULL, z_lab = NULL,
-                    x_limits = NULL, y_limits = NULL, z_limits = NULL, show_grid = TRUE, grid_color = "gray90",
-                    show_legend = TRUE, legend_position = "right", legend_title = NULL, show_title = TRUE) {
-      
-      # Store plot settings for layer resolution
-      private$.plot_settings = list(
-        text_size = text_size,
-        title_size = title_size,
-        theme = theme,
-        background = background,
-        color_palette = color_palette,
+                    x_limits = NULL, y_limits = NULL, z_limits = NULL,
+                    show_legend = TRUE, legend_title = NULL, show_title = TRUE) {
+      # Validate and store render params
+      checkmate::assert_string(plot_title, null.ok = TRUE)
+      checkmate::assert_string(plot_subtitle, null.ok = TRUE)
+      checkmate::assert_string(x_lab, null.ok = TRUE)
+      checkmate::assert_string(y_lab, null.ok = TRUE)
+      checkmate::assert_string(z_lab, null.ok = TRUE)
+      checkmate::assert_numeric(x_limits, len = 2, null.ok = TRUE)
+      checkmate::assert_numeric(y_limits, len = 2, null.ok = TRUE)
+      checkmate::assert_numeric(z_limits, len = 2, null.ok = TRUE)
+      checkmate::assert_flag(show_legend)
+      checkmate::assert_string(legend_title, null.ok = TRUE)
+      checkmate::assert_flag(show_title)
+      if (!is.null(theme)) assert_vistool_theme(theme)
+
+      # Resolve effective theme and store render params
+      base = get_pkg_theme_default()
+      inst = if (is.null(private$.theme)) list() else private$.theme
+      eff = merge_theme(base, inst)
+      eff = merge_theme(eff, theme)
+      private$.effective_theme = eff
+      # Title size derived if needed
+      private$.effective_theme$title_size = if (is.null(eff$title_size)) (eff$text_size + 2) else eff$title_size
+      private$.render_params = list(
         plot_title = plot_title,
         plot_subtitle = plot_subtitle,
         x_lab = x_lab,
@@ -87,18 +77,30 @@ Visualizer = R6::R6Class("Visualizer",
         x_limits = x_limits,
         y_limits = y_limits,
         z_limits = z_limits,
-        show_grid = show_grid,
-        grid_color = grid_color,
         show_legend = show_legend,
-        legend_position = legend_position,
         legend_title = legend_title,
         show_title = show_title
       )
-      
-      # Resolve layer colors now that we have plot settings
-      private$resolve_layer_colors()
-      
-      stop("Abstract method 'plot' must be implemented by subclass")
+
+      return(invisible(self))
+    },
+
+    #' @description
+    #' Resolve automatic color assignments in stored layers.
+    #' This method should be called by child classes after rendering layers.
+    resolve_layer_colors = function() {
+      # Initialize layers_to_add if it doesn't exist
+      if (is.null(private$.layers_to_add)) {
+        private$.layers_to_add = list()
+      }
+
+      # Reset color index for consistent color assignment
+      private$.color_index = 1
+
+      # Resolve colors in any stored layer specifications
+      private$resolve_all_layer_colors()
+
+      return(invisible(self))
     },
 
     #' @description
@@ -118,8 +120,12 @@ Visualizer = R6::R6Class("Visualizer",
       checkmate::assert_number(height, null.ok = TRUE)
       checkmate::assert_number(dpi, lower = 1)
 
-      # Get the plot object
-      plot_obj = self$plot()
+      # Use cached last plot if available; otherwise render now
+      plot_obj = private$.last_plot
+      if (is.null(plot_obj)) {
+        # try to render via subclass plot() with current instance theme
+        plot_obj = tryCatch(self$plot(), error = function(e) NULL)
+      }
 
       # Check if it's a ggplot2 or plotly object and save accordingly
       if (inherits(plot_obj, "ggplot")) {
@@ -143,11 +149,11 @@ Visualizer = R6::R6Class("Visualizer",
     #' @param color (`character(1)`)\cr
     #'   Color of the points. Use "auto" for automatic color assignment from palette. Default is "auto".
     #' @param size (`numeric(1)`)\cr
-    #'   Size of the points. Default is 2.
+    #'   Size of the points. If NULL, uses theme$point_size. Default is NULL.
     #' @param shape (`integer(1)` or `character(1)`)\cr
     #'   Shape of the points. For ggplot2: integer codes (e.g., 19 for solid circle). For plotly: shape names. Default is 19/"circle".
     #' @param alpha (`numeric(1)`)\cr
-    #'   Alpha transparency of the points. Default is 1.
+    #'   Alpha transparency of the points. If NULL, uses theme$alpha. Default is NULL.
     #' @param annotations (`character`)\cr
     #'   Optional text labels for each point. If provided, must be the same length as the number of points.
     #' @param annotation_size (`numeric(1)`)\cr
@@ -158,25 +164,25 @@ Visualizer = R6::R6Class("Visualizer",
     #'   Color of arrows when ordered = TRUE. If NULL, uses point color.
     #' @param arrow_size (`numeric(1)`)\cr
     #'   Length/size of arrows when `ordered = TRUE`. Default is 0.3 units in the coordinate system.
-    #' @param ... Additional arguments passed to the plotting layers.
-    add_points = function(points, color = "auto", size = 2, shape = 19, alpha = 1, 
-                         annotations = NULL, annotation_size = NULL, ordered = FALSE, 
-                         arrow_color = NULL, arrow_size = 0.3, ...) {
-      
+    add_points = function(points, color = "auto", size = NULL, shape = 19, alpha = NULL,
+                          annotations = NULL, annotation_size = NULL, ordered = FALSE,
+                          arrow_color = NULL, arrow_size = 0.3) {
       # Store layer specification
       private$store_layer("points", list(
         points = points, color = color, size = size, shape = shape, alpha = alpha,
-        annotations = annotations, annotation_size = annotation_size, ordered = ordered, 
-        arrow_color = arrow_color, arrow_size = arrow_size, args = list(...)
+        annotations = annotations, annotation_size = annotation_size, ordered = ordered,
+        arrow_color = arrow_color, arrow_size = arrow_size
       ))
       invisible(self)
     }
   ),
   private = list(
-
-    .layers_to_add = list(),  # General storage for all layer types
-    .color_index = 1,  # Track next color index for auto assignment
-    .plot_settings = NULL,  # Store plot settings for layer resolution
+    .layers_to_add = list(), # General storage for all layer types
+    .color_index = 1, # Track next color index for auto assignment
+    .theme = NULL, # Instance theme (partial)
+    .effective_theme = NULL, # per-render effective theme
+    .render_params = NULL, # per-render non-style params
+    .last_plot = NULL, # last built plot object
 
     # save a ggplot2 object
     save_ggplot = function(plot_obj, filename, width, height, dpi, ...) {
@@ -200,7 +206,7 @@ Visualizer = R6::R6Class("Visualizer",
       if (is.null(width)) width = 800
       if (is.null(height)) height = 600
 
-      plotly::save_image(
+      save_image(
         p = plot_obj,
         file = filename,
         width = width,
@@ -219,23 +225,26 @@ Visualizer = R6::R6Class("Visualizer",
 
       for (point_spec in points_layers) {
         points_data = private$prepare_points_data(point_spec$points, visualizer_type)
-        
+        eff = if (is.null(private$.effective_theme)) get_pkg_theme_default() else private$.effective_theme
+        size = if (is.null(point_spec$size)) eff$point_size else point_spec$size
+        alpha = if (is.null(point_spec$alpha)) eff$alpha else point_spec$alpha
+
         # Add points layer
         plot_obj = plot_obj + ggplot2::geom_point(
           data = points_data,
           ggplot2::aes(x = x, y = y),
           color = point_spec$color,
-          size = point_spec$size,
+          size = size,
           shape = point_spec$shape,
-          alpha = point_spec$alpha,
+          alpha = alpha,
           inherit.aes = FALSE
         )
-        
+
         # Add annotations if provided
         if (!is.null(point_spec$annotations)) {
           # Use annotation_size if provided, otherwise default to smaller text
-          ann_size = if (!is.null(point_spec$annotation_size)) point_spec$annotation_size else 3
-          
+          ann_size = if (!is.null(point_spec$annotation_size)) point_spec$annotation_size else max(3, eff$text_size - 2)
+
           plot_obj = plot_obj + ggplot2::geom_text(
             data = cbind(points_data, label = point_spec$annotations),
             ggplot2::aes(x = x, y = y, label = label),
@@ -245,7 +254,7 @@ Visualizer = R6::R6Class("Visualizer",
             inherit.aes = FALSE
           )
         }
-        
+
         # Add ordered path with arrows if requested
         if (point_spec$ordered && nrow(points_data) > 1) {
           # Calculate direction vectors and create shorter arrows
@@ -254,22 +263,22 @@ Visualizer = R6::R6Class("Visualizer",
             y1 = points_data$y[i]
             x2 = points_data$x[i + 1]
             y2 = points_data$y[i + 1]
-            
+
             # Calculate direction vector and normalize it
             dx = x2 - x1
             dy = y2 - y1
             dist = sqrt(dx^2 + dy^2)
-            
+
             if (dist > 0) {
               # Normalize direction vector
               dx_norm = dx / dist
               dy_norm = dy / dist
-              
+
               # Calculate arrow endpoints based on arrow_size
               arrow_size = point_spec$arrow_size
               arrow_x2 = x1 + dx_norm * arrow_size
               arrow_y2 = y1 + dy_norm * arrow_size
-              
+
               # Create arrow data frame
               arrow_data = data.frame(
                 x = x1,
@@ -277,16 +286,16 @@ Visualizer = R6::R6Class("Visualizer",
                 xend = arrow_x2,
                 yend = arrow_y2
               )
-              
+
               # Add arrow segment
               # Use the same color as points if arrow_color is not specified
               arrow_color = if (is.null(point_spec$arrow_color)) point_spec$color else point_spec$arrow_color
-              
+
               plot_obj = plot_obj + ggplot2::geom_segment(
                 data = arrow_data,
                 ggplot2::aes(x = x, y = y, xend = xend, yend = yend),
                 color = arrow_color,
-                alpha = point_spec$alpha * 0.7,
+                alpha = alpha * 0.7,
                 arrow = ggplot2::arrow(length = ggplot2::unit(0.15, "cm"), type = "closed"),
                 inherit.aes = FALSE
               )
@@ -294,7 +303,7 @@ Visualizer = R6::R6Class("Visualizer",
           }
         }
       }
-      
+
       return(plot_obj)
     },
 
@@ -307,16 +316,19 @@ Visualizer = R6::R6Class("Visualizer",
 
       for (point_spec in points_layers) {
         points_data = private$prepare_points_data(point_spec$points, visualizer_type)
-        
+        eff = if (is.null(private$.effective_theme)) get_pkg_theme_default() else private$.effective_theme
+        size = if (is.null(point_spec$size)) eff$point_size else point_spec$size
+        alpha = if (is.null(point_spec$alpha)) eff$alpha else point_spec$alpha
+
         if (visualizer_type == "surface") {
           # For 3D surface plots, need z values
           if (!"z" %in% names(points_data)) {
             # Try to infer z values if the visualizer has a way to evaluate the function
             points_data$z = private$infer_z_values(points_data)
           }
-          
+
           # Add 3D scatter trace
-          plot_obj = plot_obj %>% plotly::add_trace(
+          plot_obj = plot_obj %>% add_trace(
             x = points_data$x,
             y = points_data$y,
             z = points_data$z,
@@ -324,17 +336,17 @@ Visualizer = R6::R6Class("Visualizer",
             mode = "markers",
             marker = list(
               color = point_spec$color,
-              size = point_spec$size,
-              opacity = point_spec$alpha
+              size = size,
+              opacity = alpha
             ),
             name = "Added Points",
             showlegend = FALSE
           )
-          
+
           # Add annotations if provided (3D text)
           if (!is.null(point_spec$annotations)) {
             for (i in seq_along(point_spec$annotations)) {
-              plot_obj = plot_obj %>% plotly::add_trace(
+              plot_obj = plot_obj %>% add_trace(
                 x = points_data$x[i],
                 y = points_data$y[i],
                 z = points_data$z[i],
@@ -343,13 +355,13 @@ Visualizer = R6::R6Class("Visualizer",
                 text = point_spec$annotations[i],
                 textfont = list(
                   color = point_spec$color,
-                  size = if (!is.null(point_spec$annotation_size)) point_spec$annotation_size else 12
+                  size = if (!is.null(point_spec$annotation_size)) point_spec$annotation_size else (eff$text_size + 1)
                 ),
                 showlegend = FALSE
               )
             }
           }
-          
+
           # Add ordered path if requested
           if (point_spec$ordered && nrow(points_data) > 1) {
             # For 3D plots, we'll use lines but with shorter segments
@@ -360,34 +372,34 @@ Visualizer = R6::R6Class("Visualizer",
               x2 = points_data$x[i + 1]
               y2 = points_data$y[i + 1]
               z2 = points_data$z[i + 1]
-              
+
               # Calculate direction vector and normalize it
               dx = x2 - x1
               dy = y2 - y1
               dz = z2 - z1
               dist = sqrt(dx^2 + dy^2 + dz^2)
-              
+
               if (dist > 0) {
                 # Normalize direction vector
                 dx_norm = dx / dist
                 dy_norm = dy / dist
                 dz_norm = dz / dist
-                
+
                 # Calculate arrow endpoints based on arrow_size
                 arrow_size = point_spec$arrow_size
                 arrow_x2 = x1 + dx_norm * arrow_size
                 arrow_y2 = y1 + dy_norm * arrow_size
                 arrow_z2 = z1 + dz_norm * arrow_size
-                
+
                 # Add arrow segment
-                plot_obj = plot_obj %>% plotly::add_trace(
+                plot_obj = plot_obj %>% add_trace(
                   x = c(x1, arrow_x2),
                   y = c(y1, arrow_y2),
                   z = c(z1, arrow_z2),
                   type = "scatter3d",
                   mode = "lines",
                   line = list(
-                    color = point_spec$arrow_color,
+                    color = if (is.null(point_spec$arrow_color)) point_spec$color else point_spec$arrow_color,
                     width = 6
                   ),
                   name = "Arrow",
@@ -398,20 +410,20 @@ Visualizer = R6::R6Class("Visualizer",
           }
         } else {
           # For 2D contour plots
-          plot_obj = plot_obj %>% plotly::add_trace(
+          plot_obj = plot_obj %>% add_trace(
             x = points_data$x,
             y = points_data$y,
             type = "scatter",
             mode = "markers",
             marker = list(
               color = point_spec$color,
-              size = point_spec$size,
-              opacity = point_spec$alpha
+              size = size,
+              opacity = alpha
             ),
             name = "Added Points",
             showlegend = FALSE
           )
-          
+
           # Add annotations if provided (2D text)
           if (!is.null(point_spec$annotations)) {
             plot_obj = plot_obj %>% plotly::add_annotations(
@@ -421,11 +433,11 @@ Visualizer = R6::R6Class("Visualizer",
               showarrow = FALSE,
               font = list(
                 color = point_spec$color,
-                size = if (!is.null(point_spec$annotation_size)) point_spec$annotation_size else 12
+                size = if (!is.null(point_spec$annotation_size)) point_spec$annotation_size else (eff$text_size + 1)
               )
             )
           }
-          
+
           # Add ordered path if requested
           if (point_spec$ordered && nrow(points_data) > 1) {
             # For 2D plots, use shorter line segments
@@ -434,30 +446,30 @@ Visualizer = R6::R6Class("Visualizer",
               y1 = points_data$y[i]
               x2 = points_data$x[i + 1]
               y2 = points_data$y[i + 1]
-              
+
               # Calculate direction vector and normalize it
               dx = x2 - x1
               dy = y2 - y1
               dist = sqrt(dx^2 + dy^2)
-              
+
               if (dist > 0) {
                 # Normalize direction vector
                 dx_norm = dx / dist
                 dy_norm = dy / dist
-                
+
                 # Calculate arrow endpoints based on arrow_size
                 arrow_size = point_spec$arrow_size
                 arrow_x2 = x1 + dx_norm * arrow_size
                 arrow_y2 = y1 + dy_norm * arrow_size
-                
-                # Add arrow segment  
-                plot_obj = plot_obj %>% plotly::add_trace(
+
+                # Add arrow segment
+                plot_obj = plot_obj %>% add_trace(
                   x = c(x1, arrow_x2),
                   y = c(y1, arrow_y2),
                   type = "scatter",
                   mode = "lines",
                   line = list(
-                    color = point_spec$arrow_color,
+                    color = if (is.null(point_spec$arrow_color)) point_spec$color else point_spec$arrow_color,
                     width = 4
                   ),
                   name = "Arrow",
@@ -468,7 +480,7 @@ Visualizer = R6::R6Class("Visualizer",
           }
         }
       }
-      
+
       return(plot_obj)
     },
 
@@ -477,7 +489,7 @@ Visualizer = R6::R6Class("Visualizer",
       if (is.null(points)) {
         stop("Points cannot be NULL")
       }
-      
+
       # Convert different input formats to data.frame
       if (is.numeric(points) && visualizer_type == "1D") {
         # For 1D: numeric vector of x values
@@ -507,14 +519,14 @@ Visualizer = R6::R6Class("Visualizer",
       } else {
         stop("Unsupported points format")
       }
-      
+
       # Validate dimensions
       if (visualizer_type == "1D" && !"x" %in% names(points_data)) {
         stop("1D visualizers require x coordinates")
       } else if (visualizer_type %in% c("2D", "surface") && (!("x" %in% names(points_data)) || !("y" %in% names(points_data)))) {
         stop("2D/Surface visualizers require x and y coordinates")
       }
-      
+
       return(points_data)
     },
 
@@ -526,37 +538,51 @@ Visualizer = R6::R6Class("Visualizer",
       return(rep(0, nrow(points_data)))
     },
 
-    # Resolve layer colors based on current plot settings
-    resolve_layer_colors = function() {
-      # Initialize layers_to_add if it doesn't exist
-      if (is.null(private$.layers_to_add)) {
-        private$.layers_to_add = list()
-      }
-      
-      # Reset color index for consistent color assignment
-      private$.color_index = 1
-      
-      # Resolve colors in any stored layer specifications
-      private$resolve_all_layer_colors()
-    },
-
     # Resolve colors in all stored layers
     resolve_all_layer_colors = function() {
       # Initialize layers_to_add if it doesn't exist
       if (is.null(private$.layers_to_add)) {
         private$.layers_to_add = list()
       }
-      
+
       if (length(private$.layers_to_add) == 0) {
         return()
       }
-      
+
       for (i in seq_along(private$.layers_to_add)) {
         layer = private$.layers_to_add[[i]]
-        
-        # Recursively resolve any "auto" colors in the layer specification
-        layer = private$resolve_colors_recursive(layer)
-        
+
+        # For training_data layers, handle "auto" colors context-aware for classification vs regression
+        if (layer$type == "training_data") {
+          # Resolve colors outside of style normally
+          if ("spec" %in% names(layer)) {
+            for (spec_name in names(layer$spec)) {
+              if (spec_name != "style") {
+                layer$spec[[spec_name]] = private$resolve_colors_recursive(layer$spec[[spec_name]])
+              }
+            }
+
+            # For style, check if we have task information to determine if it's classification
+            has_task = inherits(self, "VisualizerModel") && !is.null(self$task)
+            if ("style" %in% names(layer$spec) && has_task) {
+              is_classification = identical(self$task$task_type, "classif")
+
+              # For regression tasks, resolve "auto" colors in style to avoid ggplot2 errors
+              # For classification tasks, preserve "auto" for class-aware handling
+              if (!is_classification) {
+                layer$spec$style = private$resolve_colors_recursive(layer$spec$style)
+              }
+              # For classification, leave style$color as "auto" if present
+            } else {
+              # If no task information available, resolve all colors to be safe
+              layer$spec$style = private$resolve_colors_recursive(layer$spec$style)
+            }
+          }
+        } else {
+          # For other layer types, recursively resolve any "auto" colors in the layer specification
+          layer = private$resolve_colors_recursive(layer)
+        }
+
         # Update the stored layer
         private$.layers_to_add[[i]] = layer
       }
@@ -576,20 +602,17 @@ Visualizer = R6::R6Class("Visualizer",
       return(obj)
     },
 
-    # Get auto color using current plot settings
+    # Get auto color using current effective theme
     get_auto_color_with_palette = function() {
-      if (!is.null(private$.plot_settings) && !is.null(private$.plot_settings$color_palette)) {
-        color_palette = private$.plot_settings$color_palette
-      } else {
-        color_palette = "viridis"  # fallback default
-      }
-      
+      eff = if (is.null(private$.effective_theme)) get_pkg_theme_default() else private$.effective_theme
+      color_palette = if (is.null(eff$palette)) "viridis" else eff$palette
+
       # Get color from discrete palette based on the selected color_palette
       color = get_vistool_color(private$.color_index, "discrete", base_palette = color_palette)
-      
+
       # Increment color index for next use
       private$.color_index = private$.color_index + 1
-      
+
       return(color)
     },
 
@@ -599,9 +622,11 @@ Visualizer = R6::R6Class("Visualizer",
       if (is.null(private$.layers_to_add)) {
         private$.layers_to_add = list()
       }
-      
-      private$.layers_to_add = c(private$.layers_to_add, 
-                                 list(list(type = layer_type, spec = layer_spec)))
+
+      private$.layers_to_add = c(
+        private$.layers_to_add,
+        list(list(type = layer_type, spec = layer_spec))
+      )
     },
 
     # Get a stored layer by type (returns the latest one if multiple exist)
@@ -610,11 +635,11 @@ Visualizer = R6::R6Class("Visualizer",
       if (is.null(private$.layers_to_add)) {
         private$.layers_to_add = list()
       }
-      
+
       if (length(private$.layers_to_add) == 0) {
         return(NULL)
       }
-      
+
       for (i in rev(seq_along(private$.layers_to_add))) {
         layer = private$.layers_to_add[[i]]
         if (layer$type == layer_type) {
@@ -630,11 +655,11 @@ Visualizer = R6::R6Class("Visualizer",
       if (is.null(private$.layers_to_add)) {
         private$.layers_to_add = list()
       }
-      
+
       if (length(private$.layers_to_add) == 0) {
         return(list())
       }
-      
+
       layers = list()
       for (layer in private$.layers_to_add) {
         if (layer$type == layer_type) {
@@ -642,6 +667,196 @@ Visualizer = R6::R6Class("Visualizer",
         }
       }
       return(layers)
+    },
+
+    # Initialize a base ggplot2 object (for 1D/2D visualizers)
+    init_ggplot = function(data, x_col = "x", y_col = "y") {
+      # Create base ggplot object
+      if (missing(data) || is.null(data)) {
+        p = ggplot2::ggplot()
+      } else {
+        aes_mapping = do.call(ggplot2::aes, setNames(list(as.name(x_col), as.name(y_col)), c("x", "y")))
+        p = ggplot2::ggplot(data = data, mapping = aes_mapping)
+      }
+
+      return(p)
+    },
+
+    # Apply theme and styling to ggplot2 object
+    apply_ggplot_theme = function(plot_obj, text_size = 11, title_size = NULL, theme = "minimal",
+                                  background = "white", show_grid = TRUE, grid_color = "gray90") {
+      # derive sizes
+      if (is.null(title_size)) title_size = text_size + 2
+
+      # Apply theme
+      theme_func = switch(theme,
+        "minimal" = ggplot2::theme_minimal,
+        "bw" = ggplot2::theme_bw,
+        "classic" = ggplot2::theme_classic,
+        "gray" = ggplot2::theme_gray,
+        "grey" = ggplot2::theme_grey,
+        "light" = ggplot2::theme_light,
+        "dark" = ggplot2::theme_dark,
+        "void" = ggplot2::theme_void,
+        ggplot2::theme_minimal # default fallback
+      )
+
+      plot_obj = plot_obj + theme_func(base_size = text_size)
+
+      # Apply additional theme customizations
+      plot_obj = plot_obj + ggplot2::theme(
+        plot.title = ggplot2::element_text(size = title_size, hjust = 0.5),
+        plot.background = ggplot2::element_rect(fill = background, color = NA),
+        panel.background = ggplot2::element_rect(fill = background, color = NA)
+      )
+
+      # Handle grid display
+      if (!show_grid) {
+        plot_obj = plot_obj + ggplot2::theme(
+          panel.grid.major = ggplot2::element_blank(),
+          panel.grid.minor = ggplot2::element_blank()
+        )
+      } else if (!is.null(grid_color)) {
+        plot_obj = plot_obj + ggplot2::theme(
+          panel.grid.major = ggplot2::element_line(color = grid_color),
+          panel.grid.minor = ggplot2::element_line(color = grid_color, linewidth = 0.5)
+        )
+      }
+
+      return(plot_obj)
+    },
+
+    # Apply color scales to ggplot2 object
+    apply_ggplot_color_scale = function(plot_obj, color_palette = "viridis", scale_type = "fill", discrete = FALSE) {
+      if (scale_type == "fill") {
+        if (discrete) {
+          if (color_palette == "viridis") {
+            plot_obj = plot_obj + ggplot2::scale_fill_viridis_d()
+          } else if (color_palette == "plasma") {
+            plot_obj = plot_obj + ggplot2::scale_fill_viridis_d(option = "plasma")
+          } else if (color_palette == "grayscale") {
+            plot_obj = plot_obj + ggplot2::scale_fill_grey()
+          }
+        } else {
+          if (color_palette == "viridis") {
+            plot_obj = plot_obj + ggplot2::scale_fill_viridis_c()
+          } else if (color_palette == "plasma") {
+            plot_obj = plot_obj + ggplot2::scale_fill_viridis_c(option = "plasma")
+          } else if (color_palette == "grayscale") {
+            plot_obj = plot_obj + ggplot2::scale_fill_gradient(low = "black", high = "white")
+          }
+        }
+      } else if (scale_type == "color") {
+        if (discrete) {
+          if (color_palette == "viridis") {
+            plot_obj = plot_obj + ggplot2::scale_color_viridis_d()
+          } else if (color_palette == "plasma") {
+            plot_obj = plot_obj + ggplot2::scale_color_viridis_d(option = "plasma")
+          } else if (color_palette == "grayscale") {
+            plot_obj = plot_obj + ggplot2::scale_color_grey()
+          }
+        } else {
+          if (color_palette == "viridis") {
+            plot_obj = plot_obj + ggplot2::scale_color_viridis_c()
+          } else if (color_palette == "plasma") {
+            plot_obj = plot_obj + ggplot2::scale_color_viridis_c(option = "plasma")
+          } else if (color_palette == "grayscale") {
+            plot_obj = plot_obj + ggplot2::scale_color_gradient(low = "black", high = "white")
+          }
+        }
+      }
+
+      return(plot_obj)
+    },
+
+    # Helper method to initialize 1D plots with common styling
+    gg_init_1d = function(data_structure, geom_layer_func) {
+      eff = private$.effective_theme
+      rp = private$.render_params
+
+      # Create base data for the function line
+      plot_data = data.frame(
+        x = data_structure$coordinates$x1,
+        y = data_structure$coordinates$y
+      )
+
+      # Create base ggplot
+      private$.plot = private$init_ggplot(plot_data, "x", "y")
+
+      # Add the visualization layer (line for functions, points for objectives)
+      private$.plot = geom_layer_func(private$.plot, plot_data, eff)
+
+      # Apply common styling
+      private$gg_apply_labels_limits_theme(data_structure)
+    },
+
+    # Helper method to initialize 2D plots with common styling
+    gg_init_2d = function(data_structure, geom_layer_func) {
+      eff = private$.effective_theme
+      rp = private$.render_params
+
+      # Create base data for the filled contour
+      plot_data = data.frame(
+        x1 = data_structure$coordinates$x1,
+        x2 = data_structure$coordinates$x2,
+        y = data_structure$coordinates$y
+      )
+
+      # Create base ggplot
+      private$.plot = private$init_ggplot(plot_data, "x1", "x2")
+
+      # Add the visualization layer (raster for both models and objectives)
+      private$.plot = geom_layer_func(private$.plot, plot_data, eff)
+
+      # Apply common styling
+      private$gg_apply_labels_limits_theme(data_structure, is_2d = TRUE)
+    },
+
+    # Helper method to apply labels, limits, and theme styling
+    gg_apply_labels_limits_theme = function(data_structure, is_2d = FALSE) {
+      eff = private$.effective_theme
+      rp = private$.render_params
+
+      # Apply theme and styling
+      private$.plot = private$apply_ggplot_theme(private$.plot, eff$text_size, eff$title_size, eff$theme, eff$background, eff$show_grid, eff$grid_color)
+
+      # Determine labels
+      title_text = if (!is.null(rp$plot_title)) rp$plot_title else data_structure$labels$title
+      x_text = if (!is.null(rp$x_lab)) rp$x_lab else data_structure$labels$x1
+      y_text = if (!is.null(rp$y_lab)) rp$y_lab else if (is_2d) data_structure$labels$x2 else data_structure$labels$y
+
+      # Build labels list
+      labels_list = list(
+        title = if (rp$show_title) title_text else NULL,
+        subtitle = rp$plot_subtitle,
+        x = x_text,
+        y = y_text
+      )
+
+      # Add fill label for 2D plots
+      if (is_2d) {
+        fill_text = if (!is.null(rp$legend_title)) rp$legend_title else data_structure$labels$y
+        labels_list$fill = fill_text
+      }
+
+      # Add labels conditionally
+      private$.plot = private$.plot + do.call(ggplot2::labs, labels_list)
+
+      # Apply axis limits
+      if (!is.null(rp$x_limits)) {
+        private$.plot = private$.plot + ggplot2::xlim(rp$x_limits)
+      }
+      if (!is.null(rp$y_limits)) {
+        private$.plot = private$.plot + ggplot2::ylim(rp$y_limits)
+      }
+
+      # Apply legend settings: theme drives position; "none" disables legend
+      legend_pos = if (is.null(eff$legend_position)) "right" else eff$legend_position
+      if (!rp$show_legend || identical(legend_pos, "none")) {
+        private$.plot = private$.plot + ggplot2::theme(legend.position = "none")
+      } else {
+        private$.plot = private$.plot + ggplot2::theme(legend.position = legend_pos)
+      }
     }
   )
 )

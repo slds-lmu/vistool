@@ -25,13 +25,7 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
     #' @template param_x2_limits
     #' @template param_padding
     #' @template param_n_points
-    #' @template param_opacity
-    #' @template param_colorscale
-    #' @template param_opacity
-    #' @template param_colorscale
-    #' @template param_show_title
-    initialize = function(objective, x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L,
-                          opacity = 0.8, colorscale = "auto", show_title = TRUE) {
+    initialize = function(objective, x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L) {
       self$objective = checkmate::assert_r6(objective, "Objective")
       checkmate::assert_numeric(x1_limits, len = 2, null.ok = TRUE)
       checkmate::assert_numeric(x2_limits, len = 2, null.ok = TRUE)
@@ -42,8 +36,8 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
         mlr3misc::stopf("`VisualizerSurface` requires 2-dimensional inputs, but `objective$xdim = %s`", objective$xdim)
       }
 
-      x1_limits = x1_limits %??% c(objective$lower[1], objective$upper[1])
-      x2_limits = x2_limits %??% c(objective$lower[2], objective$upper[2])
+      x1_limits = if (is.null(x1_limits)) c(objective$lower[1], objective$upper[1]) else x1_limits
+      x2_limits = if (is.null(x2_limits)) c(objective$lower[2], objective$upper[2]) else x2_limits
 
       if (any(is.na(x1_limits)) || any(is.na(x2_limits))) {
         stop("Limits could not be extracted from the objective. Please use `x_limits`.")
@@ -68,10 +62,7 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
         plot_lab = self$objective$label,
         x1_lab = "x1",
         x2_lab = "x2",
-        z_lab = "y",
-        opacity = opacity,
-        colorscale = colorscale,
-        show_title = show_title
+        z_lab = "y"
       )
 
       # Initialize trace counter for consistent coloring
@@ -116,13 +107,13 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
       checkmate::assert_count(npoints, null.ok = TRUE)
       checkmate::assert_count(npmax, null.ok = TRUE)
       checkmate::assert_string(line_color, null.ok = TRUE)
-      
+
       # Store layer specification without immediately resolving colors
       # Colors will be resolved in plot() when color_palette is known
       if (is.null(line_color)) {
-        line_color = "auto"  # Mark for automatic color assignment
+        line_color = "auto" # Mark for automatic color assignment
       }
-      
+
       # Store the optimization trace layer for later processing
       private$store_layer("optimization_trace", list(
         optimizer = opt,
@@ -137,7 +128,7 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
         marker_color = marker_color,
         args = list(...)
       ))
-      
+
       return(invisible(self))
     },
 
@@ -151,16 +142,20 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
     plot = function(...) {
       # Call parent plot method first to set up plot_settings and resolve colors
       super$plot(...)
-      
-      # Process stored optimization trace layers
-      private$render_optimization_trace_layers()
-      
-      # Process stored Taylor approximation layers
-      private$render_taylor_layers()
-      
-      # Process stored Hessian eigenvector layers
-      private$render_hessian_layers()
-      
+
+      # render layers in the order they were added
+      if (!is.null(private$.layers_to_add)) {
+        for (layer in private$.layers_to_add) {
+          if (layer$type == "optimization_trace") {
+            private$render_optimization_trace_layer(layer$spec)
+          } else if (layer$type == "taylor") {
+            private$render_taylor_layer(layer$spec)
+          } else if (layer$type == "hessian") {
+            private$render_hessian_layer(layer$spec)
+          }
+        }
+      }
+      private$.last_plot = private$.plot
       return(private$.plot)
     },
 
@@ -200,7 +195,7 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
         zlim = zlim,
         args = list(...)
       ))
-      
+
       return(invisible(self))
     },
 
@@ -227,7 +222,7 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
         x2length = x2length,
         args = list(...)
       ))
-      
+
       return(invisible(self))
     },
 
@@ -282,23 +277,23 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
         fname = sprintf("%s/frame-%s.%s", dir, is, fext)
 
         if (private$.layer_primary == "surface") {
-          do.call(self$initLayerSurface, private$.vbase)
+          do.call(self$init_layer_surface, private$.vbase)
         }
         if (private$.layer_primary == "contour") {
-          do.call(self$initLayerContour, private$.vbase)
+          do.call(self$init_layer_contour, private$.vbase)
         }
         if (is.null(private$.layer_primary)) {
           stop("No figure was created jet")
         }
 
         for (j in seq_along(private$.opts)) {
-          do.call(self$addLayerOptimizationTrace, mlr3misc::insert_named(private$.opts[[j]], list(npmax = stops[i])))
+          do.call(self$add_optimization_trace, mlr3misc::insert_named(private$.opts[[j]], list(npmax = stops[i])))
         }
 
         if (private$.layer_primary == "surface") {
-          self$setScene(x = views$x[i], y = views$y[i], z = views$z[i])
+          self$set_scene(x = views$x[i], y = views$y[i], z = views$z[i])
         }
-        do.call(self$setLayout, private$.layout)
+        do.call(self$set_layout, private$.layout)
 
         self$save(fname, ...)
       }
@@ -306,26 +301,26 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
       private$.freeze_plot = FALSE
       private$.plot = plot_temp
 
-      message(sprintf("Files stored in '%s'. Use, e.g., ImageMagic (http://www.imagemagick.org/) with `convert -delay 20 -loop 0 %s/*.%s myimage.gif` to create gif with 20 ms frames.", dir, dir, fext))
+      message(sprintf("Files stored in '%s'. Use, e.g., ImageMagick (http://www.imagemagick.org/) with `convert -delay 20 -loop 0 %s/*.%s myimage.gif` to create gif with 20 ms frames.", dir, dir, fext))
     }
   ),
   private = list(
     .trace_count = 0,
-    
+
     # Render stored optimization trace layers
     render_optimization_trace_layers = function() {
       # Get all stored optimization trace layers
       trace_layers = private$get_layers_by_type("optimization_trace")
-      
+
       if (length(trace_layers) == 0) {
         return()
       }
-      
+
       for (trace_spec in trace_layers) {
         private$render_optimization_trace_layer(trace_spec)
       }
     },
-    
+
     # Render a single optimization trace layer
     render_optimization_trace_layer = function(layer_spec) {
       opt = layer_spec$optimizer
@@ -345,7 +340,7 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
         private$.trace_count = private$.trace_count + 1
         line_color = private$get_auto_color_with_palette()
       }
-      
+
       if (is.null(private$.plot)) private$.init_default_plot()
 
       if (nrow(opt$archive) == 0) {
@@ -378,10 +373,10 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
       if (length(marker_shape) == 1) marker_shape = rep(marker_shape, length(add_marker_at))
       mvals = NULL
       if (private$.layer_primary == "contour") {
-        mvals = plotly::schema(F)$traces$scatter$attributes$marker$symbol$values
+        mvals = schema(F)$traces$scatter$attributes$marker$symbol$values
       }
       if (private$.layer_primary == "surface") {
-        mvals = plotly::schema(F)$traces$scatter3d$attributes$marker$symbol$values
+        mvals = schema(F)$traces$scatter3d$attributes$marker$symbol$values
       }
       invisible(lapply(marker_shape, function(marker_shape) checkmate::assertChoice(marker_shape, choices = c(mvals, NA))))
 
@@ -421,23 +416,28 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
       # different default stylings (such as line width) and to recreate the layer with the stored arguments:
       if (private$.layer_primary == "surface") {
         ptype = "scatter3d"
+        eff = private$.effective_theme
+        lw = (if (is.null(eff$line_width)) 1.2 else eff$line_width) * 2
         pargs = list(
           name = name,
           x = xmr$x,
           y = xmr$y,
           z = xmr$z,
-          marker = list(color = line_color, line = list(color = mcolor_out, width = 6)),
-          line = list(color = line_color, width = 8)
+          marker = list(color = line_color, line = list(color = mcolor_out, width = lw)),
+          line = list(color = line_color, width = lw)
         )
       }
       if (private$.layer_primary == "contour") {
         ptype = "scatter"
+        eff = private$.effective_theme
+        lw = (if (is.null(eff$line_width)) 1.2 else eff$line_width) * 2
+        msize = if (is.null(eff$point_size)) 6 else eff$point_size
         pargs = list(
           name = name,
           x = xmr$x,
           y = xmr$y,
-          marker = list(color = line_color, size = 12, line = list(color = mcolor_out, width = 2)),
-          line = list(color = line_color, width = 2)
+          marker = list(color = line_color, size = msize, line = list(color = mcolor_out, width = lw)),
+          line = list(color = line_color, width = lw)
         )
       }
       if (is.null(ptype)) {
@@ -446,7 +446,7 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
       pargs$type = ptype
 
       # Add optimization traces as lines to the plot:
-      private$.plot = do.call(plotly::add_trace, c(
+      private$.plot = do.call(add_trace, c(
         list(private$.plot),
         mlr3misc::insert_named(mlr3misc::remove_named(pargs, "marker"), aargs),
         list(mode = "lines")
@@ -466,23 +466,23 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
       if (private$.layer_primary == "contour") {
         pargs$z = NULL
       }
-      private$.plot = do.call(plotly::add_trace, c(list(private$.plot), pargs))
+      private$.plot = do.call(add_trace, c(list(private$.plot), pargs))
     },
-    
+
     # Render stored Taylor approximation layers
     render_taylor_layers = function() {
       # Get all stored Taylor layers
       taylor_layers = private$get_layers_by_type("taylor")
-      
+
       if (length(taylor_layers) == 0) {
         return()
       }
-      
+
       for (taylor_spec in taylor_layers) {
         private$render_taylor_layer(taylor_spec)
       }
     },
-    
+
     # Render a single Taylor approximation layer
     render_taylor_layer = function(layer_spec) {
       x0 = layer_spec$x0
@@ -492,14 +492,14 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
       npoints_per_dim = layer_spec$npoints_per_dim
       zlim = layer_spec$zlim
       aargs = layer_spec$args
-      
+
       if (is.null(private$.plot)) private$.init_default_plot()
-      
+
       # Check if this is only available for surface mode
       if (private$.layer_primary != "surface") {
         stop("Taylor approximation is currently only available for surface plots")
       }
-      
+
       f0 = self$objective$eval(x0)
       g = self$objective$grad(x0)
       h = self$objective$hess(x0)
@@ -537,30 +537,30 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
         z[!between(z, zlim[1], zlim[2])] = NA
       }
 
-      private$.plot = do.call(plotly::add_surface, c(list(private$.plot, x = grid[, 1], y = grid[, 2], z = t(z), showscale = FALSE), aargs))
+      private$.plot = do.call(add_surface, c(list(private$.plot, x = grid[, 1], y = grid[, 2], z = t(z), showscale = FALSE), aargs))
     },
-    
+
     # Render stored Hessian eigenvector layers
     render_hessian_layers = function() {
       # Get all stored Hessian layers
       hessian_layers = private$get_layers_by_type("hessian")
-      
+
       if (length(hessian_layers) == 0) {
         return()
       }
-      
+
       for (hessian_spec in hessian_layers) {
         private$render_hessian_layer(hessian_spec)
       }
     },
-    
+
     # Render a single Hessian eigenvector layer
     render_hessian_layer = function(layer_spec) {
       x0 = layer_spec$x0
       x1length = layer_spec$x1length
       x2length = layer_spec$x2length
       aargs = layer_spec$args
-      
+
       if (is.null(private$.plot)) private$.init_default_plot()
 
       f0 = self$objective$eval(x0)
@@ -578,7 +578,7 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
         mx = c(v1[1], x0[1], v2[1])
         my = c(v1[2], x0[2], v2[2])
 
-        private$.plot = do.call(plotly::add_trace, c(list(private$.plot, x = mx, y = my, mode = "lines", type = "scatter", showlegend = FALSE), aargs))
+        private$.plot = do.call(add_trace, c(list(private$.plot, x = mx, y = my, mode = "lines", type = "scatter", showlegend = FALSE), aargs))
       }
       if (private$.layer_primary == "surface") {
         v1 = v1 * x1length + x0
@@ -591,7 +591,7 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
         # Order is important to have the angle:
         marker = cbind(v1, v0, v2)
 
-        private$.plot = do.call(plotly::add_trace, c(list(private$.plot, x = marker[1, ], y = marker[2, ], z = marker[3, ], mode = "lines", type = "scatter3d", showlegend = FALSE), aargs))
+        private$.plot = do.call(add_trace, c(list(private$.plot, x = marker[1, ], y = marker[2, ], z = marker[3, ], mode = "lines", type = "scatter3d", showlegend = FALSE), aargs))
       }
     }
   )
