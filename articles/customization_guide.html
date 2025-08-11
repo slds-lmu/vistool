@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">vistool</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -69,122 +69,117 @@
 
     
     
-<p>The three-step workflow,</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://slds-lmu.github.io/vistool/">vistool</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mlr3.mlr-org.com" class="external-link">mlr3</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mlr3learners.mlr-org.com" class="external-link">mlr3learners</a></span><span class="op">)</span></span></code></pre></div>
+<p>The vistool package provides a flexible theme system that separates
+<strong>what to plot</strong> from <strong>how to plot</strong>. The
+three-step workflow:</p>
 <ol style="list-style-type: decimal">
 <li>
 <strong>Initialize</strong> the Visualizer using
-<code><a href="../reference/as_visualizer.html">as_visualizer()</a></code>,</li>
+<code><a href="../reference/as_visualizer.html">as_visualizer()</a></code> (computational setup only - the
+<strong>what</strong>) and set the theme,</li>
 <li>
-<strong>Add</strong> visualization layers (e.g., contours,
-training_data, boundaries, optimization traces),</li>
+<strong>Add</strong> visualization layers with automatic color
+management,</li>
 <li>
-<strong>Plot</strong> using <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> and optionally
-<code><a href="https://rdrr.io/r/base/save.html" class="external-link">save()</a></code> or <code>animate()</code>,</li>
+<strong>Plot</strong> using <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> with optional
+customization, and optionally <code><a href="https://rdrr.io/r/base/save.html" class="external-link">save()</a></code>,</li>
 </ol>
-<p>offers consistent customization options across all visualization
-types. In particular, all visual elements support automatic color
-assignment using <code>color = "auto"</code>:</p>
-<ul>
-<li>Colors are automatically assigned from a consistent discrete
-palette</li>
-<li>Each visualizer tracks its color index to ensure distinct
-colors</li>
-<li>Manual colors can still be specified using hex codes or named
-colors</li>
-</ul>
-<p>For convenience, three pre-defined color palettes are available:</p>
-<ul>
-<li>
-<strong>viridis</strong> (default): Perceptually uniform,
-colorblind-friendly</li>
-<li>
-<strong>plasma</strong>: High contrast alternative to viridis</li>
-<li>
-<strong>grayscale</strong>: For monochrome plots</li>
-</ul>
+<p>supports consistent customization across all visualization types with
+a clear precedence hierarchy.</p>
 <div class="section level2">
-<h2 id="global-settings-plot">Global Settings (<code>plot()</code>)<a class="anchor" aria-label="anchor" href="#global-settings-plot"></a>
+<h2 id="theme-system-overview">Theme System Overview<a class="anchor" aria-label="anchor" href="#theme-system-overview"></a>
 </h2>
-<p>These parameters affect the entire plot appearance:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
-<span>  <span class="co"># General settings</span></span>
-<span>  text_size <span class="op">=</span> <span class="fl">11</span>,            <span class="co"># Base text size for all elements</span></span>
-<span>  title_size <span class="op">=</span> <span class="cn">NULL</span>,         <span class="co"># Title size (defaults to text_size + 2)</span></span>
-<span>  theme <span class="op">=</span> <span class="st">"minimal"</span>,         <span class="co"># ggplot2 theme</span></span>
-<span>  background <span class="op">=</span> <span class="st">"white"</span>,      <span class="co"># Background color</span></span>
-<span>  color_palette <span class="op">=</span> <span class="st">"viridis"</span>, <span class="co"># Color palette for continuous scales</span></span>
-<span>  flatten <span class="op">=</span> <span class="cn">FALSE</span>,           <span class="co"># Surface only: 2D vs 3D view</span></span>
-<span>  layout <span class="op">=</span> <span class="cn">NULL</span>,             <span class="co"># plotly: custom layout options</span></span>
-<span>  scene <span class="op">=</span> <span class="cn">NULL</span>,              <span class="co"># plotly: 3D scene settings</span></span>
-<span>  </span>
-<span>  <span class="co"># Title and Subtitle Customization</span></span>
-<span>  plot_title <span class="op">=</span> <span class="cn">NULL</span>,         <span class="co"># Override plot title</span></span>
-<span>  plot_subtitle <span class="op">=</span> <span class="cn">NULL</span>,      <span class="co"># Add subtitle to plot</span></span>
-<span>  show_title <span class="op">=</span> <span class="cn">TRUE</span>,         <span class="co"># Show/hide plot title completely</span></span>
-<span>  </span>
-<span>  <span class="co"># Axis Customization</span></span>
-<span>  x_lab <span class="op">=</span> <span class="cn">NULL</span>,              <span class="co"># Custom x-axis label</span></span>
-<span>  y_lab <span class="op">=</span> <span class="cn">NULL</span>,              <span class="co"># Custom y-axis label  </span></span>
-<span>  z_lab <span class="op">=</span> <span class="cn">NULL</span>,              <span class="co"># Custom z-axis label (surface plots)</span></span>
-<span>  x_limits <span class="op">=</span> <span class="cn">NULL</span>,           <span class="co"># X-axis limits: c(min, max)</span></span>
-<span>  y_limits <span class="op">=</span> <span class="cn">NULL</span>,           <span class="co"># Y-axis limits: c(min, max)</span></span>
-<span>  z_limits <span class="op">=</span> <span class="cn">NULL</span>,           <span class="co"># Z-axis limits: c(min, max) (surface plots)</span></span>
-<span>  show_grid <span class="op">=</span> <span class="cn">TRUE</span>,          <span class="co"># Show/hide grid lines</span></span>
-<span>  grid_color <span class="op">=</span> <span class="st">"gray90"</span>,     <span class="co"># Grid line color</span></span>
-<span>  </span>
-<span>  <span class="co"># Legend Customization</span></span>
-<span>  show_legend <span class="op">=</span> <span class="cn">TRUE</span>,        <span class="co"># Show/hide legend</span></span>
-<span>  legend_position <span class="op">=</span> <span class="st">"right"</span>, <span class="co"># "top", "right", "bottom", "left", "none"</span></span>
-<span>  legend_title <span class="op">=</span> <span class="cn">NULL</span>        <span class="co"># Custom legend title</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="theme-precedence-highest-to-lowest">Theme Precedence (Highest to Lowest)<a class="anchor" aria-label="anchor" href="#theme-precedence-highest-to-lowest"></a>
+</h3>
+<ol style="list-style-type: decimal">
+<li>
+<strong>Layer-specific style</strong>:
+<code>add_points(color = "red", size = 3)</code>
+</li>
+<li>
+<strong>Plot theme override</strong>:
+<code>plot(theme = list(palette = "plasma"))</code>
+</li>
+<li>
+<strong>Instance theme</strong>:
+<code>vis$set_theme(vistool_theme(...))</code>
+</li>
+<li>
+<strong>Package default</strong>:
+<code>options(vistool.theme = vistool_theme(...))</code>
+</li>
+</ol>
+</div>
+<div class="section level3">
+<h3 id="creating-and-using-themes">Creating and Using Themes<a class="anchor" aria-label="anchor" href="#creating-and-using-themes"></a>
+</h3>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">my_theme</span> <span class="op">=</span> <span class="fu"><a href="../reference/vistool_theme.html">vistool_theme</a></span><span class="op">(</span></span>
+<span>  palette <span class="op">=</span> <span class="st">"plasma"</span>,        <span class="co"># Color palette: "viridis", "plasma", "grayscale"</span></span>
+<span>  text_size <span class="op">=</span> <span class="fl">14</span>,            <span class="co"># Base text size</span></span>
+<span>  theme <span class="op">=</span> <span class="st">"bw"</span>,              <span class="co"># ggplot2 theme: "minimal", "bw", "classic", etc.</span></span>
+<span>  alpha <span class="op">=</span> <span class="fl">0.7</span>,               <span class="co"># Default transparency</span></span>
+<span>  line_width <span class="op">=</span> <span class="fl">1.5</span>,          <span class="co"># Default line width</span></span>
+<span>  point_size <span class="op">=</span> <span class="fl">3</span>,            <span class="co"># Default point size</span></span>
+<span>  legend_position <span class="op">=</span> <span class="st">"top"</span>,   <span class="co"># Legend position</span></span>
+<span>  show_grid <span class="op">=</span> <span class="cn">TRUE</span>,          <span class="co"># Show grid lines</span></span>
+<span>  grid_color <span class="op">=</span> <span class="st">"gray95"</span>,   <span class="co"># Grid color</span></span>
+<span>  background <span class="op">=</span> <span class="st">"white"</span>     <span class="co"># Background color</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">obj</span> <span class="op">=</span> <span class="fu"><a href="../reference/obj.html">obj</a></span><span class="op">(</span><span class="st">"TF_branin"</span><span class="op">)</span></span>
+<span><span class="va">vis</span> <span class="op">=</span> <span class="fu"><a href="../reference/as_visualizer.html">as_visualizer</a></span><span class="op">(</span><span class="va">obj</span>, type <span class="op">=</span> <span class="st">"2d"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># setting the theme</span></span>
+<span><span class="va">vis</span><span class="op">$</span><span class="fu">set_theme</span><span class="op">(</span><span class="va">my_theme</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># adding layers</span></span>
+<span><span class="va">vis</span><span class="op">$</span><span class="fu">add_contours</span><span class="op">(</span>color <span class="op">=</span> <span class="st">"auto"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># override the theme for specific plots</span></span>
+<span><span class="va">vis</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span>theme <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>text_size <span class="op">=</span> <span class="fl">12</span>, alpha <span class="op">=</span> <span class="fl">0.9</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+</div>
 </div>
 <div class="section level2">
-<h2 id="layer-specific-settings-in-add_-methods">Layer-Specific Settings (in <code>add_*()</code> methods)<a class="anchor" aria-label="anchor" href="#layer-specific-settings-in-add_-methods"></a>
+<h2 id="layer-specific-customization">Layer-Specific Customization<a class="anchor" aria-label="anchor" href="#layer-specific-customization"></a>
 </h2>
+<p>All <code>add_*()</code> methods support style parameters that
+override theme defaults:</p>
 <div class="section level3">
 <h3 id="add_points">
 <code>add_points()</code><a class="anchor" aria-label="anchor" href="#add_points"></a>
 </h3>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">add_points</span><span class="op">(</span></span>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">vis</span><span class="op">$</span><span class="fu">add_points</span><span class="op">(</span></span>
 <span>  <span class="va">points</span>,                   <span class="co"># Point data</span></span>
-<span>  color <span class="op">=</span> <span class="st">"auto"</span>,           <span class="co"># Auto-assign or specify color</span></span>
-<span>  size <span class="op">=</span> <span class="fl">2</span>,                 <span class="co"># Point size</span></span>
-<span>  shape <span class="op">=</span> <span class="fl">19</span>,               <span class="co"># Point shape (ggplot2) or "circle" (plotly)</span></span>
-<span>  alpha <span class="op">=</span> <span class="fl">1</span>,                <span class="co"># Transparency</span></span>
+<span>  color <span class="op">=</span> <span class="st">"auto"</span>,           <span class="co"># "auto" uses theme palette, or specify color</span></span>
+<span>  size <span class="op">=</span> <span class="cn">NULL</span>,              <span class="co"># Point size (NULL uses theme default)</span></span>
+<span>  shape <span class="op">=</span> <span class="fl">19</span>,               <span class="co"># Point shape</span></span>
+<span>  alpha <span class="op">=</span> <span class="cn">NULL</span>,             <span class="co"># Transparency (NULL uses theme default)</span></span>
 <span>  annotations <span class="op">=</span> <span class="cn">NULL</span>,       <span class="co"># Text labels for points</span></span>
 <span>  annotation_size <span class="op">=</span> <span class="cn">NULL</span>,   <span class="co"># Size of annotations</span></span>
 <span>  ordered <span class="op">=</span> <span class="cn">FALSE</span>,          <span class="co"># Draw arrows between consecutive points</span></span>
-<span>  arrow_color <span class="op">=</span> <span class="cn">NULL</span>,       <span class="co"># Color of arrows (defaults to point color)</span></span>
-<span>  arrow_size <span class="op">=</span> <span class="fl">0.3</span>          <span class="co"># Size/length of arrows</span></span>
+<span>  arrow_color <span class="op">=</span> <span class="cn">NULL</span>,       <span class="co"># Color of arrows</span></span>
+<span>  arrow_size <span class="op">=</span> <span class="fl">0.3</span>          <span class="co"># Size of arrows</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="add_training_data">
 <code>add_training_data()</code><a class="anchor" aria-label="anchor" href="#add_training_data"></a>
 </h3>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">add_training_data</span><span class="op">(</span></span>
-<span>  color <span class="op">=</span> <span class="st">"auto"</span>,          <span class="co"># Auto-assign color</span></span>
-<span>  size <span class="op">=</span> <span class="fl">2</span>,                <span class="co"># Point size</span></span>
-<span>  shape <span class="op">=</span> <span class="fl">19</span>,              <span class="co"># Point shape</span></span>
-<span>  alpha <span class="op">=</span> <span class="fl">1</span>,               <span class="co"># Transparency</span></span>
-<span>  show_labels <span class="op">=</span> <span class="cn">FALSE</span>,     <span class="co"># Show data point indices</span></span>
-<span>  label_size <span class="op">=</span> <span class="cn">NULL</span>        <span class="co"># Size of labels</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="add_boundary">
-<code>add_boundary()</code><a class="anchor" aria-label="anchor" href="#add_boundary"></a>
-</h3>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">add_boundary</span><span class="op">(</span></span>
-<span>  values <span class="op">=</span> <span class="cn">NULL</span>,           <span class="co"># Boundary values (auto-determined if NULL)</span></span>
-<span>  color <span class="op">=</span> <span class="st">"black"</span>,         <span class="co"># Line color</span></span>
-<span>  line_width <span class="op">=</span> <span class="fl">1.5</span>,        <span class="co"># Line width</span></span>
-<span>  line_type <span class="op">=</span> <span class="st">"solid"</span>,     <span class="co"># Line type: "solid", "dashed", "dotted", etc.</span></span>
-<span>  alpha <span class="op">=</span> <span class="fl">0.8</span>              <span class="co"># Transparency</span></span>
+<code class="sourceCode R"><span><span class="va">vis</span><span class="op">$</span><span class="fu">add_training_data</span><span class="op">(</span></span>
+<span>  color <span class="op">=</span> <span class="st">"auto"</span>,          <span class="co"># Auto-assign from theme palette</span></span>
+<span>  size <span class="op">=</span> <span class="cn">NULL</span>,             <span class="co"># Uses theme$point_size if NULL</span></span>
+<span>  shape <span class="op">=</span> <span class="fl">19</span>,              <span class="co"># Point shape</span></span>
+<span>  alpha <span class="op">=</span> <span class="cn">NULL</span>,            <span class="co"># Uses theme$alpha if NULL</span></span>
+<span>  show_labels <span class="op">=</span> <span class="cn">FALSE</span>,     <span class="co"># Show data point indices</span></span>
+<span>  label_size <span class="op">=</span> <span class="cn">NULL</span>        <span class="co"># Label text size</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
@@ -192,38 +187,119 @@ colorblind-friendly</li>
 <code>add_optimization_trace()</code><a class="anchor" aria-label="anchor" href="#add_optimization_trace"></a>
 </h3>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">add_optimization_trace</span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">vis</span><span class="op">$</span><span class="fu">add_optimization_trace</span><span class="op">(</span></span>
 <span>  <span class="va">optimizer</span>,                <span class="co"># Optimizer object with trace data</span></span>
-<span>  line_color <span class="op">=</span> <span class="st">"auto"</span>,      <span class="co"># Auto-assign line color</span></span>
-<span>  line_width <span class="op">=</span> <span class="fl">1.2</span>,         <span class="co"># Line width</span></span>
-<span>  line_type <span class="op">=</span> <span class="st">"solid"</span>,      <span class="co"># Line type</span></span>
+<span>  line_color <span class="op">=</span> <span class="st">"auto"</span>,      <span class="co"># Auto-assign from theme palette</span></span>
+<span>  line_width <span class="op">=</span> <span class="cn">NULL</span>,        <span class="co"># Uses theme$line_width if NULL</span></span>
+<span>  line_type <span class="op">=</span> <span class="st">"solid"</span>,      <span class="co"># Line type: "solid", "dashed", "dotted"</span></span>
 <span>  marker_color <span class="op">=</span> <span class="cn">NULL</span>,      <span class="co"># Marker color (defaults to line color)</span></span>
-<span>  marker_size <span class="op">=</span> <span class="fl">3</span>,          <span class="co"># Marker size</span></span>
-<span>  marker_shape <span class="op">=</span> <span class="fl">16</span>,        <span class="co"># Marker shape</span></span>
+<span>  marker_size <span class="op">=</span> <span class="cn">NULL</span>,       <span class="co"># Uses theme$point_size if NULL</span></span>
+<span>  alpha <span class="op">=</span> <span class="cn">NULL</span>,             <span class="co"># Uses theme$alpha if NULL</span></span>
 <span>  show_start_end <span class="op">=</span> <span class="cn">TRUE</span>,    <span class="co"># Highlight start/end points</span></span>
-<span>  start_marker_size <span class="op">=</span> <span class="cn">NULL</span>, <span class="co"># Custom start marker size</span></span>
-<span>  end_marker_size <span class="op">=</span> <span class="cn">NULL</span>,   <span class="co"># Custom end marker size</span></span>
-<span>  alpha <span class="op">=</span> <span class="fl">0.8</span>,              <span class="co"># Overall transparency</span></span>
-<span>  name <span class="op">=</span> <span class="cn">NULL</span>,              <span class="co"># Trace name for legend</span></span>
-<span>  npoints <span class="op">=</span> <span class="cn">NULL</span>,           <span class="co"># Limit number of points shown</span></span>
-<span>  npmax <span class="op">=</span> <span class="cn">NULL</span>              <span class="co"># Alternative point limit</span></span>
+<span>  name <span class="op">=</span> <span class="cn">NULL</span>               <span class="co"># Trace name for legend</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
-<h2 id="setting-defaults-at-initialization">(Setting) Defaults at Initialization<a class="anchor" aria-label="anchor" href="#setting-defaults-at-initialization"></a>
+<h2 id="plot-level-customization">Plot-Level Customization<a class="anchor" aria-label="anchor" href="#plot-level-customization"></a>
 </h2>
+<p>The <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method accepts theme overrides and functional
+parameters:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/as_visualizer.html">as_visualizer</a></span><span class="op">(</span></span>
-<span>  <span class="va">x</span>,                       <span class="co"># Task, Objective, or LossFunction</span></span>
-<span>  <span class="va">...</span>,                     <span class="co"># Type-specific parameters</span></span>
-<span>  default_color_palette <span class="op">=</span> <span class="st">"viridis"</span>,</span>
-<span>  default_text_size <span class="op">=</span> <span class="fl">11</span>,</span>
-<span>  default_theme <span class="op">=</span> <span class="st">"minimal"</span>,</span>
-<span>  default_alpha <span class="op">=</span> <span class="fl">0.8</span>,</span>
-<span>  default_line_width <span class="op">=</span> <span class="fl">1.2</span>,</span>
-<span>  default_point_size <span class="op">=</span> <span class="fl">2</span></span>
+<code class="sourceCode R"><span><span class="va">vis</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span></span>
+<span>  <span class="co"># Theme override (merged with instance theme)</span></span>
+<span>  theme <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    palette <span class="op">=</span> <span class="st">"grayscale"</span>,     <span class="co"># Override palette for this plot</span></span>
+<span>    text_size <span class="op">=</span> <span class="fl">16</span>,            <span class="co"># Override text size</span></span>
+<span>    alpha <span class="op">=</span> <span class="fl">0.5</span>,               <span class="co"># Override default alpha</span></span>
+<span>    theme <span class="op">=</span> <span class="st">"classic"</span>          <span class="co"># Override ggplot2 theme</span></span>
+<span>  <span class="op">)</span>,</span>
+<span></span>
+<span>  show_title <span class="op">=</span> <span class="cn">TRUE</span>,           <span class="co"># Show/hide title</span></span>
+<span>  plot_title <span class="op">=</span> <span class="st">"My Plot"</span>,      <span class="co"># Custom title</span></span>
+<span>  plot_subtitle <span class="op">=</span> <span class="st">"Subtitle"</span>,  <span class="co"># Add subtitle</span></span>
+<span>  x_lab <span class="op">=</span> <span class="st">"X Variable"</span>,        <span class="co"># Custom axis labels</span></span>
+<span>  y_lab <span class="op">=</span> <span class="st">"Y Variable"</span>,</span>
+<span>  z_lab <span class="op">=</span> <span class="st">"Z Variable"</span>,        <span class="co"># For surface plots</span></span>
+<span>  x_limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span>,         <span class="co"># Custom axis limits</span></span>
+<span>  y_limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>,</span>
+<span>  z_limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">100</span><span class="op">)</span>,        <span class="co"># For surface plots</span></span>
+<span>  show_legend <span class="op">=</span> <span class="cn">TRUE</span>,          <span class="co"># Show/hide legend</span></span>
+<span>  legend_title <span class="op">=</span> <span class="st">"Legend"</span>      <span class="co"># Custom legend title</span></span>
 <span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="automatic-color-management">Automatic Color Management<a class="anchor" aria-label="anchor" href="#automatic-color-management"></a>
+</h2>
+<p>All visual elements support automatic color assignment using
+<code>color = "auto"</code>:</p>
+<ul>
+<li>Colors are automatically assigned from the effective theme
+palette</li>
+<li>Each visualizer tracks its color index to ensure distinct colors for
+multiple layers</li>
+<li>The color index resets on each <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> call</li>
+<li>Manual colors override automatic assignment</li>
+</ul>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Example: Multiple traces with auto colors</span></span>
+<span><span class="va">vis</span> <span class="op">=</span> <span class="fu"><a href="../reference/as_visualizer.html">as_visualizer</a></span><span class="op">(</span><span class="fu"><a href="../reference/obj.html">obj</a></span><span class="op">(</span><span class="st">"TF_branin"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"2d"</span><span class="op">)</span></span>
+<span><span class="va">vis</span><span class="op">$</span><span class="fu">set_theme</span><span class="op">(</span><span class="fu"><a href="../reference/vistool_theme.html">vistool_theme</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"plasma"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">vis</span><span class="op">$</span><span class="fu">add_optimization_trace</span><span class="op">(</span><span class="va">optimizer1</span>, line_color <span class="op">=</span> <span class="st">"auto"</span><span class="op">)</span>  <span class="co"># Gets first color</span></span>
+<span><span class="va">vis</span><span class="op">$</span><span class="fu">add_optimization_trace</span><span class="op">(</span><span class="va">optimizer2</span>, line_color <span class="op">=</span> <span class="st">"auto"</span><span class="op">)</span>  <span class="co"># Gets second color</span></span>
+<span><span class="va">vis</span><span class="op">$</span><span class="fu">add_points</span><span class="op">(</span><span class="va">custom_points</span>, color <span class="op">=</span> <span class="st">"auto"</span><span class="op">)</span>               <span class="co"># Gets third color</span></span>
+<span></span>
+<span><span class="co"># Plot and colors will be consistent with plasma palette</span></span>
+<span><span class="va">p</span> <span class="op">=</span> <span class="va">vis</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="example-complete-workflow">Example: Complete Workflow<a class="anchor" aria-label="anchor" href="#example-complete-workflow"></a>
+</h2>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># 1. Create visualizer (computational setup only)</span></span>
+<span><span class="va">task</span> <span class="op">=</span> <span class="fu"><a href="https://mlr3.mlr-org.com/reference/mlr_sugar.html" class="external-link">tsk</a></span><span class="op">(</span><span class="st">"mtcars"</span><span class="op">)</span><span class="op">$</span><span class="fu">select</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"wt"</span>, <span class="st">"hp"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">learner</span> <span class="op">=</span> <span class="fu"><a href="https://mlr3.mlr-org.com/reference/mlr_sugar.html" class="external-link">lrn</a></span><span class="op">(</span><span class="st">"regr.lm"</span><span class="op">)</span></span>
+<span><span class="va">vis</span> <span class="op">=</span> <span class="fu"><a href="../reference/as_visualizer.html">as_visualizer</a></span><span class="op">(</span><span class="va">task</span>, learner <span class="op">=</span> <span class="va">learner</span>, n_points <span class="op">=</span> <span class="fl">50</span>, padding <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 2. Set instance theme</span></span>
+<span><span class="va">vis</span><span class="op">$</span><span class="fu">set_theme</span><span class="op">(</span><span class="fu"><a href="../reference/vistool_theme.html">vistool_theme</a></span><span class="op">(</span></span>
+<span>  palette <span class="op">=</span> <span class="st">"plasma"</span>,</span>
+<span>  text_size <span class="op">=</span> <span class="fl">12</span>,</span>
+<span>  theme <span class="op">=</span> <span class="st">"bw"</span>,</span>
+<span>  alpha <span class="op">=</span> <span class="fl">0.8</span></span>
+<span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 3. Add layers with automatic styling</span></span>
+<span><span class="va">vis</span><span class="op">$</span><span class="fu">add_training_data</span><span class="op">(</span>color <span class="op">=</span> <span class="st">"auto"</span><span class="op">)</span>  <span class="co"># Uses theme palette</span></span>
+<span><span class="va">vis</span><span class="op">$</span><span class="fu">add_boundary</span><span class="op">(</span>color <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span>      <span class="co"># Manual override</span></span>
+<span></span>
+<span><span class="co"># 4. Plot with theme override for this render only</span></span>
+<span><span class="va">vis</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span>theme <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>text_size <span class="op">=</span> <span class="fl">14</span>, legend_position <span class="op">=</span> <span class="st">"top"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="customization_guide_files/figure-html/unnamed-chunk-9-1.png" width="100%" height="700px"></p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="co"># 5. Save uses the cached plot for efficiency</span></span>
+<span><span class="co"># vis$save("my_plot.png", width = 8, height = 6)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="package-level-defaults">Package-Level Defaults<a class="anchor" aria-label="anchor" href="#package-level-defaults"></a>
+</h2>
+<p>Set global defaults that apply to all new visualizers:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Set package default theme</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>vistool.theme <span class="op">=</span> <span class="fu"><a href="../reference/vistool_theme.html">vistool_theme</a></span><span class="op">(</span></span>
+<span>  palette <span class="op">=</span> <span class="st">"plasma"</span>,</span>
+<span>  text_size <span class="op">=</span> <span class="fl">12</span>,</span>
+<span>  theme <span class="op">=</span> <span class="st">"bw"</span></span>
+<span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># All new visualizers will use this theme unless overridden</span></span>
+<span><span class="va">vis1</span> <span class="op">=</span> <span class="fu"><a href="../reference/as_visualizer.html">as_visualizer</a></span><span class="op">(</span><span class="fu"><a href="../reference/obj.html">obj</a></span><span class="op">(</span><span class="st">"TF_branin"</span><span class="op">)</span><span class="op">)</span>  <span class="co"># Uses plasma palette</span></span>
+<span><span class="va">vis2</span> <span class="op">=</span> <span class="fu"><a href="../reference/as_visualizer.html">as_visualizer</a></span><span class="op">(</span><span class="fu"><a href="../reference/obj.html">obj</a></span><span class="op">(</span><span class="st">"TF_gaussian1"</span><span class="op">)</span><span class="op">)</span>  <span class="co"># Also uses plasma palette</span></span>
+<span></span>
+<span><span class="co"># Instance themes still override package defaults</span></span>
+<span><span class="va">vis1</span><span class="op">$</span><span class="fu">set_theme</span><span class="op">(</span><span class="fu"><a href="../reference/vistool_theme.html">vistool_theme</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"grayscale"</span><span class="op">)</span><span class="op">)</span>  <span class="co"># Now uses grayscale</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

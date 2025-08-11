@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="index.html">vistool</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,8 +44,6 @@
 
 <div class="section level2">
 <h2 id="essential-commands">Essential Commands<a class="anchor" aria-label="anchor" href="#essential-commands"></a></h2>
-<div class="section level3">
-<h3 id="package-development-devtools">Package Development (<code>devtools</code>)<a class="anchor" aria-label="anchor" href="#package-development-devtools"></a></h3>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Load package for development</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">load_all</span><span class="op">(</span><span class="op">)</span></span>
@@ -63,55 +61,28 @@
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">test_active_file</span><span class="op">(</span><span class="st">'tests/testthat/test-plot-customization.R'</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Install package locally</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a></h3>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># Generate function documentation from roxygen2 comments</span></span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">document</span>()</span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="co"># Build README.md from README.Rmd</span></span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">build_readme</span>()</span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a></span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co"># Build all vignettes</span></span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">build_vignettes</span>()</span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a></span>
-<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co"># Build a specific vignette</span></span>
-<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>R <span class="sc">-</span>e <span class="st">"devtools::load_all(); rmarkdown::render('vignettes/loss_functions.Rmd')"</span></span>
-<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a></span>
-<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="co"># Build package website</span></span>
-<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a>pkgdown<span class="sc">::</span><span class="fu">build_site</span>()</span>
-<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a></span>
-<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co"># Preview website locally</span></span>
-<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a>pkgdown<span class="sc">::</span><span class="fu">preview_site</span>()</span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="testing">Testing<a class="anchor" aria-label="anchor" href="#testing"></a></h3>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Run all tests</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">test</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Run specific test file</span></span>
-<span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/test_file.html" class="external-link">test_file</a></span><span class="op">(</span><span class="st">"tests/testthat/test-Objective.R"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Test with coverage report</span></span>
-<span><span class="fu">covr</span><span class="fu">::</span><span class="fu">package_coverage</span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Interactive test debugging</span></span>
-<span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/test_file.html" class="external-link">test_file</a></span><span class="op">(</span><span class="st">"tests/testthat/test-Objective.R"</span>, reporter <span class="op">=</span> <span class="st">"tap"</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="building">Building<a class="anchor" aria-label="anchor" href="#building"></a></h3>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Build source tarball</span></span>
+<span><span class="co"># Build source tarball</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">build</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Build binary package</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">build</span><span class="op">(</span>binary <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co"># Generate function documentation from roxygen2 comments</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">document</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Quick build without vignettes</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">build</span><span class="op">(</span>vignettes <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-</div>
+<span><span class="co"># Build README.md from README.Rmd</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">build_readme</span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Build all vignettes</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">build_vignettes</span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Build a specific vignette</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">load_all</span><span class="op">(</span><span class="op">)</span>; <span class="fu">rmarkdown</span><span class="fu">::</span><span class="fu"><a href="https://pkgs.rstudio.com/rmarkdown/reference/render.html" class="external-link">render</a></span><span class="op">(</span><span class="st">'vignettes/loss_functions.Rmd'</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Build package website</span></span>
+<span><span class="fu">pkgdown</span><span class="fu">::</span><span class="fu"><a href="https://pkgdown.r-lib.org/reference/build_site.html" class="external-link">build_site</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Preview website locally</span></span>
+<span><span class="fu">pkgdown</span><span class="fu">::</span><span class="fu"><a href="https://pkgdown.r-lib.org/reference/preview_site.html" class="external-link">preview_site</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="structure">Structure<a class="anchor" aria-label="anchor" href="#structure"></a></h2>
@@ -136,38 +107,104 @@
 </div>
 <div class="section level2">
 <h2 id="core-architecture-visualization">Core Architecture (Visualization)<a class="anchor" aria-label="anchor" href="#core-architecture-visualization"></a></h2>
+<pre><code>Visualizer
+├── VisualizerModel      # Handles both 1D and 2D
+├── VisualizerObj        # Handles both 1D and 2D
+├── VisualizerLossFuns
+└── VisualizerSurface    # plotly-based
+    ├── VisualizerSurfaceModel
+    └── VisualizerSurfaceObj</code></pre>
 <ul><li>
 <strong><code>Visualizer</code></strong>: Base visualization class
 <ul><li>
-<code>Visualizer1D*</code>: 1D plotting with ggplot2</li>
+<code>VisualizerLossFuns</code>: Plotting loss functions with ggplot2</li>
 <li>
-<code>Visualizer2D*</code>: 2D plotting with ggplot2<br></li>
+<code>VisualizerModel</code>: Plotting model predictions with ggplot2</li>
 <li>
-<code>VisualizerSurface*</code>: Interactive surface plotting with plotly for 2D functions</li>
+<code>VisualizerObj</code>: Plotting objective functions with ggplot2</li>
+<li>
+<code>VisualizerSurface*</code>: Interactive surface plotting with plotly for 2D functions <em>only</em>
+</li>
 </ul></li>
 <li>
 <strong><code><a href="reference/as_visualizer.html">as_visualizer()</a></code></strong>: Smart constructor that selects appropriate visualizer</li>
 </ul></div>
+<div class="section level2">
+<h2 id="api-design-principles">API Design Principles<a class="anchor" aria-label="anchor" href="#api-design-principles"></a></h2>
+<div class="section level3">
+<h3 id="constructor-vs-styling-separation">Constructor vs. Styling Separation<a class="anchor" aria-label="anchor" href="#constructor-vs-styling-separation"></a></h3>
+<p><strong>Constructors</strong> (<code><a href="reference/as_visualizer.html">as_visualizer()</a></code>, <code>VisualizerModel$new()</code>, etc.) accept only: - <strong>Domain objects</strong>: tasks, learners, objectives, loss functions - <strong>Computational parameters</strong>: limits, padding, n_points, grids</p>
+<p><strong>Styling</strong> is handled separately via: - <strong>Instance theme</strong>: <code>vis$set_theme(vistool_theme(...))</code> - <strong>Plot theme</strong>: <code>vis$plot(theme = list(...), ...)</code> - <strong>Layer styling</strong>: <code>vis$add_points(color = "red", size = 3)</code></p>
+</div>
+<div class="section level3">
+<h3 id="example-workflow">Example Workflow<a class="anchor" aria-label="anchor" href="#example-workflow"></a></h3>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># 1. Create visualizer (computational setup only)</span></span>
+<span><span class="va">vis</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/as_visualizer.html">as_visualizer</a></span><span class="op">(</span><span class="va">task</span>, learner <span class="op">=</span> <span class="va">learner</span>, n_points <span class="op">=</span> <span class="fl">200</span>, padding <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 2. Set styling preferences</span></span>
+<span><span class="va">vis</span><span class="op">$</span><span class="fu">set_theme</span><span class="op">(</span><span class="fu"><a href="reference/vistool_theme.html">vistool_theme</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"plasma"</span>, text_size <span class="op">=</span> <span class="fl">14</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 3. Add layers with auto colors</span></span>
+<span><span class="va">vis</span><span class="op">$</span><span class="fu">add_training_data</span><span class="op">(</span>color <span class="op">=</span> <span class="st">"auto"</span><span class="op">)</span>  <span class="co"># Uses theme palette</span></span>
+<span><span class="va">vis</span><span class="op">$</span><span class="fu">add_boundary</span><span class="op">(</span>color <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span>        <span class="co"># Explicit override</span></span>
+<span></span>
+<span><span class="co"># 4. Plot with optional theme override</span></span>
+<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="va">vis</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span>theme <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.7</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 5. Save (uses cached plot for efficiency)</span></span>
+<span><span class="va">vis</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span><span class="st">"plot.png"</span><span class="op">)</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="theme-system">Theme System<a class="anchor" aria-label="anchor" href="#theme-system"></a></h2>
+<p>vistool uses a flexible theme system that separates “what to plot” from “how to plot”:</p>
+<div class="section level3">
+<h3 id="theme-hierarchy-precedence">Theme Hierarchy (Precedence)<a class="anchor" aria-label="anchor" href="#theme-hierarchy-precedence"></a></h3>
+<ol style="list-style-type: decimal"><li>
+<strong>Layer-specific style</strong> (highest): <code>add_points(color = "red")</code>
+</li>
+<li>
+<strong>Plot theme override</strong>: <code>plot(theme = list(palette = "plasma"))</code>
+</li>
+<li>
+<strong>Instance theme</strong>: <code>vis$set_theme(vistool_theme(...))</code>
+</li>
+<li>
+<strong>Package default</strong> (lowest): Set via <code>options(vistool.theme = ...)</code>
+</li>
+</ol></div>
+<div class="section level3">
+<h3 id="theme-usage">Theme Usage<a class="anchor" aria-label="anchor" href="#theme-usage"></a></h3>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Set instance theme</span></span>
+<span><span class="va">vis</span><span class="op">$</span><span class="fu">set_theme</span><span class="op">(</span><span class="fu"><a href="reference/vistool_theme.html">vistool_theme</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"plasma"</span>, text_size <span class="op">=</span> <span class="fl">14</span>, alpha <span class="op">=</span> <span class="fl">0.7</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Override theme for single plot</span></span>
+<span><span class="va">vis</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span>theme <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>text_size <span class="op">=</span> <span class="fl">12</span>, theme <span class="op">=</span> <span class="st">"bw"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Layer-specific styling (highest precedence)</span></span>
+<span><span class="va">vis</span><span class="op">$</span><span class="fu">add_points</span><span class="op">(</span><span class="va">data</span>, color <span class="op">=</span> <span class="st">"red"</span>, size <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
+</div>
+</div>
 <div class="section level2">
 <h2 id="deferred-rendering">Deferred Rendering<a class="anchor" aria-label="anchor" href="#deferred-rendering"></a></h2>
 <p>All visualizer classes in vistool follow a standardized <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method structure that leverages the deferred rendering architecture. This ensures consistent behavior, proper color resolution, and maintainable code.</p>
 <div class="section level3">
 <h3 id="standard-pattern">Standard Pattern<a class="anchor" aria-label="anchor" href="#standard-pattern"></a></h3>
 <div class="section level4">
-<h4 id="visualizerr"><code>Visualizer.R</code><a class="anchor" aria-label="anchor" href="#visualizerr"></a></h4>
-<p>The base <code>Visualizer</code> class provides: - <strong>Layer storage</strong>: <code>private$store_layer(type, spec)</code> - <strong>Layer retrieval</strong>: <code>private$get_layers_by_type(type)</code> - <strong>Plot settings</strong>: Stored in <code>private$.plot_settings</code> for color resolution - <strong>Common parameters</strong>: text_size, theme, color_palette, etc.</p>
-<p>CAREFUL: Its <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method is <strong>abstract</strong> and needs to be implemented by <code>Visualizer1D.R</code>, <code>Visualizer2D.R</code>, <code>VisualizerSurface.R</code> (and <code>VisualizerLossFuns</code>)!</p>
+<h4 id="id_1-visualizerr">1. <code>Visualizer.R</code>
+<a class="anchor" aria-label="anchor" href="#id_1-visualizerr"></a></h4>
+<p>The base <code>Visualizer</code> class provides: - <strong>Layer storage</strong>: <code>private$store_layer(type, spec)</code> - <strong>Layer retrieval</strong>: <code>private$get_layers_by_type(type)</code> - <strong>Theme management</strong>: Effective theme resolution in <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method - <strong>Color resolution</strong>: Auto colors resolved using effective theme palette</p>
+<p>CAREFUL: Its <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method needs to be called by all child classes (<code>VisualizerSurface</code>, <code>VisualizerModel</code>, …) to resolve effective theme and prepare rendering.</p>
 </div>
 <div class="section level4">
-<h4 id="id_2-visualizer1dr-visualizer2dr-visualizersurfacer-and-visualizerlossfuns">2. <code>Visualizer1D.R</code>, <code>Visualizer2D.R</code>, <code>VisualizerSurface.R</code> (and <code>VisualizerLossFuns</code>)<a class="anchor" aria-label="anchor" href="#id_2-visualizer1dr-visualizer2dr-visualizersurfacer-and-visualizerlossfuns"></a></h4>
-<p>These implement the abstract <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method from the base <code>Visualizer</code> class and methods specific for that type/dimension (e.g., <code>add_contours()</code> for all <code>VisualizerSurface</code> classes), they inherit from <code>Visualizer</code>.</p>
-</div>
-<div class="section level4">
-<h4 id="id_3-child-class-plot-structure">3. Child Class <code>plot()</code> Structure<a class="anchor" aria-label="anchor" href="#id_3-child-class-plot-structure"></a></h4>
-<p>Every (grand-) child class (e.g., <code>Visualizer1DObj</code>, <code>Visualizer2DModel</code>, <code>VisualizerSurfaceObj</code>) should follow this exact pattern:</p>
+<h4 id="id_2-child-classes">2. Child classes<a class="anchor" aria-label="anchor" href="#id_2-child-classes"></a></h4>
+<p>These extend the <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method from the base <code>Visualizer</code> class and add methods specific for that type (e.g., <code>add_contours()</code> for all <code>VisualizerSurface</code> classes, <code>add_optimization_trace</code> for <code>Visualizer*Obj</code>), they inherit from <code>Visualizer</code> or <code>VisualizerSurface</code>.</p>
+<p><code>VisualizerLossFuns</code>, <code>VisualizerModel</code>, <code>VisualizerObj</code>, <code>VisualizerSurfaceModel</code>, <code>VisualizerSurfaceObj</code> should all follow this pattern:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plot</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="co"># 1. ALWAYS call parent first to set up plot_settings and base plot</span></span>
+<span>  <span class="co"># 1. ALWAYS call parent first to resolve effective theme and setup</span></span>
 <span>  <span class="va">p</span> <span class="op">&lt;-</span> <span class="va">super</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span><span class="va">...</span><span class="op">)</span>  <span class="co"># or just super$plot(...) for plotly classes</span></span>
 <span>  </span>
 <span>  <span class="co"># 2. Render class-specific layers using dedicated private methods</span></span>
@@ -175,7 +212,11 @@
 <span>  <span class="va">private</span><span class="op">$</span><span class="fu">render_layer_type_2</span><span class="op">(</span><span class="op">)</span></span>
 <span>  <span class="co"># ... etc</span></span>
 <span>  </span>
-<span>  <span class="co"># 3. Return the plot object (for ggplot2 classes only)</span></span>
+<span>  <span class="co"># 3. Resolve auto colors using effective theme</span></span>
+<span>  <span class="va">self</span><span class="op">$</span><span class="fu">resolve_layer_colors</span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="co"># 4. Cache and return the plot object (for ggplot2 classes only)</span></span>
+<span>  <span class="va">private</span><span class="op">$</span><span class="va">.last_plot</span> <span class="op">=</span> <span class="va">p</span>  <span class="co"># Cache for save() method</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span>  <span class="co"># omit for plotly classes that modify private$.plot</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 </div>
@@ -185,13 +226,28 @@
 <div class="section level4">
 <h4 id="ggplot2-based-classes-1d-2d">ggplot2-based Classes (1D, 2D)<a class="anchor" aria-label="anchor" href="#ggplot2-based-classes-1d-2d"></a></h4>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Good Example: Visualizer2DObj</span></span>
-<span><span class="va">plot</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="co"># Call parent to get base plot and set plot_settings</span></span>
+<code class="sourceCode R"><span><span class="va">plot</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="co"># Call parent to resolve effective theme and prepare rendering</span></span>
 <span>  <span class="va">p</span> <span class="op">&lt;-</span> <span class="va">super</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span>  </span>
-<span>  <span class="co"># Render stored layers</span></span>
-<span>  <span class="va">private</span><span class="op">$</span><span class="fu">render_optimization_trace_layers</span><span class="op">(</span><span class="va">p</span><span class="op">)</span></span>
+<span>  <span class="co"># render layers in the order they were added</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">private</span><span class="op">$</span><span class="va">.layers_to_add</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="kw">for</span> <span class="op">(</span><span class="va">layer</span> <span class="kw">in</span> <span class="va">private</span><span class="op">$</span><span class="va">.layers_to_add</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="kw">if</span> <span class="op">(</span><span class="va">layer</span><span class="op">$</span><span class="va">type</span> <span class="op">==</span> <span class="st">"optimization_trace"</span><span class="op">)</span> <span class="op">{</span></span>
+<span>        <span class="va">p</span> <span class="op">=</span> <span class="va">private</span><span class="op">$</span><span class="fu">render_optimization_trace_layer</span><span class="op">(</span><span class="va">p</span>, <span class="va">layer</span><span class="op">$</span><span class="va">spec</span><span class="op">)</span></span>
+<span>      <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">layer</span><span class="op">$</span><span class="va">type</span> <span class="op">==</span> <span class="st">"layer_type_2"</span><span class="op">)</span> <span class="op">{</span></span>
+<span>        <span class="co"># render layer_type_2</span></span>
+<span>      <span class="op">}</span></span>
+<span>      <span class="co"># ... handle other layer types</span></span>
+<span>    <span class="op">}</span></span>
+<span>  <span class="op">}</span></span>
+<span>  </span>
+<span>  <span class="co"># Resolve auto colors using effective theme</span></span>
+<span>  <span class="va">self</span><span class="op">$</span><span class="fu">resolve_layer_colors</span><span class="op">(</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="co"># Cache and return plot</span></span>
+<span>  <span class="va">private</span><span class="op">$</span><span class="va">.last_plot</span> <span class="op">=</span> <span class="va">p</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="va">private</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
@@ -215,7 +271,7 @@
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Good Example: VisualizerSurfaceObj  </span></span>
 <span><span class="va">plot</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="co"># Call parent to set up plot_settings and resolve colors</span></span>
+<span>  <span class="co"># Call parent to resolve effective theme</span></span>
 <span>  <span class="va">super</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span>  </span>
 <span>  <span class="co"># Render stored layers (modifies private$.plot directly)</span></span>
@@ -223,6 +279,11 @@
 <span>  <span class="va">private</span><span class="op">$</span><span class="fu">render_taylor_layers</span><span class="op">(</span><span class="op">)</span></span>
 <span>  <span class="va">private</span><span class="op">$</span><span class="fu">render_hessian_layers</span><span class="op">(</span><span class="op">)</span></span>
 <span>  </span>
+<span>  <span class="co"># Resolve auto colors using effective theme</span></span>
+<span>  <span class="va">self</span><span class="op">$</span><span class="fu">resolve_layer_colors</span><span class="op">(</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="co"># Cache and return plot</span></span>
+<span>  <span class="va">private</span><span class="op">$</span><span class="va">.last_plot</span> <span class="op">=</span> <span class="va">private</span><span class="op">$</span><span class="va">.plot</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">private</span><span class="op">$</span><span class="va">.plot</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
@@ -230,6 +291,7 @@
 <span>  render_optimization_trace_layers <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="va">trace_layers</span> <span class="op">&lt;-</span> <span class="va">private</span><span class="op">$</span><span class="fu">get_layers_by_type</span><span class="op">(</span><span class="st">"optimization_trace"</span><span class="op">)</span></span>
 <span>    <span class="co"># ... process layers, modify private$.plot directly</span></span>
+<span>    <span class="co"># Colors are resolved using private$.effective_theme$palette</span></span>
 <span>  <span class="op">}</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -289,7 +351,7 @@
 <div class="section level2">
 <h2 id="guidelines">Guidelines<a class="anchor" aria-label="anchor" href="#guidelines"></a></h2>
 <div class="section level3">
-<h3 id="testing-1">Testing<a class="anchor" aria-label="anchor" href="#testing-1"></a></h3>
+<h3 id="testing">Testing<a class="anchor" aria-label="anchor" href="#testing"></a></h3>
 <ul><li>Each R file should have corresponding test file</li>
 <li>Use descriptive test names: <code>test_that("objective evaluation works", ...)</code>
 </li>

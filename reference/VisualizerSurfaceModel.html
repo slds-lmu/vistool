@@ -9,7 +9,7 @@ for 2D input data using plotly."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">vistool</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -79,8 +79,10 @@ Learner used to train the model.</p></dd>
 <li><p><a href="#method-VisualizerSurfaceModel-plot"><code>VisualizerSurfaceModel$plot()</code></a></p></li>
 <li><p><a href="#method-VisualizerSurfaceModel-clone"><code>VisualizerSurfaceModel$clone()</code></a></p></li>
 </ul></div><p><details><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="add_points"><a href="Visualizer.html#method-add_points"><code>vistool::Visualizer$add_points()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="initialize_defaults"><a href="Visualizer.html#method-initialize_defaults"><code>vistool::Visualizer$initialize_defaults()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="resolve_layer_colors"><a href="Visualizer.html#method-resolve_layer_colors"><code>vistool::Visualizer$resolve_layer_colors()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href="Visualizer.html#method-save"><code>vistool::Visualizer$save()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="set_theme"><a href="Visualizer.html#method-set_theme"><code>vistool::Visualizer$set_theme()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="theme"><a href="Visualizer.html#method-theme"><code>vistool::Visualizer$theme()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="add_contours"><a href="VisualizerSurface.html#method-add_contours"><code>vistool::VisualizerSurface$add_contours()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="init_layer_contour"><a href="VisualizerSurface.html#method-init_layer_contour"><code>vistool::VisualizerSurface$init_layer_contour()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="init_layer_surface"><a href="VisualizerSurface.html#method-init_layer_surface"><code>vistool::VisualizerSurface$init_layer_surface()</code></a></span></li>
@@ -96,10 +98,7 @@ Learner used to train the model.</p></dd>
 <span>  x1_limits <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  x2_limits <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  padding <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  n_points <span class="op">=</span> <span class="fl">100L</span>,</span>
-<span>  opacity <span class="op">=</span> <span class="fl">0.8</span>,</span>
-<span>  colorscale <span class="op">=</span> <span class="st">"auto"</span>,</span>
-<span>  show_title <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  n_points <span class="op">=</span> <span class="fl">100L</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -159,31 +158,6 @@ The number of generated point per dimension.
 Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.</p></dd>
 
 
-<dt><code>opacity</code></dt>
-<dd><p>(`numeric(1)`)<br>
-Opacity of the layer.</p></dd>
-
-
-<dt><code>opacity</code></dt>
-<dd><p>(`numeric(1)`)<br>
-Opacity of the layer.</p></dd>
-
-
-<dt><code>colorscale</code></dt>
-<dd><p>(`list()`)<br>
-The coloring of the surface/contour.</p></dd>
-
-
-<dt><code>colorscale</code></dt>
-<dd><p>(`list()`)<br>
-The coloring of the surface/contour.</p></dd>
-
-
-<dt><code>show_title</code></dt>
-<dd><p>(`logical(1)`)<br>
-Indicator whether to show the title of the plot.</p></dd>
-
-
 </dl><p></p></div>
 </div>
 
@@ -191,19 +165,35 @@ Indicator whether to show the title of the plot.</p></dd>
 <h3 id="method-add-training-data-">Method <code>add_training_data()</code><a class="anchor" aria-label="anchor" href="#method-add-training-data-"></a></h3>
 <p>Adds the training data to the plot.</p><div class="section">
 <h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">VisualizerSurfaceModel</span><span class="op">$</span><span class="fu">add_training_data</span><span class="op">(</span>size <span class="op">=</span> <span class="fl">5</span>, color <span class="op">=</span> <span class="st">"grey"</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">VisualizerSurfaceModel</span><span class="op">$</span><span class="fu">add_training_data</span><span class="op">(</span></span>
+<span>  size <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  color <span class="op">=</span> <span class="st">"auto"</span>,</span>
+<span>  shape <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
 <h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>size</code></dt>
 <dd><p>(`numeric(1)`)<br>
-Size of the points.</p></dd>
+Size of the points. If NULL, uses theme$point_size. Default is NULL.</p></dd>
 
 
 <dt><code>color</code></dt>
-<dd><p>(`character(1)`)<br>
-Color of the points.</p></dd>
+<dd><p>(`character(1)` or named `character`)<br>
+Color of the points. For classification tasks:
+- `character(1)`: A single color for all points (e.g., `"blue"`) or `"auto"` for automatic color assignment.
+- `named character`: A vector mapping class labels to colors (e.g., `c(pos = "red", neg = "blue")`).
+For regression tasks, only single colors are supported. Default is `"auto"`.</p></dd>
+
+
+<dt><code>shape</code></dt>
+<dd><p>(`numeric(1)` or named `numeric`)<br>
+Shape/symbol of the points. For classification tasks:
+- `numeric(1)`: A single symbol for all points (e.g., `0` for circle).
+- `named numeric`: A vector mapping class labels to symbols (e.g., `c(pos = 0, neg = 1)`).
+For regression tasks, only single symbols are supported. Default is 0 (circle).</p></dd>
 
 
 <dt><code>...</code></dt>

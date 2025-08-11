@@ -9,7 +9,7 @@ and saving plots across different plotting backends (ggplot2 for 1D/2D, plotly f
 
     <a class="navbar-brand me-2" href="../index.html">vistool</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -50,84 +50,53 @@ and saving plots across different plotting backends (ggplot2 for 1D/2D, plotly f
 
 
     <div class="section level2">
-    <h2 id="public-fields">Public fields<a class="anchor" aria-label="anchor" href="#public-fields"></a></h2>
-    <p></p><div class="r6-fields"><dl><dt><code>defaults</code></dt>
-<dd><p>(`list`)<br>
-Default settings for plotting and visual elements.</p></dd>
-
-
-</dl><p></p></div>
-    </div>
-    <div class="section level2">
     <h2 id="methods">Methods<a class="anchor" aria-label="anchor" href="#methods"></a></h2>
 
 <div class="section">
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
 
-<ul><li><p><a href="#method-Visualizer-initialize_defaults"><code>Visualizer$initialize_defaults()</code></a></p></li>
+<ul><li><p><a href="#method-Visualizer-set_theme"><code>Visualizer$set_theme()</code></a></p></li>
+<li><p><a href="#method-Visualizer-theme"><code>Visualizer$theme()</code></a></p></li>
 <li><p><a href="#method-Visualizer-plot"><code>Visualizer$plot()</code></a></p></li>
+<li><p><a href="#method-Visualizer-resolve_layer_colors"><code>Visualizer$resolve_layer_colors()</code></a></p></li>
 <li><p><a href="#method-Visualizer-save"><code>Visualizer$save()</code></a></p></li>
 <li><p><a href="#method-Visualizer-add_points"><code>Visualizer$add_points()</code></a></p></li>
 <li><p><a href="#method-Visualizer-clone"><code>Visualizer$clone()</code></a></p></li>
-</ul></div><p></p><hr><a id="method-Visualizer-initialize_defaults"></a><div class="section">
-<h3 id="method-initialize-defaults-">Method <code>initialize_defaults()</code><a class="anchor" aria-label="anchor" href="#method-initialize-defaults-"></a></h3>
-<p>Initialize default settings for the visualizer.</p><div class="section">
+</ul></div><p></p><hr><a id="method-Visualizer-set_theme"></a><div class="section">
+<h3 id="method-set-theme-">Method <code>set_theme()</code><a class="anchor" aria-label="anchor" href="#method-set-theme-"></a></h3>
+<p>Set the instance theme (partial override stored separately)</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Visualizer</span><span class="op">$</span><span class="fu">initialize_defaults</span><span class="op">(</span></span>
-<span>  default_color_palette <span class="op">=</span> <span class="st">"viridis"</span>,</span>
-<span>  default_text_size <span class="op">=</span> <span class="fl">11</span>,</span>
-<span>  default_theme <span class="op">=</span> <span class="st">"minimal"</span>,</span>
-<span>  default_alpha <span class="op">=</span> <span class="fl">0.8</span>,</span>
-<span>  default_line_width <span class="op">=</span> <span class="fl">1.2</span>,</span>
-<span>  default_point_size <span class="op">=</span> <span class="fl">2</span></span>
-<span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Visualizer</span><span class="op">$</span><span class="fu">set_theme</span><span class="op">(</span><span class="va">theme</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
 <h4 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>default_color_palette</code></dt>
-<dd><p>(`character(1)`)<br>
-Default color palette. Default is "viridis".</p></dd>
-
-
-<dt><code>default_text_size</code></dt>
-<dd><p>(`numeric(1)`)<br>
-Default text size. Default is 11.</p></dd>
-
-
-<dt><code>default_theme</code></dt>
-<dd><p>(`character(1)`)<br>
-Default theme. Default is "minimal".</p></dd>
-
-
-<dt><code>default_alpha</code></dt>
-<dd><p>(`numeric(1)`)<br>
-Default alpha transparency. Default is 0.8.</p></dd>
-
-
-<dt><code>default_line_width</code></dt>
-<dd><p>(`numeric(1)`)<br>
-Default line width. Default is 1.2.</p></dd>
-
-
-<dt><code>default_point_size</code></dt>
-<dd><p>(`numeric(1)`)<br>
-Default point size. Default is 2.</p></dd>
+<p></p><div class="arguments"><dl><dt><code>theme</code></dt>
+<dd><p>(`list`) Partial theme created with vistool_theme() or a named list</p></dd>
 
 
 </dl><p></p></div>
 </div>
+<div class="section">
+<h4 id="returns">Returns<a class="anchor" aria-label="anchor" href="#returns"></a></h4>
+<p>Invisible self</p>
+</div>
+
+</div><p></p><hr><a id="method-Visualizer-theme"></a><div class="section">
+<h3 id="method-theme-">Method <code>theme()</code><a class="anchor" aria-label="anchor" href="#method-theme-"></a></h3>
+<p>Get the instance theme (merged with current package default)</p><div class="section">
+<h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Visualizer</span><span class="op">$</span><span class="fu">theme</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
 
 </div><p></p><hr><a id="method-Visualizer-plot"></a><div class="section">
 <h3 id="method-plot-">Method <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code><a class="anchor" aria-label="anchor" href="#method-plot-"></a></h3>
-<p>Abstract method to be implemented by subclasses.</p><div class="section">
-<h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
+<p>Base plot method that sets up common plot settings and resolves layer colors.
+This method should be called by all child classes via `super$plot(...)`.</p><div class="section">
+<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Visualizer</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span></span>
-<span>  text_size <span class="op">=</span> <span class="fl">11</span>,</span>
-<span>  title_size <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  theme <span class="op">=</span> <span class="st">"minimal"</span>,</span>
-<span>  background <span class="op">=</span> <span class="st">"white"</span>,</span>
-<span>  color_palette <span class="op">=</span> <span class="st">"viridis"</span>,</span>
+<span>  theme <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  plot_title <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  plot_subtitle <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  x_lab <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -136,10 +105,7 @@ Default point size. Default is 2.</p></dd>
 <span>  x_limits <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  y_limits <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  z_limits <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  show_grid <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  grid_color <span class="op">=</span> <span class="st">"gray90"</span>,</span>
 <span>  show_legend <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  legend_position <span class="op">=</span> <span class="st">"right"</span>,</span>
 <span>  legend_title <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  show_title <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
@@ -147,29 +113,9 @@ Default point size. Default is 2.</p></dd>
 
 <div class="section">
 <h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>text_size</code></dt>
-<dd><p>(`numeric(1)`)<br>
-Base text size for plot elements. Default is 11.</p></dd>
-
-
-<dt><code>title_size</code></dt>
-<dd><p>(`numeric(1)`)<br>
-Title text size. If NULL, defaults to text_size + 2.</p></dd>
-
-
-<dt><code>theme</code></dt>
-<dd><p>(`character(1)`)<br>
-ggplot2 theme to use. One of "minimal", "bw", "classic", "gray", "light", "dark", "void". Default is "minimal".</p></dd>
-
-
-<dt><code>background</code></dt>
-<dd><p>(`character(1)`)<br>
-Background color for the plot. Default is "white".</p></dd>
-
-
-<dt><code>color_palette</code></dt>
-<dd><p>(`character(1)`)<br>
-Default color palette to use. One of "viridis", "plasma", "grayscale". Default is "viridis".</p></dd>
+<p></p><div class="arguments"><dl><dt><code>theme</code></dt>
+<dd><p>(`list`)<br>
+Partial theme override for this render; see vistool_theme().</p></dd>
 
 
 <dt><code>plot_title</code></dt>
@@ -212,24 +158,9 @@ Y-axis limits as c(min, max). If NULL, uses automatic limits. Default is NULL.</
 Z-axis limits as c(min, max) (for surface plots). If NULL, uses automatic limits. Default is NULL.</p></dd>
 
 
-<dt><code>show_grid</code></dt>
-<dd><p>(`logical(1)`)<br>
-Whether to show axis grid lines. Default is TRUE.</p></dd>
-
-
-<dt><code>grid_color</code></dt>
-<dd><p>(`character(1)`)<br>
-Color of grid lines. Default is "gray90".</p></dd>
-
-
 <dt><code>show_legend</code></dt>
 <dd><p>(`logical(1)`)<br>
 Whether to show the legend. Default is TRUE.</p></dd>
-
-
-<dt><code>legend_position</code></dt>
-<dd><p>(`character(1)`)<br>
-Position of the legend. One of "top", "right", "bottom", "left", "none". Default is "right".</p></dd>
 
 
 <dt><code>legend_title</code></dt>
@@ -245,14 +176,23 @@ Indicator whether to show the title of the plot.</p></dd>
 </dl><p></p></div>
 </div>
 <div class="section">
-<h4 id="returns">Returns<a class="anchor" aria-label="anchor" href="#returns"></a></h4>
-<p>The plot object.</p>
+<h4 id="returns-1">Returns<a class="anchor" aria-label="anchor" href="#returns-1"></a></h4>
+<p>Invisible self for method chaining (child classes handle actual plot creation).</p>
 </div>
+
+</div><p></p><hr><a id="method-Visualizer-resolve_layer_colors"></a><div class="section">
+<h3 id="method-resolve-layer-colors-">Method <code>resolve_layer_colors()</code><a class="anchor" aria-label="anchor" href="#method-resolve-layer-colors-"></a></h3>
+<p>Resolve automatic color assignments in stored layers.
+This method should be called by child classes after rendering layers.</p><div class="section">
+<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Visualizer</span><span class="op">$</span><span class="fu">resolve_layer_colors</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
 
 </div><p></p><hr><a id="method-Visualizer-save"></a><div class="section">
 <h3 id="method-save-">Method <code><a href="https://rdrr.io/r/base/save.html" class="external-link">save()</a></code><a class="anchor" aria-label="anchor" href="#method-save-"></a></h3>
 <p>Save the plot to a file. The format is determined by the file extension.</p><div class="section">
-<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
+<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Visualizer</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span><span class="va">filename</span>, width <span class="op">=</span> <span class="cn">NULL</span>, height <span class="op">=</span> <span class="cn">NULL</span>, dpi <span class="op">=</span> <span class="fl">300</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -288,19 +228,18 @@ Resolution for ggplot2 plots (ignored for plotly plots).</p></dd>
 </div><p></p><hr><a id="method-Visualizer-add_points"></a><div class="section">
 <h3 id="method-add-points-">Method <code>add_points()</code><a class="anchor" aria-label="anchor" href="#method-add-points-"></a></h3>
 <p>Add points to the plot. This method can be called multiple times to add different sets of points.</p><div class="section">
-<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
+<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Visualizer</span><span class="op">$</span><span class="fu">add_points</span><span class="op">(</span></span>
 <span>  <span class="va">points</span>,</span>
 <span>  color <span class="op">=</span> <span class="st">"auto"</span>,</span>
-<span>  size <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  size <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  shape <span class="op">=</span> <span class="fl">19</span>,</span>
-<span>  alpha <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  alpha <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  annotations <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  annotation_size <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  ordered <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  arrow_color <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  arrow_size <span class="op">=</span> <span class="fl">0.3</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  arrow_size <span class="op">=</span> <span class="fl">0.3</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -320,7 +259,7 @@ Color of the points. Use "auto" for automatic color assignment from palette. Def
 
 <dt><code>size</code></dt>
 <dd><p>(`numeric(1)`)<br>
-Size of the points. Default is 2.</p></dd>
+Size of the points. If NULL, uses theme$point_size. Default is NULL.</p></dd>
 
 
 <dt><code>shape</code></dt>
@@ -330,7 +269,7 @@ Shape of the points. For ggplot2: integer codes (e.g., 19 for solid circle). For
 
 <dt><code>alpha</code></dt>
 <dd><p>(`numeric(1)`)<br>
-Alpha transparency of the points. Default is 1.</p></dd>
+Alpha transparency of the points. If NULL, uses theme$alpha. Default is NULL.</p></dd>
 
 
 <dt><code>annotations</code></dt>
@@ -358,17 +297,13 @@ Color of arrows when ordered = TRUE. If NULL, uses point color.</p></dd>
 Length/size of arrows when `ordered = TRUE`. Default is 0.3 units in the coordinate system.</p></dd>
 
 
-<dt><code>...</code></dt>
-<dd><p>Additional arguments passed to the plotting layers.</p></dd>
-
-
 </dl><p></p></div>
 </div>
 
 </div><p></p><hr><a id="method-Visualizer-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
+<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Visualizer</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 

@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">vistool</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -70,7 +70,10 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://slds-lmu.github.io/vistool/">vistool</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://slds-lmu.github.io/vistool/">vistool</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>vistool.theme <span class="op">=</span> <span class="fu"><a href="../reference/vistool_theme.html">vistool_theme</a></span><span class="op">(</span></span>
+<span>  palette <span class="op">=</span> <span class="st">"plasma"</span></span>
+<span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Loss functions are wrapped in <code>LossFunction</code> objects. The
 package includes predefined loss functions for both regression and
 classification tasks. Classification loss functions can work with
@@ -133,7 +136,7 @@ points for smooth curves.</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">loss_huber</span>, <span class="va">loss_l2</span>, <span class="va">loss_l1</span>, <span class="va">loss_logcosh</span><span class="op">)</span>,</span>
 <span>  y_pred <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">4</span>, <span class="fl">4</span><span class="op">)</span>,</span>
 <span>  y_true <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  n_points <span class="op">=</span> <span class="fl">5000L</span>  <span class="co"># higher resolution for smooth curves</span></span>
+<span>  n_points <span class="op">=</span> <span class="fl">5000L</span> <span class="co"># higher resolution for smooth curves</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">vis_combined</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="loss_functions_files/figure-html/unnamed-chunk-7-1.png" width="100%"></p>
@@ -192,10 +195,9 @@ parameter:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">vis_y1</span> <span class="op">=</span> <span class="fu"><a href="../reference/as_visualizer.html">as_visualizer</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">crossentropy_loss</span>, <span class="va">brier_loss</span><span class="op">)</span>,</span>
-<span>  input_type <span class="op">=</span> <span class="st">"probability"</span>,</span>
-<span>  y_curves <span class="op">=</span> <span class="st">"y1"</span>  <span class="co"># Only show y = 1 curve</span></span>
+<span>  input_type <span class="op">=</span> <span class="st">"probability"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">vis_y1</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">vis_y1</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span>y_curves <span class="op">=</span> <span class="st">"y1"</span><span class="op">)</span> <span class="co"># Only show y = 1 curve</span></span></code></pre></div>
 <p><img src="loss_functions_files/figure-html/unnamed-chunk-10-1.png" width="100%"></p>
 </div>
 </div>
@@ -218,14 +220,14 @@ x-coordinates.</p>
 <span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>, <span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>,</span>
 <span>  loss_id <span class="op">=</span> <span class="st">"l2"</span>,</span>
 <span>  show_line <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  color <span class="op">=</span> <span class="st">"red"</span>,</span>
+<span>  color <span class="op">=</span> <span class="st">"blue"</span>,</span>
 <span>  size <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>  alpha <span class="op">=</span> <span class="fl">0.8</span></span>
 <span><span class="op">)</span><span class="op">$</span><span class="fu">add_points</span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span>,</span>
-<span>  loss_id <span class="op">=</span> <span class="st">"l1"</span>,  <span class="co"># Specify the L1 loss</span></span>
+<span>  loss_id <span class="op">=</span> <span class="st">"l1"</span>, <span class="co"># Specify the L1 loss</span></span>
 <span>  show_line <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  color <span class="op">=</span> <span class="st">"blue"</span>,</span>
+<span>  color <span class="op">=</span> <span class="st">"#febf01"</span>,</span>
 <span>  size <span class="op">=</span> <span class="fl">2.5</span>,</span>
 <span>  alpha <span class="op">=</span> <span class="fl">0.7</span></span>
 <span><span class="op">)</span></span>

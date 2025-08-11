@@ -9,7 +9,7 @@ for 2D objectives using plotly."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">vistool</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -76,8 +76,10 @@ The objective function.</p></dd>
 <li><p><a href="#method-VisualizerSurfaceObj-animate"><code>VisualizerSurfaceObj$animate()</code></a></p></li>
 <li><p><a href="#method-VisualizerSurfaceObj-clone"><code>VisualizerSurfaceObj$clone()</code></a></p></li>
 </ul></div><p><details><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="add_points"><a href="Visualizer.html#method-add_points"><code>vistool::Visualizer$add_points()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="initialize_defaults"><a href="Visualizer.html#method-initialize_defaults"><code>vistool::Visualizer$initialize_defaults()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="resolve_layer_colors"><a href="Visualizer.html#method-resolve_layer_colors"><code>vistool::Visualizer$resolve_layer_colors()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href="Visualizer.html#method-save"><code>vistool::Visualizer$save()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="set_theme"><a href="Visualizer.html#method-set_theme"><code>vistool::Visualizer$set_theme()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="theme"><a href="Visualizer.html#method-theme"><code>vistool::Visualizer$theme()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="add_contours"><a href="VisualizerSurface.html#method-add_contours"><code>vistool::VisualizerSurface$add_contours()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="init_layer_contour"><a href="VisualizerSurface.html#method-init_layer_contour"><code>vistool::VisualizerSurface$init_layer_contour()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="VisualizerSurface" data-id="init_layer_surface"><a href="VisualizerSurface.html#method-init_layer_surface"><code>vistool::VisualizerSurface$init_layer_surface()</code></a></span></li>
@@ -92,10 +94,7 @@ The objective function.</p></dd>
 <span>  x1_limits <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  x2_limits <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  padding <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  n_points <span class="op">=</span> <span class="fl">100L</span>,</span>
-<span>  opacity <span class="op">=</span> <span class="fl">0.8</span>,</span>
-<span>  colorscale <span class="op">=</span> <span class="st">"auto"</span>,</span>
-<span>  show_title <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  n_points <span class="op">=</span> <span class="fl">100L</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -148,31 +147,6 @@ Note that a grid of `npoints^2` values is generated and evaluated by `objective$
 <dd><p>(`integer(1)`)<br>
 The number of generated point per dimension.
 Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.</p></dd>
-
-
-<dt><code>opacity</code></dt>
-<dd><p>(`numeric(1)`)<br>
-Opacity of the layer.</p></dd>
-
-
-<dt><code>opacity</code></dt>
-<dd><p>(`numeric(1)`)<br>
-Opacity of the layer.</p></dd>
-
-
-<dt><code>colorscale</code></dt>
-<dd><p>(`list()`)<br>
-The coloring of the surface/contour.</p></dd>
-
-
-<dt><code>colorscale</code></dt>
-<dd><p>(`list()`)<br>
-The coloring of the surface/contour.</p></dd>
-
-
-<dt><code>show_title</code></dt>
-<dd><p>(`logical(1)`)<br>
-Indicator whether to show the title of the plot.</p></dd>
 
 
 </dl><p></p></div>
