@@ -1,4 +1,7 @@
 
+# vistool 0.4.0
+* Added option to specify hypotheses as an alternative to learners for plotting model predictions.
+
 # vistool 0.3.2
 
 * Added options to specify color and shape for training data of classification tasks.
