@@ -60,7 +60,9 @@ Creates a new instance of this [R6][R6::R6Class] class.
   x1_limits = NULL,
   x2_limits = NULL,
   padding = 0,
-  n_points = 100L
+  n_points = 100L,
+  hypothesis = NULL,
+  domain = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -96,6 +98,14 @@ Note that a grid of `npoints^2` values is generated and evaluated by `objective$
 \item{\code{n_points}}{(`integer(1)`)\cr
 The number of generated point per dimension.
 Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
+
+\item{\code{hypothesis}}{(`Hypothesis`|`NULL`)
+Optional hypothesis object that provides predictions instead of a learner.
+Supply either `learner` or `hypothesis`, but not both.}
+
+\item{\code{domain}}{(`list`|`NULL`)
+Named list giving axis limits per predictor when no Task data is available,
+e.g., `list(x = c(-1, 1))` for 1D or `list(x = c(-1,1), y = c(-1,1))` for 2D.}
 }
 \if{html}{\out{</div>}}
 }

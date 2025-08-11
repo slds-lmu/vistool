@@ -9,6 +9,8 @@
 #' @template param_x2_limits
 #' @template param_padding
 #' @template param_n_points
+#' @template param_hypothesis
+#' @template param_domain
 #'
 #' @export
 VisualizerModel = R6::R6Class("VisualizerModel",
@@ -38,17 +40,21 @@ VisualizerModel = R6::R6Class("VisualizerModel",
     #' @template param_padding
     #' @template param_n_points
     initialize = function(task, learner, x1_limits = NULL, x2_limits = NULL,
-                          padding = 0, n_points = 100L) {
+                          padding = 0, n_points = 100L, hypothesis = NULL, domain = NULL) {
       # Validate inputs
-      self$task = mlr3::assert_task(task)
-      self$learner = mlr3::assert_learner(learner, task = self$task)
+      if (!is.null(learner) && !is.null(hypothesis)) stop("Provide only one of learner or hypothesis")
+      if (!is.null(task)) self$task = mlr3::assert_task(task)
+      if (!is.null(learner)) self$learner = mlr3::assert_learner(learner, task = self$task)
+      if (!is.null(hypothesis)) assertHypothesis(hypothesis)
+      private$.hypothesis = hypothesis
+      private$.domain = domain
       checkmate::assert_numeric(x1_limits, len = 2, null.ok = TRUE)
       checkmate::assert_numeric(x2_limits, len = 2, null.ok = TRUE)
       checkmate::assert_number(padding, lower = 0)
       checkmate::assert_count(n_points)
 
       # Determine dimensionality
-      n_features = length(task$feature_names)
+      n_features = if (!is.null(self$task)) length(self$task$feature_names) else hypothesis$input_dim
       private$.dimensionality = if (n_features == 1) {
         "1d"
       } else if (n_features == 2) {
@@ -58,7 +64,7 @@ VisualizerModel = R6::R6Class("VisualizerModel",
       }
 
       # Train the learner
-      self$learner$train(task)
+      if (!is.null(self$learner)) self$learner$train(self$task)
 
       # Initialize appropriate data structure
       if (private$.dimensionality == "1d") {
@@ -103,6 +109,11 @@ VisualizerModel = R6::R6Class("VisualizerModel",
       checkmate::assert_number(alpha, lower = 0, upper = 1, null.ok = TRUE)
       checkmate::assert_flag(show_labels)
       checkmate::assert_number(label_size, lower = 0, null.ok = TRUE)
+
+      # Training data can only be added when a Task is available
+      if (is.null(self$task)) {
+        stop("Training data not available without a Task")
+      }
 
       # Get training data in dimension-appropriate format
       training_data = private$get_training_data()
@@ -149,7 +160,9 @@ VisualizerModel = R6::R6Class("VisualizerModel",
 
       # Determine default values based on dimensionality and prediction type
       if (is.null(values)) {
-        if (self$learner$predict_type == "prob") {
+        if (!is.null(self$learner) && self$learner$predict_type == "prob") {
+          values = 0.5
+        } else if (!is.null(private$.hypothesis) && private$.hypothesis$type == "classif") {
           values = 0.5
         } else {
           # For regression or response predictions, use median of predictions
@@ -201,6 +214,8 @@ VisualizerModel = R6::R6Class("VisualizerModel",
     .dimensionality = NULL, # "1d" or "2d"
     .data_structure = NULL, # Unified data container
     .plot = NULL, # The actual ggplot2 object
+    .hypothesis = NULL,
+    .domain = NULL,
 
     # Render all stored layers in the order they were added
     render_all_layers = function() {
@@ -244,7 +259,7 @@ VisualizerModel = R6::R6Class("VisualizerModel",
     render_training_data_layer = function(layer_spec) {
       training_data = layer_spec$data
       style = layer_spec$style
-      is_classification = self$task$task_type == "classif"
+      is_classification = (!is.null(self$task) && self$task$task_type == "classif") || (!is.null(private$.hypothesis) && private$.hypothesis$type == "classif")
 
       # Resolve style defaults from effective theme
       eff = private$.effective_theme
@@ -428,12 +443,25 @@ VisualizerModel = R6::R6Class("VisualizerModel",
     # Initialize data structure for 1D tasks
     initialize_1d_data = function(x1_limits, n_points) {
       # Get feature and target information
-      feature_name = self$task$feature_names[1]
-      target_name = self$task$target_names
+      if (!is.null(self$task)) {
+        feature_name = self$task$feature_names[1]
+        target_name = self$task$target_names
+      } else {
+        feature_name = private$.hypothesis$predictors[1]
+        target_name = if (private$.hypothesis$type == "regr") "y" else "p"
+      }
 
       # Determine x limits
       if (is.null(x1_limits)) {
-        x1_limits = range(self$task$data()[[feature_name]])
+        if (!is.null(self$task)) {
+          x1_limits = range(self$task$data()[[feature_name]])
+        } else if (!is.null(private$.domain)) {
+          x1_limits = private$.domain[[feature_name]]
+        } else if (!is.null(private$.hypothesis$domain)) {
+          x1_limits = private$.hypothesis$domain[[feature_name]]
+        } else {
+          stop("x1_limits or domain must be provided for hypothesis-only visualization")
+        }
       }
 
       # Generate prediction grid
@@ -441,15 +469,21 @@ VisualizerModel = R6::R6Class("VisualizerModel",
       newdata = as.data.table(x_pred)
       setnames(newdata, feature_name)
 
-      # Handle integer features
-      original_types = sapply(self$task$data()[, feature_name, with = FALSE], class)
-      if (original_types[feature_name] == "integer") {
-        newdata[[feature_name]] = as.integer(round(newdata[[feature_name]]))
+      # Handle integer features (only when task exists)
+      if (!is.null(self$task)) {
+        original_types = sapply(self$task$data()[, feature_name, with = FALSE], class)
+        if (original_types[feature_name] == "integer") {
+          newdata[[feature_name]] = as.integer(round(newdata[[feature_name]]))
+        }
       }
 
       # Generate predictions
-      y_pred = self$learner$predict_newdata(newdata)
-      y_values = private$process_predictions(y_pred)
+      if (!is.null(self$learner)) {
+        y_pred = self$learner$predict_newdata(newdata)
+        y_values = private$process_predictions(y_pred)
+      } else {
+        y_values = private$.hypothesis$predict(newdata)
+      }
 
       # Store in unified data structure
       private$.data_structure = list(
@@ -460,7 +494,7 @@ VisualizerModel = R6::R6Class("VisualizerModel",
           y = y_values
         ),
         labels = list(
-          title = sprintf("%s on %s", self$learner$id, self$task$id),
+          title = if (!is.null(self$learner)) sprintf("%s on %s", self$learner$id, self$task$id) else "Hypothesis",
           x1 = feature_name,
           x2 = NULL,
           y = target_name
@@ -475,16 +509,22 @@ VisualizerModel = R6::R6Class("VisualizerModel",
     # Initialize data structure for 2D tasks
     initialize_2d_data = function(x1_limits, x2_limits, padding, n_points) {
       # Get feature and target information
-      feature_names = self$task$feature_names
-      target_name = self$task$target_names
-      data = self$task$data()
+      if (!is.null(self$task)) {
+        feature_names = self$task$feature_names
+        target_name = self$task$target_names
+        data = self$task$data()
+      } else {
+        feature_names = private$.hypothesis$predictors
+        target_name = if (private$.hypothesis$type == "regr") "y" else "p"
+        data = NULL
+      }
 
       # Determine limits
       if (is.null(x1_limits)) {
-        x1_limits = range(data[, feature_names[1], with = FALSE])
+        x1_limits = if (!is.null(data)) range(data[, feature_names[1], with = FALSE]) else private$.domain[[feature_names[1]]]
       }
       if (is.null(x2_limits)) {
-        x2_limits = range(data[, feature_names[2], with = FALSE])
+        x2_limits = if (!is.null(data)) range(data[, feature_names[2], with = FALSE]) else private$.domain[[feature_names[2]]]
       }
 
       # Apply padding
@@ -497,17 +537,23 @@ VisualizerModel = R6::R6Class("VisualizerModel",
       newdata = CJ(x1, x2)
       setnames(newdata, feature_names)
 
-      # Handle integer features
-      original_types = sapply(self$task$data()[, feature_names, with = FALSE], class)
-      for (col in names(original_types)) {
-        if (original_types[col] == "integer") {
-          newdata[[col]] = as.integer(round(newdata[[col]]))
+      # Handle integer features when task exists
+      if (!is.null(self$task)) {
+        original_types = sapply(self$task$data()[, self$task$feature_names, with = FALSE], class)
+        for (col in names(original_types)) {
+          if (original_types[col] == "integer") {
+            newdata[[col]] = as.integer(round(newdata[[col]]))
+          }
         }
       }
 
       # Generate predictions
-      y_pred = self$learner$predict_newdata(newdata)
-      y_values = private$process_predictions(y_pred)
+      if (!is.null(self$learner)) {
+        y_pred = self$learner$predict_newdata(newdata)
+        y_values = private$process_predictions(y_pred)
+      } else {
+        y_values = private$.hypothesis$predict(newdata)
+      }
 
       # Store in unified data structure
       private$.data_structure = list(
@@ -518,7 +564,7 @@ VisualizerModel = R6::R6Class("VisualizerModel",
           y = y_values
         ),
         labels = list(
-          title = sprintf("%s on %s", self$learner$id, self$task$id),
+          title = if (!is.null(self$learner)) sprintf("%s on %s", self$learner$id, self$task$id) else "Hypothesis",
           x1 = feature_names[1],
           x2 = feature_names[2],
           y = target_name
@@ -532,7 +578,7 @@ VisualizerModel = R6::R6Class("VisualizerModel",
 
     # Process predictions to extract appropriate values for visualization
     process_predictions = function(y_pred) {
-      if (self$learner$predict_type == "prob") {
+      if (!is.null(self$learner) && self$learner$predict_type == "prob") {
         # For probability predictions
         if (length(self$task$class_names) == 2 && !is.null(self$task$positive)) {
           # Binary classification - use positive class probability
@@ -556,6 +602,7 @@ VisualizerModel = R6::R6Class("VisualizerModel",
 
     # Get training data in appropriate format for dimensionality
     get_training_data = function() {
+      if (is.null(self$task)) stop("Training data not available without a Task")
       data = self$task$data()
 
       if (private$.dimensionality == "1d") {
@@ -567,9 +614,9 @@ VisualizerModel = R6::R6Class("VisualizerModel",
         training_y_original = training_y
 
         # Convert factors to numeric for visualization
-        if (self$learner$predict_type == "prob" && is.factor(training_y)) {
+        if (!is.null(self$learner) && self$learner$predict_type == "prob" && is.factor(training_y)) {
           training_y = as.integer(training_y) - 1
-        } else if (self$learner$predict_type == "response" && is.factor(training_y)) {
+        } else if (!is.null(self$learner) && self$learner$predict_type == "response" && is.factor(training_y)) {
           training_y = as.integer(training_y) - 1
         }
 
@@ -584,9 +631,9 @@ VisualizerModel = R6::R6Class("VisualizerModel",
         training_y_original = training_y
 
         # Convert factors to numeric for visualization
-        if (self$learner$predict_type == "prob" && is.factor(training_y)) {
+        if (!is.null(self$learner) && self$learner$predict_type == "prob" && is.factor(training_y)) {
           training_y = as.integer(training_y) - 1
-        } else if (self$learner$predict_type == "response" && is.factor(training_y)) {
+        } else if (!is.null(self$learner) && self$learner$predict_type == "response" && is.factor(training_y)) {
           training_y = as.integer(training_y) - 1
         }
 

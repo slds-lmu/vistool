@@ -1,4 +1,9 @@
 
+# vistool 0.4.0
+* New `Hypothesis` R6 class and `hypothesis()` constructor: wrap user-defined functions for regression or classification (1D/2D), with optional link and domain.
+* `as_visualizer()` now accepts a `hypothesis` argument for `Task` objects (mutually exclusive with `learner`), and supports direct visualization of `Hypothesis` objects (standalone, with required `domain`).
+* Domain parameter (`domain`) allows specifying plotting limits for hypothesis-only visualizations.
+
 # vistool 0.3.2
 
 * Added options to specify color and shape for training data of classification tasks.
