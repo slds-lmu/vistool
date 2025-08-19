@@ -28,18 +28,22 @@ functionality provided by Python packages, accessed via
 
 ### Optional: Setup for Saving Plotly Plots
 
-In particular, the `$save()` functionality for surface plots uses
-`plotly::save_image()` internally, which requires the `kaleido` Python
-package. The following instructions are provided by
-`?plotly::save_image` and assume you do not have `miniconda` installed
-already:
+The `$save()` functionality for surface plots uses `plotly::save_image()`
+internally, which in turn relies on the Python package `kaleido`.
+
+`vistool` (via `reticulate >= 1.41`) declares this requirement on load
+using `py_require("kaleido")`. The first time Python is needed, an
+ephemeral, cached Python environment is provisioned automatically with
+`kaleido`—no manual Miniconda setup required for typical users.
+
+If you prefer to manage Python yourself, ensure `kaleido` is installed
+in the Python environment that `reticulate` uses. Example:
 
 ``` r
-install.packages('reticulate')
-reticulate::install_miniconda()
-reticulate::conda_install('r-reticulate', 'python-kaleido')
-reticulate::conda_install('r-reticulate', 'plotly', channel = 'plotly')
-reticulate::use_miniconda('r-reticulate')
+install.packages("reticulate")
+# OPTIONAL: point reticulate to a specific python before loading vistool
+# Sys.setenv(RETICULATE_PYTHON = "/path/to/python")
+reticulate::py_install("kaleido")
 ```
 
 ## Example

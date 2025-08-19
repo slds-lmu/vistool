@@ -33,6 +33,7 @@ test_that("as_visualizer works with hypothesis only (2D surface)", {
 
 test_that("error when both learner and hypothesis supplied", {
   skip_if_not_installed("mlr3")
+  skip_if_not_installed("rpart")
   task = mlr3::tsk("iris")$filter(1:100)$select(c("Petal.Length", "Petal.Width"))$set_row_roles(NULL)
   learner = mlr3::lrn("classif.rpart", predict_type = "prob")
   hyp = hypothesis(function(x, y) plogis(x - y), type = "classif", predictors = c("Petal.Length", "Petal.Width"))

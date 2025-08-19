@@ -29,6 +29,7 @@ Imports:
     mlr3misc,
     paradox,
     plotly,
+    reticulate,
     R6,
     rootSolve,
     stringr,

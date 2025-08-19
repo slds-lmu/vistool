@@ -115,21 +115,21 @@ VisualizerModel = R6::R6Class("VisualizerModel",
       if (loss_id %in% c("l2", "se")) loss_id = "l2_se"
       if (loss_id %in% c("l1", "abs", "mae")) loss_id = "l1_ae"
       if (!loss_id %in% c("l2_se", "l1_ae")) {
-        warning(sprintf("Unknown loss '%s' – ignoring loss geometry.", loss))
+        warning(sprintf("Unknown loss '%s' - ignoring loss geometry.", loss))
         return(invisible(self))
       }
 
       # Only 1D regression currently supported
       is_classif = (!is.null(self$task) && self$task$task_type == "classif") || (!is.null(private$.hypothesis) && private$.hypothesis$type == "classif")
       if (private$.dimensionality != "1d" || is_classif) {
-        message("Loss geometry currently only implemented for 1D regression – argument 'loss' ignored.")
+        message("Loss geometry currently only implemented for 1D regression - argument 'loss' ignored.")
         return(invisible(self))
       }
 
       # Prepare points (need observed y to compute residuals)
       pts = private$prepare_points_data(points, "1D")
       if (!"y" %in% names(pts) || all(is.na(pts$y))) {
-        message("Observed y values missing – cannot compute residual geometry.")
+        message("Observed y values missing - cannot compute residual geometry.")
         return(invisible(self))
       }
 

@@ -44,6 +44,6 @@ test_that("retrain flag controls (re)training", {
   # Case C: untrained learner, retrain = FALSE still trains with warning
   l3 = LearnerRegrCount$new()
   expect_equal(l3$train_calls, 0L)
-  expect_warning(vis3 = as_visualizer(task, learner = l3, retrain = FALSE), "retrain = FALSE ignored")
+  expect_warning(as_visualizer(task, learner = l3, retrain = FALSE), "retrain = FALSE ignored")
   expect_equal(l3$train_calls, 1L)
 })

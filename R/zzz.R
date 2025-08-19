@@ -18,12 +18,23 @@
 #' @importFrom stats optimize
 #' @importFrom stringr str_pad
 #' @importFrom ggsci pal_npg
+#' @importFrom reticulate py_require
 NULL
 
 .onLoad = function(libname, pkgname) {
   # Initialize default theme if not set
   if (is.null(getOption("vistool.theme"))) {
     options(vistool.theme = vistool_theme())
+  }
+
+  # Declare Python dependency for plotly static image export (kaleido)
+  # This uses reticulate >= 1.41's py_require() mechanism which will
+  # (lazily) provision an ephemeral Python env via uv when Python is
+  # first initialized, avoiding manual miniconda setup for typical users.
+  if (requireNamespace("reticulate", quietly = TRUE) &&
+      utils::packageVersion("reticulate") >= "1.41") {
+    # Be conservative: wrap in try to avoid impacting package load
+    try(reticulate::py_require("kaleido"), silent = TRUE)
   }
 }
 

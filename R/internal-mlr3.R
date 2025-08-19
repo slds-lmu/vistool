@@ -8,7 +8,7 @@ internal_maybe_train = function(learner, task, retrain) { # nocov start
     return(invisible(TRUE))
   }
   if (is.null(learner$model)) {
-    warning("Learner not trained; retrain = FALSE ignored – training now.")
+    warning("Learner not trained; retrain = FALSE ignored - training now.")
     learner$train(task)
     return(invisible(TRUE))
   }

@@ -138,3 +138,53 @@ Hypothesis = R6::R6Class("Hypothesis",
     }
   )
 )
+
+
+#' @title Assertions for Hypothesis objects
+#'
+#' @description
+#' Validate a `Hypothesis` object and basic properties required by the
+#' visualizer and prediction helpers.
+#'
+#' @param x (`Hypothesis`) The hypothesis object to validate.
+#'
+#' @return Invisibly `TRUE` on success, otherwise the function raises an error.
+#' @rdname assertHypothesis
+#' @keywords internal
+#' @noRd
+assertHypothesis = function(x) {
+  if (!inherits(x, "Hypothesis")) stop("Object is not a Hypothesis")
+  checkmate::assert_choice(x$type, c("regr", "classif"))
+  checkmate::assert_character(x$predictors, min.len = 1, max.len = 2, any.missing = FALSE)
+  checkmate::assert_choice(x$link, c("identity", "logit"))
+  if (!is.null(x$domain)) {
+    checkmate::assert_list(x$domain, names = "named")
+    for (nm in names(x$domain)) checkmate::assert_numeric(x$domain[[nm]], len = 2)
+  }
+  invisible(TRUE)
+}
+
+ #'
+#' Assertion for hypothesis predictions
+#'
+#' Check that a hypothesis `h` can produce valid predictions on `newdata`.
+#'
+#' @param h (`Hypothesis`) Hypothesis object created with `Hypothesis$new()` or via `hypothesis()`.
+#' @param newdata (`data.frame`) New data to predict on. Must contain the columns named in `h$predictors`.
+#'
+#' @return Invisibly `TRUE` on success, otherwise an error is raised.
+#' @rdname assertHypothesis
+#' @keywords internal
+#' @noRd
+assertHypothesisPredict = function(h, newdata) {
+  assertHypothesis(h)
+  checkmate::assert_data_frame(newdata)
+  checkmate::assert_true(all(h$predictors %in% colnames(newdata)))
+  p = h$predict(newdata)
+  checkmate::assert_numeric(p, len = nrow(newdata), any.missing = FALSE, all.missing = FALSE)
+  if (h$type == "classif") {
+    checkmate::assert_number(min(p), lower = 0 - 1e-8)
+    checkmate::assert_number(max(p), upper = 1 + 1e-8)
+  }
+  invisible(TRUE)
+}

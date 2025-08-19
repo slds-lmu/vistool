@@ -5,6 +5,7 @@
 * Domain parameter (`domain`) allows specifying plotting limits for hypothesis-only visualizations.
 * `as_visualizer(retrain = FALSE)` allows reusing existing fitted models.
 * `lss()` now accepts `mlr3` measure keys (e.g., `regr.huber`).
+* Automatic declaration of Python `kaleido` dependency via `reticulate::py_require()` (reticulate >= 1.41) to support `plotly::save_image()` without manual Miniconda setup.
 
 # vistool 0.3.2
 

@@ -153,7 +153,7 @@ vis_hsurf$add_training_data()
 vis_hsurf$plot(z_limits = range(vis_hsurf$zmat, na.rm = TRUE))
 ```
 
-## Adding custom points to a 1D model (with residual geometry)
+## Adding custom points
 
 You can add arbitrary points to a model visualization using `add_points()`. When you supply both x and y values you may also request geometric loss visualization (for 1D regression only):
 
@@ -165,7 +165,7 @@ Below we create a 1D regression task (single feature) and add three custom point
 ```{r, out.width='100%', out.height='700px'}
 # create target y = 2x + 1 with small noise
 dt = data.table::data.table(x = seq(-1, 1, length.out = 11))
-dt[, y = 2 * x + 1]
+dt[, y := 2 * x + 1]
 task = mlr3::TaskRegr$new(id = "lin", backend = dt, target = "y")
 learner = mlr3::lrn("regr.lm")
 vis = as_visualizer(task, learner = learner)
@@ -175,5 +175,3 @@ vis$add_points(pts, loss = "l2_se")$plot()
 ```
 
 The translucent squares represent the squared error areas; the vertical segments show absolute residuals. Use `loss = "l1"` to only draw residual segments.
-
-
