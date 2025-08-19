@@ -62,7 +62,8 @@ Creates a new instance of this [R6][R6::R6Class] class.
   padding = 0,
   n_points = 100L,
   hypothesis = NULL,
-  domain = NULL
+  domain = NULL,
+  retrain = TRUE
 )}\if{html}{\out{</div>}}
 }
 
@@ -106,6 +107,12 @@ Supply either `learner` or `hypothesis`, but not both.}
 \item{\code{domain}}{(`list`|`NULL`)
 Named list giving axis limits per predictor when no Task data is available,
 e.g., `list(x = c(-1, 1))` for 1D or `list(x = c(-1,1), y = c(-1,1))` for 2D.}
+
+\item{\code{retrain}}{(`logical(1)`)
+Whether to (re)train the supplied learner on the task (default `TRUE`).
+Set to `FALSE` to reuse an already trained learner. If set to `FALSE` but the
+learner has not yet been trained (`learner$model` is `NULL`), a warning is emitted
+and training is performed to ensure predictions are available.}
 }
 \if{html}{\out{</div>}}
 }

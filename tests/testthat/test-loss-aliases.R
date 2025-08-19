@@ -1,0 +1,11 @@
+test_that("mlr3 loss key aliases resolve", {
+  skip_if_not_installed("mlr3")
+  expect_identical(lss("regr.mse")$id, lss("l2_se")$id)
+  expect_identical(lss("regr.rmse")$id, lss("l2_se")$id)
+  expect_identical(lss("regr.mae")$id, lss("l1_ae")$id)
+  expect_identical(lss("regr.huber")$id, lss("huber")$id)
+  expect_identical(lss("classif.logloss")$id, lss("cross-entropy")$id)
+  expect_identical(lss("classif.ce")$id, lss("cross-entropy")$id)
+  expect_identical(lss("classif.brier")$id, lss("brier")$id)
+  expect_error(lss("regr.unknown123"), "not found")
+})

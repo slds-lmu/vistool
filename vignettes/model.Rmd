@@ -53,7 +53,8 @@ Now we create a visualizer object, using the `plotly` backend (`type = "surface"
 vis = as_visualizer(task_housing, learner = learner, type = "surface")
 ```
 
-First, the learner is trained on the entire task.
+By default `as_visualizer()` (re)trains the supplied learner on the task.
+If you already trained the learner yourself and just want to visualize it, set `retrain = FALSE` to reuse the existing fitted model.
 After that a grid is created for the two features and the predictions of the model are computed for each grid point.
 The predictions are then visualized using an interactive surface plot.
 
@@ -64,7 +65,6 @@ vis$plot()
 Draw with contour lines above z dimension.
 
 ```{r, out.width='100%', out.height='700px'}
-vis = as_visualizer(task, learner = learner, type = "surface")
 vis$add_contours()$plot()
 ```
 

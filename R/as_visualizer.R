@@ -25,6 +25,10 @@
 #'   Which response curve(s) to draw when `input_type = "probability"`.
 #'   One of `"both"`, `"y1"`, or `"y0"`.
 #' @template param_learner
+#' @param retrain (`logical(1)`)\cr
+#'   If a learner is supplied, whether it should be (re)trained on the task (`TRUE`, default)
+#'   or reused as-is (`FALSE`). If `FALSE` but the learner is untrained, a warning is issued
+#'   and training is performed.
 #' @template param_dots
 #'
 #' @return An object inheriting from a Visualizer class (Visualizer1D, Visualizer2D, VisualizerSurface, etc.)
@@ -51,7 +55,8 @@ as_visualizer = function(x, type = "auto", x1_limits = NULL, x2_limits = NULL,
 #' @export
 as_visualizer.Task = function(x, type = "auto", x1_limits = NULL, x2_limits = NULL,
                               padding = 0, n_points = 100L, y_pred = NULL, y_true = NULL,
-                              input_type = "auto", y_curves = "both", learner = NULL, hypothesis = NULL, ...) {
+                              input_type = "auto", y_curves = "both", learner = NULL, hypothesis = NULL,
+                              retrain = TRUE, ...) {
   if (!is.null(learner) && !is.null(hypothesis)) {
     stop("Provide exactly one of 'learner' or 'hypothesis', not both.")
   }
@@ -86,12 +91,12 @@ as_visualizer.Task = function(x, type = "auto", x1_limits = NULL, x2_limits = NU
   if (vis_type %in% c("1d", "2d")) {
     vis = VisualizerModel$new(x, learner = learner, hypothesis = hypothesis,
       x1_limits = x1_limits, x2_limits = x2_limits,
-      padding = padding, n_points = n_points, ...
+      padding = padding, n_points = n_points, retrain = retrain, ...
     )
   } else if (vis_type == "surface") {
     vis = VisualizerSurfaceModel$new(x, learner = learner, hypothesis = hypothesis,
       x1_limits = x1_limits, x2_limits = x2_limits,
-      padding = padding, n_points = n_points, ...
+      padding = padding, n_points = n_points, retrain = retrain, ...
     )
   } else {
     stop("Unknown visualization type.")

@@ -3,6 +3,8 @@
 * New `Hypothesis` R6 class and `hypothesis()` constructor: wrap user-defined functions for regression or classification (1D/2D), with optional link and domain.
 * `as_visualizer()` now accepts a `hypothesis` argument for `Task` objects (mutually exclusive with `learner`), and supports direct visualization of `Hypothesis` objects (standalone, with required `domain`).
 * Domain parameter (`domain`) allows specifying plotting limits for hypothesis-only visualizations.
+* `as_visualizer(retrain = FALSE)` allows reusing existing fitted models.
+* `lss()` now accepts `mlr3` measure keys (e.g., `regr.huber`).
 
 # vistool 0.3.2
 

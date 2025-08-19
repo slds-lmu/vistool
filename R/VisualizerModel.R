@@ -11,6 +11,11 @@
 #' @template param_n_points
 #' @template param_hypothesis
 #' @template param_domain
+#' @param retrain (`logical(1)`)
+#'   Whether to (re)train the supplied learner on the task (default `TRUE`).
+#'   Set to `FALSE` to reuse an already trained learner. If set to `FALSE` but the
+#'   learner has not yet been trained (`learner$model` is `NULL`), a warning is emitted
+#'   and training is performed to ensure predictions are available.
 #'
 #' @export
 VisualizerModel = R6::R6Class("VisualizerModel",
@@ -40,7 +45,8 @@ VisualizerModel = R6::R6Class("VisualizerModel",
     #' @template param_padding
     #' @template param_n_points
     initialize = function(task, learner, x1_limits = NULL, x2_limits = NULL,
-                          padding = 0, n_points = 100L, hypothesis = NULL, domain = NULL) {
+                          padding = 0, n_points = 100L, hypothesis = NULL, domain = NULL,
+                          retrain = TRUE) {
       # Validate inputs
       if (!is.null(learner) && !is.null(hypothesis)) stop("Provide only one of learner or hypothesis")
       if (!is.null(task)) self$task = mlr3::assert_task(task)
@@ -63,8 +69,8 @@ VisualizerModel = R6::R6Class("VisualizerModel",
         stop("VisualizerModel supports only 1D and 2D tasks.")
       }
 
-      # Train the learner
-      if (!is.null(self$learner)) self$learner$train(self$task)
+      # Optionally (re)train the learner
+      if (!is.null(self$learner)) internal_maybe_train(self$learner, self$task, retrain)
 
       # Initialize appropriate data structure
       if (private$.dimensionality == "1d") {

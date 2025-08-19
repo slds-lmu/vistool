@@ -37,6 +37,7 @@ as_visualizer(
   y_curves = "both",
   learner = NULL,
   hypothesis = NULL,
+  retrain = TRUE,
   ...
 )
 
@@ -147,6 +148,11 @@ Additional arguments.}
 \item{hypothesis}{(`Hypothesis`|`NULL`)
 Optional hypothesis object that provides predictions instead of a learner.
 Supply either `learner` or `hypothesis`, but not both.}
+
+\item{retrain}{(`logical(1)`)\cr
+If a learner is supplied, whether it should be (re)trained on the task (`TRUE`, default)
+or reused as-is (`FALSE`). If `FALSE` but the learner is untrained, a warning is issued
+and training is performed.}
 
 \item{domain}{(`list`|`NULL`)
 Named list giving axis limits per predictor when no Task data is available,

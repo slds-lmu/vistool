@@ -34,13 +34,15 @@ as.data.table(dict_loss)
 ```
 
 To get a loss function from the dictionary, use the `lss()` function.
-Many loss functions support parameters (e.g., `quantile` for pinball loss, `delta` for Huber loss, `epsilon` for epsilon-insensitive loss).
+Some loss functions support parameters (e.g., `quantile` for pinball loss, `delta` for Huber loss, `epsilon` for epsilon-insensitive loss).
 You can specify these parameters directly in the `lss()` function call.
 Here we retrieve the pinball loss function for regression with a custom quantile parameter.
 
 ```{r}
 loss_function = lss("pinball", quantile = 0.3)
 ```
+
+*You can also refer to loss functions via common mlr3 **measure IDs** (e.g., `regr.mse`). These are internally translated internally to the corresponding vistool loss keys.*
 
 # Visualization
 
@@ -64,7 +66,7 @@ vis$plot()
 Here we visualize multiple regression loss functions:
 
 ```{r, echo=TRUE, message=FALSE, warning=FALSE, out.width='100%'}
-loss_huber = lss("huber")
+loss_huber = lss("regr.huber") # or simply "huber"
 loss_l2 = lss("l2_se")
 loss_l1 = lss("l1_ae")
 loss_logcosh = lss("log-cosh")

@@ -36,7 +36,8 @@ VisualizerSurfaceModel = R6::R6Class("VisualizerSurfaceModel",
     #' @template param_n_points
     #' @param hypothesis (`Hypothesis`|`NULL`) Optional hypothesis used instead of a learner
     #' @param domain (`list`|`NULL`) Domain limits when visualizing a hypothesis without a task
-    initialize = function(task, learner, x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L, hypothesis = NULL, domain = NULL) {
+    #' @param retrain (`logical(1)`) Whether to retrain the learner if it has already been trained on the task. Default is `TRUE`.
+    initialize = function(task, learner, x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L, hypothesis = NULL, domain = NULL, retrain = TRUE) {
       if (!is.null(learner) && !is.null(hypothesis)) stop("Provide only one of learner or hypothesis")
       if (!is.null(task)) self$task = mlr3::assert_task(task)
       if (!is.null(learner)) self$learner = mlr3::assert_learner(learner, task = self$task)
@@ -65,7 +66,7 @@ VisualizerSurfaceModel = R6::R6Class("VisualizerSurfaceModel",
         x2 = hypothesis$predictors[2]
         data = NULL
       }
-      if (!is.null(self$learner)) self$learner$train(task)
+      if (!is.null(self$learner)) internal_maybe_train(self$learner, task, retrain)
 
       # Determine limits - respect user-provided limits, fall back to data range
       if (is.null(x1_limits)) {
