@@ -17,8 +17,8 @@ test_that("retrain flag controls (re)training", {
     ),
     private = list(
       .train = function(task) {
-        self$train_calls <- self$train_calls + 1L
-        self$model <- list(mean = mean(task$data(cols = task$target_names)[[1]]))
+        self$train_calls = self$train_calls + 1L
+        self$model = list(mean = mean(task$data(cols = task$target_names)[[1]]))
       },
       .predict = function(task) {
         mlr3::PredictionRegr$new(task = task, response = rep(self$model$mean, task$nrow))
@@ -35,7 +35,8 @@ test_that("retrain flag controls (re)training", {
   expect_true(!is.null(l1$model))
 
   # Case B: pre-trained learner, retrain = FALSE reuses model
-  l2 = LearnerRegrCount$new(); l2$train(task)
+  l2 = LearnerRegrCount$new()
+  l2$train(task)
   expect_equal(l2$train_calls, 1L)
   vis2 = as_visualizer(task, learner = l2, retrain = FALSE)
   expect_equal(l2$train_calls, 1L) # unchanged
@@ -43,6 +44,6 @@ test_that("retrain flag controls (re)training", {
   # Case C: untrained learner, retrain = FALSE still trains with warning
   l3 = LearnerRegrCount$new()
   expect_equal(l3$train_calls, 0L)
-  expect_warning(vis3 <- as_visualizer(task, learner = l3, retrain = FALSE), "retrain = FALSE ignored")
+  expect_warning(vis3 = as_visualizer(task, learner = l3, retrain = FALSE), "retrain = FALSE ignored")
   expect_equal(l3$train_calls, 1L)
 })

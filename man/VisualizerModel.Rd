@@ -31,6 +31,7 @@ Learner used to train the model.}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-VisualizerModel-new}{\code{VisualizerModel$new()}}
+\item \href{#method-VisualizerModel-add_points}{\code{VisualizerModel$add_points()}}
 \item \href{#method-VisualizerModel-add_training_data}{\code{VisualizerModel$add_training_data()}}
 \item \href{#method-VisualizerModel-add_boundary}{\code{VisualizerModel$add_boundary()}}
 \item \href{#method-VisualizerModel-plot}{\code{VisualizerModel$plot()}}
@@ -40,7 +41,6 @@ Learner used to train the model.}
 \if{html}{\out{
 <details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="add_points"><a href='../../vistool/html/Visualizer.html#method-Visualizer-add_points'><code>vistool::Visualizer$add_points()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="resolve_layer_colors"><a href='../../vistool/html/Visualizer.html#method-Visualizer-resolve_layer_colors'><code>vistool::Visualizer$resolve_layer_colors()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href='../../vistool/html/Visualizer.html#method-Visualizer-save'><code>vistool::Visualizer$save()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="set_theme"><a href='../../vistool/html/Visualizer.html#method-Visualizer-set_theme'><code>vistool::Visualizer$set_theme()</code></a></span></li>
@@ -115,6 +115,74 @@ learner has not yet been trained (`learner$model` is `NULL`), a warning is emitt
 and training is performed to ensure predictions are available.}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-VisualizerModel-add_points"></a>}}
+\if{latex}{\out{\hypertarget{method-VisualizerModel-add_points}{}}}
+\subsection{Method \code{add_points()}}{
+Add points with optional residual loss geometry (1D regression only for now).
+Extends base add_points() with a `loss` argument to visualize residuals.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{VisualizerModel$add_points(
+  points,
+  color = "auto",
+  size = NULL,
+  shape = 19,
+  alpha = NULL,
+  annotations = NULL,
+  annotation_size = NULL,
+  ordered = FALSE,
+  arrow_color = NULL,
+  arrow_size = 0.3,
+  loss = NULL,
+  loss_params = list(),
+  loss_fill = "auto",
+  loss_alpha = NULL,
+  loss_color = NA,
+  loss_linetype = "solid"
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{points}}{(`data.frame`|`matrix`|`list`) Points to add. For 1D these should contain columns `x` and `y` (observed y required for residuals).}
+
+\item{\code{color}}{(`character(1)`) Color of the points or "auto". Default "auto".}
+
+\item{\code{size}}{(`numeric(1)`|`NULL`) Point size. If NULL uses theme default.}
+
+\item{\code{shape}}{(`integer(1)`|`character(1)`) Point shape. Default 19.}
+
+\item{\code{alpha}}{(`numeric(1)`|`NULL`) Alpha transparency for points.}
+
+\item{\code{annotations}}{(`character()`|`NULL`) Optional text annotations for points.}
+
+\item{\code{annotation_size}}{(`numeric(1)`|`NULL`) Size of annotation text.}
+
+\item{\code{ordered}}{(`logical(1)`) Whether points should be connected in order (arrows). Default FALSE.}
+
+\item{\code{arrow_color}}{(`character(1)`|`NULL`) Arrow color when ordered = TRUE.}
+
+\item{\code{arrow_size}}{(`numeric(1)`) Arrow size when ordered = TRUE. Default 0.3.}
+
+\item{\code{loss}}{(`character(1)`|`NULL`) One of `"l2_se"` (aliases: `"l2"`, `"se"`), `"l1_ae"` (aliases: `"l1"`, `"abs"`, `"mae"`), or `NULL` (no geometry).}
+
+\item{\code{loss_params}}{(`list()`) Reserved for future loss-specific parameters (e.g. Huber delta).}
+
+\item{\code{loss_fill}}{(`character(1)`) Fill color for L2 squares. "auto" draws from palette.}
+
+\item{\code{loss_alpha}}{(`numeric(1)`|`NULL`) Fill alpha for L2 squares (defaults to theme$alpha * 0.4).}
+
+\item{\code{loss_color}}{(`character(1)`|`NA`) Color for residual segment / square border. If `NA`, derived from fill.}
+
+\item{\code{loss_linetype}}{(`character(1)`) Line type for residual segment. Default "solid".}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Invisible self.
 }
 }
 \if{html}{\out{<hr>}}

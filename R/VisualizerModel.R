@@ -80,6 +80,123 @@ VisualizerModel = R6::R6Class("VisualizerModel",
       }
     },
 
+  #' @description
+  #' Add points with optional residual loss geometry (1D regression only for now).
+  #' Extends base add_points() with a `loss` argument to visualize residuals.
+  #' @param points (`data.frame`|`matrix`|`list`) Points to add. For 1D these should contain columns `x` and `y` (observed y required for residuals).
+  #' @param color (`character(1)`) Color of the points or "auto". Default "auto".
+  #' @param size (`numeric(1)`|`NULL`) Point size. If NULL uses theme default.
+  #' @param shape (`integer(1)`|`character(1)`) Point shape. Default 19.
+  #' @param alpha (`numeric(1)`|`NULL`) Alpha transparency for points.
+  #' @param annotations (`character()`|`NULL`) Optional text annotations for points.
+  #' @param annotation_size (`numeric(1)`|`NULL`) Size of annotation text.
+  #' @param ordered (`logical(1)`) Whether points should be connected in order (arrows). Default FALSE.
+  #' @param arrow_color (`character(1)`|`NULL`) Arrow color when ordered = TRUE.
+  #' @param arrow_size (`numeric(1)`) Arrow size when ordered = TRUE. Default 0.3.
+  #' @param loss (`character(1)`|`NULL`) One of `"l2_se"` (aliases: `"l2"`, `"se"`), `"l1_ae"` (aliases: `"l1"`, `"abs"`, `"mae"`), or `NULL` (no geometry).
+  #' @param loss_params (`list()`) Reserved for future loss-specific parameters (e.g. Huber delta).
+  #' @param loss_fill (`character(1)`) Fill color for L2 squares. "auto" draws from palette.
+  #' @param loss_alpha (`numeric(1)`|`NULL`) Fill alpha for L2 squares (defaults to theme$alpha * 0.4).
+  #' @param loss_color (`character(1)`|`NA`) Color for residual segment / square border. If `NA`, derived from fill.
+  #' @param loss_linetype (`character(1)`) Line type for residual segment. Default "solid".
+  #' @return Invisible self.
+    add_points = function(points, color = "auto", size = NULL, shape = 19, alpha = NULL,
+                          annotations = NULL, annotation_size = NULL, ordered = FALSE,
+                          arrow_color = NULL, arrow_size = 0.3,
+                          loss = NULL, loss_params = list(),
+                          loss_fill = "auto", loss_alpha = NULL, loss_color = NA, loss_linetype = "solid") {
+      # First store the regular points layer via base implementation
+      super$add_points(points = points, color = color, size = size, shape = shape, alpha = alpha,
+        annotations = annotations, annotation_size = annotation_size, ordered = ordered,
+        arrow_color = arrow_color, arrow_size = arrow_size)
+
+      if (is.null(loss)) return(invisible(self))
+      loss_id = tolower(loss)
+      if (loss_id %in% c("l2", "se")) loss_id = "l2_se"
+      if (loss_id %in% c("l1", "abs", "mae")) loss_id = "l1_ae"
+      if (!loss_id %in% c("l2_se", "l1_ae")) {
+        warning(sprintf("Unknown loss '%s' – ignoring loss geometry.", loss))
+        return(invisible(self))
+      }
+
+      # Only 1D regression currently supported
+      is_classif = (!is.null(self$task) && self$task$task_type == "classif") || (!is.null(private$.hypothesis) && private$.hypothesis$type == "classif")
+      if (private$.dimensionality != "1d" || is_classif) {
+        message("Loss geometry currently only implemented for 1D regression – argument 'loss' ignored.")
+        return(invisible(self))
+      }
+
+      # Prepare points (need observed y to compute residuals)
+      pts = private$prepare_points_data(points, "1D")
+      if (!"y" %in% names(pts) || all(is.na(pts$y))) {
+        message("Observed y values missing – cannot compute residual geometry.")
+        return(invisible(self))
+      }
+
+      # Interpolate prediction line at provided x's
+      x_grid = private$.data_structure$coordinates$x1
+      y_grid = private$.data_structure$coordinates$y
+      preds = stats::approx(x = x_grid, y = y_grid, xout = pts$x, rule = 2)$y
+      residuals = pts$y - preds
+
+      # Minimal width to avoid zero-width rectangles
+      x_range = diff(range(x_grid))
+      min_width = x_range / 500
+
+      data_list = list()
+      if (loss_id == "l2_se") {
+        rect_df = lapply(seq_along(residuals), function(i) {
+          r = residuals[i]
+          s = abs(r)
+          w = max(s, min_width)
+          y_pred_i = preds[i]
+          y_obs_i = pts$y[i]
+          data.frame(
+            x = pts$x[i],
+            xmin = pts$x[i],
+            xmax = pts$x[i] + w, # extend to right
+            ymin = min(y_pred_i, y_obs_i),
+            ymax = max(y_pred_i, y_obs_i),
+            y_pred = y_pred_i,
+            y_obs = y_obs_i,
+            residual = r,
+            side_len = s
+          )
+        })
+        rect_df = do.call(rbind, rect_df)
+        seg_df = data.frame(
+          x = pts$x,
+          xend = pts$x,
+          y = preds,
+          yend = pts$y,
+          residual = residuals
+        )
+        data_list$rect = rect_df
+        data_list$segment = seg_df
+      } else if (loss_id == "l1_ae") {
+        seg_df = data.frame(
+          x = pts$x,
+          xend = pts$x,
+          y = preds,
+          yend = pts$y,
+          residual = residuals
+        )
+        data_list$segment = seg_df
+      }
+
+      private$store_layer("loss_geom", list(
+        loss_fun_id = loss_id,
+        data = data_list,
+        style = list(
+          fill = loss_fill,
+          alpha = loss_alpha,
+          color = loss_color,
+          linetype = loss_linetype
+        )
+      ))
+      invisible(self)
+    },
+
     #' @description
     #' Adds the training data to the plot.
     #'
@@ -237,6 +354,8 @@ VisualizerModel = R6::R6Class("VisualizerModel",
         } else if (layer$type == "points") {
           # Handle points layer using the base class method
           private$.plot = private$add_points_to_ggplot(private$.plot, private$.dimensionality)
+        } else if (layer$type == "loss_geom") {
+          private$render_loss_geom_layer(layer$spec)
         }
       }
     },
@@ -663,6 +782,45 @@ VisualizerModel = R6::R6Class("VisualizerModel",
         }
       }
       # For 2D, contour values outside range are handled by ggplot2 naturally
+    },
+
+    # Render residual loss geometry layer (1D regression)
+    render_loss_geom_layer = function(layer_spec) {
+      if (private$.dimensionality != "1d") return()
+      eff = private$.effective_theme
+      style = layer_spec$style
+      loss_id = layer_spec$loss_fun_id
+      # L2 squares
+      if (loss_id == "l2_se" && !is.null(layer_spec$data$rect)) {
+        rect_df = layer_spec$data$rect
+        fill_col = if (identical(style$fill, NA)) NA else style$fill
+        alpha_rect = if (is.null(style$alpha)) eff$alpha * 0.4 else style$alpha
+        private$.plot = private$.plot + ggplot2::geom_rect(
+          data = rect_df,
+          ggplot2::aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+          inherit.aes = FALSE,
+          fill = fill_col,
+          color = NA,
+          alpha = alpha_rect
+        )
+      }
+      # Segments for L1 or L2
+      if (!is.null(layer_spec$data$segment)) {
+        seg_df = layer_spec$data$segment
+        base_col = if (is.na(style$color)) style$fill else style$color
+        if (identical(base_col, "auto")) base_col = style$fill # after color resolution "auto" becomes hex
+        if (is.null(base_col) || is.na(base_col)) base_col = get_vistool_color(1, "discrete", base_palette = eff$palette)
+        alpha_seg = if (is.null(style$alpha)) eff$alpha * 0.9 else style$alpha
+        private$.plot = private$.plot + ggplot2::geom_segment(
+          data = seg_df,
+          ggplot2::aes(x = x, xend = xend, y = y, yend = yend),
+          inherit.aes = FALSE,
+          color = base_col,
+          alpha = alpha_seg,
+          linetype = style$linetype,
+          linewidth = if (is.null(eff$line_width)) 0.6 else eff$line_width * 0.7
+        )
+      }
     }
   )
 )

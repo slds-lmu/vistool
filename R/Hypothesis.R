@@ -18,6 +18,7 @@
 #' @param levels (`character(2)`|`NULL`) Class labels for binary classification.
 #'
 #' @return An `R6` Hypothesis object with a `predict(newdata)` method.
+#' @rdname Hypothesis
 #' @export
 hypothesis = function(fun, type, predictors, link = "identity", domain = NULL, levels = NULL) {
   Hypothesis$new(fun = fun, type = type, predictors = predictors, link = link, domain = domain, levels = levels)
