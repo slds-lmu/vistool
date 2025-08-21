@@ -164,7 +164,7 @@ assertHypothesis = function(x) {
   invisible(TRUE)
 }
 
- #'
+#'
 #' Assertion for hypothesis predictions
 #'
 #' Check that a hypothesis `h` can produce valid predictions on `newdata`.

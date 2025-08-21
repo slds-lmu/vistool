@@ -80,26 +80,26 @@ VisualizerModel = R6::R6Class("VisualizerModel",
       }
     },
 
-  #' @description
-  #' Add points with optional residual loss geometry (1D regression only for now).
-  #' Extends base add_points() with a `loss` argument to visualize residuals.
-  #' @param points (`data.frame`|`matrix`|`list`) Points to add. For 1D these should contain columns `x` and `y` (observed y required for residuals).
-  #' @param color (`character(1)`) Color of the points or "auto". Default "auto".
-  #' @param size (`numeric(1)`|`NULL`) Point size. If NULL uses theme default.
-  #' @param shape (`integer(1)`|`character(1)`) Point shape. Default 19.
-  #' @param alpha (`numeric(1)`|`NULL`) Alpha transparency for points.
-  #' @param annotations (`character()`|`NULL`) Optional text annotations for points.
-  #' @param annotation_size (`numeric(1)`|`NULL`) Size of annotation text.
-  #' @param ordered (`logical(1)`) Whether points should be connected in order (arrows). Default FALSE.
-  #' @param arrow_color (`character(1)`|`NULL`) Arrow color when ordered = TRUE.
-  #' @param arrow_size (`numeric(1)`) Arrow size when ordered = TRUE. Default 0.3.
-  #' @param loss (`character(1)`|`NULL`) One of `"l2_se"` (aliases: `"l2"`, `"se"`), `"l1_ae"` (aliases: `"l1"`, `"abs"`, `"mae"`), or `NULL` (no geometry).
-  #' @param loss_params (`list()`) Reserved for future loss-specific parameters (e.g. Huber delta).
-  #' @param loss_fill (`character(1)`) Fill color for L2 squares. "auto" draws from palette.
-  #' @param loss_alpha (`numeric(1)`|`NULL`) Fill alpha for L2 squares (defaults to theme$alpha * 0.4).
-  #' @param loss_color (`character(1)`|`NA`) Color for residual segment / square border. If `NA`, derived from fill.
-  #' @param loss_linetype (`character(1)`) Line type for residual segment. Default "solid".
-  #' @return Invisible self.
+    #' @description
+    #' Add points with optional residual loss geometry (1D regression only for now).
+    #' Extends base add_points() with a `loss` argument to visualize residuals.
+    #' @param points (`data.frame`|`matrix`|`list`) Points to add. For 1D these should contain columns `x` and `y` (observed y required for residuals).
+    #' @param color (`character(1)`) Color of the points or "auto". Default "auto".
+    #' @param size (`numeric(1)`|`NULL`) Point size. If NULL uses theme default.
+    #' @param shape (`integer(1)`|`character(1)`) Point shape. Default 19.
+    #' @param alpha (`numeric(1)`|`NULL`) Alpha transparency for points.
+    #' @param annotations (`character()`|`NULL`) Optional text annotations for points.
+    #' @param annotation_size (`numeric(1)`|`NULL`) Size of annotation text.
+    #' @param ordered (`logical(1)`) Whether points should be connected in order (arrows). Default FALSE.
+    #' @param arrow_color (`character(1)`|`NULL`) Arrow color when ordered = TRUE.
+    #' @param arrow_size (`numeric(1)`) Arrow size when ordered = TRUE. Default 0.3.
+    #' @param loss (`character(1)`|`NULL`) One of `"l2_se"` (aliases: `"l2"`, `"se"`), `"l1_ae"` (aliases: `"l1"`, `"abs"`, `"mae"`), or `NULL` (no geometry).
+    #' @param loss_params (`list()`) Reserved for future loss-specific parameters (e.g. Huber delta).
+    #' @param loss_fill (`character(1)`) Fill color for L2 squares. "auto" draws from palette.
+    #' @param loss_alpha (`numeric(1)`|`NULL`) Fill alpha for L2 squares (defaults to theme$alpha * 0.4).
+    #' @param loss_color (`character(1)`|`NA`) Color for residual segment / square border. If `NA`, derived from fill.
+    #' @param loss_linetype (`character(1)`) Line type for residual segment. Default "solid".
+    #' @return Invisible self.
     add_points = function(points, color = "auto", size = NULL, shape = 19, alpha = NULL,
                           annotations = NULL, annotation_size = NULL, ordered = FALSE,
                           arrow_color = NULL, arrow_size = 0.3,

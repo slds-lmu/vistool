@@ -32,7 +32,7 @@ NULL
   # (lazily) provision an ephemeral Python env via uv when Python is
   # first initialized, avoiding manual miniconda setup for typical users.
   if (requireNamespace("reticulate", quietly = TRUE) &&
-      utils::packageVersion("reticulate") >= "1.41") {
+    utils::packageVersion("reticulate") >= "1.41") {
     # Be conservative: wrap in try to avoid impacting package load
     try(reticulate::py_require("kaleido"), silent = TRUE)
   }

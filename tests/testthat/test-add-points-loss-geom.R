@@ -3,7 +3,7 @@ test_that("add_points loss geometry (1D regression) produces residual squares an
   skip_if_not_installed("rpart")
   # create target y = 2x + 1 with small noise
   dt = data.table::data.table(x = seq(-1, 1, length.out = 11))
-  dt[, y := 2 * x + 1]
+  dt[, `:=`(y = 2 * x + 1)]
   task = mlr3::TaskRegr$new(id = "lin", backend = dt, target = "y")
   learner = mlr3::lrn("regr.rpart")
   vis = as_visualizer(task, learner = learner)

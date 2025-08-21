@@ -69,6 +69,7 @@ as_visualizer(
   input_type = "auto",
   y_curves = "both",
   learner = NULL,
+  allow_extrapolation = FALSE,
   ...
 )
 
@@ -157,6 +158,12 @@ and training is performed.}
 \item{domain}{(`list`|`NULL`)
 Named list giving axis limits per predictor when no Task data is available,
 e.g., `list(x = c(-1, 1))` for 1D or `list(x = c(-1,1), y = c(-1,1))` for 2D.}
+
+\item{allow_extrapolation}{(`logical(1)`)
+Whether to evaluate the objective outside its evaluation (canonical) bounds when plot limits
+extend further. If `FALSE` (default), values outside are masked (set to `NA`) producing blank
+regions in the plot; if `TRUE`, the objective is called on the extended region (may yield
+misleading or numerically extreme values depending on the function definition).}
 }
 \value{
 An object inheriting from a Visualizer class (Visualizer1D, Visualizer2D, VisualizerSurface, etc.)
