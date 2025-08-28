@@ -200,19 +200,12 @@ Visualizer = R6::R6Class("Visualizer",
       )
     },
 
-    # save a plotly object
+    # save a plotly object via JSON -> Python (plotly.io + kaleido >= 1.0)
     save_plotly = function(plot_obj, filename, width, height, ...) {
       # default dimensions for plotly (in pixels)
       if (is.null(width)) width = 800
       if (is.null(height)) height = 600
-
-      save_image(
-        p = plot_obj,
-        file = filename,
-        width = width,
-        height = height,
-        ...
-      )
+      .vistool_write_plotly_image(plot_obj, filename, width = width, height = height, opts = list(...))
     },
 
     # Helper method to add points to ggplot2 objects
@@ -329,9 +322,9 @@ Visualizer = R6::R6Class("Visualizer",
 
           # Add 3D scatter trace
           plot_obj = plot_obj %>% add_trace(
-            x = points_data$x,
-            y = points_data$y,
-            z = points_data$z,
+            x = if (length(points_data$x) == 1) list(points_data$x) else points_data$x,
+            y = if (length(points_data$y) == 1) list(points_data$y) else points_data$y,
+            z = if (length(points_data$z) == 1) list(points_data$z) else points_data$z,
             type = "scatter3d",
             mode = "markers",
             marker = list(
@@ -346,10 +339,11 @@ Visualizer = R6::R6Class("Visualizer",
           # Add annotations if provided (3D text)
           if (!is.null(point_spec$annotations)) {
             for (i in seq_along(point_spec$annotations)) {
+              # Wrap single values in list() so plotly receives array-like inputs
               plot_obj = plot_obj %>% add_trace(
-                x = points_data$x[i],
-                y = points_data$y[i],
-                z = points_data$z[i],
+                x = list(points_data$x[i]),
+                y = list(points_data$y[i]),
+                z = list(points_data$z[i]),
                 type = "scatter3d",
                 mode = "text",
                 text = point_spec$annotations[i],

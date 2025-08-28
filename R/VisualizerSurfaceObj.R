@@ -474,9 +474,10 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
       # Now add marker to the lines. Marker are added at `add_marker_at` iterations
       # and with the specified shape and color:
       pargs = list(
-        x = xmarkers$x[add_marker_at],
-        y = xmarkers$y[add_marker_at],
-        z = xmarkers$z[add_marker_at],
+        # Ensure array-like for plotly/kaleido even when length == 1
+        x = if (length(add_marker_at) == 1) list(xmarkers$x[add_marker_at]) else xmarkers$x[add_marker_at],
+        y = if (length(add_marker_at) == 1) list(xmarkers$y[add_marker_at]) else xmarkers$y[add_marker_at],
+        z = if (length(add_marker_at) == 1) list(xmarkers$z[add_marker_at]) else xmarkers$z[add_marker_at],
         mode = "markers",
         type = ptype,
         marker = mlr3misc::insert_named(pargs$marker, list(symbol = marker_shape, color = marker_color)),
