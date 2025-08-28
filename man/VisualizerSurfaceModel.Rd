@@ -59,7 +59,10 @@ Creates a new instance of this [R6][R6::R6Class] class.
   x1_limits = NULL,
   x2_limits = NULL,
   padding = 0,
-  n_points = 100L
+  n_points = 100L,
+  hypothesis = NULL,
+  domain = NULL,
+  retrain = TRUE
 )}\if{html}{\out{</div>}}
 }
 
@@ -99,6 +102,12 @@ Note that a grid of `npoints^2` values is generated and evaluated by `objective$
 \item{\code{n_points}}{(`integer(1)`)\cr
 The number of generated point per dimension.
 Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
+
+\item{\code{hypothesis}}{(`Hypothesis`|`NULL`) Optional hypothesis used instead of a learner}
+
+\item{\code{domain}}{(`list`|`NULL`) Domain limits when visualizing a hypothesis without a task}
+
+\item{\code{retrain}}{(`logical(1)`) Whether to retrain the learner if it has already been trained on the task. Default is `TRUE`.}
 }
 \if{html}{\out{</div>}}
 }

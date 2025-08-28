@@ -9,6 +9,8 @@
 #' @template param_x2_limits
 #' @template param_padding
 #' @template param_n_points
+#' @template param_allow_extrapolation
+#' @template param_allow_extrapolation
 #'
 #' @export
 VisualizerObj = R6::R6Class("VisualizerObj",
@@ -34,13 +36,16 @@ VisualizerObj = R6::R6Class("VisualizerObj",
     #'   Optional visualization type ("1d" or "2d") to override automatic dimension detection.
     #'   Useful when objective dimensions are unknown but visualization type is explicitly specified.
     initialize = function(objective, x1_limits = NULL, x2_limits = NULL,
-                          padding = 0, n_points = 100L, type = NULL) {
+                          padding = 0, n_points = 100L, type = NULL,
+                          allow_extrapolation = FALSE) {
       # Validate inputs
       self$objective = checkmate::assert_r6(objective, "Objective")
       checkmate::assert_numeric(x1_limits, len = 2, null.ok = TRUE)
       checkmate::assert_numeric(x2_limits, len = 2, null.ok = TRUE)
       checkmate::assert_number(padding, lower = 0)
       checkmate::assert_count(n_points)
+      checkmate::assert_flag(allow_extrapolation)
+      private$.allow_extrapolation = allow_extrapolation
 
       # Determine dimensionality and validate
       n_dim = objective$xdim
@@ -183,6 +188,7 @@ VisualizerObj = R6::R6Class("VisualizerObj",
     .dimensionality = NULL, # "1d" or "2d"
     .data_structure = NULL, # Unified data container
     .plot = NULL, # The actual ggplot2 object
+    .allow_extrapolation = FALSE,
 
     # Render all stored layers in the order they were added
     render_all_layers = function() {
@@ -214,7 +220,21 @@ VisualizerObj = R6::R6Class("VisualizerObj",
 
       # Generate evaluation grid
       x_vals = seq(x1_limits[1], x1_limits[2], length.out = n_points)
-      y_vals = sapply(x_vals, function(x) self$objective$eval(x))
+      eval_lower = self$objective$lower
+      eval_upper = self$objective$upper
+      if (!any(is.na(c(eval_lower, eval_upper)))) {
+        inside = x_vals >= eval_lower & x_vals <= eval_upper
+        if (private$.allow_extrapolation) {
+          y_vals = sapply(x_vals, function(x) self$objective$eval(x))
+        } else {
+          y_vals = rep(NA_real_, length(x_vals))
+          if (any(inside)) {
+            y_vals[inside] = sapply(x_vals[inside], function(x) self$objective$eval(x))
+          }
+        }
+      } else {
+        y_vals = sapply(x_vals, function(x) self$objective$eval(x))
+      }
 
       # Store in unified data structure
       private$.data_structure = list(
@@ -256,8 +276,23 @@ VisualizerObj = R6::R6Class("VisualizerObj",
       x2 = unique(seq(x2_limits[1] - x2_pad, x2_limits[2] + x2_pad, length.out = n_points))
       grid = CJ(x1, x2)
 
-      # Evaluate objective on grid
-      y_vals = apply(grid, 1, function(row) self$objective$eval(c(row[1], row[2])))
+      # Evaluate objective on grid with masking based on evaluation bounds
+      eval_lower = self$objective$lower
+      eval_upper = self$objective$upper
+      if (!any(is.na(c(eval_lower, eval_upper)))) {
+        inside = (grid$x1 >= eval_lower[1] & grid$x1 <= eval_upper[1]) &
+          (grid$x2 >= eval_lower[2] & grid$x2 <= eval_upper[2])
+        if (private$.allow_extrapolation) {
+          y_vals = apply(grid, 1, function(row) self$objective$eval(c(row[1], row[2])))
+        } else {
+          y_vals = rep(NA_real_, nrow(grid))
+          if (any(inside)) {
+            y_vals[inside] = apply(as.matrix(grid[inside, ]), 1, function(row) self$objective$eval(c(row[1], row[2])))
+          }
+        }
+      } else {
+        y_vals = apply(grid, 1, function(row) self$objective$eval(c(row[1], row[2])))
+      }
 
       # Store in unified data structure
       private$.data_structure = list(

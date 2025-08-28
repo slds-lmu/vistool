@@ -3,6 +3,7 @@
 \name{as_visualizer}
 \alias{as_visualizer}
 \alias{as_visualizer.Task}
+\alias{as_visualizer.Hypothesis}
 \alias{as_visualizer.Objective}
 \alias{as_visualizer.LossFunction}
 \alias{as_visualizer.list}
@@ -35,6 +36,24 @@ as_visualizer(
   input_type = "auto",
   y_curves = "both",
   learner = NULL,
+  hypothesis = NULL,
+  retrain = TRUE,
+  ...
+)
+
+\method{as_visualizer}{Hypothesis}(
+  x,
+  type = "auto",
+  x1_limits = NULL,
+  x2_limits = NULL,
+  padding = 0,
+  n_points = 100L,
+  y_pred = NULL,
+  y_true = NULL,
+  input_type = "auto",
+  y_curves = "both",
+  learner = NULL,
+  domain = NULL,
   ...
 )
 
@@ -50,6 +69,7 @@ as_visualizer(
   input_type = "auto",
   y_curves = "both",
   learner = NULL,
+  allow_extrapolation = FALSE,
   ...
 )
 
@@ -125,6 +145,25 @@ The learner to train the model with.}
 
 \item{...}{(`any`)\cr
 Additional arguments.}
+
+\item{hypothesis}{(`Hypothesis`|`NULL`)
+Optional hypothesis object that provides predictions instead of a learner.
+Supply either `learner` or `hypothesis`, but not both.}
+
+\item{retrain}{(`logical(1)`)\cr
+If a learner is supplied, whether it should be (re)trained on the task (`TRUE`, default)
+or reused as-is (`FALSE`). If `FALSE` but the learner is untrained, a warning is issued
+and training is performed.}
+
+\item{domain}{(`list`|`NULL`)
+Named list giving axis limits per predictor when no Task data is available,
+e.g., `list(x = c(-1, 1))` for 1D or `list(x = c(-1,1), y = c(-1,1))` for 2D.}
+
+\item{allow_extrapolation}{(`logical(1)`)
+Whether to evaluate the objective outside its evaluation (canonical) bounds when plot limits
+extend further. If `FALSE` (default), values outside are masked (set to `NA`) producing blank
+regions in the plot; if `TRUE`, the objective is called on the extended region (may yield
+misleading or numerically extreme values depending on the function definition).}
 }
 \value{
 An object inheriting from a Visualizer class (Visualizer1D, Visualizer2D, VisualizerSurface, etc.)
@@ -141,4 +180,8 @@ If `type = "auto"` (default), the function will inspect the input and select the
 - 1D: For objects with 1 feature/dimension (uses ggplot2)
 - 2D: For objects with 2 features/dimensions (uses ggplot2)
 You can override this by specifying `type = "1d"`, `type = "2d"`, or for 2D inputs only: `type = "surface"` (uses plotly for interactive surfaces, Models and Objectives only).
+
+Hypotheses can be used instead of learners to visualize functional forms directly. When
+no Task is provided (i.e., visualizing a `Hypothesis` alone), a `domain` must be supplied
+to define plotting limits.
 }

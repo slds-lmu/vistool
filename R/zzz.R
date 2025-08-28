@@ -11,19 +11,37 @@
 #' @importFrom ggplot2 scale_linewidth_manual scale_linetype_manual element_blank
 #' @importFrom ggplot2 scale_fill_viridis_c scale_fill_gradient scale_color_viridis_c theme_minimal theme_bw ggsave
 #' @importFrom ggplot2 theme_classic theme_gray theme_light theme_dark theme_void element_text
-#' @importFrom plotly plot_ly add_trace add_surface layout save_image schema
+#' @importFrom plotly plot_ly add_trace add_surface layout schema
 #' @importFrom data.table between
 #' @importFrom magrittr %>%
 #' @importFrom R6 R6Class
 #' @importFrom stats optimize
 #' @importFrom stringr str_pad
 #' @importFrom ggsci pal_npg
+#' @importFrom reticulate py_require
 NULL
 
 .onLoad = function(libname, pkgname) {
   # Initialize default theme if not set
   if (is.null(getOption("vistool.theme"))) {
     options(vistool.theme = vistool_theme())
+  }
+
+  # Declare Python dependency for plotly static image export (kaleido)
+  # This uses reticulate >= 1.41's py_require() mechanism which will
+  # (lazily) provision an ephemeral Python env via uv when Python is
+  # first initialized, avoiding manual miniconda setup for typical users.
+  if (requireNamespace("reticulate", quietly = TRUE) &&
+    utils::packageVersion("reticulate") >= "1.41.0") {
+    # Be conservative: wrap in try to avoid impacting package load.
+    # Pin versions: Kaleido >=1.0 requires Plotly.py >=6.1.1 and Chrome.
+    try(reticulate::py_require(
+      packages = c(
+        "plotly>=6.1.1",
+        "kaleido>=1.0.0"
+      ),
+      python_version = ">=3.9,<3.13"
+    ), silent = TRUE)
   }
 }
 
