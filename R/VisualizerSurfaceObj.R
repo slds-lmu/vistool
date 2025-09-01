@@ -99,6 +99,8 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
     #'   The color of the trace.
     #' @param mcolor_out (`character(1)`)\cr
     #'   The outer line color of the marker.
+    #' @param line_width (`numeric(1)`)\cr
+    #'   Width of the optimization trace line. If `NULL`, uses theme$line_width.
     #' @param npoints (`integer(1)`)\cr
     #'   The number of used points from the archive.
     #'   Default is `NULL` which means that all points are used.
@@ -120,23 +122,27 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
     #'   If `marker_shape = NA`, no marker are added.
     #' @param marker_color (`character()`)\cr
     #'   The colors for the markers.
+    #' @param line_type (`character(1)`)
+    #'   Line type for the optimization trace (e.g., "solid", "dashed", "dotted", "dash", "dot", "dashdot").
+    #'   Mapped to Plotly's `line$dash`. If `NULL`, defaults to solid.
     #' @param ... Further arguments passed to `add_trace(...)`.
-    add_optimization_trace = function(opt, line_color = NULL, mcolor_out = "black", npoints = NULL, npmax = NULL, name = NULL, offset = NULL, add_marker_at = 1, marker_shape = "circle", marker_color = NULL, ...) {
+    add_optimization_trace = function(opt, line_color = NULL, mcolor_out = "black", line_width = NULL, npoints = NULL, npmax = NULL, name = NULL, offset = NULL, add_marker_at = 1, marker_shape = "circle", marker_color = NULL, line_type = NULL, ...) {
       checkmate::assert_r6(opt, "Optimizer")
       checkmate::assert_count(npoints, null.ok = TRUE)
       checkmate::assert_count(npmax, null.ok = TRUE)
       checkmate::assert_string(line_color, null.ok = TRUE)
+      checkmate::assert_string(line_type, null.ok = TRUE)
+      checkmate::assert_number(line_width, lower = 0, null.ok = TRUE)
 
-      # Store layer specification without immediately resolving colors
-      # Colors will be resolved in plot() when color_palette is known
-      if (is.null(line_color)) {
-        line_color = "auto" # Mark for automatic color assignment
-      }
+      # Mark color for auto assignment if not provided
+      if (is.null(line_color)) line_color = "auto"
 
-      # Store the optimization trace layer for later processing
+      # Store layer specification for deferred rendering
       private$store_layer("optimization_trace", list(
         optimizer = opt,
         line_color = line_color,
+        line_width = line_width,
+        line_type = line_type,
         mcolor_out = mcolor_out,
         npoints = npoints,
         npmax = npmax,
@@ -325,6 +331,20 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
   ),
   private = list(
     .trace_count = 0,
+    # Map common line type names/codes to Plotly dash values
+    map_line_type_to_dash = function(line_type) {
+      if (is.null(line_type)) return(NULL)
+      lt = tolower(as.character(line_type))
+      # Support numeric lty codes and aliases
+      if (lt %in% c("1", "solid")) return("solid")
+      if (lt %in% c("2", "dashed", "dash")) return("dash")
+      if (lt %in% c("3", "dotted", "dot")) return("dot")
+      if (lt %in% c("4", "dotdash", "dashdot", "twodash")) return("dashdot")
+      if (lt %in% c("5", "longdash")) return("longdash")
+      if (lt %in% c("6", "longdashdot")) return("longdashdot")
+      # Fallback to whatever Plotly accepts
+      return(lt)
+    },
 
     # Render stored optimization trace layers
     render_optimization_trace_layers = function() {
@@ -354,6 +374,12 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
       marker_color = layer_spec$marker_color
       aargs = layer_spec$args
 
+      # Resolve line type (dash) if provided; map common R/ggplot linetypes to Plotly dashes
+      dash = NULL
+      if (!is.null(layer_spec$line_type)) {
+        dash = private$map_line_type_to_dash(layer_spec$line_type)
+      }
+
       # Resolve color if it's "auto"
       if (line_color == "auto") {
         private$.trace_count = private$.trace_count + 1
@@ -369,16 +395,12 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
       # Set offset defaults based on layer type
       if (private$.layer_primary == "contour") {
         checkmate::assertNumeric(offset, len = 2L, null.ok = TRUE)
-        if (is.null(offset)) {
-          offset = rep(0, 2)
-        }
+        if (is.null(offset)) offset = rep(0, 2)
         offset[3] = 0
       }
       if (private$.layer_primary == "surface") {
         checkmate::assertNumeric(offset, len = 3L, null.ok = TRUE)
-        if (is.null(offset)) {
-          offset = rep(0, 3)
-        }
+        if (is.null(offset)) offset = rep(0, 3)
       }
 
       # Add to opts for animation support
@@ -386,95 +408,84 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
         private$.opts = c(private$.opts, list(c(layer_spec, list(line_color = line_color))))
       }
 
-      # Assert marker styling:
+      # Assert marker styling
       checkmate::assertIntegerish(add_marker_at, lower = 1, upper = nrow(opt$archive))
       if (is.null(marker_shape)) marker_shape = NA
       if (length(marker_shape) == 1) marker_shape = rep(marker_shape, length(add_marker_at))
       mvals = NULL
-      if (private$.layer_primary == "contour") {
-        mvals = schema(F)$traces$scatter$attributes$marker$symbol$values
-      }
-      if (private$.layer_primary == "surface") {
-        mvals = schema(F)$traces$scatter3d$attributes$marker$symbol$values
-      }
-      invisible(lapply(marker_shape, function(marker_shape) checkmate::assertChoice(marker_shape, choices = c(mvals, NA))))
+      if (private$.layer_primary == "contour") mvals = schema(F)$traces$scatter$attributes$marker$symbol$values
+      if (private$.layer_primary == "surface") mvals = schema(F)$traces$scatter3d$attributes$marker$symbol$values
+      invisible(lapply(marker_shape, function(ms) checkmate::assertChoice(ms, choices = c(mvals, NA))))
 
       if (is.null(marker_color)) marker_color = line_color
-      if (length(marker_color) == 1) {
-        marker_color = rep(marker_color, length(marker_shape))
-      }
+      if (length(marker_color) == 1) marker_color = rep(marker_color, length(marker_shape))
       checkmate::assertCharacter(marker_color, len = length(marker_shape), null.ok = TRUE)
 
-      # Define marker coordinates for plotting:
+      # Define marker coordinates for plotting
       xmat = do.call(rbind, c(opt$archive$x_in[1], opt$archive$x_out))
       xmarkers = data.frame(
-        x = xmat[, 1] + offset[1], y = xmat[, 2] + offset[2],
+        x = xmat[, 1] + offset[1],
+        y = xmat[, 2] + offset[2],
         z = c(opt$archive$fval_in[1], opt$archive$fval_out) + offset[3]
       )
-      if (is.null(npoints)) {
-        npoints = nrow(xmarkers)
-      }
+      if (is.null(npoints)) npoints = nrow(xmarkers)
       if (is.null(npmax)) {
         npmax = nrow(xmarkers)
-        if (npmax > nrow(xmarkers)) {
-          npmax = nrow(xmarkers)
-        }
+        if (npmax > nrow(xmarkers)) npmax = nrow(xmarkers)
       }
-      # Cut marker after npmax iterations (if specified):
       xmr = xmarkers[unique(round(seq(1, nrow(xmarkers), length.out = npoints))), ]
       xmr = xmr[seq_len(npmax), ]
       add_marker_at = add_marker_at[add_marker_at <= npmax]
 
-      ptype = NULL
-      if (is.null(name)) {
-        name = paste0(opt$id, " on ", opt$objective$id)
-      }
+      if (is.null(name)) name = paste0(opt$id, " on ", opt$objective$id)
 
-      # Define the plotting arguments as list, so we can call `do.call` with these arguments. This is
-      # more comfortable due to just one call to `add_trace`. Additionally, it is easier to control
-      # different default stylings (such as line width) and to recreate the layer with the stored arguments:
+      # Resolve effective line width from theme or layer override
+      eff = private$.effective_theme
+      base_lw = if (is.null(eff$line_width)) 1.2 else eff$line_width
+      lw = if (is.null(layer_spec$line_width)) base_lw else layer_spec$line_width
+
+      # Build trace args
+      ptype = NULL
       if (private$.layer_primary == "surface") {
         ptype = "scatter3d"
-        eff = private$.effective_theme
-        lw = (if (is.null(eff$line_width)) 1.2 else eff$line_width) * 2
+        line_list = list(color = line_color, width = lw)
         pargs = list(
           name = name,
           x = xmr$x,
           y = xmr$y,
           z = xmr$z,
           marker = list(color = line_color, line = list(color = mcolor_out, width = lw)),
-          line = list(color = line_color, width = lw)
+          line = line_list
         )
       }
       if (private$.layer_primary == "contour") {
         ptype = "scatter"
-        eff = private$.effective_theme
-        lw = (if (is.null(eff$line_width)) 1.2 else eff$line_width) * 2
         msize = if (is.null(eff$point_size)) 6 else eff$point_size
+        line_list = list(color = line_color, width = lw)
+        if (!is.null(dash)) line_list$dash = dash
         pargs = list(
           name = name,
           x = xmr$x,
           y = xmr$y,
           marker = list(color = line_color, size = msize, line = list(color = mcolor_out, width = lw)),
-          line = list(color = line_color, width = lw)
+          line = line_list
         )
       }
-      if (is.null(ptype)) {
-        stop("No known plot mode")
-      }
+      if (is.null(ptype)) stop("No known plot mode")
       pargs$type = ptype
 
-      # Add optimization traces as lines to the plot:
+      # Remove any unsupported aliases from ... to avoid warnings
+      aargs_clean = mlr3misc::remove_named(aargs, c("line_type", "linetype", "lty", "line_width", "linewidth", "lwd"))
+
+      # Add optimization trace line
       private$.plot = do.call(add_trace, c(
         list(private$.plot),
-        mlr3misc::insert_named(mlr3misc::remove_named(pargs, "marker"), aargs),
+        mlr3misc::insert_named(mlr3misc::remove_named(pargs, "marker"), aargs_clean),
         list(mode = "lines")
       ))
 
-      # Now add marker to the lines. Marker are added at `add_marker_at` iterations
-      # and with the specified shape and color:
+      # Add markers at specified iterations
       pargs = list(
-        # Ensure array-like for plotly/kaleido even when length == 1
         x = if (length(add_marker_at) == 1) list(xmarkers$x[add_marker_at]) else xmarkers$x[add_marker_at],
         y = if (length(add_marker_at) == 1) list(xmarkers$y[add_marker_at]) else xmarkers$y[add_marker_at],
         z = if (length(add_marker_at) == 1) list(xmarkers$z[add_marker_at]) else xmarkers$z[add_marker_at],
@@ -483,9 +494,7 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
         marker = mlr3misc::insert_named(pargs$marker, list(symbol = marker_shape, color = marker_color)),
         showlegend = FALSE
       )
-      if (private$.layer_primary == "contour") {
-        pargs$z = NULL
-      }
+      if (private$.layer_primary == "contour") pargs$z = NULL
       private$.plot = do.call(add_trace, c(list(private$.plot), pargs))
     },
 
