@@ -65,7 +65,7 @@ NULL
 
   go = reticulate::import("plotly.graph_objects", delay_load = TRUE)
   kaleido = reticulate::import("kaleido", delay_load = TRUE)
-  # Ensure a Chrome/Chromium is available for Kaleido; if missing, prompt to install
+  # Ensure a Chrome/Chromium is available for Kaleido; if missing, instruct user to install
   has_chrome = TRUE
   if (reticulate::py_has_attr(kaleido, "has_chrome")) {
     has_chrome = tryCatch(isTRUE(kaleido$has_chrome()), error = function(e) FALSE)
@@ -82,22 +82,12 @@ NULL
     if (has_chrome && file.exists(tmp_png)) unlink(tmp_png)
   }
   if (!has_chrome) {
-    if (interactive() && reticulate::py_has_attr(kaleido, "get_chrome")) {
-      msg = paste0(
-        "Kaleido requires Chrome/Chromium for static image export, but none was found.\n",
-        "Download and install a local Chrome now via kaleido$get_chrome()?"
+    stop(
+      paste(
+        "Kaleido requires Chrome/Chromium for static image export, but none was found.",
+        "Please install Google Chrome or Chromium and ensure it is discoverable by Kaleido."
       )
-      resp = utils::askYesNo(msg, default = TRUE)
-      if (isTRUE(resp)) {
-        try(kaleido$get_chrome(), silent = TRUE)
-      } else {
-        message("Skipping Chrome install. You can run reticulate::import('kaleido')$get_chrome() later.")
-      }
-    } else {
-      message(
-        "Kaleido could not find Chrome/Chromium. Run reticulate::import('kaleido')$get_chrome() to install, or configure kaleido to use an existing Chrome."
-      )
-    }
+    )
   }
   sanitize_ranges = function(ax) {
     if (is.null(ax) || !is.list(ax)) return(ax)
