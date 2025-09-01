@@ -106,14 +106,18 @@ vis$add_training_data(
 ```{r, eval=FALSE}
 vis$add_optimization_trace(
   optimizer,                # Optimizer object with trace data
-  line_color = "auto",      # Auto-assign from theme palette
-  line_width = NULL,        # Uses theme$line_width if NULL
+  line_color = NULL,        # Color of the trace line (NULL -> "auto" resolved at plot time)
+  line_width = NULL,        # Width of trace line (NULL -> theme$line_width)
   line_type = "solid",      # Line type: "solid", "dashed", "dotted"
-  marker_color = NULL,      # Marker color (defaults to line color)
-  marker_size = NULL,       # Uses theme$point_size if NULL
-  alpha = NULL,             # Uses theme$alpha if NULL
-  show_start_end = TRUE,    # Highlight start/end points
-  name = NULL               # Trace name for legend
+  npoints = NULL,           # Number of points to show from the trace (NULL -> all)
+  npmax = NULL,             # Maximum number of points to show (post-processing cap)
+  name = NULL,              # Name for the trace (legend)
+  add_marker_at = 1,        # Iteration numbers where to add markers
+  marker_size = 3,          # Size of markers
+  marker_shape = 16,        # Marker shape (ggplot2 integer or plotly symbol)
+  marker_color = NULL,      # Color of markers (NULL -> uses line color)
+  show_start_end = TRUE,    # Highlight start/end points (2D only)
+  alpha = NULL              # Alpha transparency (NULL -> theme$alpha)
 )
 ```
 
@@ -125,23 +129,23 @@ The `plot()` method accepts theme overrides and functional parameters:
 vis$plot(
   # Theme override (merged with instance theme)
   theme = list(
-    palette = "grayscale",     # Override palette for this plot
-    text_size = 16,            # Override text size
-    alpha = 0.5,               # Override default alpha
-    theme = "classic"          # Override ggplot2 theme
+    palette = "grayscale",      # Override palette for this plot
+    text_size = 16,             # Override text size
+    alpha = 0.5,                # Override default alpha
+    theme = "classic"           # Override ggplot2 theme
   ),
 
-  show_title = TRUE,           # Show/hide title
-  plot_title = "My Plot",      # Custom title
-  plot_subtitle = "Subtitle",  # Add subtitle
-  x_lab = "X Variable",        # Custom axis labels
+  show_title = TRUE,            # Show/hide title
+  plot_title = "My Plot",       # Custom title
+  plot_subtitle = "Subtitle",   # Add subtitle
+  show_legend = TRUE,           # Show/hide legend
+  legend_title = "Legend",      # Custom legend title
+  x_lab = "X Variable",         # Custom axis labels
   y_lab = "Y Variable",
-  z_lab = "Z Variable",        # For surface plots
-  x_limits = c(-2, 2),         # Custom axis limits
+  z_lab = "Z Variable",         # For surface plots
+  x_limits = c(-2, 2),          # Custom axis limits
   y_limits = c(-1, 1),
-  z_limits = c(0, 100),        # For surface plots
-  show_legend = TRUE,          # Show/hide legend
-  legend_title = "Legend"      # Custom legend title
+  z_limits = c(0, 100)          # For surface plots
 )
 ```
 

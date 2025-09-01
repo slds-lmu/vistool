@@ -30,34 +30,36 @@ Visualizer = R6::R6Class("Visualizer",
     #' This method should be called by all child classes via `super$plot(...)`.
     #' @param theme (`list`)\cr
     #'   Partial theme override for this render; see vistool_theme().
+    #' @template param_show_title
     #' @template param_plot_title
     #' @template param_plot_subtitle
+    #' @template param_show_legend
+    #' @template param_legend_title
     #' @template param_x_lab
     #' @template param_y_lab
     #' @template param_z_lab_custom
     #' @template param_x_limits
     #' @template param_y_limits
     #' @template param_z_limits
-    #' @template param_show_legend
-    #' @template param_legend_title
-    #' @template param_show_title
     #' @return Invisible self for method chaining (child classes handle actual plot creation).
     plot = function(theme = NULL,
-                    plot_title = NULL, plot_subtitle = NULL, x_lab = NULL, y_lab = NULL, z_lab = NULL,
-                    x_limits = NULL, y_limits = NULL, z_limits = NULL,
-                    show_legend = TRUE, legend_title = NULL, show_title = TRUE) {
+                    show_title = TRUE,
+                    plot_title = NULL, plot_subtitle = NULL,
+                    show_legend = TRUE, legend_title = NULL,
+                    x_lab = NULL, y_lab = NULL, z_lab = NULL,
+                    x_limits = NULL, y_limits = NULL, z_limits = NULL) {
       # Validate and store render params
+      checkmate::assert_flag(show_title)
       checkmate::assert_string(plot_title, null.ok = TRUE)
       checkmate::assert_string(plot_subtitle, null.ok = TRUE)
+      checkmate::assert_flag(show_legend)
+      checkmate::assert_string(legend_title, null.ok = TRUE)
       checkmate::assert_string(x_lab, null.ok = TRUE)
       checkmate::assert_string(y_lab, null.ok = TRUE)
       checkmate::assert_string(z_lab, null.ok = TRUE)
       checkmate::assert_numeric(x_limits, len = 2, null.ok = TRUE)
       checkmate::assert_numeric(y_limits, len = 2, null.ok = TRUE)
       checkmate::assert_numeric(z_limits, len = 2, null.ok = TRUE)
-      checkmate::assert_flag(show_legend)
-      checkmate::assert_string(legend_title, null.ok = TRUE)
-      checkmate::assert_flag(show_title)
       if (!is.null(theme)) assert_vistool_theme(theme)
 
       # Resolve effective theme and store render params
