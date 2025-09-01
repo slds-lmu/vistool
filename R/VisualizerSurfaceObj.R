@@ -441,7 +441,7 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
 
       # Resolve effective line width from theme or layer override
       eff = private$.effective_theme
-      base_lw = if (is.null(eff$line_width)) 1.2 else eff$line_width
+      base_lw = if (is.null(eff$line_width)) 4.2 else (eff$line_width + 3)
       lw = if (is.null(layer_spec$line_width)) base_lw else layer_spec$line_width
 
       # Build trace args

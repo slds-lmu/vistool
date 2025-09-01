@@ -182,7 +182,7 @@ oo2$optimize(steps = 100)
 oo3$optimize(steps = 100)
 ```
 
-Optimization traces added with `$add_optimization_trace` support many customization options (see the [Customization Guide](customization_guide.html)):
+Optimization traces support many customization options (see the [Customization Guide](customization_guide.html)):
 
 ```{r, out.width='100%', out.height='700px'}
 viz = as_visualizer(obj_lm, x1_limits = c(-0.5, 5), x2_limits = c(-3.2, 2.8), type = "surface")
