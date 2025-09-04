@@ -25,15 +25,3 @@ navbar:
         href: articles/customization_guide.html
       - text: "Advanced Options"
         href: articles/advanced_visualization.html
-
-# articles:
-#   - title: Core
-#     contents:
-#       - loss_functions
-#       - model
-#       - objective
-#       - optimization_traces
-#   - title: Customization
-#     contents:
-#       - customization_guide
-#       - advanced_visualization

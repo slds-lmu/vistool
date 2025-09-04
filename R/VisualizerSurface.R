@@ -188,8 +188,11 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
     #' This method is used internally by plot(layout = ...) and should not be called directly.
     #' @param ... Layout options directly passed to `layout(...)`.
     set_layout = function(...) {
+      # persist provided layout; apply immediately only if a plot exists
       private$.layout = list(...)
-      private$.plot = private$.plot %>% plotly::layout(...)
+      if (!is.null(private$.plot)) {
+        private$.plot = do.call(plotly::layout, c(list(private$.plot), private$.layout))
+      }
 
       return(invisible(self))
     },
@@ -200,17 +203,23 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
     #' @param y (`numeric(1)`) The view from which the "camera looks down" to the plot.
     #' @param z (`numeric(1)`) The view from which the "camera looks down" to the plot.
     set_scene = function(x, y, z) {
-      if (is.null(private$.plot)) private$.init_default_plot()
       checkmate::assert_number(x)
       checkmate::assert_number(y)
       checkmate::assert_number(z)
 
-      if (private$.layer_primary != "surface") {
+      # If a plot exists and is not a surface, disallow. If no plot yet, just persist.
+      if (!is.null(private$.layer_primary) && private$.layer_primary != "surface") {
         stop("Scene can only be set for `surface` plots")
       }
 
-      private$.plot = private$.plot %>%
-        plotly::layout(scene = list(camera = list(eye = list(x = x, y = y, z = z))))
+      # persist camera eye for re-application in plot()
+      private$.scene_eye = list(x = x, y = y, z = z)
+
+      # if a plot already exists, update it immediately; otherwise it will be applied in plot()
+  if (!is.null(private$.plot)) {
+        private$.plot = private$.plot %>%
+          plotly::layout(scene = list(camera = list(eye = private$.scene_eye)))
+      }
 
       return(invisible(self))
     },
@@ -354,14 +363,22 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
         }
       }
 
-      # Apply additional layout options if provided
+      # Apply additional layout options if provided; otherwise re-apply any
+      # persisted layout set previously via set_layout().
       if (!is.null(settings$layout)) {
         private$.plot = do.call(plotly::layout, c(list(private$.plot), settings$layout))
+      } else if (length(private$.layout)) {
+        private$.plot = do.call(plotly::layout, c(list(private$.plot), private$.layout))
       }
 
-      # Apply scene options if provided (only for surface plots)
-      if (!is.null(settings$scene) && private$.layer_primary == "surface") {
-        private$.plot = private$.plot %>% plotly::layout(scene = settings$scene)
+      # Apply scene options if provided (only for surface plots). If not provided,
+      # use any camera set previously via set_scene().
+      if (private$.layer_primary == "surface") {
+        if (!is.null(settings$scene)) {
+          private$.plot = private$.plot %>% plotly::layout(scene = settings$scene)
+        } else if (!is.null(private$.scene_eye)) {
+          private$.plot = private$.plot %>% plotly::layout(scene = list(camera = list(eye = private$.scene_eye)))
+        }
       }
 
       # Add points from add_points() method
@@ -398,6 +415,9 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
 
     # @field .surface_plot_settings (`list`) Store VisualizerSurface-specific plot settings
     .surface_plot_settings = list(),
+
+  # Persisted camera eye set via set_scene(); applied on plot() when present
+  .scene_eye = NULL,
 
     # Initialize default surface plot (called automatically by plot())
     .init_default_plot = function() {

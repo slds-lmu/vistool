@@ -223,7 +223,6 @@ vis1$set_theme(vistool_theme(palette = "grayscale"))  # Now uses grayscale
 
 ## See also
 
-- [Getting Started](getting_started.html)
 - [Loss Functions](loss_functions.html)
 - [Model Predictions](model.html)
 - [Objective Functions](objective.html)

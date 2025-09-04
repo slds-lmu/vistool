@@ -30,6 +30,8 @@ The `as_visualizer()` function automatically creates appropriate visualizers for
 By default, it uses `ggplot2` for 1D and 2D visualizations. 
 For 2D tasks, you can optionally specify `type = "surface"` to get interactive `plotly` surface plots.
 
+## Prediction surfaces
+
 Let's start with the `california_housing` data set.
 The goal is to predict the median house value for California districts.
 We subset the data set to only use the features `median_income` and `housing_median_age`, and sample 2000 observations for faster rendering.
@@ -81,6 +83,8 @@ vis$plot(flatten = TRUE)
 ```
 
 To switch back to the surface plot, simply use `flatten = FALSE` (or omit the parameter since it's the default).
+
+## Classification tasks
 
 It is also possible to visualize classification tasks.
 We use the `pima` data set and impute the missing values.
@@ -134,9 +138,8 @@ hyp = hypothesis(pi_fun, type = "classif", predictors = c("x", "y"), link = "log
 as_visualizer(hyp, type = "surface", domain = hyp$domain)$plot()
 ```
 
-## Hypothesis on a real task (surface)
-
-You can also skip training a learner and visualize a hand-crafted hypothesis directly on a real 2D task. Below, we return to the California Housing task with two features and define a simple regression hypothesis over those features, then render it as an interactive surface.
+You can also skip training a learner and visualize a hand-crafted hypothesis directly on a real 2D task.
+Below, we return to the California Housing task with two features and define a simple regression hypothesis over those features, then render it as an interactive surface.
 
 ```{r, out.width='100%', out.height='700px'}
 fun = function(median_income, housing_median_age) {
@@ -178,7 +181,6 @@ The translucent squares represent the squared error areas; the vertical segments
 
 ## See also
 
-- [Getting Started](getting_started.html)
 - [Loss Functions](loss_functions.html)
 - [Objective Functions](objective.html)
 - [Optimization & Traces](optimization_traces.html)

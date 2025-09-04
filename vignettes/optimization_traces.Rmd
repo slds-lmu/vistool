@@ -63,7 +63,7 @@ A layer of the `Visualizer` class is `$add_optimization_trace()` that gets the o
 
 ```{r, out.width='100%', out.height='700px'}
 viz = as_visualizer(obj, type = "surface")
-viz$add_optimization_trace(opt)
+viz$add_optimization_trace(opt, name = "GD")
 viz$plot()
 ```
 
@@ -220,7 +220,6 @@ viz_2d$plot()
 
 ## See also
 
-- [Getting Started](getting_started.html)
 - [Loss Functions](loss_functions.html)
 - [Model Predictions](model.html)
 - [Objective Functions](objective.html)

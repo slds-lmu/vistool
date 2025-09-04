@@ -94,6 +94,80 @@ test_that("VisualizerSurface scene setting works", {
 
   p = vis$plot()
   expect_s3_class(p, "plotly")
+
+  # The layout should contain the camera eye we set (or in layout attrs)
+  eye1 = NULL
+  if (!is.null(p$x$layout$scene$camera$eye)) {
+    eye1 = p$x$layout$scene$camera$eye
+  } else if (length(p$x$layoutAttrs)) {
+    # fallback: find scene camera in layoutAttrs
+    for (la in p$x$layoutAttrs) {
+      if (!is.null(la$scene$camera$eye)) {
+        eye1 = la$scene$camera$eye
+        break
+      }
+    }
+  }
+  expect_true(!is.null(eye1))
+  expect_equal(unname(c(eye1$x, eye1$y, eye1$z)), c(1.1, 1.2, 1.3), tolerance = 1e-8)
+
+  # Now change the scene and expect a different camera after re-plot
+  vis$set_scene(x = 0.7, y = 0.7, z = 2.0)
+  p2 = vis$plot()
+  expect_s3_class(p2, "plotly")
+  eye2 = NULL
+  if (!is.null(p2$x$layout$scene$camera$eye)) {
+    eye2 = p2$x$layout$scene$camera$eye
+  } else if (length(p2$x$layoutAttrs)) {
+    for (la in p2$x$layoutAttrs) {
+      if (!is.null(la$scene$camera$eye)) {
+        eye2 = la$scene$camera$eye
+        break
+      }
+    }
+  }
+  expect_true(!is.null(eye2))
+  expect_equal(unname(c(eye2$x, eye2$y, eye2$z)), c(0.7, 0.7, 2.0), tolerance = 1e-8)
+})
+
+test_that("VisualizerSurface set_layout persists and re-applies", {
+  skip_if_not_installed("plotly")
+
+  # Create simple data
+  x1 = seq(-1, 1, length.out = 3)
+  x2 = seq(-1, 1, length.out = 3)
+  z_matrix = outer(x1, x2, function(x, y) x^2 + y^2)
+
+  vis = VisualizerSurface$new(
+    grid = list(x1 = x1, x2 = x2),
+    zmat = z_matrix
+  )
+
+  # Set a custom layout before any plot
+  vis$set_layout(title = list(text = "MyTitle", font = list(size = 18)), showlegend = TRUE)
+
+  # First plot should include layout
+  p = vis$plot()
+  expect_s3_class(p, "plotly")
+  title_text1 = NULL
+  if (!is.null(p$x$layout$title$text)) title_text1 = p$x$layout$title$text
+  if (is.null(title_text1) && length(p$x$layoutAttrs)) {
+    for (la in p$x$layoutAttrs) {
+      if (!is.null(la$title$text)) { title_text1 = la$title$text; break }
+    }
+  }
+  expect_equal(title_text1, "MyTitle")
+
+  # Re-plot without passing layout; title should persist
+  p2 = vis$plot()
+  title_text2 = NULL
+  if (!is.null(p2$x$layout$title$text)) title_text2 = p2$x$layout$title$text
+  if (is.null(title_text2) && length(p2$x$layoutAttrs)) {
+    for (la in p2$x$layoutAttrs) {
+      if (!is.null(la$title$text)) { title_text2 = la$title$text; break }
+    }
+  }
+  expect_equal(title_text2, "MyTitle")
 })
 
 test_that("VisualizerSurface input validation works", {

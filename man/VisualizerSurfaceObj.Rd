@@ -115,6 +115,7 @@ Add an optimization trace.
   opt,
   line_color = NULL,
   mcolor_out = "black",
+  line_width = NULL,
   npoints = NULL,
   npmax = NULL,
   name = NULL,
@@ -122,6 +123,7 @@ Add an optimization trace.
   add_marker_at = 1,
   marker_shape = "circle",
   marker_color = NULL,
+  line_type = NULL,
   ...
 )}\if{html}{\out{</div>}}
 }
@@ -138,6 +140,9 @@ The color of the trace.}
 \item{\code{mcolor_out}}{(`character(1)`)\cr
 The outer line color of the marker.}
 
+\item{\code{line_width}}{(`numeric(1)`)\cr
+Width of the optimization trace line. If `NULL`, uses theme$line_width.}
+
 \item{\code{npoints}}{(`integer(1)`)\cr
 The number of used points from the archive.
 Default is `NULL` which means that all points are used.
@@ -148,7 +153,7 @@ The number of points used from the sequence `seq_len(nrow(opt$archive))[seq_len(
 
 \item{\code{name}}{(`character(1)`)\cr
 The name of the trace in the legend.
-Default is `NULL` which means that the name is pasted from `opt$id` and `objective$id`.}
+Default is `NULL` which uses only `opt$id` (optimizer ID).}
 
 \item{\code{offset}}{(`numeric(3)`)\cr
 Trace shift in direction (x, y, z).}
@@ -165,6 +170,10 @@ If `marker_shape = NA`, no marker are added.}
 
 \item{\code{marker_color}}{(`character()`)\cr
 The colors for the markers.}
+
+\item{\code{line_type}}{(`character(1)`)
+Line type for the optimization trace (e.g., "solid", "dashed", "dotted", "dash", "dot", "dashdot").
+Mapped to Plotly's `line$dash`. If `NULL`, defaults to solid.}
 
 \item{\code{...}}{Further arguments passed to `add_trace(...)`.}
 }

@@ -178,7 +178,6 @@ subplot(visualizers, nrows = 8)
 
 ## See also
 
-- [Getting Started](getting_started.html)
 - [Loss Functions](loss_functions.html)
 - [Model Predictions](model.html)
 - [Optimization & Traces](optimization_traces.html)

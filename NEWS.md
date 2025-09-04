@@ -8,12 +8,12 @@
 * For 1D regression tasks, `add_points()` allows specifying a loss geometry for L1 (residuals) and L2 (squares) losses.
 * `as_visualizer.Objective` accepts `allow_extrapolation`, whether to evaluate the objective outside its evaluation (canonical) bounds when plot limits; by default, only canonical bounds are plotted.
 * Automatic declaration of Python `kaleido` dependency via `reticulate::py_require()` (reticulate >= 1.41) to support saving surface plots without manual Miniconda setup.
+* New theme system.
 
 # vistool 0.3.2
 
 * Added options to specify color and shape for training data of classification tasks.
 * Added layers are now rendered in the order they were added.
-* New theme system.
 * Various fixes.
 
 # vistool 0.3.1

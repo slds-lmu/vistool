@@ -205,7 +205,6 @@ p + labs(title = "TF Franke Function")
 
 ## See also
 
-- [Getting Started](getting_started.html)
 - [Loss Functions](loss_functions.html)
 - [Model Predictions](model.html)
 - [Objective Functions](objective.html)
