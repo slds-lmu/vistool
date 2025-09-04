@@ -216,7 +216,7 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
       private$.scene_eye = list(x = x, y = y, z = z)
 
       # if a plot already exists, update it immediately; otherwise it will be applied in plot()
-  if (!is.null(private$.plot)) {
+      if (!is.null(private$.plot)) {
         private$.plot = private$.plot %>%
           plotly::layout(scene = list(camera = list(eye = private$.scene_eye)))
       }
@@ -416,8 +416,8 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
     # @field .surface_plot_settings (`list`) Store VisualizerSurface-specific plot settings
     .surface_plot_settings = list(),
 
-  # Persisted camera eye set via set_scene(); applied on plot() when present
-  .scene_eye = NULL,
+    # Persisted camera eye set via set_scene(); applied on plot() when present
+    .scene_eye = NULL,
 
     # Initialize default surface plot (called automatically by plot())
     .init_default_plot = function() {

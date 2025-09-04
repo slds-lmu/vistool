@@ -146,7 +146,7 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
         mcolor_out = mcolor_out,
         npoints = npoints,
         npmax = npmax,
-      name = if (is.null(name)) opt$id else name,
+        name = if (is.null(name)) opt$id else name,
         offset = offset,
         add_marker_at = add_marker_at,
         marker_shape = marker_shape,
@@ -437,7 +437,7 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
       xmr = xmr[seq_len(npmax), ]
       add_marker_at = add_marker_at[add_marker_at <= npmax]
 
-  if (is.null(name)) name = opt$id
+      if (is.null(name)) name = opt$id
 
       # Resolve effective line width from theme or layer override
       eff = private$.effective_theme

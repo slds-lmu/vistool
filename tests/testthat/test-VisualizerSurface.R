@@ -153,7 +153,10 @@ test_that("VisualizerSurface set_layout persists and re-applies", {
   if (!is.null(p$x$layout$title$text)) title_text1 = p$x$layout$title$text
   if (is.null(title_text1) && length(p$x$layoutAttrs)) {
     for (la in p$x$layoutAttrs) {
-      if (!is.null(la$title$text)) { title_text1 = la$title$text; break }
+      if (!is.null(la$title$text)) {
+        title_text1 = la$title$text
+        break
+      }
     }
   }
   expect_equal(title_text1, "MyTitle")
@@ -164,7 +167,10 @@ test_that("VisualizerSurface set_layout persists and re-applies", {
   if (!is.null(p2$x$layout$title$text)) title_text2 = p2$x$layout$title$text
   if (is.null(title_text2) && length(p2$x$layoutAttrs)) {
     for (la in p2$x$layoutAttrs) {
-      if (!is.null(la$title$text)) { title_text2 = la$title$text; break }
+      if (!is.null(la$title$text)) {
+        title_text2 = la$title$text
+        break
+      }
     }
   }
   expect_equal(title_text2, "MyTitle")
