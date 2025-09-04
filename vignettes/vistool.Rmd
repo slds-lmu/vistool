@@ -1,0 +1,119 @@
+---
+title: "Getting Started"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting Started}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  dpi = 150,
+  dev = "png",
+  out.width = "100%",
+  fig.retina = 2
+)
+```
+
+```{r, message=FALSE}
+library(vistool)
+set.seed(1)
+```
+
+## What is vistool?
+
+`vistool` helps visualize optimization concepts and model predictions:
+- Loss functions (regression/classification)
+- Objective functions (1D/2D test functions and custom objectives)
+- Optimization traces (GD, Momentum, Nesterov)
+- Model prediction surfaces and decision boundaries
+
+You can render either with `ggplot2` (2D) or interactively with `plotly` (3D surfaces).
+
+## Installation
+
+Install the development version from GitHub:
+
+```r
+# install.packages("pak")
+pak::pak("slds-lmu/vistool")
+```
+
+### Plotly backend and static export
+
+- Interactive surfaces use `plotly`.
+- Saving plotly surfaces as static images uses `plotly::save_image()`, which relies on the Python package `kaleido` (a separate Chrome/Chromium installation is required).
+- On first use of save/export, `vistool` triggers `reticulate::py_require("kaleido")` to provision a cached Python environment automatically.
+
+If you prefer to manage Python yourself, ensure `kaleido` is installed and that `reticulate` points to your Python:
+
+```r
+# optional manual setup
+install.packages("reticulate")
+# Sys.setenv(RETICULATE_PYTHON = "/path/to/python")
+reticulate::py_install("kaleido")
+```
+
+## Quick tour
+
+### 1) Loss functions
+
+```{r}
+vis_loss = as_visualizer(lss("regr.huber"), y_pred = seq(-4, 4), y_true = 0)
+vis_loss$plot()
+```
+
+### 2) Objective functions (2D)
+
+```{r}
+vis_obj = as_visualizer(obj("TF_branin"))   # ggplot2 contours
+vis_obj$plot()
+```
+
+Use an interactive surface instead:
+
+```{r, out.width='100%', out.height='600px'}
+vis_obj3d = as_visualizer(obj("TF_branin"), type = "surface")
+vis_obj3d$plot()
+```
+
+### 3) Model predictions (2D task)
+
+```{r}
+library(mlr3)
+library(mlr3learners)
+library(mlr3pipelines)
+
+task = tsk("pima")
+task = po("imputemean")$train(list(task))[[1]]
+task$select(c("insulin", "mass"))
+learner = lrn("classif.svm", predict_type = "prob")
+vis_model = as_visualizer(task, learner = learner)
+vis_model$plot()
+```
+
+For an interactive surface, set `type = "surface"`:
+
+```{r, out.width='100%', out.height='600px'}
+vis_model_surf = as_visualizer(task, learner = learner, type = "surface")
+vis_model_surf$plot()
+```
+
+### 4) Saving a surface (optional)
+
+```{r, eval=FALSE}
+# Requires Python package 'kaleido' (auto-provisioned on first use)
+vis_obj3d$save("branin.png", width = 600, height = 500)
+```
+
+## See also
+
+- [Loss Functions](loss_functions.html)
+- [Model Predictions](model.html)
+- [Objective Functions](objective.html)
+- [Optimization & Traces](optimization_traces.html)
+- [Customization Guide](customization_guide.html)
+- [Advanced Visualization](advanced_visualization.html)

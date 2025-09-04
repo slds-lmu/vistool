@@ -22,6 +22,7 @@ knitr::opts_chunk$set(
 library(vistool)
 library(mlr3)
 library(mlr3learners)
+set.seed(1)
 ```
 
 The vistool package provides a flexible theme system that separates **what to plot** from **how to plot**. The three-step workflow:
@@ -192,10 +193,12 @@ vis$add_training_data(color = "auto")  # Uses theme palette
 vis$add_boundary(color = "black")      # Manual override
 
 # 4. Plot with theme override for this render only
-vis$plot(theme = list(text_size = 14, legend_position = "top"))
+vis$plot(theme = list(text_size = 14, legend_position = "top"), show_title = FALSE)
+```
 
+```{r, eval=FALSE}
 # 5. Save uses the cached plot for efficiency
-# vis$save("my_plot.png", width = 8, height = 6)
+vis$save("my_plot.png", width = 8, height = 6)
 ```
 
 ## Package-Level Defaults
@@ -217,3 +220,12 @@ vis2 = as_visualizer(obj("TF_gaussian1"))  # Also uses plasma palette
 # Instance themes still override package defaults
 vis1$set_theme(vistool_theme(palette = "grayscale"))  # Now uses grayscale
 ```
+
+## See also
+
+- [Getting Started](getting_started.html)
+- [Loss Functions](loss_functions.html)
+- [Model Predictions](model.html)
+- [Objective Functions](objective.html)
+- [Optimization & Traces](optimization_traces.html)
+- [Advanced Visualization](advanced_visualization.html)

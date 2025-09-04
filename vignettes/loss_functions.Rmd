@@ -1,8 +1,8 @@
 ---
-title: "Visualization of Loss Functions"
+title: "Loss Functions"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Visualization of Loss Functions}
+  %\VignetteIndexEntry{Loss Functions}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -20,6 +20,7 @@ knitr::opts_chunk$set(
 
 ```{r, message=FALSE}
 library(vistool)
+set.seed(1)
 options(vistool.theme = vistool_theme(
   palette = "plasma"
 ))
@@ -175,3 +176,12 @@ custom_loss = LossFunction$new(
 vis = as_visualizer(custom_loss, y_pred = seq(-10, 10), y_true = 0, n_points = 5000L)
 vis$plot()
 ```
+
+## See also
+
+- [Getting Started](getting_started.html)
+- [Model Predictions](model.html)
+- [Objective Functions](objective.html)
+- [Optimization & Traces](optimization_traces.html)
+- [Customization Guide](customization_guide.html)
+- [Advanced Visualization](advanced_visualization.html)

@@ -1,8 +1,8 @@
 ---
-title: "Visualization of Model Predictions"
+title: "Model Predictions"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Visualization of Model Predictions}
+  %\VignetteIndexEntry{Model Predictions}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -175,3 +175,12 @@ vis$add_points(pts, loss = "l2_se")$plot()
 ```
 
 The translucent squares represent the squared error areas; the vertical segments show absolute residuals. Use `loss = "l1"` to only draw residual segments.
+
+## See also
+
+- [Getting Started](getting_started.html)
+- [Loss Functions](loss_functions.html)
+- [Objective Functions](objective.html)
+- [Optimization & Traces](optimization_traces.html)
+- [Customization Guide](customization_guide.html)
+- [Advanced Visualization](advanced_visualization.html)

@@ -1,8 +1,8 @@
 ---
-title: "Visualization of Objective Functions"
+title: "Objective Functions"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Visualization of Objective Functions}
+  %\VignetteIndexEntry{Objective Functions}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -22,6 +22,7 @@ knitr::opts_chunk$set(
 library(vistool)
 library(plotly)
 library(purrr)
+set.seed(1)
 ```
 
 This vignette covers the basic usage of objective functions in `vistool`, including predefined objectives and how to define custom objectives.
@@ -174,3 +175,12 @@ visualizers = map(keys, function(key) {
 
 subplot(visualizers, nrows = 8)
 ```
+
+## See also
+
+- [Getting Started](getting_started.html)
+- [Loss Functions](loss_functions.html)
+- [Model Predictions](model.html)
+- [Optimization & Traces](optimization_traces.html)
+- [Customization Guide](customization_guide.html)
+- [Advanced Visualization](advanced_visualization.html)

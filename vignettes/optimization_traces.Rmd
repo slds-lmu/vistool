@@ -22,6 +22,7 @@ knitr::opts_chunk$set(
 library(vistool)
 library(plotly)
 library(purrr)
+set.seed(1)
 ```
 
 This vignette covers the available optimizers, step size control, and how to visualize optimization traces.
@@ -158,7 +159,7 @@ tail(my_oo$archive)
 
 ## Customization options
 
-Let's optimize a custom linear model objective (see the [Objective Functions vignette](objective_functions.html)) using the three available optimizers.
+Let's optimize a custom linear model objective (see the [Objective Functions vignette](objective.html)) using the three available optimizers.
 ```{r}
 # Define the linear model loss function as SSE:
 l2norm = function(x) sqrt(sum(crossprod(x)))
@@ -216,3 +217,12 @@ viz_2d$add_optimization_trace(oo3,
 
 viz_2d$plot()
 ```
+
+## See also
+
+- [Getting Started](getting_started.html)
+- [Loss Functions](loss_functions.html)
+- [Model Predictions](model.html)
+- [Objective Functions](objective.html)
+- [Customization Guide](customization_guide.html)
+- [Advanced Visualization](advanced_visualization.html)
