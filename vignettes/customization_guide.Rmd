@@ -25,7 +25,8 @@ library(mlr3learners)
 set.seed(1)
 ```
 
-The vistool package provides a flexible theme system that separates **what to plot** from **how to plot**. The three-step workflow:
+The vistool package provides a flexible theme system that separates **what to plot** from **how to plot**.
+The three-step workflow:
 
 1. **Initialize** the Visualizer using `as_visualizer()` (computational setup only - the **what**) and set the theme,
 2. **Add** visualization layers with automatic color management,
@@ -73,8 +74,8 @@ vis$plot(theme = list(text_size = 12, alpha = 0.9))
 
 ## Layer-Specific Customization
 
-All `add_*()` methods support style parameters that override theme defaults:
-TODO: see reference for specific methods (UPDATE THERE), just list 1 or 2 add methods as examples here.
+All `add_*()` methods support style parameters that override theme defaults (see the reference!).
+Below are common examples:
 
 ### `add_points()`
 ```{r, eval=FALSE}
@@ -89,18 +90,6 @@ vis$add_points(
   ordered = FALSE,          # Draw arrows between consecutive points
   arrow_color = NULL,       # Color of arrows
   arrow_size = 0.3          # Size of arrows
-)
-```
-
-### `add_training_data()`
-```{r, eval=FALSE}
-vis$add_training_data(
-  color = "auto",          # Auto-assign from theme palette
-  size = NULL,             # Uses theme$point_size if NULL
-  shape = 19,              # Point shape
-  alpha = NULL,            # Uses theme$alpha if NULL
-  show_labels = FALSE,     # Show data point indices
-  label_size = NULL        # Label text size
 )
 ```
 
@@ -151,6 +140,9 @@ vis$plot(
 )
 ```
 
+Note that you can further customize the returned plot objects directly by adding *manual layers*.
+For some examples, see the [Advanced Visualization](advanced_visualization.html) vignette.
+
 ## Automatic Color Management
 
 All visual elements support automatic color assignment using `color = "auto"`:
@@ -167,7 +159,7 @@ vis$set_theme(vistool_theme(palette = "plasma"))
 
 vis$add_optimization_trace(optimizer1, line_color = "auto")  # Gets first color
 vis$add_optimization_trace(optimizer2, line_color = "auto")  # Gets second color
-vis$add_points(custom_points, color = "auto")               # Gets third color
+vis$add_points(custom_points, color = "auto")                # Gets third color
 
 # Plot and colors will be consistent with plasma palette
 p = vis$plot()
@@ -221,9 +213,6 @@ vis2 = as_visualizer(obj("TF_gaussian1"))  # Also uses plasma palette
 # Instance themes still override package defaults
 vis1$set_theme(vistool_theme(palette = "grayscale"))  # Now uses grayscale
 ```
-
-# TODO
-FURTHER CUSTOMIZATION VIA GGPLOT2 / PLOTLY (from advanced visualization)
 
 ## See also
 

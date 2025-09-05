@@ -128,6 +128,24 @@ viz2$plot()
 
 ## Manual layers
 
+You can extend the returned plot objects directly:
+
+- ggplot2: modify the ggplot result with standard layers and themes
+
+```{r, eval=FALSE}
+viz2d = as_visualizer(obj("TF_franke"))
+p = viz2d$plot(show_title = FALSE)
+p + ggplot2::labs(title = "Franke Function") + ggplot2::theme_minimal()
+```
+
+- plotly: add traces or update layout/scene
+
+```{r, eval=FALSE}
+viz3d = as_visualizer(obj("TF_branin"), type = "surface")
+p = viz3d$plot()
+plotly::add_markers(p, x = c(0.5), y = c(0.5), z = c(0.0), name = "mark")
+```
+
 ```{r, out.width='100%', out.height='700px'}
 obj = obj("TF_banana")
 viz = as_visualizer(obj, type = "surface")
@@ -176,32 +194,6 @@ viz$animate(
 
 ![](gif1.gif)
 ![](gif2.gif)
-
-### Performance tips
-
-- Use `flatten = TRUE` when interactivity is not required to reduce rendering cost.
-- Reduce `n_points` in `as_visualizer(..., n_points = 80)` for heavy surfaces.
-- Prefer a single interactive surface per section; show additional views via saved images/GIFs.
-
-**Note:** Some sections show heavier surface examples; use flattened contours where interactivity is not required.
-
-## ggplot2 Backend
-
-You can use the ggplot2 backend for 2D objectives:
-
-```{r, out.width='100%', out.height='700px'}
-viz = as_visualizer(obj("TF_franke"))
-viz$plot()
-```
-
-Further customization:
-
-```{r, out.width='100%', out.height='700px'}
-library(ggplot2)
-viz = as_visualizer(obj("TF_franke"))
-p = viz$plot()
-p + labs(title = "TF Franke Function")
-```
 
 ## See also
 

@@ -1,6 +1,6 @@
 # Copilot Coding Agent Instructions for vistool
 
-Goal: Help contributors work productively in this R package for visualizing optimization traces. Keep changes consistent with R6 patterns, rendering pipeline, and theme system.
+Goal: Help contributors work productively in this R package for visualizing various concepts in machine learning. Keep changes consistent with R6 patterns, rendering pipeline, and theme system.
 
 Big picture
 - Entry point: `as_visualizer()` (R/as_visualizer.R) selects the R6 visualizer class based on input and dimensionality.

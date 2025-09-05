@@ -59,15 +59,61 @@ reticulate::py_install("kaleido")
 
 ## Quick tour
 
-TODO: explain workflow: 1) `as_visualizer`, 2) adding layers, 3) plot, 4) save; theme system
+The workflow is consistent across plot types:
 
-TODO: visualize ...
+1) Create a visualizer with `as_visualizer(...)` (computational setup)
+2) Add optional layers via `add_*()`
+3) Render with `plot(...)` (and optionally `save(...)`)
+
+### 1) Visualizers
+
+```r
+# Loss functions
+vis_loss = as_visualizer(lss("regr.mse"), y_pred = seq(-3, 3), y_true = 0)
+
+# Objectives (1D/2D)
+vis_obj2d = as_visualizer(obj("TF_branin"))                 # ggplot2
+vis_surf  = as_visualizer(obj("TF_branin"), type = "surface")  # plotly
+
+# Models (mlr3 Task + Learner)
+library(mlr3); library(mlr3learners)
+task = tsk("pima")$select(c("insulin", "mass"))
+learner = lrn("classif.svm", predict_type = "prob")
+vis_model = as_visualizer(task, learner = learner)
+```
+
+### 2) Layers
+
+```r
+vis_model$add_boundary(values = c(0.3, 0.5, 0.7))
+vis_model$add_training_data()
+vis_surf$add_contours()
+```
+
+### 3) Plot (and Save)
+
+```r
+# ggplot2 (2D)
+vis_model$plot(show_title = FALSE)
+
+# plotly surface (3D or flattened)
+vis_surf$plot()                    # interactive surface
+vis_surf$plot(flatten = TRUE)      # 2D contour
+
+# Theme overrides per render
+vis_model$plot(theme = list(palette = "plasma", text_size = 13))
+
+# Optional: save the last rendered plot
+vis_model$save("model.png", width = 8, height = 6)
+```
+
+Explore specific topics:
 
 - [Loss Functions](loss_functions.html)
 - [Model Predictions](model.html)
 - [Objective Functions](objective.html)
 - [Optimization & Traces](optimization_traces.html)
 
-For customization options, see:
+Styling and composition:
 - [Customization Guide](customization_guide.html)
 - [Advanced Visualization](advanced_visualization.html)

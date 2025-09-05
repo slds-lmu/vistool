@@ -56,15 +56,14 @@ vis = as_visualizer(task_housing, learner = learner, type = "surface")
 ```
 
 By default `as_visualizer()` (re)trains the supplied learner on the task.
-If you already trained the learner yourself and just want to visualize it, set `retrain = FALSE` to reuse the existing fitted model.
-After that a grid is created for the two features and the predictions of the model are computed for each grid point.
-The predictions are then visualized using an interactive surface plot.
+If you already trained the learner and just want to visualize it, set `retrain = FALSE` to reuse the fitted model.
+It then creates a grid for the two features, computes predictions for each grid point, and renders an interactive surface plot.
 
 ```{r, out.width='100%', out.height='700px'}
 vis$plot()
 ```
 
-Draw with contour lines above z dimension.
+Add contour lines on the surface.
 
 ```{r, out.width='100%', out.height='700px'}
 vis$add_contours()$plot()

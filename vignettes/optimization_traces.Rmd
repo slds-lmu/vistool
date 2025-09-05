@@ -30,11 +30,11 @@ This vignette covers the available optimizers, step size control, and how to vis
 ## Optimizers
 
 The optimizer class defines the optimization strategy and is initialized by taking an objective function, start value, and learning rate.
-Available optimizer are:
+Available optimizers are:
 
 - Gradient descent with `OptimizerGD`
 - Momentum with `OptimizerMomentum`
-- Nesterovs momentum with `OptimizerNAG`
+- Nesterov's momentum with `OptimizerNAG`
 
 Creating an optimizer is done by (let's use an x value that works well):
 
@@ -43,7 +43,7 @@ obj = obj("TF_GoldsteinPriceLog")
 opt = OptimizerGD$new(obj, x_start = c(0.22, 0.77), lr = 0.01)
 ```
 
-With these value set, optimization is done by calling `$optimize()` with the number of steps as argument:
+With these values set, run `$optimize()` with the number of steps:
 
 ```{r}
 opt$optimize(10L)
@@ -69,11 +69,11 @@ viz$plot()
 
 ## Step size control
 
-When calling `$optimize()`, the second argument is `stepSizeControl` that allows to expand or compress the update added to the old value of $x$.
-For example, for GD with $x_{\text{new}} = x_{\text{old}} + lr * \Delta_f(x_{\text{old}})$ the update $u = lr * \Delta_f(x_{\text{old}})$ is multiplied with the return value of `stepSizeControl()`.
+`$optimize()` accepts a second argument `stepSizeControl` to scale the parameter update.
+For GD with $x_{\text{new}} = x_{\text{old}} + lr * \Delta_f(x_{\text{old}})$, the update $u = lr * \Delta_f(x_{\text{old}})$ is multiplied by the return value of `stepSizeControl()`.
 There are a few pre-implemented control functions like line search or various decaying methods:
 
-- `stepSizeControlLineSearch(lower, upper)`: Conduct a line search for $a$ in $x_{\text{new}} = x_{\text{old}} +  a * lr * \Delta_f(x_{\text{old}})$`.
+- `stepSizeControlLineSearch(lower, upper)`: Conduct a line search for $a$ in $x_{\text{new}} = x_{\text{old}} + a \cdot lr \cdot \Delta_f(x_{\text{old}})$.
 - `stepSizeControlDecayTime(decay) `: Lower the updates by $(1 + decay * iteration)^{-1}$.
 - `stepSizeControlDecayExp(decay)`: Lower the updates by $exp(-decay * iteration)$.
 - `stepSizeControlDecayLinear(iter_zero)`: Lower the updates until `iter_zero` is reached. Updates with `iter > iter_zero` are 0.
