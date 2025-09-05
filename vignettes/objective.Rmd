@@ -1,8 +1,8 @@
 ---
-title: "Visualization of Objective Functions"
+title: "Objective Functions"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Visualization of Objective Functions}
+  %\VignetteIndexEntry{Objective Functions}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -22,6 +22,7 @@ knitr::opts_chunk$set(
 library(vistool)
 library(plotly)
 library(purrr)
+set.seed(1)
 ```
 
 This vignette covers the basic usage of objective functions in `vistool`, including predefined objectives and how to define custom objectives.
@@ -39,6 +40,20 @@ To retrieve an objective function:
 ```{r}
 obj_branin = obj("TF_branin")
 ```
+
+---
+
+__Note: Extrapolation__
+
+We explicitly distinguish between:
+
+* Evaluation (canonical) bounds: The domain on which the objective is defined (stored in `objective$lower` / `objective$upper`). For `TF_branin` this is $x_1 \in [-5,10], x_2 \in [0,15]$.
+* Plot bounds: The region you choose to visualize (via `x1_limits` / `x2_limits`). These may extend beyond the evaluation bounds.
+
+By default, any area outside the evaluation bounds is **masked** (rendered as blank/NA) so you immediately see the true defined region of the function.
+If you really want to look at extrapolated values, set `allow_extrapolation = TRUE` when creating a visualizer.
+
+---
 
 You can evaluate the objective, gradient, and Hessian at a point:
 
@@ -160,3 +175,11 @@ visualizers = map(keys, function(key) {
 
 subplot(visualizers, nrows = 8)
 ```
+
+## See also
+
+- [Loss Functions](loss_functions.html)
+- [Model Predictions](model.html)
+- [Optimization & Traces](optimization_traces.html)
+- [Customization Guide](customization_guide.html)
+- [Advanced Visualization](advanced_visualization.html)

@@ -54,7 +54,8 @@ Creates a new instance of this [R6][R6::R6Class] class.
   x2_limits = NULL,
   padding = 0,
   n_points = 100L,
-  type = NULL
+  type = NULL,
+  allow_extrapolation = FALSE
 )}\if{html}{\out{</div>}}
 }
 
@@ -91,6 +92,18 @@ Note that a grid of `npoints^2` values is generated and evaluated by `objective$
 \item{\code{type}}{(`character(1)`)\cr
 Optional visualization type ("1d" or "2d") to override automatic dimension detection.
 Useful when objective dimensions are unknown but visualization type is explicitly specified.}
+
+\item{\code{allow_extrapolation}}{(`logical(1)`)
+Whether to evaluate the objective outside its evaluation (canonical) bounds when plot limits
+extend further. If `FALSE` (default), values outside are masked (set to `NA`) producing blank
+regions in the plot; if `TRUE`, the objective is called on the extended region (may yield
+misleading or numerically extreme values depending on the function definition).}
+
+\item{\code{allow_extrapolation}}{(`logical(1)`)
+Whether to evaluate the objective outside its evaluation (canonical) bounds when plot limits
+extend further. If `FALSE` (default), values outside are masked (set to `NA`) producing blank
+regions in the plot; if `TRUE`, the objective is called on the extended region (may yield
+misleading or numerically extreme values depending on the function definition).}
 }
 \if{html}{\out{</div>}}
 }
