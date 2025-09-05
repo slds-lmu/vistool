@@ -74,6 +74,7 @@ vis$plot(theme = list(text_size = 12, alpha = 0.9))
 ## Layer-Specific Customization
 
 All `add_*()` methods support style parameters that override theme defaults:
+TODO: see reference for specific methods (UPDATE THERE), just list 1 or 2 add methods as examples here.
 
 ### `add_points()`
 ```{r, eval=FALSE}
@@ -220,6 +221,9 @@ vis2 = as_visualizer(obj("TF_gaussian1"))  # Also uses plasma palette
 # Instance themes still override package defaults
 vis1$set_theme(vistool_theme(palette = "grayscale"))  # Now uses grayscale
 ```
+
+# TODO
+FURTHER CUSTOMIZATION VIA GGPLOT2 / PLOTLY (from advanced visualization)
 
 ## See also
 

@@ -23,5 +23,5 @@ navbar:
       - text: "Customization"
       - text: "Customization Guide"
         href: articles/customization_guide.html
-      - text: "Advanced Options"
+      - text: "Advanced Visualization"
         href: articles/advanced_visualization.html
