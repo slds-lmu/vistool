@@ -11,7 +11,7 @@ creates appropriate visualizations using ggplot2."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">vistool</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -19,15 +19,19 @@ creates appropriate visualizations using ggplot2."></head><body>
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/vistool.html">Get started</a></li>
+<li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/advanced_visualization.html">Advanced Visualization (TODO)</a></li>
-    <li><a class="dropdown-item" href="../articles/customization_guide.html">Customization Guide</a></li>
-    <li><a class="dropdown-item" href="../articles/loss_functions.html">Visualization of Loss Functions</a></li>
-    <li><a class="dropdown-item" href="../articles/model.html">Visualization of Model Predictions</a></li>
-    <li><a class="dropdown-item" href="../articles/objective_functions.html">Visualization of Objective Functions</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><h6 class="dropdown-header" data-toc-skip>Core</h6></li>
+    <li><a class="dropdown-item" href="../articles/loss_functions.html">Loss Functions</a></li>
+    <li><a class="dropdown-item" href="../articles/model.html">Model Predictions</a></li>
+    <li><a class="dropdown-item" href="../articles/objective.html">Objective Functions</a></li>
     <li><a class="dropdown-item" href="../articles/optimization_traces.html">Optimization &amp; Traces</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Customization</h6></li>
+    <li><a class="dropdown-item" href="../articles/customization_guide.html">Customization Guide</a></li>
+    <li><a class="dropdown-item" href="../articles/advanced_visualization.html">Advanced Visualization</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -82,12 +86,12 @@ Learner used to train the model.</p></dd>
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
 
 <ul><li><p><a href="#method-VisualizerModel-new"><code>VisualizerModel$new()</code></a></p></li>
+<li><p><a href="#method-VisualizerModel-add_points"><code>VisualizerModel$add_points()</code></a></p></li>
 <li><p><a href="#method-VisualizerModel-add_training_data"><code>VisualizerModel$add_training_data()</code></a></p></li>
 <li><p><a href="#method-VisualizerModel-add_boundary"><code>VisualizerModel$add_boundary()</code></a></p></li>
 <li><p><a href="#method-VisualizerModel-plot"><code>VisualizerModel$plot()</code></a></p></li>
 <li><p><a href="#method-VisualizerModel-clone"><code>VisualizerModel$clone()</code></a></p></li>
-</ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="add_points"><a href="Visualizer.html#method-add_points"><code>vistool::Visualizer$add_points()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="resolve_layer_colors"><a href="Visualizer.html#method-resolve_layer_colors"><code>vistool::Visualizer$resolve_layer_colors()</code></a></span></li>
+</ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="resolve_layer_colors"><a href="Visualizer.html#method-resolve_layer_colors"><code>vistool::Visualizer$resolve_layer_colors()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href="Visualizer.html#method-save"><code>vistool::Visualizer$save()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="set_theme"><a href="Visualizer.html#method-set_theme"><code>vistool::Visualizer$set_theme()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="theme"><a href="Visualizer.html#method-theme"><code>vistool::Visualizer$theme()</code></a></span></li>
@@ -101,7 +105,10 @@ Learner used to train the model.</p></dd>
 <span>  x1_limits <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  x2_limits <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  padding <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  n_points <span class="op">=</span> <span class="fl">100L</span></span>
+<span>  n_points <span class="op">=</span> <span class="fl">100L</span>,</span>
+<span>  hypothesis <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  domain <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  retrain <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -153,13 +160,131 @@ The number of generated point per dimension.
 Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.</p></dd>
 
 
+<dt><code>hypothesis</code></dt>
+<dd><p>(`Hypothesis`|`NULL`)
+Optional hypothesis object that provides predictions instead of a learner.
+Supply either `learner` or `hypothesis`, but not both.</p></dd>
+
+
+<dt><code>domain</code></dt>
+<dd><p>(`list`|`NULL`)
+Named list giving axis limits per predictor when no Task data is available,
+e.g., `list(x = c(-1, 1))` for 1D or `list(x = c(-1,1), y = c(-1,1))` for 2D.</p></dd>
+
+
+<dt><code>retrain</code></dt>
+<dd><p>(`logical(1)`)
+Whether to (re)train the supplied learner on the task (default `TRUE`).
+Set to `FALSE` to reuse an already trained learner. If set to `FALSE` but the
+learner has not yet been trained (`learner$model` is `NULL`), a warning is emitted
+and training is performed to ensure predictions are available.</p></dd>
+
+
 </dl><p></p></div>
+</div>
+
+</div><p></p><hr><a id="method-VisualizerModel-add_points"></a><div class="section">
+<h3 id="method-add-points-">Method <code>add_points()</code><a class="anchor" aria-label="anchor" href="#method-add-points-"></a></h3>
+<p>Add points with optional residual loss geometry (1D regression only for now).
+Extends base add_points() with a `loss` argument to visualize residuals.</p><div class="section">
+<h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">VisualizerModel</span><span class="op">$</span><span class="fu">add_points</span><span class="op">(</span></span>
+<span>  <span class="va">points</span>,</span>
+<span>  color <span class="op">=</span> <span class="st">"auto"</span>,</span>
+<span>  size <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  shape <span class="op">=</span> <span class="fl">19</span>,</span>
+<span>  alpha <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  annotations <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  annotation_size <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ordered <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  arrow_color <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  arrow_size <span class="op">=</span> <span class="fl">0.3</span>,</span>
+<span>  loss <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  loss_params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  loss_fill <span class="op">=</span> <span class="st">"auto"</span>,</span>
+<span>  loss_alpha <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  loss_color <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  loss_linetype <span class="op">=</span> <span class="st">"solid"</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>points</code></dt>
+<dd><p>(`data.frame`|`matrix`|`list`) Points to add. For 1D these should contain columns `x` and `y` (observed y required for residuals).</p></dd>
+
+
+<dt><code>color</code></dt>
+<dd><p>(`character(1)`) Color of the points or "auto". Default "auto".</p></dd>
+
+
+<dt><code>size</code></dt>
+<dd><p>(`numeric(1)`|`NULL`) Point size. If NULL uses theme default.</p></dd>
+
+
+<dt><code>shape</code></dt>
+<dd><p>(`integer(1)`|`character(1)`) Point shape. Default 19.</p></dd>
+
+
+<dt><code>alpha</code></dt>
+<dd><p>(`numeric(1)`|`NULL`) Alpha transparency for points.</p></dd>
+
+
+<dt><code>annotations</code></dt>
+<dd><p>(`character()`|`NULL`) Optional text annotations for points.</p></dd>
+
+
+<dt><code>annotation_size</code></dt>
+<dd><p>(`numeric(1)`|`NULL`) Size of annotation text.</p></dd>
+
+
+<dt><code>ordered</code></dt>
+<dd><p>(`logical(1)`) Whether points should be connected in order (arrows). Default FALSE.</p></dd>
+
+
+<dt><code>arrow_color</code></dt>
+<dd><p>(`character(1)`|`NULL`) Arrow color when ordered = TRUE.</p></dd>
+
+
+<dt><code>arrow_size</code></dt>
+<dd><p>(`numeric(1)`) Arrow size when ordered = TRUE. Default 0.3.</p></dd>
+
+
+<dt><code>loss</code></dt>
+<dd><p>(`character(1)`|`NULL`) One of `"l2_se"` (aliases: `"l2"`, `"se"`), `"l1_ae"` (aliases: `"l1"`, `"abs"`, `"mae"`), or `NULL` (no geometry).</p></dd>
+
+
+<dt><code>loss_params</code></dt>
+<dd><p>(`list()`) Reserved for future loss-specific parameters (e.g. Huber delta).</p></dd>
+
+
+<dt><code>loss_fill</code></dt>
+<dd><p>(`character(1)`) Fill color for L2 squares. "auto" draws from palette.</p></dd>
+
+
+<dt><code>loss_alpha</code></dt>
+<dd><p>(`numeric(1)`|`NULL`) Fill alpha for L2 squares (defaults to theme$alpha * 0.4).</p></dd>
+
+
+<dt><code>loss_color</code></dt>
+<dd><p>(`character(1)`|`NA`) Color for residual segment / square border. If `NA`, derived from fill.</p></dd>
+
+
+<dt><code>loss_linetype</code></dt>
+<dd><p>(`character(1)`) Line type for residual segment. Default "solid".</p></dd>
+
+
+</dl><p></p></div>
+</div>
+<div class="section">
+<h4 id="returns">Returns<a class="anchor" aria-label="anchor" href="#returns"></a></h4>
+<p>Invisible self.</p>
 </div>
 
 </div><p></p><hr><a id="method-VisualizerModel-add_training_data"></a><div class="section">
 <h3 id="method-add-training-data-">Method <code>add_training_data()</code><a class="anchor" aria-label="anchor" href="#method-add-training-data-"></a></h3>
 <p>Adds the training data to the plot.</p><div class="section">
-<h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
+<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">VisualizerModel</span><span class="op">$</span><span class="fu">add_training_data</span><span class="op">(</span></span>
 <span>  color <span class="op">=</span> <span class="st">"auto"</span>,</span>
 <span>  size <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -171,7 +296,7 @@ Note that a grid of `npoints^2` values is generated and evaluated by `objective$
 </div>
 
 <div class="section">
-<h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
+<h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>color</code></dt>
 <dd><p>(`character(1)` or named `character`)<br>
 Color of the points. For classification tasks:
@@ -212,7 +337,7 @@ Size of data point labels. If NULL, defaults to smaller text.</p></dd>
 </div><p></p><hr><a id="method-VisualizerModel-add_boundary"></a><div class="section">
 <h3 id="method-add-boundary-">Method <code>add_boundary()</code><a class="anchor" aria-label="anchor" href="#method-add-boundary-"></a></h3>
 <p>Adds boundary lines/contours to the plot.</p><div class="section">
-<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
+<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">VisualizerModel</span><span class="op">$</span><span class="fu">add_boundary</span><span class="op">(</span></span>
 <span>  values <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  color <span class="op">=</span> <span class="st">"black"</span>,</span>
@@ -223,7 +348,7 @@ Size of data point labels. If NULL, defaults to smaller text.</p></dd>
 </div>
 
 <div class="section">
-<h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
+<h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>values</code></dt>
 <dd><p>(`numeric()`)<br>
 Values at which to draw boundaries. For 1D: horizontal lines (y-values).
@@ -257,12 +382,12 @@ Alpha transparency of boundary lines. If NULL, uses theme$alpha.</p></dd>
 </div><p></p><hr><a id="method-VisualizerModel-plot"></a><div class="section">
 <h3 id="method-plot-">Method <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code><a class="anchor" aria-label="anchor" href="#method-plot-"></a></h3>
 <p>Create and return the ggplot2 plot with model-specific layers.</p><div class="section">
-<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
+<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">VisualizerModel</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
+<h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>...</code></dt>
 <dd><p>Additional arguments passed to the parent plot method.</p></dd>
 
@@ -270,19 +395,19 @@ Alpha transparency of boundary lines. If NULL, uses theme$alpha.</p></dd>
 </dl><p></p></div>
 </div>
 <div class="section">
-<h4 id="returns">Returns<a class="anchor" aria-label="anchor" href="#returns"></a></h4>
+<h4 id="returns-1">Returns<a class="anchor" aria-label="anchor" href="#returns-1"></a></h4>
 <p>A ggplot2 object.</p>
 </div>
 
 </div><p></p><hr><a id="method-VisualizerModel-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
+<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">VisualizerModel</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
+<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 

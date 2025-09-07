@@ -9,7 +9,7 @@ for 2D input data using plotly."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">vistool</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -17,15 +17,19 @@ for 2D input data using plotly."></head><body>
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/vistool.html">Get started</a></li>
+<li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/advanced_visualization.html">Advanced Visualization (TODO)</a></li>
-    <li><a class="dropdown-item" href="../articles/customization_guide.html">Customization Guide</a></li>
-    <li><a class="dropdown-item" href="../articles/loss_functions.html">Visualization of Loss Functions</a></li>
-    <li><a class="dropdown-item" href="../articles/model.html">Visualization of Model Predictions</a></li>
-    <li><a class="dropdown-item" href="../articles/objective_functions.html">Visualization of Objective Functions</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><h6 class="dropdown-header" data-toc-skip>Core</h6></li>
+    <li><a class="dropdown-item" href="../articles/loss_functions.html">Loss Functions</a></li>
+    <li><a class="dropdown-item" href="../articles/model.html">Model Predictions</a></li>
+    <li><a class="dropdown-item" href="../articles/objective.html">Objective Functions</a></li>
     <li><a class="dropdown-item" href="../articles/optimization_traces.html">Optimization &amp; Traces</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Customization</h6></li>
+    <li><a class="dropdown-item" href="../articles/customization_guide.html">Customization Guide</a></li>
+    <li><a class="dropdown-item" href="../articles/advanced_visualization.html">Advanced Visualization</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -98,7 +102,10 @@ Learner used to train the model.</p></dd>
 <span>  x1_limits <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  x2_limits <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  padding <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  n_points <span class="op">=</span> <span class="fl">100L</span></span>
+<span>  n_points <span class="op">=</span> <span class="fl">100L</span>,</span>
+<span>  hypothesis <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  domain <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  retrain <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -156,6 +163,18 @@ Note that a grid of `npoints^2` values is generated and evaluated by `objective$
 <dd><p>(`integer(1)`)<br>
 The number of generated point per dimension.
 Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.</p></dd>
+
+
+<dt><code>hypothesis</code></dt>
+<dd><p>(`Hypothesis`|`NULL`) Optional hypothesis used instead of a learner</p></dd>
+
+
+<dt><code>domain</code></dt>
+<dd><p>(`list`|`NULL`) Domain limits when visualizing a hypothesis without a task</p></dd>
+
+
+<dt><code>retrain</code></dt>
+<dd><p>(`logical(1)`) Whether to retrain the learner if it has already been trained on the task. Default is `TRUE`.</p></dd>
 
 
 </dl><p></p></div>

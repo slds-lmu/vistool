@@ -7,12 +7,14 @@
 <url><loc>https://slds-lmu.github.io/vistool/articles/index.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/articles/loss_functions.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/articles/model.html</loc></url>
-<url><loc>https://slds-lmu.github.io/vistool/articles/objective_functions.html</loc></url>
+<url><loc>https://slds-lmu.github.io/vistool/articles/objective.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/articles/optimization_traces.html</loc></url>
+<url><loc>https://slds-lmu.github.io/vistool/articles/vistool.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/authors.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/copilot-instructions.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/index.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/news/index.html</loc></url>
+<url><loc>https://slds-lmu.github.io/vistool/reference/Hypothesis.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/LossFunction.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/Objective.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/Optimizer.html</loc></url>
@@ -44,6 +46,7 @@
 <url><loc>https://slds-lmu.github.io/vistool/reference/mlr_learners_regr.lm_formula.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/obj.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/reexports.html</loc></url>
+<url><loc>https://slds-lmu.github.io/vistool/reference/resolve_loss_key.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/stepSizeControlDecayExp.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/stepSizeControlDecayLinear.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/stepSizeControlDecaySteps.html</loc></url>

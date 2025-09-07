@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">vistool</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -31,16 +31,20 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
+<li class="nav-item"><a class="nav-link" href="articles/vistool.html">Get started</a></li>
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="articles/advanced_visualization.html">Advanced Visualization (TODO)</a></li>
-    <li><a class="dropdown-item" href="articles/customization_guide.html">Customization Guide</a></li>
-    <li><a class="dropdown-item" href="articles/loss_functions.html">Visualization of Loss Functions</a></li>
-    <li><a class="dropdown-item" href="articles/model.html">Visualization of Model Predictions</a></li>
-    <li><a class="dropdown-item" href="articles/objective_functions.html">Visualization of Objective Functions</a></li>
+<li><h6 class="dropdown-header" data-toc-skip>Core</h6></li>
+    <li><a class="dropdown-item" href="articles/loss_functions.html">Loss Functions</a></li>
+    <li><a class="dropdown-item" href="articles/model.html">Model Predictions</a></li>
+    <li><a class="dropdown-item" href="articles/objective.html">Objective Functions</a></li>
     <li><a class="dropdown-item" href="articles/optimization_traces.html">Optimization &amp; Traces</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Customization</h6></li>
+    <li><a class="dropdown-item" href="articles/customization_guide.html">Customization Guide</a></li>
+    <li><a class="dropdown-item" href="articles/advanced_visualization.html">Advanced Visualization</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
@@ -73,13 +77,14 @@
 <div class="section level3">
 <h3 id="optional-setup-for-saving-plotly-plots">Optional: Setup for Saving Plotly Plots<a class="anchor" aria-label="anchor" href="#optional-setup-for-saving-plotly-plots"></a>
 </h3>
-<p>In particular, the <code>$save()</code> functionality for surface plots uses <code><a href="https://rdrr.io/pkg/plotly/man/save_image.html" class="external-link">plotly::save_image()</a></code> internally, which requires the <code>kaleido</code> Python package. The following instructions are provided by <code><a href="https://rdrr.io/pkg/plotly/man/save_image.html" class="external-link">?plotly::save_image</a></code> and assume you do not have <code>miniconda</code> installed already:</p>
+<p>The <code>$save()</code> functionality for surface plots uses <code><a href="https://rdrr.io/pkg/plotly/man/save_image.html" class="external-link">plotly::save_image()</a></code> internally, which in turn relies on the Python package <code>kaleido</code>.</p>
+<p><code>vistool</code> (via <code>reticulate &gt;= 1.41</code>) declares this requirement on load using <code>py_require("kaleido")</code>. The first time Python is needed, an ephemeral, cached Python environment is provisioned automatically with <code>kaleido</code>—no manual Miniconda setup required for typical users.</p>
+<p>If you prefer to manage Python yourself, ensure <code>kaleido</code> is installed in the Python environment that <code>reticulate</code> uses. Example:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">'reticulate'</span><span class="op">)</span></span>
-<span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu">install_miniconda</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu">conda_install</span><span class="op">(</span><span class="st">'r-reticulate'</span>, <span class="st">'python-kaleido'</span><span class="op">)</span></span>
-<span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu">conda_install</span><span class="op">(</span><span class="st">'r-reticulate'</span>, <span class="st">'plotly'</span>, channel <span class="op">=</span> <span class="st">'plotly'</span><span class="op">)</span></span>
-<span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu">use_miniconda</span><span class="op">(</span><span class="st">'r-reticulate'</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"reticulate"</span><span class="op">)</span></span>
+<span><span class="co"># OPTIONAL: point reticulate to a specific python before loading vistool</span></span>
+<span><span class="co"># Sys.setenv(RETICULATE_PYTHON = "/path/to/python")</span></span>
+<span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/py_install.html" class="external-link">py_install</a></span><span class="op">(</span><span class="st">"kaleido"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">

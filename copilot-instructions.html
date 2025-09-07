@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="index.html">vistool</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -15,15 +15,19 @@
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
+      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="articles/vistool.html">Get started</a></li>
+<li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="articles/advanced_visualization.html">Advanced Visualization (TODO)</a></li>
-    <li><a class="dropdown-item" href="articles/customization_guide.html">Customization Guide</a></li>
-    <li><a class="dropdown-item" href="articles/loss_functions.html">Visualization of Loss Functions</a></li>
-    <li><a class="dropdown-item" href="articles/model.html">Visualization of Model Predictions</a></li>
-    <li><a class="dropdown-item" href="articles/objective_functions.html">Visualization of Objective Functions</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><h6 class="dropdown-header" data-toc-skip>Core</h6></li>
+    <li><a class="dropdown-item" href="articles/loss_functions.html">Loss Functions</a></li>
+    <li><a class="dropdown-item" href="articles/model.html">Model Predictions</a></li>
+    <li><a class="dropdown-item" href="articles/objective.html">Objective Functions</a></li>
     <li><a class="dropdown-item" href="articles/optimization_traces.html">Optimization &amp; Traces</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Customization</h6></li>
+    <li><a class="dropdown-item" href="articles/customization_guide.html">Customization Guide</a></li>
+    <li><a class="dropdown-item" href="articles/advanced_visualization.html">Advanced Visualization</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -42,91 +46,21 @@
 
 <div id="copilot-coding-agent-instructions-for-vistool" class="section level1">
 
-<div class="section level2">
-<h2 id="project-overview">Project Overview<a class="anchor" aria-label="anchor" href="#project-overview"></a></h2>
-<ul><li>
-<strong>vistool</strong> is an R package for visualizing optimization traces and teaching optimization concepts.</li>
-<li>Core visualizations: 1D/2D (ggplot2), 2D surface (plotly, interactive), and loss/model/objective visualizations.</li>
-<li>Main entry point: <code><a href="reference/as_visualizer.html">as_visualizer()</a></code> (see <code>R/as_visualizer.R</code>) auto-selects the appropriate visualizer class based on input.</li>
-<li>Core workflow: (1) Initialize with <code><a href="reference/as_visualizer.html">as_visualizer()</a></code>, (2) add layers using <code>add_*</code> methods, (3) <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>; optionally <code><a href="https://rdrr.io/r/base/save.html" class="external-link">save()</a></code> or <code>animate()</code>
-</li>
-</ul></div>
-<div class="section level2">
-<h2 id="architecture--key-components">Architecture &amp; Key Components<a class="anchor" aria-label="anchor" href="#architecture--key-components"></a></h2>
-<ul><li>
-<strong>R6 OOP</strong>: All visualizers and core objects (e.g., <code>Visualizer</code>, <code>Visualizer1D</code>, <code>Visualizer2D</code>, <code>VisualizerSurface</code>, <code>LossFunction</code>, <code>Objective</code>, <code>Optimizer</code>) are R6 classes in <code>R/</code>.</li>
-<li>
-<strong>Visualizer classes</strong>:
-<ul><li>
-<code>Visualizer1D*</code>, <code>Visualizer2D*</code>: ggplot2-based</li>
-<li>
-<code>VisualizerSurface*</code>: plotly-based, for interactive 3D/2D</li>
-<li>Suffixes <code>Model</code>, <code>Obj</code>, <code>LossFuns</code> indicate specialization for models, objectives, or loss functions</li>
-</ul></li>
-<li>
-<strong>Customization options</strong>: Global settings that affect the entire plot belong in <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>. Settings for specific visual elements belong in the <code>add_*()</code> methods that create them. Defaults are set (at initialization) in <code><a href="reference/as_visualizer.html">as_visualizer()</a></code>.</li>
-<li>
-<strong>Templates</strong>: Common roxygen2 doc blocks are in <code>man-roxygen/</code> and referenced via <code>@template</code>.</li>
-<li>
-<strong>Tests</strong>: All public R6 methods and S3 generics should have corresponding tests in <code>tests/testthat/</code>.</li>
-</ul></div>
-<div class="section level2">
-<h2 id="developer-workflow">Developer Workflow<a class="anchor" aria-label="anchor" href="#developer-workflow"></a></h2>
-<ul><li>Use <code>devtools</code> for all development tasks:
-<ul><li>
-<code>devtools::load_all()</code> — load package for development</li>
-<li>
-<code>devtools::install_deps(dependencies = TRUE)</code> — install dependencies</li>
-<li>
-<code>devtools::test()</code> — run all tests</li>
-<li>
-<code>devtools::check()</code> — full package check</li>
-<li>
-<code>devtools::document()</code> — update documentation</li>
-<li>
-<code><a href="https://pkgdown.r-lib.org/reference/build_site.html" class="external-link">pkgdown::build_site()</a></code> — build/preview documentation website</li>
-</ul></li>
-<li>For plotly <code>$save()</code> support, ensure Python <code>kaleido</code> is installed via <code>reticulate</code> (see README for setup).</li>
-</ul></div>
-<div class="section level2">
-<h2 id="project-conventions">Project Conventions<a class="anchor" aria-label="anchor" href="#project-conventions"></a></h2>
-<ul><li>
-<strong>R6 classes</strong>: Always use <code>new()</code> for instantiation, <code>clone()</code> for copying (inherited from R6, not user-defined).</li>
-<li>
-<strong>Documentation</strong>: Use roxygen2 with templates for consistency. All exported functions/classes must be documented with examples.</li>
-<li>
-<strong>Naming</strong>: Suffixes (<code>1D</code>, <code>2D</code>, <code>Surface</code>, <code>Model</code>, <code>Obj</code>, <code>LossFuns</code>) indicate type and specialization.</li>
-<li>
-<strong>Visualization selection</strong>: Use <code><a href="reference/as_visualizer.html">as_visualizer()</a></code> for user-facing API; do not instantiate visualizer classes directly in user code.</li>
-<li>
-<strong>Surface plots</strong>: Use plotly for interactive 3D/2D; saving requires Python <code>kaleido</code>.</li>
-</ul></div>
-<div class="section level2">
-<h2 id="integration--external-dependencies">Integration &amp; External Dependencies<a class="anchor" aria-label="anchor" href="#integration--external-dependencies"></a></h2>
-<ul><li>
-<strong>plotly</strong>: For interactive surface plots; requires Python <code>kaleido</code> for saving images.</li>
-<li>
-<strong>reticulate</strong>: Used to bridge R and Python for plotly image export.</li>
-<li>
-<strong>mlr3</strong>: Used in examples and for model-based visualizations.</li>
-<li>
-<strong>checkmate</strong>: Used for argument validation throughout the codebase.</li>
-</ul></div>
-<div class="section level2">
-<h2 id="examples">Examples<a class="anchor" aria-label="anchor" href="#examples"></a></h2>
-<ul><li>See <code>README.Rmd</code> and vignettes in <code>vignettes/</code> for usage patterns and best practices.</li>
-<li>Example: <code>as_visualizer(task, learner, type = "surface")</code> creates an interactive surface visualizer for a 2D task.</li>
-</ul></div>
-<div class="section level2">
-<h2 id="cicd">CI/CD<a class="anchor" aria-label="anchor" href="#cicd"></a></h2>
-<ul><li>GitHub Actions workflows in <code>.github/workflows/</code> run R CMD check and tests on push/PR.</li>
-<li>Tests requiring Python/plotly are skipped on CI if dependencies are missing.</li>
-</ul><hr><p>If any conventions or workflows are unclear, please consult <code>DEVELOPMENT.md</code> or ask for clarification.</p>
-</div>
+<p>Goal: Help contributors work productively in this R package for visualizing various concepts in machine learning. Keep changes consistent with R6 patterns, rendering pipeline, and theme system.</p>
+<p>Big picture - Entry point: <code><a href="reference/as_visualizer.html">as_visualizer()</a></code> (R/as_visualizer.R) selects the R6 visualizer class based on input and dimensionality. - Backends: ggplot2 for 1D/2D (<code>VisualizerModel</code>, <code>VisualizerObj</code>, <code>VisualizerLossFuns</code>), plotly for interactive 2D surfaces (<code>VisualizerSurface*</code>). Loss functions are 1D only; “surface” is for 2D Models/Objectives only. - Data sources: mlr3 Tasks/Learners for model plots; custom <code>Objective</code> and <code>LossFunction</code> classes for function plots.</p>
+<p>Architecture essentials (files under R/) - Base: <code>Visualizer</code> (R/Visualizer.R) handles theme resolution, layer storage, color assignment, caching, and save() for ggplot/plotly. - ggplot2 classes: <code>VisualizerModel.R</code>, <code>VisualizerObj.R</code>, <code>VisualizerLossFuns.R</code>. - plotly classes: <code>VisualizerSurface.R</code>, <code>VisualizerSurfaceModel.R</code>, <code>VisualizerSurfaceObj.R</code>. - Selection rules (R/as_visualizer.R): Tasks need <code>learner</code>; LossFunction supports only <code>1d</code>; Objectives/Tasks must be 1D or 2D; <code>type = "surface"</code> only valid for 2D Models/Objectives.</p>
+<p>Deferred rendering pattern (do this in every plot implementation) - Always call <code>super$plot(...)</code> first to resolve effective theme and store render args. - Render class-specific layers, then call <code>self$resolve_layer_colors()</code>. - ggplot2: build and return a ggplot object; set <code>private$.last_plot</code> for save(). - plotly: modify <code>private$.plot</code> and return it; <code><a href="https://rdrr.io/r/base/save.html" class="external-link">save()</a></code> uses plotly image export.</p>
+<p>Theme and styling rules - Precedence: layer-specific &gt; plot(theme = …) override &gt; instance <code>set_theme()</code> &gt; package default (<code>options(vistool.theme = ...)</code>). - Use <code>color = "auto"</code> to draw from the active palette; <code><a href="reference/merge_theme.html">merge_theme()</a></code> and <code><a href="reference/get_pkg_theme_default.html">get_pkg_theme_default()</a></code> in R/theme.R control defaults.</p>
+<p>Layer system and add_* methods - Add methods store specs (not draw immediately). Example: <code>Visualizer$add_points(...)</code> stores a “points” layer; rendering happens in private helpers for ggplot/plotly. - When adding new layers: (1) store via a single <code>private$store_layer(type, spec)</code>, (2) implement type-specific render helpers for ggplot and/or plotly, (3) respect theme and auto-colors.</p>
+<p>Developer workflows (R/devtools) - Load/install/test: <code>devtools::load_all()</code>, <code>devtools::install_deps(dependencies = TRUE)</code>, <code>devtools::test()</code>, <code>devtools::check()</code>. - Docs/site: <code>devtools::document()</code>, <code>devtools::build_readme()</code>, <code><a href="https://pkgdown.r-lib.org/reference/build_site.html" class="external-link">pkgdown::build_site()</a></code>. - Tests live in <code>tests/testthat/</code>; skip plotly-dependent saves on CI when Python/kaleido is missing.</p>
+<p>Integrations and deps - plotly + reticulate: <code><a href="https://rdrr.io/r/base/save.html" class="external-link">save()</a></code> for surface plots uses <code><a href="https://rdrr.io/pkg/plotly/man/save_image.html" class="external-link">plotly::save_image()</a></code>; requires Python <code>kaleido</code> (see README.md for setup). - mlr3 for Tasks/Learners; checkmate for argument validation; roxygen2 with templates in <code>man-roxygen/</code>.</p>
+<p>Conventions - R6: instantiate with <code>$new()</code>, copy with <code>$clone()</code>. - Naming: suffixes <code>Model</code>, <code>Obj</code>, <code>LossFuns</code>, and <code>Surface</code> indicate specialization and backend. - Keep constructors computational (limits, grids, padding); styling belongs in <code>set_theme()</code>, <code>plot(theme=...)</code>, or layer args.</p>
+<p>Examples (common patterns) - <code>as_visualizer(task, learner)$plot()</code> for 2D ggplot; <code>as_visualizer(task, learner, type = "surface")$plot()</code> for interactive surface; <code>as_visualizer(obj, type = "1d")$plot()</code> for 1D objectives; <code>as_visualizer(list(loss1, loss2))$plot()</code> for losses.</p>
+<p>CI/CD - Workflows in <code>.github/workflows/</code> run R CMD check and pkgdown. Tests that need plotly/Python are skipped if deps are absent.</p>
+<p>Unsure about a pattern? Check <code>DEVELOPMENT.md</code> for architecture and examples, or inspect the corresponding class in R/ for a reference implementation.</p>
 </div>
 
-  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
-    </nav></aside></div>
+  </main></div>
 
 
     <footer><div class="pkgdown-footer-left">

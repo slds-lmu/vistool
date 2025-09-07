@@ -6,9 +6,10 @@ articles:
   customization_guide: customization_guide.html
   loss_functions: loss_functions.html
   model: model.html
-  objective_functions: objective_functions.html
+  objective: objective.html
   optimization_traces: optimization_traces.html
-last_built: 2025-08-11T13:17Z
+  vistool: vistool.html
+last_built: 2025-09-07T16:28Z
 urls:
   reference: https://slds-lmu.github.io/vistool/reference
   article: https://slds-lmu.github.io/vistool/articles

@@ -9,7 +9,7 @@ for 2D objectives using plotly."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">vistool</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -17,15 +17,19 @@ for 2D objectives using plotly."></head><body>
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/vistool.html">Get started</a></li>
+<li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/advanced_visualization.html">Advanced Visualization (TODO)</a></li>
-    <li><a class="dropdown-item" href="../articles/customization_guide.html">Customization Guide</a></li>
-    <li><a class="dropdown-item" href="../articles/loss_functions.html">Visualization of Loss Functions</a></li>
-    <li><a class="dropdown-item" href="../articles/model.html">Visualization of Model Predictions</a></li>
-    <li><a class="dropdown-item" href="../articles/objective_functions.html">Visualization of Objective Functions</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><h6 class="dropdown-header" data-toc-skip>Core</h6></li>
+    <li><a class="dropdown-item" href="../articles/loss_functions.html">Loss Functions</a></li>
+    <li><a class="dropdown-item" href="../articles/model.html">Model Predictions</a></li>
+    <li><a class="dropdown-item" href="../articles/objective.html">Objective Functions</a></li>
     <li><a class="dropdown-item" href="../articles/optimization_traces.html">Optimization &amp; Traces</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Customization</h6></li>
+    <li><a class="dropdown-item" href="../articles/customization_guide.html">Customization Guide</a></li>
+    <li><a class="dropdown-item" href="../articles/advanced_visualization.html">Advanced Visualization</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -94,7 +98,8 @@ The objective function.</p></dd>
 <span>  x1_limits <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  x2_limits <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  padding <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  n_points <span class="op">=</span> <span class="fl">100L</span></span>
+<span>  n_points <span class="op">=</span> <span class="fl">100L</span>,</span>
+<span>  allow_extrapolation <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -149,6 +154,14 @@ The number of generated point per dimension.
 Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.</p></dd>
 
 
+<dt><code>allow_extrapolation</code></dt>
+<dd><p>(`logical(1)`)
+Whether to evaluate the objective outside its evaluation (canonical) bounds when plot limits
+extend further. If `FALSE` (default), values outside are masked (set to `NA`) producing blank
+regions in the plot; if `TRUE`, the objective is called on the extended region (may yield
+misleading or numerically extreme values depending on the function definition).</p></dd>
+
+
 </dl><p></p></div>
 </div>
 
@@ -160,6 +173,7 @@ Note that a grid of `npoints^2` values is generated and evaluated by `objective$
 <span>  <span class="va">opt</span>,</span>
 <span>  line_color <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  mcolor_out <span class="op">=</span> <span class="st">"black"</span>,</span>
+<span>  line_width <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  npoints <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  npmax <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  name <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -167,6 +181,7 @@ Note that a grid of `npoints^2` values is generated and evaluated by `objective$
 <span>  add_marker_at <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  marker_shape <span class="op">=</span> <span class="st">"circle"</span>,</span>
 <span>  marker_color <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  line_type <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
@@ -188,6 +203,11 @@ The color of the trace.</p></dd>
 The outer line color of the marker.</p></dd>
 
 
+<dt><code>line_width</code></dt>
+<dd><p>(`numeric(1)`)<br>
+Width of the optimization trace line. If `NULL`, uses theme$line_width.</p></dd>
+
+
 <dt><code>npoints</code></dt>
 <dd><p>(`integer(1)`)<br>
 The number of used points from the archive.
@@ -203,7 +223,7 @@ The number of points used from the sequence `seq_len(nrow(opt$archive))[seq_len(
 <dt><code>name</code></dt>
 <dd><p>(`character(1)`)<br>
 The name of the trace in the legend.
-Default is `NULL` which means that the name is pasted from `opt$id` and `objective$id`.</p></dd>
+Default is `NULL` which uses only `opt$id` (optimizer ID).</p></dd>
 
 
 <dt><code>offset</code></dt>
@@ -228,6 +248,12 @@ If `marker_shape = NA`, no marker are added.</p></dd>
 <dt><code>marker_color</code></dt>
 <dd><p>(`character()`)<br>
 The colors for the markers.</p></dd>
+
+
+<dt><code>line_type</code></dt>
+<dd><p>(`character(1)`)
+Line type for the optimization trace (e.g., "solid", "dashed", "dotted", "dash", "dot", "dashdot").
+Mapped to Plotly's `line$dash`. If `NULL`, defaults to solid.</p></dd>
 
 
 <dt><code>...</code></dt>
