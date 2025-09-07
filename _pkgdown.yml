@@ -2,3 +2,26 @@ url: https://slds-lmu.github.io/vistool/
 template:
   bootstrap: 5
 
+navbar:
+  structure:
+    left:  [intro, reference, articles, news]
+    right: [search, github]
+  components:
+    articles:
+      text: Articles
+      menu:
+      - text: "Core"
+      - text: "Loss Functions"
+        href: articles/loss_functions.html
+      - text: "Model Predictions"
+        href: articles/model.html
+      - text: "Objective Functions"
+        href: articles/objective.html
+      - text: "Optimization & Traces"
+        href: articles/optimization_traces.html
+      - text: -------
+      - text: "Customization"
+      - text: "Customization Guide"
+        href: articles/customization_guide.html
+      - text: "Advanced Visualization"
+        href: articles/advanced_visualization.html

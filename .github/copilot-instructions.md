@@ -1,51 +1,50 @@
 # Copilot Coding Agent Instructions for vistool
 
-## Project Overview
-- **vistool** is an R package for visualizing optimization traces and teaching optimization concepts.
-- Core visualizations: 1D/2D (ggplot2), 2D surface (plotly, interactive), and loss/model/objective visualizations.
-- Main entry point: `as_visualizer()` (see `R/as_visualizer.R`) auto-selects the appropriate visualizer class based on input.
-- Core workflow: (1) Initialize with `as_visualizer()`, (2) add layers using `add_*` methods, (3) `plot()`; optionally `save()` or `animate()`
+Goal: Help contributors work productively in this R package for visualizing various concepts in machine learning. Keep changes consistent with R6 patterns, rendering pipeline, and theme system.
 
-## Architecture & Key Components
-- **R6 OOP**: All visualizers and core objects (e.g., `Visualizer`, `Visualizer1D`, `Visualizer2D`, `VisualizerSurface`, `LossFunction`, `Objective`, `Optimizer`) are R6 classes in `R/`.
-- **Visualizer classes**:
-  - `Visualizer1D*`, `Visualizer2D*`: ggplot2-based
-  - `VisualizerSurface*`: plotly-based, for interactive 3D/2D
-  - Suffixes `Model`, `Obj`, `LossFuns` indicate specialization for models, objectives, or loss functions
-- **Customization options**: Global settings that affect the entire plot belong in `plot()`. Settings for specific visual elements belong in the `add_*()` methods that create them. Defaults are set (at initialization) in `as_visualizer()`.
-- **Templates**: Common roxygen2 doc blocks are in `man-roxygen/` and referenced via `@template`.
-- **Tests**: All public R6 methods and S3 generics should have corresponding tests in `tests/testthat/`.
+Big picture
+- Entry point: `as_visualizer()` (R/as_visualizer.R) selects the R6 visualizer class based on input and dimensionality.
+- Backends: ggplot2 for 1D/2D (`VisualizerModel`, `VisualizerObj`, `VisualizerLossFuns`), plotly for interactive 2D surfaces (`VisualizerSurface*`). Loss functions are 1D only; “surface” is for 2D Models/Objectives only.
+- Data sources: mlr3 Tasks/Learners for model plots; custom `Objective` and `LossFunction` classes for function plots.
 
-## Developer Workflow
-- Use `devtools` for all development tasks:
-  - `devtools::load_all()` — load package for development
-  - `devtools::install_deps(dependencies = TRUE)` — install dependencies
-  - `devtools::test()` — run all tests
-  - `devtools::check()` — full package check
-  - `devtools::document()` — update documentation
-  - `pkgdown::build_site()` — build/preview documentation website
-- For plotly `$save()` support, ensure Python `kaleido` is installed via `reticulate` (see README for setup).
+Architecture essentials (files under R/)
+- Base: `Visualizer` (R/Visualizer.R) handles theme resolution, layer storage, color assignment, caching, and save() for ggplot/plotly.
+- ggplot2 classes: `VisualizerModel.R`, `VisualizerObj.R`, `VisualizerLossFuns.R`.
+- plotly classes: `VisualizerSurface.R`, `VisualizerSurfaceModel.R`, `VisualizerSurfaceObj.R`.
+- Selection rules (R/as_visualizer.R): Tasks need `learner`; LossFunction supports only `1d`; Objectives/Tasks must be 1D or 2D; `type = "surface"` only valid for 2D Models/Objectives.
 
-## Project Conventions
-- **R6 classes**: Always use `new()` for instantiation, `clone()` for copying (inherited from R6, not user-defined).
-- **Documentation**: Use roxygen2 with templates for consistency. All exported functions/classes must be documented with examples.
-- **Naming**: Suffixes (`1D`, `2D`, `Surface`, `Model`, `Obj`, `LossFuns`) indicate type and specialization.
-- **Visualization selection**: Use `as_visualizer()` for user-facing API; do not instantiate visualizer classes directly in user code.
-- **Surface plots**: Use plotly for interactive 3D/2D; saving requires Python `kaleido`.
+Deferred rendering pattern (do this in every plot implementation)
+- Always call `super$plot(...)` first to resolve effective theme and store render args.
+- Render class-specific layers, then call `self$resolve_layer_colors()`.
+- ggplot2: build and return a ggplot object; set `private$.last_plot` for save().
+- plotly: modify `private$.plot` and return it; `save()` uses plotly image export.
 
-## Integration & External Dependencies
-- **plotly**: For interactive surface plots; requires Python `kaleido` for saving images.
-- **reticulate**: Used to bridge R and Python for plotly image export.
-- **mlr3**: Used in examples and for model-based visualizations.
-- **checkmate**: Used for argument validation throughout the codebase.
+Theme and styling rules
+- Precedence: layer-specific > plot(theme = ...) override > instance `set_theme()` > package default (`options(vistool.theme = ...)`).
+- Use `color = "auto"` to draw from the active palette; `merge_theme()` and `get_pkg_theme_default()` in R/theme.R control defaults.
 
-## Examples
-- See `README.Rmd` and vignettes in `vignettes/` for usage patterns and best practices.
-- Example: `as_visualizer(task, learner, type = "surface")` creates an interactive surface visualizer for a 2D task.
+Layer system and add_* methods
+- Add methods store specs (not draw immediately). Example: `Visualizer$add_points(...)` stores a "points" layer; rendering happens in private helpers for ggplot/plotly.
+- When adding new layers: (1) store via a single `private$store_layer(type, spec)`, (2) implement type-specific render helpers for ggplot and/or plotly, (3) respect theme and auto-colors.
 
-## CI/CD
-- GitHub Actions workflows in `.github/workflows/` run R CMD check and tests on push/PR.
-- Tests requiring Python/plotly are skipped on CI if dependencies are missing.
+Developer workflows (R/devtools)
+- Load/install/test: `devtools::load_all()`, `devtools::install_deps(dependencies = TRUE)`, `devtools::test()`, `devtools::check()`.
+- Docs/site: `devtools::document()`, `devtools::build_readme()`, `pkgdown::build_site()`.
+- Tests live in `tests/testthat/`; skip plotly-dependent saves on CI when Python/kaleido is missing.
 
----
-If any conventions or workflows are unclear, please consult `DEVELOPMENT.md` or ask for clarification.
+Integrations and deps
+- plotly + reticulate: `save()` for surface plots uses `plotly::save_image()`; requires Python `kaleido` (see README.md for setup).
+- mlr3 for Tasks/Learners; checkmate for argument validation; roxygen2 with templates in `man-roxygen/`.
+
+Conventions
+- R6: instantiate with `$new()`, copy with `$clone()`.
+- Naming: suffixes `Model`, `Obj`, `LossFuns`, and `Surface` indicate specialization and backend.
+- Keep constructors computational (limits, grids, padding); styling belongs in `set_theme()`, `plot(theme=...)`, or layer args.
+
+Examples (common patterns)
+- `as_visualizer(task, learner)$plot()` for 2D ggplot; `as_visualizer(task, learner, type = "surface")$plot()` for interactive surface; `as_visualizer(obj, type = "1d")$plot()` for 1D objectives; `as_visualizer(list(loss1, loss2))$plot()` for losses.
+
+CI/CD
+- Workflows in `.github/workflows/` run R CMD check and pkgdown. Tests that need plotly/Python are skipped if deps are absent.
+
+Unsure about a pattern? Check `DEVELOPMENT.md` for architecture and examples, or inspect the corresponding class in R/ for a reference implementation.

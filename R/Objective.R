@@ -229,13 +229,13 @@ dict_objective = R6::R6Class("DictionaryObjective",
 )$new()
 
 tfuns = c(
-  list(list(minimize = TRUE, name = "branin", desc = "A function. 2 dimensional function.", xdim = 2, lower = c(-2, -2), upper = c(3, 3))),
+  # Canonical domains stored as evaluation bounds. For Branin we now use the core, unscaled
+  # formula function `TF_branin` with its standard domain x1 in [-5, 10], x2 in [0, 15].
+  list(list(minimize = TRUE, name = "branin", desc = "Branin function (canonical domain). 2D.", xdim = 2, lower = c(-5, 0), upper = c(10, 15))),
   list(list(minimize = TRUE, name = "borehole", desc = "A function estimating water flow through a borehole. 8 dimensional function.", xdim = 2, lower = c(0, 0), upper = c(1.5, 1))),
   list(list(minimize = FALSE, name = "franke", desc = "A function. 2 dimensional function.", xdim = 2, lower = c(-0.5, -0.5), upper = c(1, 1))),
   list(list(minimize = FALSE, name = "zhou1998", desc = "A function. 2 dimensional function.", xdim = 2, lower = c(0, 0), upper = c(1, 1))),
   list(list(minimize = TRUE, name = "currin1991", desc = "A function. 2 dimensional function.", xdim = 2, lower = c(0, 0), upper = c(1, 1))),
-  # lim2002 no longer available as of 2024-03-25
-  # list(list(minimize = FALSE, name = "lim2002", desc = "Some function? 2 dimensional function.", xdim = 2, lower = c(0, 0), upper = c(1, 1))),
   list(list(minimize = FALSE, name = "banana", desc = "A banana shaped function. 2 dimensional function.", xdim = 2, lower = c(0, 0), upper = c(1, 1))),
   list(list(minimize = FALSE, name = "sinumoid", desc = "A sinusoid added to a sigmoid function. 2 dimensional function.", xdim = 2, lower = c(0, 0), upper = c(1, 1))),
   list(list(minimize = FALSE, name = "waterfall", desc = "A sinusoid added to a sigmoid function. 2 dimensional function.", xdim = 2, lower = c(0, 0), upper = c(1, 1))),
@@ -253,7 +253,6 @@ tfuns = c(
   list(list(minimize = FALSE, name = "OTL_Circuit", desc = "OTL Circuit. 6 dimensional function.", xdim = 6, lower = NA, upper = NA)),
   list(list(minimize = FALSE, name = "piston", desc = "Piston simulation function. 7 dimensional function", xdim = 7, lower = NA, upper = NA)),
   list(list(minimize = FALSE, name = "wingweight", desc = "Wing weight function. 10 dimensional function.", xdim = 10, lower = NA, upper = NA)),
-  # list(list(minimize = FALSE, name = "welch", desc = "Welch et al (1992) function. 20 dimensional function.", xdim = 20, lower = NA, upper = NA)),
   list(list(minimize = FALSE, name = "robotarm", desc = "Robot arm function. 8 dimensional function.", xdim = 8, lower = NA, upper = NA)),
   list(list(minimize = FALSE, name = "RoosArnold", desc = "Roos & Arnold (1963) function. d dimensional function.", xdim = NA, lower = NA, upper = NA)),
   list(list(minimize = FALSE, name = "Gfunction", desc = "G-function d dimensional function.", xdim = NA, lower = NA, upper = NA)),
@@ -261,10 +260,7 @@ tfuns = c(
   list(list(minimize = FALSE, name = "levy", desc = "Levy function n dimensional function.", xdim = NA, lower = NA, upper = NA)),
   list(list(minimize = FALSE, name = "michalewicz", desc = "Michalewicz function n dimensional function.", xdim = NA, lower = NA, upper = NA)),
   list(list(minimize = FALSE, name = "rastrigin", desc = "Rastrigin function n dimensional function.", xdim = NA, lower = NA, upper = NA)),
-  # list(list(minimize = FALSE, name = "moon_high", desc = "Moon (2010) high-dimensional function for screening 20 dimensional function.", xdim = 20, lower = NA, upper = NA)),
   list(list(minimize = FALSE, name = "linkletter_nosignal", desc = "Linkletter (2006) no signal function, just returns zero d dimensional function.", xdim = NA, lower = NA, upper = NA)),
-  # list(list(minimize = FALSE, name = "Morris", desc = "Morris function 20 dimensional function.", xdim = 20, lower = NA, upper = NA)),
-  # list(list(minimize = FALSE, name = "detpep8d", desc = "detpep8d function 8 dimensional function.", xdim = 8, lower = NA, upper = NA)),
   list(list(minimize = FALSE, name = "hartmann", desc = "hartmann function 6 dimensional function.", xdim = 6, lower = NA, upper = NA))
 )
 
@@ -275,12 +271,15 @@ for (i in seq_along(tfuns)) {
 
   cl_fun = tryCatch(
     {
-      utils::getFromNamespace(tf$name, "TestFunctions")
+      if (tf$name == "branin") {
+        utils::getFromNamespace("TF_branin", "TestFunctions") # canonical unscaled formula
+      } else {
+        utils::getFromNamespace(tf$name, "TestFunctions")
+      }
     },
     error = function(e) {
       "skip"
-    }
-  )
+    })
 
   if (identical(cl_fun, "skip")) {
     message("Error retrieving '", tf$name, "' from namespace TestFunctions, skipping.")

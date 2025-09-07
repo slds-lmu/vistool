@@ -30,34 +30,36 @@ Visualizer = R6::R6Class("Visualizer",
     #' This method should be called by all child classes via `super$plot(...)`.
     #' @param theme (`list`)\cr
     #'   Partial theme override for this render; see vistool_theme().
+    #' @template param_show_title
     #' @template param_plot_title
     #' @template param_plot_subtitle
+    #' @template param_show_legend
+    #' @template param_legend_title
     #' @template param_x_lab
     #' @template param_y_lab
     #' @template param_z_lab_custom
     #' @template param_x_limits
     #' @template param_y_limits
     #' @template param_z_limits
-    #' @template param_show_legend
-    #' @template param_legend_title
-    #' @template param_show_title
     #' @return Invisible self for method chaining (child classes handle actual plot creation).
     plot = function(theme = NULL,
-                    plot_title = NULL, plot_subtitle = NULL, x_lab = NULL, y_lab = NULL, z_lab = NULL,
-                    x_limits = NULL, y_limits = NULL, z_limits = NULL,
-                    show_legend = TRUE, legend_title = NULL, show_title = TRUE) {
+                    show_title = TRUE,
+                    plot_title = NULL, plot_subtitle = NULL,
+                    show_legend = TRUE, legend_title = NULL,
+                    x_lab = NULL, y_lab = NULL, z_lab = NULL,
+                    x_limits = NULL, y_limits = NULL, z_limits = NULL) {
       # Validate and store render params
+      checkmate::assert_flag(show_title)
       checkmate::assert_string(plot_title, null.ok = TRUE)
       checkmate::assert_string(plot_subtitle, null.ok = TRUE)
+      checkmate::assert_flag(show_legend)
+      checkmate::assert_string(legend_title, null.ok = TRUE)
       checkmate::assert_string(x_lab, null.ok = TRUE)
       checkmate::assert_string(y_lab, null.ok = TRUE)
       checkmate::assert_string(z_lab, null.ok = TRUE)
       checkmate::assert_numeric(x_limits, len = 2, null.ok = TRUE)
       checkmate::assert_numeric(y_limits, len = 2, null.ok = TRUE)
       checkmate::assert_numeric(z_limits, len = 2, null.ok = TRUE)
-      checkmate::assert_flag(show_legend)
-      checkmate::assert_string(legend_title, null.ok = TRUE)
-      checkmate::assert_flag(show_title)
       if (!is.null(theme)) assert_vistool_theme(theme)
 
       # Resolve effective theme and store render params
@@ -200,19 +202,12 @@ Visualizer = R6::R6Class("Visualizer",
       )
     },
 
-    # save a plotly object
+    # save a plotly object via JSON -> Python (plotly.io + kaleido >= 1.0)
     save_plotly = function(plot_obj, filename, width, height, ...) {
       # default dimensions for plotly (in pixels)
       if (is.null(width)) width = 800
       if (is.null(height)) height = 600
-
-      save_image(
-        p = plot_obj,
-        file = filename,
-        width = width,
-        height = height,
-        ...
-      )
+      .vistool_write_plotly_image(plot_obj, filename, width = width, height = height, opts = list(...))
     },
 
     # Helper method to add points to ggplot2 objects
@@ -329,9 +324,9 @@ Visualizer = R6::R6Class("Visualizer",
 
           # Add 3D scatter trace
           plot_obj = plot_obj %>% add_trace(
-            x = points_data$x,
-            y = points_data$y,
-            z = points_data$z,
+            x = if (length(points_data$x) == 1) list(points_data$x) else points_data$x,
+            y = if (length(points_data$y) == 1) list(points_data$y) else points_data$y,
+            z = if (length(points_data$z) == 1) list(points_data$z) else points_data$z,
             type = "scatter3d",
             mode = "markers",
             marker = list(
@@ -346,10 +341,11 @@ Visualizer = R6::R6Class("Visualizer",
           # Add annotations if provided (3D text)
           if (!is.null(point_spec$annotations)) {
             for (i in seq_along(point_spec$annotations)) {
+              # Wrap single values in list() so plotly receives array-like inputs
               plot_obj = plot_obj %>% add_trace(
-                x = points_data$x[i],
-                y = points_data$y[i],
-                z = points_data$z[i],
+                x = list(points_data$x[i]),
+                y = list(points_data$y[i]),
+                z = list(points_data$z[i]),
                 type = "scatter3d",
                 mode = "text",
                 text = point_spec$annotations[i],

@@ -128,8 +128,10 @@ dict_loss = R6::R6Class("DictionaryLoss", inherit = Dictionary, cloneable = FALS
 #'
 #' @export
 lss = function(.key, ...) {
+  # Resolve mlr3-style aliases first
+  .key_resolved = resolve_loss_key(.key)
   # Get the base loss function from dictionary
-  base_loss = dict_loss$get(.key)
+  base_loss = dict_loss$get(.key_resolved)
 
   # Check if additional parameters were provided
   params = list(...)
@@ -168,6 +170,23 @@ lss = function(.key, ...) {
       input_supported = base_loss$input_supported
     ))
   }
+}
+
+# Internal: mapping of mlr3 measure ids to vistool loss keys
+.loss_key_aliases = c(
+  "regr.mse" = "l2_se",
+  "regr.rmse" = "l2_se",
+  "regr.mae" = "l1_ae",
+  "regr.huber" = "huber",
+  "classif.logloss" = "cross-entropy",
+  "classif.ce" = "cross-entropy",
+  "classif.brier" = "brier"
+)
+
+#' Resolve Loss Key (Internal)
+#' @keywords internal
+resolve_loss_key = function(key) {
+  if (key %in% names(.loss_key_aliases)) .loss_key_aliases[[key]] else key
 }
 
 dict_loss$add(

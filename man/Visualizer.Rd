@@ -58,17 +58,17 @@ This method should be called by all child classes via `super$plot(...)`.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Visualizer$plot(
   theme = NULL,
+  show_title = TRUE,
   plot_title = NULL,
   plot_subtitle = NULL,
+  show_legend = TRUE,
+  legend_title = NULL,
   x_lab = NULL,
   y_lab = NULL,
   z_lab = NULL,
   x_limits = NULL,
   y_limits = NULL,
-  z_limits = NULL,
-  show_legend = TRUE,
-  legend_title = NULL,
-  show_title = TRUE
+  z_limits = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -78,11 +78,20 @@ This method should be called by all child classes via `super$plot(...)`.
 \item{\code{theme}}{(`list`)\cr
 Partial theme override for this render; see vistool_theme().}
 
+\item{\code{show_title}}{(`logical(1)`)\cr
+Indicator whether to show the title of the plot.}
+
 \item{\code{plot_title}}{(`character(1)`)\cr
 Main plot title. If NULL, uses the visualizer's default title. Default is NULL.}
 
 \item{\code{plot_subtitle}}{(`character(1)`)\cr
 Plot subtitle. If NULL, no subtitle is shown. Default is NULL.}
+
+\item{\code{show_legend}}{(`logical(1)`)\cr
+Whether to show the legend. Default is TRUE.}
+
+\item{\code{legend_title}}{(`character(1)`)\cr
+Title for the legend. If NULL, uses default based on visualizer type. Default is NULL.}
 
 \item{\code{x_lab}}{(`character(1)`)\cr
 X-axis label. If NULL, uses the visualizer's default label. Default is NULL.}
@@ -101,15 +110,6 @@ Y-axis limits as c(min, max). If NULL, uses automatic limits. Default is NULL.}
 
 \item{\code{z_limits}}{(`numeric(2)`)\cr
 Z-axis limits as c(min, max) (for surface plots). If NULL, uses automatic limits. Default is NULL.}
-
-\item{\code{show_legend}}{(`logical(1)`)\cr
-Whether to show the legend. Default is TRUE.}
-
-\item{\code{legend_title}}{(`character(1)`)\cr
-Title for the legend. If NULL, uses default based on visualizer type. Default is NULL.}
-
-\item{\code{show_title}}{(`logical(1)`)\cr
-Indicator whether to show the title of the plot.}
 }
 \if{html}{\out{</div>}}
 }
