@@ -84,9 +84,10 @@ test_that("as_visualizer parameter passing works correctly", {
   obj_2d = obj("TF_branin")
 
   # Test with custom limits and n_points
-  vis = as_visualizer(obj_2d,
+  vis = as_visualizer(
+    obj_2d,
     x1_limits = c(-1, 1),
-    x2_limits = c(-2, 2),
+    x2_limits = c(2, 6),
     padding = 0.1,
     n_points = 50L
   )

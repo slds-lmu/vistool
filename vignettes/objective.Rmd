@@ -43,15 +43,18 @@ obj_branin = obj("TF_branin")
 
 ---
 
-__Note: Extrapolation__
+__Note: Plot bounds vs. objective bounds__
 
-We explicitly distinguish between:
+We distinguish between:
 
-* Evaluation (canonical) bounds: The domain on which the objective is defined (stored in `objective$lower` / `objective$upper`). For `TF_branin` this is $x_1 \in [-5,10], x_2 \in [0,15]$.
-* Plot bounds: The region you choose to visualize (via `x1_limits` / `x2_limits`). These may extend beyond the evaluation bounds.
+* Objective bounds: The canonical domain on which the objective is defined (stored in `objective$lower` / `objective$upper`). For `TF_branin` this is $x_1 \in [-5,10], x_2 \in [0,15]$.
+* Plot bounds: The region you choose to visualize (via `x1_limits` / `x2_limits`).
 
-By default, any area outside the evaluation bounds is **masked** (rendered as blank/NA) so you immediately see the true defined region of the function.
-If you really want to look at extrapolated values, set `allow_extrapolation = TRUE` when creating a visualizer.
+Behavior:
+
+* If objective bounds exist, they are used as default plot bounds.
+* If bounds are not available, you must specify `x1_limits` (and `x2_limits` for 2D); otherwise an error is raised.
+* If you supply plot bounds outside the objective bounds, the plot is still created and a warning is shown.
 
 ---
 

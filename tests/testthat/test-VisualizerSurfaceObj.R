@@ -103,7 +103,7 @@ test_that("VisualizerSurfaceObj with missing limits works", {
   # Should fail without explicit limits
   expect_error(
     VisualizerSurfaceObj$new(obj),
-    "Limits could not be extracted"
+    "Objective bounds not available; please specify both 'x1_limits' and 'x2_limits' explicitly."
   )
 
   # Should work with explicit limits

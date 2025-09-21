@@ -8,7 +8,7 @@
 #' @template param_x2_limits
 #' @template param_padding
 #' @template param_n_points
-#' @template param_allow_extrapolation
+#'
 #'
 #' @export
 VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
@@ -26,14 +26,12 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
     #' @template param_x2_limits
     #' @template param_padding
     #' @template param_n_points
-    initialize = function(objective, x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L,
-                          allow_extrapolation = FALSE) {
+    initialize = function(objective, x1_limits = NULL, x2_limits = NULL, padding = 0, n_points = 100L) {
       self$objective = checkmate::assert_r6(objective, "Objective")
       checkmate::assert_numeric(x1_limits, len = 2, null.ok = TRUE)
       checkmate::assert_numeric(x2_limits, len = 2, null.ok = TRUE)
       checkmate::assert_numeric(padding)
       checkmate::assert_count(n_points)
-      checkmate::assert_flag(allow_extrapolation)
 
       if (objective$xdim != 2) {
         mlr3misc::stopf("`VisualizerSurface` requires 2-dimensional inputs, but `objective$xdim = %s`", objective$xdim)
@@ -43,7 +41,7 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
       x2_limits = if (is.null(x2_limits)) c(objective$lower[2], objective$upper[2]) else x2_limits
 
       if (any(is.na(x1_limits)) || any(is.na(x2_limits))) {
-        stop("Limits could not be extracted from the objective. Please use `x_limits`.")
+        stop("Objective bounds not available; please specify both 'x1_limits' and 'x2_limits' explicitly.")
       }
 
       x1_pad = (x1_limits[2] - x1_limits[1]) * padding
@@ -54,26 +52,26 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
         x2 = unique(seq(x2_limits[1] - x2_pad, x2_limits[2] + x2_pad, length.out = n_points))
       )
 
-      # Evaluate with optional masking outside evaluation bounds
+      # Warn if limits exceed objective bounds
       eval_lower = objective$lower
       eval_upper = objective$upper
-      if (!any(is.na(c(eval_lower, eval_upper))) && !allow_extrapolation) {
-        zmat = matrix(NA_real_, nrow = length(grid$x1), ncol = length(grid$x2))
-        for (i in seq_along(grid$x1)) {
-          for (j in seq_along(grid$x2)) {
-            x1v = grid$x1[i]
-            x2v = grid$x2[j]
-            if (x1v >= eval_lower[1] && x1v <= eval_upper[1] && x2v >= eval_lower[2] && x2v <= eval_upper[2]) {
-              zmat[i, j] = objective$eval(c(x1v, x2v))
-            }
-          }
+      if (!any(is.na(c(eval_lower, eval_upper)))) {
+        warn_x1 = (x1_limits[1] < eval_lower[1]) || (x1_limits[2] > eval_upper[1])
+        warn_x2 = (x2_limits[1] < eval_lower[2]) || (x2_limits[2] > eval_upper[2])
+        if (warn_x1 || warn_x2) {
+          warning(sprintf(
+            "Plot limits exceed objective bounds: x1_limits=[%s,%s], x2_limits=[%s,%s]; bounds x1=[%s,%s], x2=[%s,%s]. Evaluating outside the defined domain.",
+            format(x1_limits[1]), format(x1_limits[2]), format(x2_limits[1]), format(x2_limits[2]),
+            format(eval_lower[1]), format(eval_upper[1]), format(eval_lower[2]), format(eval_upper[2])
+          ))
         }
-      } else {
-        zmat = outer(grid$x1, grid$x2, function(x, y) {
-          xin = cbind(x, y)
-          apply(xin, 1, function(x) self$objective$eval(x))
-        })
       }
+
+      # Evaluate objective on the full grid
+      zmat = outer(grid$x1, grid$x2, function(x, y) {
+        xin = cbind(x, y)
+        apply(xin, 1, function(x) self$objective$eval(x))
+      })
 
       super$initialize(
         grid = grid,

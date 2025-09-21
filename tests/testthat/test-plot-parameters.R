@@ -1,7 +1,7 @@
 test_that("plot() methods accept theme override with text_size and theme", {
   # Test VisualizerObj (1D) - using gaussian1 which supports any dimension
   obj_1d = obj("TF_gaussian1", xdim = 1)
-  vis1d = as_visualizer(obj_1d, type = "1d")
+  vis1d = as_visualizer(obj_1d, type = "1d", x1_limits = c(-3, 3))
 
   # Test with different text sizes and themes
   p1 = vis1d$plot(theme = list(text_size = 8, theme = "bw"))
@@ -36,7 +36,7 @@ test_that("plot() methods accept theme override with text_size and theme", {
 test_that("plot() methods validate parameters correctly", {
   # Create a simple visualizer for testing
   obj_1d = obj("TF_gaussian1", xdim = 1)
-  vis = as_visualizer(obj_1d, type = "1d")
+  vis = as_visualizer(obj_1d, type = "1d", x1_limits = c(-3, 3))
 
   # Test invalid text_size
   expect_error(vis$plot(theme = list(text_size = 0)))
@@ -49,7 +49,7 @@ test_that("plot() methods validate parameters correctly", {
 test_that("plot() methods work without parameters", {
   # Test VisualizerObj
   obj_1d = obj("TF_gaussian1", xdim = 1)
-  vis1d = as_visualizer(obj_1d, type = "1d")
+  vis1d = as_visualizer(obj_1d, type = "1d", x1_limits = c(-3, 3))
 
   # Should work without any parameters (using defaults)
   p1 = vis1d$plot()

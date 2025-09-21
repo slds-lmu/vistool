@@ -14,8 +14,7 @@
 #' @template param_hypothesis
 #' @template param_domain
 #' @template param_n_points
-#' @template param_allow_extrapolation
-#' @template param_allow_extrapolation
+#'
 #' @param y_pred (`numeric()`)\cr
 #'   Predicted values (used for loss function visualizations).
 #' @param y_true (`numeric()`)\cr
@@ -149,8 +148,7 @@ as_visualizer.Hypothesis = function(x, type = "auto", x1_limits = NULL, x2_limit
 #' @export
 as_visualizer.Objective = function(x, type = "auto", x1_limits = NULL, x2_limits = NULL,
                                    padding = 0, n_points = 100L, y_pred = NULL, y_true = NULL,
-                                   input_type = "auto", y_curves = "both", learner = NULL,
-                                   allow_extrapolation = FALSE, ...) {
+                                   input_type = "auto", y_curves = "both", learner = NULL, ...) {
   checkmate::assert_choice(type, choices = c("auto", "1d", "2d", "surface"))
   n_dim = x$xdim
 
@@ -185,12 +183,10 @@ as_visualizer.Objective = function(x, type = "auto", x1_limits = NULL, x2_limits
   if (vis_type %in% c("1d", "2d")) {
     return(VisualizerObj$new(x,
       x1_limits = x1_limits, x2_limits = x2_limits,
-      padding = padding, n_points = n_points, type = vis_type,
-      allow_extrapolation = allow_extrapolation, ...
+      padding = padding, n_points = n_points, type = vis_type, ...
     ))
   } else if (vis_type == "surface") {
-    return(VisualizerSurfaceObj$new(x, x1_limits = x1_limits, x2_limits = x2_limits, padding = padding, n_points = n_points,
-      allow_extrapolation = allow_extrapolation, ...))
+    return(VisualizerSurfaceObj$new(x, x1_limits = x1_limits, x2_limits = x2_limits, padding = padding, n_points = n_points, ...))
   } else {
     stop("Unknown visualization type.")
   }

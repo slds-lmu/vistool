@@ -323,6 +323,19 @@ pkgdown::build_site()
 
 ## Guidelines
 
+### Naming Conventions
+
+- Classes (R6 generators and class-like objects): CamelCase
+  - Examples: `Visualizer`, `VisualizerModel`, `Objective`, `OptimizerGD`
+- Everything else: snake_case
+  - Functions: `as_visualizer()`, `merge_theme()`, `get_vistool_color()`
+  - Variables/fields/args: `n_points`, `x_limits`, `effective_theme`
+  - Files: snake_case where feasible (e.g., `as_visualizer.R`); class files should retain CamelCase to match class names (e.g., `VisualizerModel.R`).
+
+Tooling:
+- lintr: `.lintr` config allows both `snake_case` and `CamelCase`. It cannot distinguish classes from other objects, so we enforce “CamelCase only for classes” via code review and PRs. If you must use a non-conforming name due to external APIs, add a short comment and, if necessary, a targeted `# nolint: object_name_linter.` on that line.
+- styler: formatting only; it does not rename identifiers. See `.styler` for formatting configuration.
+
 ### Testing
 
 - Each R file should have corresponding test file

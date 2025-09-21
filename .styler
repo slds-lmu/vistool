@@ -1,4 +1,10 @@
 # source(".styler")
+#
+# Naming policy note (informational):
+# - Classes/R6 generators use CamelCase (e.g., VisualizerModel).
+# - Everything else (functions, variables, arguments) uses snake_case.
+# This file configures code formatting. Naming enforcement is handled by lintr and code review.
+# See DEVELOPMENT.md (Naming Conventions) for details.
 equals_assign_style <- function(
   indent_by = 2L,
   strict = FALSE,

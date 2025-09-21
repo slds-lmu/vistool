@@ -229,9 +229,11 @@ dict_objective = R6::R6Class("DictionaryObjective",
 )$new()
 
 tfuns = c(
-  # Canonical domains stored as evaluation bounds. For Branin we now use the core, unscaled
-  # formula function `TF_branin` with its standard domain x1 in [-5, 10], x2 in [0, 15].
-  list(list(minimize = TRUE, name = "branin", desc = "Branin function (canonical domain). 2D.", xdim = 2, lower = c(-5, 0), upper = c(10, 15))),
+  # Canonical domains stored as evaluation bounds.
+  # For Branin we use the canonical, unscaled internal formula `TF_branin` from TestFunctions
+  # with its standard domain x1 in [-5, 10], x2 in [0, 15]. We keep `name` for labeling, and
+  # specify `fun_symbol` for the actual function symbol to resolve from the namespace.
+  list(list(minimize = TRUE, name = "branin", fun_symbol = "TF_branin", desc = "Branin function (canonical domain). 2D.", xdim = 2, lower = c(-5, 0), upper = c(10, 15))),
   list(list(minimize = TRUE, name = "borehole", desc = "A function estimating water flow through a borehole. 8 dimensional function.", xdim = 2, lower = c(0, 0), upper = c(1.5, 1))),
   list(list(minimize = FALSE, name = "franke", desc = "A function. 2 dimensional function.", xdim = 2, lower = c(-0.5, -0.5), upper = c(1, 1))),
   list(list(minimize = FALSE, name = "zhou1998", desc = "A function. 2 dimensional function.", xdim = 2, lower = c(0, 0), upper = c(1, 1))),
@@ -264,35 +266,31 @@ tfuns = c(
   list(list(minimize = FALSE, name = "hartmann", desc = "hartmann function 6 dimensional function.", xdim = 6, lower = NA, upper = NA))
 )
 
-for (i in seq_along(tfuns)) {
-  tf = tfuns[[i]]
-  id = sprintf("TF_%s", tf$name)
-  # cl = sprintf("TestFunctions::%s", tf$name)
+if (requireNamespace("TestFunctions", quietly = TRUE)) {
+  ns_tf = asNamespace("TestFunctions")
+  for (i in seq_along(tfuns)) {
+    tf = tfuns[[i]]
+    id = sprintf("TF_%s", tf$name)
 
-  cl_fun = tryCatch(
-    {
-      if (tf$name == "branin") {
-        utils::getFromNamespace("TF_branin", "TestFunctions") # canonical unscaled formula
-      } else {
-        utils::getFromNamespace(tf$name, "TestFunctions")
-      }
-    },
-    error = function(e) {
-      "skip"
-    })
+    # Resolve function symbol: default to `name`, allow override via `fun_symbol`.
+    sym = if (!is.null(tf$fun_symbol)) tf$fun_symbol else tf$name
+    cl_fun = get0(sym, envir = ns_tf, inherits = FALSE, ifnotfound = NULL)
 
-  if (identical(cl_fun, "skip")) {
-    message("Error retrieving '", tf$name, "' from namespace TestFunctions, skipping.")
-    next
+    if (is.null(cl_fun) || !is.function(cl_fun)) {
+      message("Error retrieving '", sym, "' from namespace TestFunctions, skipping.")
+      next
+    }
+
+    suppressWarnings(dict_objective$add(
+      id, Objective$new(
+        fun = cl_fun,
+        id = id, label = tf$name, xdim = tf$xdim, lower = tf$lower,
+        upper = tf$upper, minimize = tf$minimize
+      )
+    ))
   }
-
-  suppressWarnings(dict_objective$add(
-    id, Objective$new(
-      fun = cl_fun,
-      id = id, label = tf$name, xdim = tf$xdim, lower = tf$lower,
-      upper = tf$upper, minimize = tf$minimize
-    )
-  ))
+} else {
+  message("Package 'TestFunctions' not available; skipping registration of test functions in dict_objective.")
 }
 
 #' @title Retrieve Objective Functions
