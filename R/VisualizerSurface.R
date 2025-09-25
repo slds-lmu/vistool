@@ -105,7 +105,7 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
 
       if (!private$.freeze_plot) { # Used in animate to not overwrite the
         private$.opts = list() # plot over and over again when calling
-        private$.layer_arrow = list() # `$initLayerXXX`.
+        private$.layer_arrow = list() # `$init_layerXXX`.
       }
 
       return(invisible(self))
@@ -397,14 +397,14 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
     # the trace setup.
     .layer_primary = NULL,
 
-    # @field .layer_arrow (`list()`) Arguments passed to `$addLayerArrow()` to reconstruct the plot for animations.
+    # @field .layer_arrow (`list()`) Arguments passed to `$add_arrow_layer()` to reconstruct the plot for animations.
     .layer_arrow = list(),
 
     # @field .plot (`plot_ly()`) The plot.
     .plot = NULL,
 
-    # @field .opts (`list(Optimizer)`) List of optimizers used to add traces. Each `$initLayerXXX()`
-    # resets this list. An optimizer is added after each call to `$addLayerOptimizationTrace()`.
+    # @field .opts (`list(Optimizer)`) List of optimizers used to add traces. Each `$init_layerXXX()`
+    # resets this list. An optimizer is added after each call to `$add_optimization_trace()`.
     # this private field is exclusively used to create animations with `$animate()`.
     .opts = list(),
     .vbase = list(),
@@ -423,20 +423,20 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
     .init_default_plot = function() {
       self$init_layer_surface()
     },
-    checkInit = function() {
+    check_init = function() {
       if (is.null(private$.plot)) {
         private$.init_default_plot()
       }
       return(invisible(TRUE))
     },
-    checkInput = function(x) {
+    check_input = function(x) {
       if (private$.layer_primary == "surface") {
         return(checkmate::assertNumeric(x, len = 3L))
       }
       if (private$.layer_primary == "contour") {
         return(checkmate::assertNumeric(x, len = 3L))
       }
-      stop("Error in `$checkInput()`")
+      stop("Error in `$check_input()`")
     },
 
     # Override infer_z_values to use the surface's zmat

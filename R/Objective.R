@@ -56,12 +56,12 @@ Objective = R6::R6Class("Objective",
       if (is.null(xtest)) {
         xtest = rep(0, ifelse(is.na(xdim), 2, xdim))
       }
-      private$p_xtest = self$assertX(xtest)
+      private$p_xtest = self$assert_x(xtest)
       assertNumber(self$eval(xtest)) # check that fun works as expected
 
-      self$addLogFun(function(x, fval, grad) l2norm(grad), "gnorm")
-      if (!is.na(lower[1])) self$lower = self$assertX(lower)
-      if (!is.na(upper[1])) self$upper = self$assertX(upper)
+      self$add_log_fun(function(x, fval, grad) l2norm(grad), "gnorm")
+      if (!is.na(lower[1])) self$lower = self$assert_x(lower)
+      if (!is.na(upper[1])) self$upper = self$assert_x(upper)
 
       return(invisible(self))
     },
@@ -78,10 +78,10 @@ Objective = R6::R6Class("Objective",
 
     #' @description Evaluate the objective function and log into the archive. Each call logs
     #' the input vector `x`, result of fun `fval`, the gradient `grad`, the norm of the gradient
-    #' `gnorm`, and additional logs that were added by `$addLogFun`.
+    #' `gnorm`, and additional logs that were added by `$add_log_fun`.
     #' @param x (`numeric`) The numerical input of `fun`.
     #' @return Invisible list of logs that are added to the archive.
-    evalStore = function(x) {
+    eval_store = function(x) {
       if (!is.na(private$p_xdim)) {
         assertNumeric(x, len = private$p_xdim)
       }
@@ -101,7 +101,7 @@ Objective = R6::R6Class("Objective",
     #' @description Assert a numeric input if it is suitable or not.
     #' @param x (`numeric()`) Input value for `fun`.
     #' @param ... Additional arguments passed to `assertNumeric(...)`.
-    assertX = function(x, ...) {
+    assert_x = function(x, ...) {
       if (is.na(private$p_xdim)) {
         return(assertNumeric(x, ...))
       } else {
@@ -113,8 +113,8 @@ Objective = R6::R6Class("Objective",
     #' @param x (`numeric`) The numerical input of `fun`.
     grad = function(x) {
       if (is.null(private$p_gradient)) {
-        return(do.call(private$p_gradientFallback, c(list(x = x), private$p_fargs)))
-        # return(private$p_gradientFallback(x))
+        return(do.call(private$p_gradient_fallback, c(list(x = x), private$p_fargs)))
+        # return(private$p_gradient_fallback(x))
       } else {
         return(do.call(private$p_gradient, c(list(x = x), private$p_fargs)))
         # return(private$p_gradient(x))
@@ -125,8 +125,8 @@ Objective = R6::R6Class("Objective",
     #' @param x (`numeric`) The numerical input of `fun`.
     hess = function(x) {
       if (is.null(private$p_hessian)) {
-        # return(private$p_hessianFallback(x))
-        return(do.call(private$p_hessianFallback, c(list(x = x), private$p_fargs)))
+        # return(private$p_hessian_fallback(x))
+        return(do.call(private$p_hessian_fallback, c(list(x = x), private$p_fargs)))
       } else {
         # return(private$p_hessian(x))
         return(do.call(private$p_hessian, c(list(x = x), private$p_fargs)))
@@ -137,14 +137,14 @@ Objective = R6::R6Class("Objective",
     #' @param l (`function`) Function that returns a single numerical value or a string.
     #' The arguments of `l` must be `x`, `fval` and `grad`.
     #' @param label (`character(1)`) The name of the logger.
-    addLogFun = function(l, label) {
+    add_log_fun = function(l, label) {
       assertFunction(l, c("x", "fval", "grad"))
       xtest = private$p_xtest
       testfval = self$eval(xtest)
       testgrad = self$grad(xtest)
       e = try(l(xtest, testfval, testgrad), silent = TRUE)
       if (inherits(e, "try-error")) {
-        stop("Error in `$addLogFun`: ", attr(e, "condition")$message)
+        stop("Error in `$add_log_fun`: ", attr(e, "condition")$message)
       } else {
         checked = FALSE
         if (is.numeric(e)) {
@@ -164,12 +164,12 @@ Objective = R6::R6Class("Objective",
     },
 
     #' @description Delete the archive.
-    clearArchive = function() {
+    clear_archive = function() {
       private$p_archive = data.table()
     }
   ),
   active = list(
-    #' @field archive (`data.table()`) Archive of all calls to `$evalStore`.
+    #' @field archive (`data.table()`) Archive of all calls to `$eval_store`.
     archive = function(x) {
       if (!missing(x)) stop("`archive` is read only")
       return(private$p_archive)
@@ -197,7 +197,7 @@ Objective = R6::R6Class("Objective",
     # @field xtest (`numeric()`) The test value to check functions.
     p_xtest = NULL,
 
-    # @field p_archive (`data.table`) The archive or logs, a new entry is added for each call to `evalStore`.
+    # @field p_archive (`data.table`) The archive or logs, a new entry is added for each call to `eval_store`.
     p_archive = data.table(),
 
     # @field p_gradient (`function`) A function that calculate the gradient of `fun` at `x`.
@@ -212,8 +212,8 @@ Objective = R6::R6Class("Objective",
     # `x`, `fval`, `grad`.
     p_log_funs = list(),
     p_fargs = list(),
-    p_gradientFallback = function(x, ...) rootSolve::gradient(f = private$p_fun, x = x, ...)[1, ],
-    p_hessianFallback = function(x, ...) rootSolve::hessian(f = private$p_fun, x = x, ...)
+    p_gradient_fallback = function(x, ...) rootSolve::gradient(f = private$p_fun, x = x, ...)[1, ],
+    p_hessian_fallback = function(x, ...) rootSolve::hessian(f = private$p_fun, x = x, ...)
   )
 )
 

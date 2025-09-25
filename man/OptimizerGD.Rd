@@ -26,9 +26,9 @@ This class defines gradient descent
 \if{html}{\out{
 <details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="Optimizer" data-id="prepareUpdateForArchive"><a href='../../vistool/html/Optimizer.html#method-Optimizer-prepareUpdateForArchive'><code>vistool::Optimizer$prepareUpdateForArchive()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="Optimizer" data-id="setX"><a href='../../vistool/html/Optimizer.html#method-Optimizer-setX'><code>vistool::Optimizer$setX()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="Optimizer" data-id="updateArchive"><a href='../../vistool/html/Optimizer.html#method-Optimizer-updateArchive'><code>vistool::Optimizer$updateArchive()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Optimizer" data-id="prepare_update_for_archive"><a href='../../vistool/html/Optimizer.html#method-Optimizer-prepare_update_for_archive'><code>vistool::Optimizer$prepare_update_for_archive()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Optimizer" data-id="set_x"><a href='../../vistool/html/Optimizer.html#method-Optimizer-set_x'><code>vistool::Optimizer$set_x()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Optimizer" data-id="update_archive"><a href='../../vistool/html/Optimizer.html#method-Optimizer-update_archive'><code>vistool::Optimizer$update_archive()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="OptimizerMomentum" data-id="optimize"><a href='../../vistool/html/OptimizerMomentum.html#method-OptimizerMomentum-optimize'><code>vistool::OptimizerMomentum$optimize()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="OptimizerMomentum" data-id="update"><a href='../../vistool/html/OptimizerMomentum.html#method-OptimizerMomentum-update'><code>vistool::OptimizerMomentum$update()</code></a></span></li>
 </ul>

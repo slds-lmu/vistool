@@ -102,7 +102,7 @@ test_that("Optimizer parameter updates work", {
   expect_equal(opt$lr, 0.2)
 
   # Test position updates
-  opt$setX(2)
+  opt$set_x(2)
   expect_equal(opt$x, 2)
 })
 
@@ -120,13 +120,13 @@ test_that("Optimizer with step size control works", {
 
   # Test with custom step size control
   step_control = function(x, u, obj, opt) 0.5 # Half step size
-  opt$optimize(steps = 2L, stepSizeControl = step_control)
+  opt$optimize(steps = 2L, step_size_control = step_control)
 
   expect_equal(nrow(opt$archive), 2)
   expect_true(all(opt$archive$step_size == 0.5))
 })
 
-test_that("mergeOptimArchives works", {
+test_that("merge_optim_archives works", {
   obj = Objective$new(
     id = "test",
     fun = function(x) sum(x^2),
@@ -142,7 +142,7 @@ test_that("mergeOptimArchives works", {
   opt1$optimize(steps = 2L)
   opt2$optimize(steps = 3L)
 
-  merged = mergeOptimArchives(opt1, opt2)
+  merged = merge_optim_archives(opt1, opt2)
 
   expect_s3_class(merged, "data.table")
   expect_equal(nrow(merged), 5) # 2 + 3

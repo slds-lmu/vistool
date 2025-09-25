@@ -51,7 +51,7 @@ VisualizerModel = R6::R6Class("VisualizerModel",
       if (!is.null(learner) && !is.null(hypothesis)) stop("Provide only one of learner or hypothesis")
       if (!is.null(task)) self$task = mlr3::assert_task(task)
       if (!is.null(learner)) self$learner = mlr3::assert_learner(learner, task = self$task)
-      if (!is.null(hypothesis)) assertHypothesis(hypothesis)
+      if (!is.null(hypothesis)) assert_hypothesis(hypothesis)
       private$.hypothesis = hypothesis
       private$.domain = domain
       checkmate::assert_numeric(x1_limits, len = 2, null.ok = TRUE)

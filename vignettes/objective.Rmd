@@ -41,23 +41,6 @@ To retrieve an objective function:
 obj_branin = obj("TF_branin")
 ```
 
----
-
-__Note: Plot bounds vs. objective bounds__
-
-We distinguish between:
-
-* Objective bounds: The canonical domain on which the objective is defined (stored in `objective$lower` / `objective$upper`). For `TF_branin` this is $x_1 \in [-5,10], x_2 \in [0,15]$.
-* Plot bounds: The region you choose to visualize (via `x1_limits` / `x2_limits`).
-
-Behavior:
-
-* If objective bounds exist, they are used as default plot bounds.
-* If bounds are not available, you must specify `x1_limits` (and `x2_limits` for 2D); otherwise an error is raised.
-* If you supply plot bounds outside the objective bounds, the plot is still created and a warning is shown.
-
----
-
 You can evaluate the objective, gradient, and Hessian at a point:
 
 ```{r}
@@ -115,9 +98,9 @@ y = iris$Sepal.Width
 # Create a new object:
 obj_lm = Objective$new(id = "iris LM", fun = mylm, xdim = 2, Xmat = Xmat, y = y, minimize = TRUE)
 
-obj_lm$evalStore(c(1, 2))
-obj_lm$evalStore(c(2, 3))
-obj_lm$evalStore(coef(lm(Sepal.Width ~ Petal.Width, data = iris)))
+obj_lm$eval_store(c(1, 2))
+obj_lm$eval_store(c(2, 3))
+obj_lm$eval_store(coef(lm(Sepal.Width ~ Petal.Width, data = iris)))
 
 obj_lm$archive
 ```

@@ -49,7 +49,7 @@ With these values set, run `$optimize()` with the number of steps:
 opt$optimize(10L)
 ```
 
-Calling `$optimize()` also writes into the archive of the optimizer and also calls `$evalStore()` of the objective.
+Calling `$optimize()` also writes into the archive of the optimizer and also calls `$eval_store()` of the objective.
 Therefore, `$optimize()` writes into two archives:
 
 ```{r}
@@ -69,20 +69,20 @@ viz$plot()
 
 ## Step size control
 
-`$optimize()` accepts a second argument `stepSizeControl` to scale the parameter update.
-For GD with $x_{\text{new}} = x_{\text{old}} + lr * \Delta_f(x_{\text{old}})$, the update $u = lr * \Delta_f(x_{\text{old}})$ is multiplied by the return value of `stepSizeControl()`.
+`$optimize()` accepts a second argument `step_size_control` to scale the parameter update.
+For GD with $x_{\text{new}} = x_{\text{old}} + lr * \Delta_f(x_{\text{old}})$, the update $u = lr * \Delta_f(x_{\text{old}})$ is multiplied by the return value of `step_size_control()`.
 There are a few pre-implemented control functions like line search or various decaying methods:
 
-- `stepSizeControlLineSearch(lower, upper)`: Conduct a line search for $a$ in $x_{\text{new}} = x_{\text{old}} + a \cdot lr \cdot \Delta_f(x_{\text{old}})$.
-- `stepSizeControlDecayTime(decay) `: Lower the updates by $(1 + decay * iteration)^{-1}$.
-- `stepSizeControlDecayExp(decay)`: Lower the updates by $exp(-decay * iteration)$.
-- `stepSizeControlDecayLinear(iter_zero)`: Lower the updates until `iter_zero` is reached. Updates with `iter > iter_zero` are 0.
-- `stepSizeControlDecaySteps(drop_rate, every_iter)`: Lower the updates `every_iter` by `drop_rate`.
+- `step_size_control_line_search(lower, upper)`: Conduct a line search for $a$ in $x_{\text{new}} = x_{\text{old}} + a \cdot lr \cdot \Delta_f(x_{\text{old}})$.
+- `step_size_control_decay_time(decay) `: Lower the updates by $(1 + decay * iteration)^{-1}$.
+- `step_size_control_decay_exp(decay)`: Lower the updates by $exp(-decay * iteration)$.
+- `step_size_control_decay_linear(iter_zero)`: Lower the updates until `iter_zero` is reached. Updates with `iter > iter_zero` are 0.
+- `step_size_control_decay_steps(drop_rate, every_iter)`: Lower the updates `every_iter` by `drop_rate`.
 
 Note that these functions return a function that contains a function with the required signature:
 
 ```{r}
-stepSizeControlDecayTime()
+step_size_control_decay_time()
 ```
 
 Let's define multiple gradient descent optimizers and optimize 10 steps with a step size control:
@@ -99,17 +99,17 @@ oo5 = OptimizerGD$new(obj, x_start = x0, lr = lr, id = "GD with Linear Decay", p
 oo6 = OptimizerGD$new(obj, x_start = x0, lr = lr, id = "GD with Step Decay", print_trace = FALSE)
 
 oo1$optimize(steps = 10)
-oo2$optimize(steps = 10, stepSizeControlLineSearch())
-oo3$optimize(steps = 10, stepSizeControlDecayTime())
-oo4$optimize(steps = 10, stepSizeControlDecayExp())
-oo5$optimize(steps = 10, stepSizeControlDecayLinear())
-oo6$optimize(steps = 10, stepSizeControlDecaySteps())
+oo2$optimize(steps = 10, step_size_control_line_search())
+oo3$optimize(steps = 10, step_size_control_decay_time())
+oo4$optimize(steps = 10, step_size_control_decay_exp())
+oo5$optimize(steps = 10, step_size_control_decay_linear())
+oo6$optimize(steps = 10, step_size_control_decay_steps())
 ```
 
-For now we don't know how well it worked. Let's collect all archives with `mergeOptimArchives()` and visualize the step sizes and function values with `patchwork` magic:
+For now we don't know how well it worked. Let's collect all archives with `merge_optim_archives()` and visualize the step sizes and function values with `patchwork` magic:
 
 ```{r}
-arx = mergeOptimArchives(oo1, oo2, oo3, oo4, oo5, oo6)
+arx = merge_optim_archives(oo1, oo2, oo3, oo4, oo5, oo6)
 
 library(ggplot2)
 library(patchwork)
@@ -147,8 +147,8 @@ The important thing is to keep the signature of the function by allowing the fun
 
 ```{r}
 myStepSizeControl = function(x, u, obj, opt) {
-  sc1 = stepSizeControlLineSearch(0, 10)
-  sc2 = stepSizeControlDecayTime(0.1)
+  sc1 = step_size_control_line_search(0, 10)
+  sc2 = step_size_control_decay_time(0.1)
   return(sc1(x, u, obj, opt) * sc2(x, u, obj, opt))
 }
 

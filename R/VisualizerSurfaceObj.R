@@ -263,7 +263,7 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
     #' @param fext (`character(1)`)\cr
     #'   The file extension (default is `png`).
     #' @param stops (`integer()`)\cr
-    #'   The step / iteration in the archives of the optimizers added by `$addLayerOptimizationTrace()` at which a frame is taken.
+    #'   The step / iteration in the archives of the optimizers added by `$add_optimization_trace()` at which a frame is taken.
     #'   Must have exact the same length as defined in `nframes`.
     #'   By default, a sequence with equidistant points is generated for `stops`.
     #' @param ... (`any`)\cr
@@ -555,11 +555,11 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
         }
         return(as.numeric(out))
       }
-      fappV = function(x, y) {
+      fapp_v = function(x, y) {
         X = cbind(x = x, y = y)
         apply(X, 1, fapp)
       }
-      z = outer(X = grid[, 1], Y = grid[, 2], FUN = function(x, y) fappV(x, y))
+      z = outer(X = grid[, 1], Y = grid[, 2], FUN = function(x, y) fapp_v(x, y))
       if (!is.null(zlim)) {
         z[!between(z, zlim[1], zlim[2])] = NA
       }

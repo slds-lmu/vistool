@@ -28,7 +28,7 @@ The id of the object.}
 \section{Active bindings}{
 \if{html}{\out{<div class="r6-active-bindings">}}
 \describe{
-\item{\code{archive}}{(`data.table()`) Archive of all calls to `$evalStore`.}
+\item{\code{archive}}{(`data.table()`) Archive of all calls to `$eval_store`.}
 
 \item{\code{log_funs}}{(`list()`) A list containing logging functions. Each function must have argument.}
 
@@ -41,12 +41,12 @@ The id of the object.}
 \itemize{
 \item \href{#method-Objective-new}{\code{Objective$new()}}
 \item \href{#method-Objective-eval}{\code{Objective$eval()}}
-\item \href{#method-Objective-evalStore}{\code{Objective$evalStore()}}
-\item \href{#method-Objective-assertX}{\code{Objective$assertX()}}
+\item \href{#method-Objective-eval_store}{\code{Objective$eval_store()}}
+\item \href{#method-Objective-assert_x}{\code{Objective$assert_x()}}
 \item \href{#method-Objective-grad}{\code{Objective$grad()}}
 \item \href{#method-Objective-hess}{\code{Objective$hess()}}
-\item \href{#method-Objective-addLogFun}{\code{Objective$addLogFun()}}
-\item \href{#method-Objective-clearArchive}{\code{Objective$clearArchive()}}
+\item \href{#method-Objective-add_log_fun}{\code{Objective$add_log_fun()}}
+\item \href{#method-Objective-clear_archive}{\code{Objective$clear_archive()}}
 \item \href{#method-Objective-clone}{\code{Objective$clone()}}
 }
 }
@@ -118,14 +118,14 @@ The result of `fun(x)`.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Objective-evalStore"></a>}}
-\if{latex}{\out{\hypertarget{method-Objective-evalStore}{}}}
-\subsection{Method \code{evalStore()}}{
+\if{html}{\out{<a id="method-Objective-eval_store"></a>}}
+\if{latex}{\out{\hypertarget{method-Objective-eval_store}{}}}
+\subsection{Method \code{eval_store()}}{
 Evaluate the objective function and log into the archive. Each call logs
 the input vector `x`, result of fun `fval`, the gradient `grad`, the norm of the gradient
-`gnorm`, and additional logs that were added by `$addLogFun`.
+`gnorm`, and additional logs that were added by `$add_log_fun`.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Objective$evalStore(x)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Objective$eval_store(x)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -140,12 +140,12 @@ Invisible list of logs that are added to the archive.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Objective-assertX"></a>}}
-\if{latex}{\out{\hypertarget{method-Objective-assertX}{}}}
-\subsection{Method \code{assertX()}}{
+\if{html}{\out{<a id="method-Objective-assert_x"></a>}}
+\if{latex}{\out{\hypertarget{method-Objective-assert_x}{}}}
+\subsection{Method \code{assert_x()}}{
 Assert a numeric input if it is suitable or not.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Objective$assertX(x, ...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Objective$assert_x(x, ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -193,12 +193,12 @@ Evaluate the hessian of the objective function at x.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Objective-addLogFun"></a>}}
-\if{latex}{\out{\hypertarget{method-Objective-addLogFun}{}}}
-\subsection{Method \code{addLogFun()}}{
+\if{html}{\out{<a id="method-Objective-add_log_fun"></a>}}
+\if{latex}{\out{\hypertarget{method-Objective-add_log_fun}{}}}
+\subsection{Method \code{add_log_fun()}}{
 Method to add custom logger to the objective.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Objective$addLogFun(l, label)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Objective$add_log_fun(l, label)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -213,12 +213,12 @@ The arguments of `l` must be `x`, `fval` and `grad`.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Objective-clearArchive"></a>}}
-\if{latex}{\out{\hypertarget{method-Objective-clearArchive}{}}}
-\subsection{Method \code{clearArchive()}}{
+\if{html}{\out{<a id="method-Objective-clear_archive"></a>}}
+\if{latex}{\out{\hypertarget{method-Objective-clear_archive}{}}}
+\subsection{Method \code{clear_archive()}}{
 Delete the archive.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Objective$clearArchive()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Objective$clear_archive()}\if{html}{\out{</div>}}
 }
 
 }

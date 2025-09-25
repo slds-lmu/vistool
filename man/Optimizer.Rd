@@ -21,7 +21,7 @@ The id of the object.}
 \describe{
 \item{\code{lr}}{(`numeric(1`) Step size of the algorithm.}
 
-\item{\code{archive}}{(`data.table()`) Archive of all calls to `$evalStore`.}
+\item{\code{archive}}{(`data.table()`) Archive of all calls to `$eval_store`.}
 
 \item{\code{objective}}{(`Objective`) The objective function.}
 
@@ -33,9 +33,9 @@ The id of the object.}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-Optimizer-new}{\code{Optimizer$new()}}
-\item \href{#method-Optimizer-prepareUpdateForArchive}{\code{Optimizer$prepareUpdateForArchive()}}
-\item \href{#method-Optimizer-updateArchive}{\code{Optimizer$updateArchive()}}
-\item \href{#method-Optimizer-setX}{\code{Optimizer$setX()}}
+\item \href{#method-Optimizer-prepare_update_for_archive}{\code{Optimizer$prepare_update_for_archive()}}
+\item \href{#method-Optimizer-update_archive}{\code{Optimizer$update_archive()}}
+\item \href{#method-Optimizer-set_x}{\code{Optimizer$set_x()}}
 \item \href{#method-Optimizer-clone}{\code{Optimizer$clone()}}
 }
 }
@@ -69,12 +69,12 @@ Indicator whether to print the status of `$optimize()`.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Optimizer-prepareUpdateForArchive"></a>}}
-\if{latex}{\out{\hypertarget{method-Optimizer-prepareUpdateForArchive}{}}}
-\subsection{Method \code{prepareUpdateForArchive()}}{
+\if{html}{\out{<a id="method-Optimizer-prepare_update_for_archive"></a>}}
+\if{latex}{\out{\hypertarget{method-Optimizer-prepare_update_for_archive}{}}}
+\subsection{Method \code{prepare_update_for_archive()}}{
 Prepare updates for adding them to the archive.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Optimizer$prepareUpdateForArchive(
+\if{html}{\out{<div class="r">}}\preformatted{Optimizer$prepare_update_for_archive(
   x_out,
   x_in,
   update,
@@ -118,12 +118,12 @@ Prepare updates for adding them to the archive.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Optimizer-updateArchive"></a>}}
-\if{latex}{\out{\hypertarget{method-Optimizer-updateArchive}{}}}
-\subsection{Method \code{updateArchive()}}{
+\if{html}{\out{<a id="method-Optimizer-update_archive"></a>}}
+\if{latex}{\out{\hypertarget{method-Optimizer-update_archive}{}}}
+\subsection{Method \code{update_archive()}}{
 Add points to the archive.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Optimizer$updateArchive(ain)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Optimizer$update_archive(ain)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -136,12 +136,12 @@ Add points to the archive.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Optimizer-setX"></a>}}
-\if{latex}{\out{\hypertarget{method-Optimizer-setX}{}}}
-\subsection{Method \code{setX()}}{
+\if{html}{\out{<a id="method-Optimizer-set_x"></a>}}
+\if{latex}{\out{\hypertarget{method-Optimizer-set_x}{}}}
+\subsection{Method \code{set_x()}}{
 Set the current input vector used as start point of `$optimize()`.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Optimizer$setX(x)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Optimizer$set_x(x)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{

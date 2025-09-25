@@ -57,8 +57,7 @@ Creates a new instance of this [R6][R6::R6Class] class.
   x1_limits = NULL,
   x2_limits = NULL,
   padding = 0,
-  n_points = 100L,
-  allow_extrapolation = FALSE
+  n_points = 100L
 )}\if{html}{\out{</div>}}
 }
 
@@ -95,12 +94,6 @@ Note that a grid of `npoints^2` values is generated and evaluated by `objective$
 \item{\code{n_points}}{(`integer(1)`)\cr
 The number of generated point per dimension.
 Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
-
-\item{\code{allow_extrapolation}}{(`logical(1)`)
-Whether to evaluate the objective outside its evaluation (canonical) bounds when plot limits
-extend further. If `FALSE` (default), values outside are masked (set to `NA`) producing blank
-regions in the plot; if `TRUE`, the objective is called on the extended region (may yield
-misleading or numerically extreme values depending on the function definition).}
 }
 \if{html}{\out{</div>}}
 }
@@ -309,7 +302,7 @@ The end view of the animation.}
 The file extension (default is `png`).}
 
 \item{\code{stops}}{(`integer()`)\cr
-The step / iteration in the archives of the optimizers added by `$addLayerOptimizationTrace()` at which a frame is taken.
+The step / iteration in the archives of the optimizers added by `$add_optimization_trace()` at which a frame is taken.
 Must have exact the same length as defined in `nframes`.
 By default, a sequence with equidistant points is generated for `stops`.}
 
