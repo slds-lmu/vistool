@@ -59,6 +59,7 @@ Creates a new instance of this [R6][R6::R6Class] class.
   y_pred = NULL,
   y_true = NULL,
   input_type = "auto",
+  n_points = 1000L,
   ...
 )}\if{html}{\out{</div>}}
 }
@@ -80,6 +81,10 @@ Desired input scale. One of `"auto"`, `"score"`, `"probability"`.
 `"auto"` (default) chooses the common `input_default` of the supplied
 losses.}
 
+\item{\code{n_points}}{(`integer(1)`)
+Default resolution used when calling `$plot()` without specifying `n_points`.
+Defaults to 1000.}
+
 \item{\code{...}}{Additional arguments (currently unused).}
 }
 \if{html}{\out{</div>}}
@@ -92,7 +97,7 @@ losses.}
 Create and return the ggplot2 plot with model-specific layers.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{VisualizerLossFuns$plot(
-  n_points = 1000L,
+  n_points = NULL,
   y_curves = "both",
   line_width = NULL,
   line_col = NULL,
@@ -105,7 +110,9 @@ Create and return the ggplot2 plot with model-specific layers.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{n_points}}{(`integer(1)`)\cr
-Number of points to use for plotting the loss functions. Default is 1000.}
+Number of points to use for plotting the loss functions. Defaults to the
+value configured when constructing the visualizer (via `as_visualizer()`),
+falling back to 1000 if not set.}
 
 \item{\code{y_curves}}{(`character(1)`)\cr
 When `input_type = "probability"`, choose which curves to display: `"both"`, `"y1"`, or `"y0"`. Default is "both".}

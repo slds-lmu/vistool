@@ -21,7 +21,9 @@ as_visualizer(
   input_type = "auto",
   y_curves = "both",
   learner = NULL,
-  ...
+  hypothesis = NULL,
+  domain = NULL,
+  retrain = TRUE
 )
 
 \method{as_visualizer}{Task}(
@@ -31,10 +33,6 @@ as_visualizer(
   x2_limits = NULL,
   padding = 0,
   n_points = 100L,
-  y_pred = NULL,
-  y_true = NULL,
-  input_type = "auto",
-  y_curves = "both",
   learner = NULL,
   hypothesis = NULL,
   retrain = TRUE,
@@ -48,12 +46,8 @@ as_visualizer(
   x2_limits = NULL,
   padding = 0,
   n_points = 100L,
-  y_pred = NULL,
-  y_true = NULL,
-  input_type = "auto",
-  y_curves = "both",
-  learner = NULL,
   domain = NULL,
+  retrain = TRUE,
   ...
 )
 
@@ -64,41 +58,28 @@ as_visualizer(
   x2_limits = NULL,
   padding = 0,
   n_points = 100L,
-  y_pred = NULL,
-  y_true = NULL,
-  input_type = "auto",
-  y_curves = "both",
-  learner = NULL,
   ...
 )
 
 \method{as_visualizer}{LossFunction}(
   x,
   type = "auto",
-  x1_limits = NULL,
-  x2_limits = NULL,
-  padding = 0,
   n_points = 1000L,
   y_pred = NULL,
   y_true = NULL,
   input_type = "auto",
   y_curves = "both",
-  learner = NULL,
   ...
 )
 
 \method{as_visualizer}{list}(
   x,
   type = "auto",
-  x1_limits = NULL,
-  x2_limits = NULL,
-  padding = 0,
   n_points = 1000L,
   y_pred = NULL,
   y_true = NULL,
   input_type = "auto",
   y_curves = "both",
-  learner = NULL,
   ...
 )
 }
@@ -125,56 +106,85 @@ The x1 margin is calculated by `max(x1lmits) - min(x1limits) * padding`.}
 The number of generated point per dimension.
 Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
 
-\item{y_pred}{(`numeric()`)\cr
-Predicted values (used for loss function visualizations).}
+\item{y_pred}{(`numeric()`)
+Predicted values (for loss function visualizations).}
 
-\item{y_true}{(`numeric()`)\cr
-True values (used for loss function visualizations).}
+\item{y_true}{(`numeric()`)
+True values (for loss function visualizations).}
 
-\item{input_type}{(`character(1)`)\cr
-`"auto"` (default), `"score"` or `"probability"`. Passed through to
-the loss visualiser.}
+\item{input_type}{(`character(1)`)
+One of `"auto"` (default), `"score"`, or `"probability"`. Passed through to
+the loss visualizer.}
 
-\item{y_curves}{(`character(1)`)\cr
+\item{y_curves}{(`character(1)`)
 Which response curve(s) to draw when `input_type = "probability"`.
 One of `"both"`, `"y1"`, or `"y0"`.}
 
 \item{learner}{(`mlr3::Learner`)\cr
 The learner to train the model with.}
 
-\item{...}{(`any`)\cr
-Additional arguments.}
-
 \item{hypothesis}{(`Hypothesis`|`NULL`)
 Optional hypothesis object that provides predictions instead of a learner.
 Supply either `learner` or `hypothesis`, but not both.}
 
-\item{retrain}{(`logical(1)`)\cr
-If a learner is supplied, whether it should be (re)trained on the task (`TRUE`, default)
-or reused as-is (`FALSE`). If `FALSE` but the learner is untrained, a warning is issued
-and training is performed.}
-
 \item{domain}{(`list`|`NULL`)
 Named list giving axis limits per predictor when no Task data is available,
 e.g., `list(x = c(-1, 1))` for 1D or `list(x = c(-1,1), y = c(-1,1))` for 2D.}
+
+\item{retrain}{(`logical(1)`)
+If a learner is supplied, whether it should be (re)trained on the task (`TRUE`, default)
+or reused as-is (`FALSE`). If `FALSE` but the learner is untrained, a warning is issued
+and training is performed.}
 }
 \value{
-An object inheriting from a Visualizer class (Visualizer1D, Visualizer2D, VisualizerSurface, etc.)
-depending on the input and selected type.
+An object inheriting from a Visualizer class (e.g. `VisualizerModel`,
+`VisualizerObj`, or `VisualizerLossFuns`) depending on the input and selected type.
 }
 \description{
-This function converts to a visualizer. Automatically chooses between 1D and 2D
-visualizations based on the number of features/dimensions using ggplot2 backend.
-For 2D inputs, you can optionally use `type = "surface"` to get interactive plotly
-surface plots (available for Models and Objectives only).
+`as_visualizer()` inspects its input and instantiates the matching visualizer class.
+All common arguments are validated first so that incompatible combinations fail fast
+with informative messages before any expensive rendering work is scheduled.
 }
 \details{
-If `type = "auto"` (default), the function will inspect the input and select the appropriate ggplot2 visualizer:
-- 1D: For objects with 1 feature/dimension (uses ggplot2)
-- 2D: For objects with 2 features/dimensions (uses ggplot2)
-You can override this by specifying `type = "1d"`, `type = "2d"`, or for 2D inputs only: `type = "surface"` (uses plotly for interactive surfaces, Models and Objectives only).
+By default (`type = "auto"`), `as_visualizer()` chooses a ggplot2 backend for 1D and 2D
+inputs. For 2D models or objectives you can opt into interactive plotly surfaces via
+`type = "surface"`. All inputs are checked by a shared validation helper that enforces
+mutual exclusivity of `learner`/`hypothesis`, ensures limits are finite and ordered, and
+rejects parameters that are irrelevant for the chosen input.
+}
+\section{Supported inputs}{
 
-Hypotheses can be used instead of learners to visualize functional forms directly. When
-no Task is provided (i.e., visualizing a `Hypothesis` alone), a `domain` must be supplied
-to define plotting limits.
+\tabular{llll}{
+  Input & Auto `type` & Allowed overrides & Notes \\ 
+  `Task` & `"1d"` (1 feature) or `"2d"` (2 features) & `type = "surface"` (2D only) & Exactly one of `learner`/`hypothesis`; `domain` is ignored and therefore rejected. \\ 
+  `Hypothesis` & matches `input_dim` & `type = "surface"` (2D only) & Requires complete `domain`; `learner` not supported. \\ 
+  `Objective` & matches `xdim` when available & `type = "surface"` (2D only) & `learner`/`hypothesis` not supported. \\ 
+  `LossFunction` or list of losses & always `"1d"` & `n_points` & `input_type`, `y_pred`, `y_true`, `y_curves`, and `n_points` are forwarded to the loss visualizer. \\
+}
+}
+
+\section{Validation}{
+
+Common argument validation is centralized so that:
+* unused parameters (e.g. 2D limits supplied for 1D losses) raise an error,
+* limits supplied manually are finite, strictly ordered, and match the dimensionality,
+* high grid resolutions for interactive surfaces trigger explicit warnings, and
+* probability inputs for loss visualizations are checked for consistency of
+  `input_type`, `y_pred`, `y_true`, and `y_curves`.
+}
+
+\examples{
+obj <- obj("TF_branin")
+vis <- as_visualizer(obj, type = "2d")
+
+# High resolutions on surfaces warn before plotting
+tryCatch(
+  as_visualizer(obj, type = "surface", n_points = 256L),
+  warning = function(w) message("Warning: ", conditionMessage(w))
+)
+
+}
+\seealso{
+[VisualizerModel], [VisualizerSurfaceModel], [VisualizerObj], [VisualizerSurfaceObj],
+[VisualizerLossFuns]
 }

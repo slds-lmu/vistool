@@ -1,10 +1,9 @@
 #' @title Convert to visualizer
 #'
 #' @description
-#' This function converts to a visualizer. Automatically chooses between 1D and 2D
-#' visualizations based on the number of features/dimensions using ggplot2 backend.
-#' For 2D inputs, you can optionally use `type = "surface"` to get interactive plotly
-#' surface plots (available for Models and Objectives only).
+#' `as_visualizer()` inspects its input and instantiates the matching visualizer class.
+#' All common arguments are validated first so that incompatible combinations fail fast
+#' with informative messages before any expensive rendering work is scheduled.
 #'
 #' @template param_x
 #' @template param_type
@@ -15,218 +14,186 @@
 #' @template param_domain
 #' @template param_n_points
 #'
-#' @param y_pred (`numeric()`)\cr
-#'   Predicted values (used for loss function visualizations).
-#' @param y_true (`numeric()`)\cr
-#'   True values (used for loss function visualizations).
-#' @param input_type (`character(1)`)\cr
-#'   `"auto"` (default), `"score"` or `"probability"`. Passed through to
-#'   the loss visualiser.
-#' @param y_curves (`character(1)`)\cr
+#' @param y_pred (`numeric()`)
+#'   Predicted values (for loss function visualizations).
+#' @param y_true (`numeric()`)
+#'   True values (for loss function visualizations).
+#' @param input_type (`character(1)`)
+#'   One of `"auto"` (default), `"score"`, or `"probability"`. Passed through to
+#'   the loss visualizer.
+#' @param y_curves (`character(1)`)
 #'   Which response curve(s) to draw when `input_type = "probability"`.
 #'   One of `"both"`, `"y1"`, or `"y0"`.
 #' @template param_learner
-#' @param retrain (`logical(1)`)\cr
+#' @param retrain (`logical(1)`)
 #'   If a learner is supplied, whether it should be (re)trained on the task (`TRUE`, default)
 #'   or reused as-is (`FALSE`). If `FALSE` but the learner is untrained, a warning is issued
 #'   and training is performed.
-#' @template param_dots
 #'
-#' @return An object inheriting from a Visualizer class (Visualizer1D, Visualizer2D, VisualizerSurface, etc.)
-#' depending on the input and selected type.
+#' @return An object inheriting from a Visualizer class (e.g. `VisualizerModel`,
+#' `VisualizerObj`, or `VisualizerLossFuns`) depending on the input and selected type.
 #'
 #' @details
-#' If `type = "auto"` (default), the function will inspect the input and select the appropriate ggplot2 visualizer:
-#' - 1D: For objects with 1 feature/dimension (uses ggplot2)
-#' - 2D: For objects with 2 features/dimensions (uses ggplot2)
-#' You can override this by specifying `type = "1d"`, `type = "2d"`, or for 2D inputs only: `type = "surface"` (uses plotly for interactive surfaces, Models and Objectives only).
+#' By default (`type = "auto"`), `as_visualizer()` chooses a ggplot2 backend for 1D and 2D
+#' inputs. For 2D models or objectives you can opt into interactive plotly surfaces via
+#' `type = "surface"`. All inputs are checked by a shared validation helper that enforces
+#' mutual exclusivity of `learner`/`hypothesis`, ensures limits are finite and ordered, and
+#' rejects parameters that are irrelevant for the chosen input.
 #'
-#' Hypotheses can be used instead of learners to visualize functional forms directly. When
-#' no Task is provided (i.e., visualizing a `Hypothesis` alone), a `domain` must be supplied
-#' to define plotting limits.
+#' @section Supported inputs:
+#' \tabular{llll}{
+#'   Input & Auto `type` & Allowed overrides & Notes \\
+#'   `Task` & `"1d"` (1 feature) or `"2d"` (2 features) & `type = "surface"` (2D only) & Exactly one of `learner`/`hypothesis`; `domain` is ignored and therefore rejected. \\
+#'   `Hypothesis` & matches `input_dim` & `type = "surface"` (2D only) & Requires complete `domain`; `learner` not supported. \\
+#'   `Objective` & matches `xdim` when available & `type = "surface"` (2D only) & `learner`/`hypothesis` not supported. \\
+#'   `LossFunction` or list of losses & always `"1d"` & `n_points` & `input_type`, `y_pred`, `y_true`, `y_curves`, and `n_points` are forwarded to the loss visualizer. \\
+#' }
+#'
+#' @section Validation:
+#' Common argument validation is centralized so that:
+#' * unused parameters (e.g. 2D limits supplied for 1D losses) raise an error,
+#' * limits supplied manually are finite, strictly ordered, and match the dimensionality,
+#' * high grid resolutions for interactive surfaces trigger explicit warnings, and
+#' * probability inputs for loss visualizations are checked for consistency of
+#'   `input_type`, `y_pred`, `y_true`, and `y_curves`.
+#'
+#' @seealso
+#' [VisualizerModel], [VisualizerSurfaceModel], [VisualizerObj], [VisualizerSurfaceObj],
+#' [VisualizerLossFuns]
+#'
+#' @examples
+#' obj = obj("TF_branin")
+#' vis = as_visualizer(obj, type = "2d")
+#'
+#' # High resolutions on surfaces warn before plotting
+#' tryCatch(
+#'   as_visualizer(obj, type = "surface", n_points = 256L),
+#'   warning = function(w) message("Warning: ", conditionMessage(w))
+#' )
 #'
 #' @export
 as_visualizer = function(x, type = "auto", x1_limits = NULL, x2_limits = NULL,
                          padding = 0, n_points = 100L, y_pred = NULL, y_true = NULL,
-                         input_type = "auto", y_curves = "both", learner = NULL, ...) {
+                         input_type = "auto", y_curves = "both", learner = NULL,
+                         hypothesis = NULL, domain = NULL, retrain = TRUE) {
   UseMethod("as_visualizer")
 }
 
 #' @rdname as_visualizer
 #' @export
 as_visualizer.Task = function(x, type = "auto", x1_limits = NULL, x2_limits = NULL,
-                              padding = 0, n_points = 100L, y_pred = NULL, y_true = NULL,
-                              input_type = "auto", y_curves = "both", learner = NULL, hypothesis = NULL,
-                              retrain = TRUE, ...) {
-  if (!is.null(learner) && !is.null(hypothesis)) {
-    stop("Provide exactly one of 'learner' or 'hypothesis', not both.")
-  }
-  if (is.null(learner) && is.null(hypothesis)) {
-    stop("One of 'learner' or 'hypothesis' is required for Task visualizations")
-  }
-  checkmate::assert_choice(type, choices = c("auto", "1d", "2d", "surface"))
-  n_features = length(x$feature_names)
-
-  # Determine visualization type
-  if (type == "auto") {
-    if (n_features == 1) {
-      vis_type = "1d"
-    } else if (n_features == 2) {
-      vis_type = "2d" # Default to ggplot2 for 2D
-    } else {
-      stop("Auto visualization only supports 1D and 2D tasks. For higher dimensions, please specify type explicitly.")
-    }
-  } else {
-    vis_type = type
-  }
-
-  # Validate type against features
-  if (vis_type == "1d" && n_features != 1) {
-    stop("1D visualization requires a task with exactly 1 feature.")
-  }
-  if (vis_type %in% c("2d", "surface") && n_features != 2) {
-    stop("2D and surface visualizations require a task with exactly 2 features.")
-  }
-
-  # Create appropriate visualizer
-  if (vis_type %in% c("1d", "2d")) {
-    vis = VisualizerModel$new(x, learner = learner, hypothesis = hypothesis,
-      x1_limits = x1_limits, x2_limits = x2_limits,
-      padding = padding, n_points = n_points, retrain = retrain, ...
-    )
-  } else if (vis_type == "surface") {
-    vis = VisualizerSurfaceModel$new(x, learner = learner, hypothesis = hypothesis,
-      x1_limits = x1_limits, x2_limits = x2_limits,
-      padding = padding, n_points = n_points, retrain = retrain, ...
-    )
-  } else {
-    stop("Unknown visualization type.")
-  }
-
-  return(vis)
+                              padding = 0, n_points = 100L, learner = NULL,
+                              hypothesis = NULL, retrain = TRUE, ...) {
+  dots = list(...)
+  payload = validate_visualizer_args("task", list(
+    call = match.call(expand.dots = FALSE),
+    x = x,
+    type = type,
+    x1_limits = x1_limits,
+    x2_limits = x2_limits,
+    padding = padding,
+    n_points = n_points,
+    y_pred = dots$y_pred,
+    y_true = dots$y_true,
+    input_type = dots$input_type,
+    y_curves = dots$y_curves,
+    learner = learner,
+    hypothesis = hypothesis,
+    domain = dots$domain,
+    retrain = retrain
+  ))
+  construct_visualizer(payload)
 }
 
 #' @rdname as_visualizer
 #' @export
 as_visualizer.Hypothesis = function(x, type = "auto", x1_limits = NULL, x2_limits = NULL,
-                                    padding = 0, n_points = 100L, y_pred = NULL, y_true = NULL,
-                                    input_type = "auto", y_curves = "both", learner = NULL, domain = NULL, ...) {
-  # Determine dimensionality from hypothesis
-  checkmate::assert_choice(type, choices = c("auto", "1d", "2d", "surface"))
-  dim = x$input_dim
-  if (type == "auto") {
-    vis_type = if (dim == 1) "1d" else if (dim == 2) "2d" else stop("Hypothesis supports only 1D/2D")
-  } else {
-    vis_type = type
-  }
-  if (vis_type == "surface" && dim != 2) stop("Surface visualization requires 2D hypothesis")
-
-  # Resolve domain when no task is available
-  if (is.null(domain)) domain = x$domain
-  if (is.null(domain)) stop("'domain' is required when visualizing a hypothesis without a Task")
-  # derive limits from domain
-  if (dim == 1) {
-    if (is.null(x1_limits)) x1_limits = domain[[x$predictors[1]]]
-  } else {
-    if (is.null(x1_limits)) x1_limits = domain[[x$predictors[1]]]
-    if (is.null(x2_limits)) x2_limits = domain[[x$predictors[2]]]
-  }
-
-  if (vis_type %in% c("1d", "2d")) {
-    vis = VisualizerModel$new(task = NULL, learner = NULL, hypothesis = x,
-      x1_limits = x1_limits, x2_limits = x2_limits, padding = padding, n_points = n_points, domain = domain, ...)
-  } else if (vis_type == "surface") {
-    vis = VisualizerSurfaceModel$new(task = NULL, learner = NULL, hypothesis = x,
-      x1_limits = x1_limits, x2_limits = x2_limits, padding = padding, n_points = n_points, domain = domain, ...)
-  } else {
-    stop("Unknown visualization type.")
-  }
-  return(vis)
+                                    padding = 0, n_points = 100L, domain = NULL,
+                                    retrain = TRUE, ...) {
+  dots = list(...)
+  payload = validate_visualizer_args("hypothesis", list(
+    call = match.call(expand.dots = FALSE),
+    x = x,
+    type = type,
+    x1_limits = x1_limits,
+    x2_limits = x2_limits,
+    padding = padding,
+    n_points = n_points,
+    y_pred = dots$y_pred,
+    y_true = dots$y_true,
+    input_type = dots$input_type,
+    y_curves = dots$y_curves,
+    learner = dots$learner,
+    hypothesis = dots$hypothesis,
+    domain = domain,
+    retrain = retrain
+  ))
+  construct_visualizer(payload)
 }
 
 #' @rdname as_visualizer
 #' @export
 as_visualizer.Objective = function(x, type = "auto", x1_limits = NULL, x2_limits = NULL,
-                                   padding = 0, n_points = 100L, y_pred = NULL, y_true = NULL,
-                                   input_type = "auto", y_curves = "both", learner = NULL, ...) {
-  checkmate::assert_choice(type, choices = c("auto", "1d", "2d", "surface"))
-  n_dim = x$xdim
-
-  # Determine visualization type
-  if (type == "auto") {
-    if (is.na(n_dim)) {
-      stop("Auto visualization type detection not supported for variable-dimension objectives. Please specify type explicitly (1d, 2d, or surface).")
-    } else if (n_dim == 1) {
-      vis_type = "1d"
-    } else if (n_dim == 2) {
-      vis_type = "2d" # Default to ggplot2 for 2D
-    } else {
-      stop("Auto visualization only supports 1D and 2D objectives. For higher dimensions, please specify type explicitly.")
-    }
-  } else {
-    vis_type = type
-  }
-
-  # Validate type against dimensions
-  if (!is.na(n_dim)) {
-    # For known dimensions, validate the type makes sense
-    if (vis_type == "1d" && n_dim != 1) {
-      stop("1D visualization requires an objective with exactly 1 dimension.")
-    }
-    if (vis_type %in% c("2d", "surface") && n_dim != 2) {
-      stop("2D and surface visualizations require an objective with exactly 2 dimensions.")
-    }
-  }
-  # For unknown dimensions (NA), trust the user's explicit type specification
-
-  # Create appropriate visualizer
-  if (vis_type %in% c("1d", "2d")) {
-    return(VisualizerObj$new(x,
-      x1_limits = x1_limits, x2_limits = x2_limits,
-      padding = padding, n_points = n_points, type = vis_type, ...
-    ))
-  } else if (vis_type == "surface") {
-    return(VisualizerSurfaceObj$new(x, x1_limits = x1_limits, x2_limits = x2_limits, padding = padding, n_points = n_points, ...))
-  } else {
-    stop("Unknown visualization type.")
-  }
+                                   padding = 0, n_points = 100L, ...) {
+  dots = list(...)
+  payload = validate_visualizer_args("objective", list(
+    call = match.call(expand.dots = FALSE),
+    x = x,
+    type = type,
+    x1_limits = x1_limits,
+    x2_limits = x2_limits,
+    padding = padding,
+    n_points = n_points,
+    y_pred = dots$y_pred,
+    y_true = dots$y_true,
+    input_type = dots$input_type,
+    y_curves = dots$y_curves,
+    learner = dots$learner,
+    hypothesis = dots$hypothesis,
+    domain = dots$domain,
+    retrain = dots$retrain
+  ))
+  construct_visualizer(payload)
 }
 
 #' @rdname as_visualizer
 #' @export
-as_visualizer.LossFunction = function(x, type = "auto", x1_limits = NULL, x2_limits = NULL,
-                                      padding = 0, n_points = 1000L,
+as_visualizer.LossFunction = function(x, type = "auto", n_points = 1000L,
                                       y_pred = NULL, y_true = NULL,
-                                      input_type = "auto", y_curves = "both", learner = NULL, ...) {
-  checkmate::assert_choice(type, choices = c("auto", "1d"))
-  checkmate::assert_choice(input_type, choices = c("auto", "score", "probability"))
-  if (type != "auto" && type != "1d") {
-    stop("Only 1D visualization is currently supported for loss functions")
-  }
-  return(VisualizerLossFuns$new(
-    losses = list(x), y_pred = y_pred, y_true = y_true,
-    n_points = n_points, input_type = input_type, y_curves = y_curves, ...
+                                      input_type = "auto", y_curves = "both", ...) {
+  dots = list(...)
+  payload = validate_visualizer_args("loss", list(
+    call = match.call(expand.dots = FALSE),
+    x = x,
+    type = type,
+    n_points = n_points,
+    y_pred = y_pred,
+    y_true = y_true,
+    input_type = input_type,
+    y_curves = y_curves,
+    learner = dots$learner,
+    domain = dots$domain
   ))
+  construct_visualizer(payload)
 }
 
 #' @rdname as_visualizer
 #' @export
-as_visualizer.list = function(x, type = "auto", x1_limits = NULL, x2_limits = NULL,
-                              padding = 0, n_points = 1000L,
+as_visualizer.list = function(x, type = "auto", n_points = 1000L,
                               y_pred = NULL, y_true = NULL,
-                              input_type = "auto", y_curves = "both", learner = NULL, ...) {
-  # Check all elements are LossFunction objects
-  invalid_indices = which(!vapply(x, function(obj) inherits(obj, "LossFunction"), logical(1)))
-  if (length(invalid_indices) > 0) {
-    stop(sprintf("The following elements of the list are not LossFunction objects: %s", paste(invalid_indices, collapse = ", ")))
-  }
-  checkmate::assert_choice(type, choices = c("auto", "1d"))
-  checkmate::assert_choice(input_type, choices = c("auto", "score", "probability"))
-  if (type != "auto" && type != "1d") {
-    stop("Only 1D visualization is currently supported for loss functions")
-  }
-  return(VisualizerLossFuns$new(
-    losses = x, y_pred = y_pred, y_true = y_true,
-    n_points = n_points, input_type = input_type, y_curves = y_curves, ...
+                              input_type = "auto", y_curves = "both", ...) {
+  dots = list(...)
+  payload = validate_visualizer_args("loss_list", list(
+    call = match.call(expand.dots = FALSE),
+    x = x,
+    type = type,
+    n_points = n_points,
+    y_pred = y_pred,
+    y_true = y_true,
+    input_type = input_type,
+    y_curves = y_curves,
+    learner = dots$learner,
+    domain = dots$domain
   ))
+  construct_visualizer(payload)
 }

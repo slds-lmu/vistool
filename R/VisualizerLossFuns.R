@@ -41,13 +41,17 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
     #'   Desired input scale. One of `"auto"`, `"score"`, `"probability"`.
     #'   `"auto"` (default) chooses the common `input_default` of the supplied
     #'   losses.
+    #' @param n_points (`integer(1)`)
+    #'   Default resolution used when calling `$plot()` without specifying `n_points`.
+    #'   Defaults to 1000.
     #' @param ... Additional arguments (currently unused).
     initialize = function(losses, y_pred = NULL, y_true = NULL,
-                          input_type = "auto", ...) {
+                          input_type = "auto", n_points = 1000L, ...) {
       checkmate::assert_list(losses, "LossFunction")
       checkmate::assert_numeric(y_pred, null.ok = TRUE)
       checkmate::assert_numeric(y_true, null.ok = TRUE)
       checkmate::assert_choice(input_type, choices = c("auto", "score", "probability"))
+      n_points = as.integer(checkmate::assert_integerish(n_points, len = 1, lower = 10))
 
       # Theme defaults are handled by base Visualizer via set_theme()/plot(theme=...)
 
@@ -80,12 +84,15 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
       self$input_type = input_type
       self$y_pred = y_pred
       self$y_true = y_true
+      private$.default_n_points = n_points
     },
 
     #' @description
     #' Create and return the ggplot2 plot with model-specific layers.
     #' @param n_points (`integer(1)`)\cr
-    #'   Number of points to use for plotting the loss functions. Default is 1000.
+    #'   Number of points to use for plotting the loss functions. Defaults to the
+    #'   value configured when constructing the visualizer (via `as_visualizer()`),
+    #'   falling back to 1000 if not set.
     #' @param y_curves (`character(1)`)\cr
     #'   When `input_type = "probability"`, choose which curves to display: `"both"`, `"y1"`, or `"y0"`. Default is "both".
     #' @param line_width (`numeric()`)\cr
@@ -96,7 +103,10 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
     #'   Line types for different loss functions. If NULL, uses "solid" for all lines.
     #' @param ... Additional arguments passed to the parent plot method.
     #' @return A ggplot2 object.
-    plot = function(n_points = 1000L, y_curves = "both", line_width = NULL, line_col = NULL, line_type = NULL, ...) {
+    plot = function(n_points = NULL, y_curves = "both", line_width = NULL, line_col = NULL, line_type = NULL, ...) {
+      if (is.null(n_points)) {
+        n_points = private$.default_n_points
+      }
       checkmate::assert_integerish(n_points, lower = 10, len = 1)
       checkmate::assert_choice(y_curves, choices = c("both", "y1", "y0"))
       checkmate::assert_numeric(line_width, null.ok = TRUE)
@@ -210,6 +220,7 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
   ),
   private = list(
     .loss_plot_settings = NULL, # Store loss-specific plot settings
+    .default_n_points = 1000L,
 
     # Override infer_z_values to handle loss function evaluation
     infer_z_values = function(points_data) {

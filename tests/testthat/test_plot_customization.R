@@ -267,7 +267,7 @@ test_that("show_title parameter works for loss function visualizers", {
   # Use a single loss function to avoid compatibility issues
   losses = list(lss("cross-entropy"))
 
-  vis_loss = as_visualizer(losses, task = task_classif)
+  vis_loss = as_visualizer(losses)
 
   # Test with title shown (default)
   p1 = vis_loss$plot(show_title = TRUE)

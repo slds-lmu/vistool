@@ -53,5 +53,5 @@ test_that("error when domain missing for hypothesis-only", {
 
 test_that("surface type requires 2D hypothesis", {
   hyp = hypothesis(function(x) x, type = "regr", predictors = "x", domain = list(x = c(0, 1)))
-  expect_error(as_visualizer(hyp, type = "surface", domain = hyp$domain), "requires 2D")
+  expect_error(as_visualizer(hyp, type = "surface", domain = hyp$domain), "requires a 2D")
 })

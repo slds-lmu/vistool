@@ -1,189 +1,4 @@
-test_that("as_visualizer works for Objective with auto type selection", {
-  # Test 1D objective (create a custom one since most TF functions are 2D)
-  obj_1d = Objective$new(id = "test_1d", fun = function(x) x^2, xdim = 1, lower = -5, upper = 5)
-  vis_1d = as_visualizer(obj_1d)
-  expect_s3_class(vis_1d, "VisualizerObj")
-
-  # Test 2D objective (auto should default to ggplot2)
-  obj_2d = obj("TF_branin")
-  vis_2d = as_visualizer(obj_2d)
-  expect_s3_class(vis_2d, "VisualizerObj")
-
-  # For objectives with 3D+ dimensions, auto selection should error
-  obj_3d = Objective$new(
-    id = "test_3d", fun = function(x) sum(x^2), xdim = 3,
-    lower = c(-1, -1, -1), upper = c(1, 1, 1)
-  )
-  expect_error(as_visualizer(obj_3d), "Auto visualization only supports 1D and 2D objectives")
-})
-
-test_that("as_visualizer works for Objective with explicit type selection", {
-  obj_2d = obj("TF_branin")
-
-  # Test explicit 2D (ggplot2)
-  vis_2d = as_visualizer(obj_2d, type = "2d")
-  expect_s3_class(vis_2d, "VisualizerObj")
-
-  # Test explicit surface for 2D objective (plotly)
-  vis_surface = as_visualizer(obj_2d, type = "surface")
-  expect_s3_class(vis_surface, "VisualizerSurfaceObj")
-})
-
-test_that("as_visualizer works for Task with auto type selection", {
-  skip_if_not_installed("mlr3learners")
-
-  # Test 1D task
-  task_1d = tsk("mtcars")
-  task_1d$select("gear")
-  learner = lrn("regr.lm")
-
-  vis_1d = as_visualizer(task_1d, learner = learner)
-  expect_s3_class(vis_1d, "VisualizerModel")
-
-  # Test 2D task (auto should default to ggplot2)
-  task_2d = tsk("mtcars")
-  task_2d$select(c("gear", "cyl"))
-
-  vis_2d = as_visualizer(task_2d, learner = learner)
-  expect_s3_class(vis_2d, "VisualizerModel")
-
-  # Test task with >2 features (auto should error)
-  task_3d = tsk("mtcars")
-  task_3d$select(c("gear", "cyl", "hp"))
-
-  expect_error(as_visualizer(task_3d, learner = learner), "Auto visualization only supports 1D and 2D tasks")
-})
-
-test_that("as_visualizer works for Task with explicit type selection", {
-  skip_if_not_installed("mlr3learners")
-
-  task_2d = tsk("mtcars")
-  task_2d$select(c("gear", "cyl"))
-  learner = lrn("regr.lm")
-
-  # Test explicit 2D (ggplot2)
-  vis_2d = as_visualizer(task_2d, learner = learner, type = "2d")
-  expect_s3_class(vis_2d, "VisualizerModel")
-
-  # Test explicit surface for 2D task (plotly)
-  vis_surface = as_visualizer(task_2d, learner = learner, type = "surface")
-  expect_s3_class(vis_surface, "VisualizerSurfaceModel")
-})
-
-test_that("as_visualizer works for LossFunction", {
-  # Test LossFunction (should always create 1D visualizer)
-  loss_func = lss("l2_se") # Use a valid loss function key
-  y_pred = seq(-4, 4, length.out = 100)
-  y_true = 1
-
-  vis = as_visualizer(loss_func, y_pred = y_pred, y_true = y_true)
-  expect_s3_class(vis, "VisualizerLossFuns")
-})
-
-test_that("as_visualizer parameter passing works correctly", {
-  obj_2d = obj("TF_branin")
-
-  # Test with custom limits and n_points
-  vis = as_visualizer(
-    obj_2d,
-    x1_limits = c(-1, 1),
-    x2_limits = c(2, 6),
-    padding = 0.1,
-    n_points = 50L
-  )
-
-  expect_s3_class(vis, "VisualizerObj")
-  # We can't easily test the internal parameters without accessing private fields
-  # but we can at least verify the object was created successfully
-})
-
-test_that("as_visualizer error handling works", {
-  # Create test objectives
-  obj_1d = Objective$new(id = "test_1d", fun = function(x) x^2, xdim = 1, lower = -5, upper = 5)
-  obj_2d = obj("TF_branin")
-
-  # Test dimension mismatch errors
-  expect_error(
-    as_visualizer(obj_1d, type = "2d"),
-    "2D and surface visualizations require an objective with exactly 2 dimensions"
-  )
-
-  expect_error(
-    as_visualizer(obj_2d, type = "1d"),
-    "1D visualization requires an objective with exactly 1 dimension"
-  )
-
-  expect_error(
-    as_visualizer(obj_1d, type = "surface"),
-    "2D and surface visualizations require an objective with exactly 2 dimensions"
-  )
-
-  # Test invalid type - the actual error message uses checkmate format
-  expect_error(
-    as_visualizer(obj_2d, type = "invalid"),
-    "Must be element of set"
-  )
-})
-
-test_that("as_visualizer automatic type selection follows documented behavior", {
-  # Test that auto selection follows the documented rules:
-  # 1D -> VisualizerObj (ggplot2)
-  # 2D -> VisualizerObj (ggplot2)
-  # 3D+ -> Error (must specify type explicitly)
-
-  # 1D objective
-  obj_1d = Objective$new(id = "test_1d", fun = function(x) x^2, xdim = 1, lower = -5, upper = 5)
-  vis_1d_auto = as_visualizer(obj_1d) # type = "auto" is default
-  expect_s3_class(vis_1d_auto, "VisualizerObj")
-
-  # 2D objective (should default to ggplot2, not plotly)
-  obj_2d = obj("TF_branin")
-  vis_2d_auto = as_visualizer(obj_2d) # type = "auto" is default
-  expect_s3_class(vis_2d_auto, "VisualizerObj") # Should be 2D ggplot2, not surface plotly
-})
-
-test_that("as_visualizer backend selection works correctly", {
-  # Test 2D objective with different backends
-  obj_2d = obj("TF_branin")
-
-  # Test default 2D (ggplot2)
-  vis_2d_ggplot = as_visualizer(obj_2d) # defaults to type = "2d"
-  expect_s3_class(vis_2d_ggplot, "VisualizerObj")
-  plot_2d = vis_2d_ggplot$plot()
-  expect_s3_class(plot_2d, "ggplot")
-
-  # Test explicit surface (plotly)
-  vis_2d_plotly = as_visualizer(obj_2d, type = "surface")
-  expect_s3_class(vis_2d_plotly, "VisualizerSurfaceObj")
-  vis_2d_plotly$init_layer_surface()
-  plot_surface = vis_2d_plotly$plot()
-  expect_s3_class(plot_surface, "plotly")
-
-  # Test 1D objective (always ggplot2)
-  obj_1d = Objective$new(id = "test_1d", fun = function(x) x^2, xdim = 1, lower = -5, upper = 5)
-  vis_1d = as_visualizer(obj_1d)
-  expect_s3_class(vis_1d, "VisualizerObj")
-  plot_1d = vis_1d$plot()
-  expect_s3_class(plot_1d, "ggplot")
-})
-
-test_that("as_visualizer creates objects that can plot", {
-  # Test that the created visualizers can actually plot
-  obj_2d = obj("TF_branin")
-
-  # Test 2D ggplot2 visualizer
-  vis_2d = as_visualizer(obj_2d, type = "2d")
-  plot_2d = vis_2d$plot()
-  expect_s3_class(plot_2d, "ggplot")
-
-  # Test surface plotly visualizer
-  vis_surface = as_visualizer(obj_2d, type = "surface")
-  vis_surface$init_layer_surface()
-  plot_surface = vis_surface$plot()
-  expect_s3_class(plot_surface, "plotly")
-})
-
-test_that("as_visualizer Task dimension validation works", {
+test_that("task validation enforces compatibility and derives limits", {
   skip_if_not_installed("mlr3learners")
 
   task_1d = tsk("mtcars")
@@ -191,53 +6,128 @@ test_that("as_visualizer Task dimension validation works", {
   task_2d = tsk("mtcars")
   task_2d$select(c("gear", "cyl"))
   learner = lrn("regr.lm")
-
-  # Test dimension validation for tasks
-  expect_error(
-    as_visualizer(task_1d, learner = learner, type = "2d"),
-    "2D and surface visualizations require a task with exactly 2 features"
+  hyp2d = hypothesis(
+    fun = function(gear, cyl) gear + cyl,
+    type = "regr",
+    predictors = c("gear", "cyl"),
+    domain = list(gear = c(2, 6), cyl = c(2, 8))
   )
 
-  expect_error(
-    as_visualizer(task_2d, learner = learner, type = "1d"),
-    "1D visualization requires a task with exactly 1 feature"
+  expect_snapshot(error = TRUE, as_visualizer(task_2d, learner = learner, hypothesis = hyp2d))
+  expect_snapshot(error = TRUE, as_visualizer(task_2d, learner = learner, domain = list(gear = c(0, 1))))
+  expect_snapshot(error = TRUE, as_visualizer(task_2d, learner = learner, y_pred = 1))
+  expect_snapshot(error = TRUE, as_visualizer(task_1d, learner = learner, x2_limits = c(0, 1)))
+
+  vis_1d = as_visualizer(task_1d, learner = learner, padding = 0.1)
+  orig = range(task_1d$data()[["gear"]])
+  expected = c(orig[1] - diff(orig) * 0.1, orig[2] + diff(orig) * 0.1)
+  limits_1d = vis_1d$.__enclos_env__$private$.data_structure$limits$x1
+  expect_equal(limits_1d, expected)
+})
+
+test_that("hypothesis validation requires domain coverage", {
+  hyp1d = hypothesis(
+    fun = function(x) x,
+    type = "regr",
+    predictors = "x",
+    domain = list(x = c(-1, 1))
+  )
+  hyp2d = hypothesis(
+    fun = function(x, y) x + y,
+    type = "regr",
+    predictors = c("x", "y"),
+    domain = list(x = c(-1, 1), y = c(-2, 2))
+  )
+  hyp_no_domain = hypothesis(
+    fun = function(x) x,
+    type = "regr",
+    predictors = "x",
+    domain = NULL
   )
 
-  expect_error(
-    as_visualizer(task_1d, learner = learner, type = "surface"),
-    "2D and surface visualizations require a task with exactly 2 features"
+  expect_snapshot(error = TRUE, as_visualizer(hyp_no_domain))
+  expect_snapshot(error = TRUE, as_visualizer(hyp1d, input_type = "score"))
+  expect_snapshot(error = TRUE, as_visualizer(hyp1d, y_pred = 1))
+  expect_snapshot(error = TRUE, as_visualizer(hyp1d, x2_limits = c(0, 1)))
+  expect_warning(as_visualizer(hyp2d, retrain = FALSE), "retrain is ignored")
+})
+
+test_that("objective validation enforces dimensional constraints", {
+  obj_1d = Objective$new(
+    id = "obj1",
+    fun = function(x) x^2,
+    label = "f",
+    xdim = 1,
+    lower = -2,
+    upper = 2
+  )
+  obj_2d = obj("TF_branin")
+  obj_unknown = Objective$new(
+    id = "obj_na",
+    fun = function(x) sum(x^2),
+    label = "f",
+    xdim = NA,
+    xtest = c(0, 0)
   )
 
-  # Test that tasks with >2 features fail in auto mode
-  task_multi = tsk("mtcars")
-  task_multi$select(c("gear", "cyl", "hp"))
+  expect_snapshot(error = TRUE, as_visualizer(obj_1d, type = "2d"))
+  expect_snapshot(error = TRUE, as_visualizer(obj_2d, type = "1d"))
+  expect_snapshot(error = TRUE, as_visualizer(obj_unknown))
 
-  expect_error(
-    as_visualizer(task_multi, learner = learner),
-    "Auto visualization only supports 1D and 2D tasks"
+  expect_s3_class(as_visualizer(obj_1d), "VisualizerObj")
+  expect_s3_class(as_visualizer(obj_2d, type = "surface"), "VisualizerSurfaceObj")
+})
+
+test_that("loss visualizer validation rejects incompatible inputs", {
+  loss_reg = lss("l2_se")
+  loss_ce = lss("cross-entropy")
+
+  expect_snapshot(error = TRUE, as_visualizer(loss_reg, n_points = 5))
+  expect_snapshot(error = TRUE, as_visualizer(loss_reg, y_curves = "y1"))
+  expect_snapshot(error = TRUE, as_visualizer(loss_reg, y_pred = 1:2, y_true = 1:3))
+  expect_snapshot(error = TRUE, as_visualizer(loss_ce, input_type = "probability", y_pred = c(-0.1, 0.5)))
+  expect_snapshot(error = TRUE, as_visualizer(list(loss_reg, 1)))
+
+  expect_s3_class(as_visualizer(loss_reg, y_pred = seq(-3, 3), y_true = 0), "VisualizerLossFuns")
+  expect_s3_class(as_visualizer(loss_ce, input_type = "probability", y_pred = seq(0.1, 0.9, length.out = 5)), "VisualizerLossFuns")
+
+  vis_loss_custom = as_visualizer(loss_reg, n_points = 512L)
+  vis_loss_custom$plot()
+  expect_equal(
+    vis_loss_custom$.__enclos_env__$private$.loss_plot_settings$n_points,
+    512L
   )
 })
 
-test_that("as_visualizer LossFunction type validation works", {
-  loss_func = lss("l2_se")
-  y_pred = seq(-4, 4, length.out = 100)
-  y_true = 1
+test_that("surface requests warn on large grids", {
+  skip_if_not_installed("mlr3learners")
+  skip_if_not_installed("plotly")
 
-  # Test that LossFunction only accepts "auto" and "1d" types
-  expect_error(
-    as_visualizer(loss_func, type = "2d", y_pred = y_pred, y_true = y_true),
-    "Must be element of set"
-  )
+  task_2d = tsk("mtcars")
+  task_2d$select(c("gear", "cyl"))
+  learner = lrn("regr.lm")
 
-  expect_error(
-    as_visualizer(loss_func, type = "surface", y_pred = y_pred, y_true = y_true),
-    "Must be element of set"
-  )
+  expect_warning(as_visualizer(task_2d, learner = learner, type = "surface", n_points = 256L), "n_points")
 
-  # Test that "auto" and "1d" work
-  vis_auto = as_visualizer(loss_func, type = "auto", y_pred = y_pred, y_true = y_true)
-  expect_s3_class(vis_auto, "VisualizerLossFuns")
+  obj_2d = obj("TF_branin")
+  expect_warning(as_visualizer(obj_2d, type = "surface", n_points = 256L), "n_points")
+})
 
-  vis_1d = as_visualizer(loss_func, type = "1d", y_pred = y_pred, y_true = y_true)
-  expect_s3_class(vis_1d, "VisualizerLossFuns")
+test_that("positive construction paths remain available", {
+  skip_if_not_installed("mlr3learners")
+
+  task_2d = tsk("mtcars")
+  task_2d$select(c("gear", "cyl"))
+  learner = lrn("regr.lm")
+
+  vis_task = as_visualizer(task_2d, learner = learner)
+  expect_s3_class(vis_task, "VisualizerModel")
+
+  obj_2d = obj("TF_branin")
+  vis_obj = as_visualizer(obj_2d)
+  expect_s3_class(vis_obj, "VisualizerObj")
+
+  loss_reg = lss("l2_se")
+  vis_loss = as_visualizer(loss_reg, y_pred = rnorm(20), y_true = rnorm(20))
+  expect_s3_class(vis_loss, "VisualizerLossFuns")
 })
