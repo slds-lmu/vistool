@@ -9,7 +9,6 @@ Objective = R6::R6Class("Objective",
     #' @template field_id
     id = NULL,
 
-    # TODO: how to manage and use labels?
     #' @field label (`character(1)` The label of the objective, i.e. a.
     label = NULL,
 

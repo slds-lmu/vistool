@@ -33,10 +33,14 @@ as_visualizer(
   x2_limits = NULL,
   padding = 0,
   n_points = 100L,
+  y_pred = NULL,
+  y_true = NULL,
+  input_type = "auto",
+  y_curves = "both",
   learner = NULL,
   hypothesis = NULL,
-  retrain = TRUE,
-  ...
+  domain = NULL,
+  retrain = TRUE
 )
 
 \method{as_visualizer}{Hypothesis}(
@@ -46,9 +50,14 @@ as_visualizer(
   x2_limits = NULL,
   padding = 0,
   n_points = 100L,
+  y_pred = NULL,
+  y_true = NULL,
+  input_type = "auto",
+  y_curves = "both",
+  learner = NULL,
+  hypothesis = NULL,
   domain = NULL,
-  retrain = TRUE,
-  ...
+  retrain = TRUE
 )
 
 \method{as_visualizer}{Objective}(
@@ -58,29 +67,48 @@ as_visualizer(
   x2_limits = NULL,
   padding = 0,
   n_points = 100L,
-  ...
+  y_pred = NULL,
+  y_true = NULL,
+  input_type = "auto",
+  y_curves = "both",
+  learner = NULL,
+  hypothesis = NULL,
+  domain = NULL,
+  retrain = TRUE
 )
 
 \method{as_visualizer}{LossFunction}(
   x,
   type = "auto",
+  x1_limits = NULL,
+  x2_limits = NULL,
+  padding = 0,
   n_points = 1000L,
   y_pred = NULL,
   y_true = NULL,
   input_type = "auto",
   y_curves = "both",
-  ...
+  learner = NULL,
+  hypothesis = NULL,
+  domain = NULL,
+  retrain = TRUE
 )
 
 \method{as_visualizer}{list}(
   x,
   type = "auto",
+  x1_limits = NULL,
+  x2_limits = NULL,
+  padding = 0,
   n_points = 1000L,
   y_pred = NULL,
   y_true = NULL,
   input_type = "auto",
   y_curves = "both",
-  ...
+  learner = NULL,
+  hypothesis = NULL,
+  domain = NULL,
+  retrain = TRUE
 )
 }
 \arguments{
@@ -155,10 +183,10 @@ rejects parameters that are irrelevant for the chosen input.
 \section{Supported inputs}{
 
 \tabular{llll}{
-  Input & Auto `type` & Allowed overrides & Notes \\ 
-  `Task` & `"1d"` (1 feature) or `"2d"` (2 features) & `type = "surface"` (2D only) & Exactly one of `learner`/`hypothesis`; `domain` is ignored and therefore rejected. \\ 
-  `Hypothesis` & matches `input_dim` & `type = "surface"` (2D only) & Requires complete `domain`; `learner` not supported. \\ 
-  `Objective` & matches `xdim` when available & `type = "surface"` (2D only) & `learner`/`hypothesis` not supported. \\ 
+  Input & Auto `type` & Allowed overrides & Notes \\
+  `Task` & `"1d"` (1 feature) or `"2d"` (2 features) & `type = "surface"` (2D only) & Exactly one of `learner`/`hypothesis`; `domain` is ignored and therefore rejected. \\
+  `Hypothesis` & matches `input_dim` & `type = "surface"` (2D only) & Requires complete `domain`; `learner` not supported. \\
+  `Objective` & matches `xdim` when available & `type = "surface"` (2D only) & `learner`/`hypothesis` not supported. \\
   `LossFunction` or list of losses & always `"1d"` & `n_points` & `input_type`, `y_pred`, `y_true`, `y_curves`, and `n_points` are forwarded to the loss visualizer. \\
 }
 }
@@ -174,8 +202,8 @@ Common argument validation is centralized so that:
 }
 
 \examples{
-obj <- obj("TF_branin")
-vis <- as_visualizer(obj, type = "2d")
+obj = obj("TF_branin")
+vis = as_visualizer(obj, type = "2d")
 
 # High resolutions on surfaces warn before plotting
 tryCatch(
