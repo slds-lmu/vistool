@@ -533,6 +533,17 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
         }
       }
 
+      x_vals = NULL
+      y_vals = NULL
+      if (!is.null(plot_obj$data)) {
+        cols = names(plot_obj$data)
+        if ("x" %in% cols) x_vals = plot_obj$data$x
+        if (is.null(x_vals) && "r" %in% cols) x_vals = plot_obj$data$r
+        if ("y" %in% cols) y_vals = plot_obj$data$y
+        if (is.null(y_vals) && "loss_val" %in% cols) y_vals = plot_obj$data$loss_val
+      }
+      plot_obj = private$add_annotations_to_ggplot(plot_obj, "1d", list(x = x_vals, y = y_vals))
+
       return(plot_obj)
     },
 

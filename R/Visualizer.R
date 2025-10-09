@@ -176,6 +176,95 @@ Visualizer = R6::R6Class("Visualizer",
         arrow_color = arrow_color, arrow_size = arrow_size
       ))
       invisible(self)
+    },
+
+    #' @description Add a textual annotation that is resolved during plotting.
+    #' @param text (`character(1)`)
+    #'   The annotation text. Must be non-empty.
+    #' @param latex (`logical(1)`)
+    #'   If `TRUE`, interpret `text` as LaTeX. Requires the `latex2exp` package for ggplot backends.
+    #' @param color (`character(1)`)
+    #'   Text color. Use "auto" to draw from the active theme palette. Defaults to "auto".
+    #' @param size (`numeric(1)`)
+    #'   Text size in points. Defaults to the effective theme `text_size`.
+    #' @param opacity (`numeric(1)`)
+    #'   Text opacity in `[0, 1]`. Defaults to the effective theme `alpha`.
+    #' @param x (`numeric(1)`)
+    #'   Absolute x-coordinate for the annotation. Required unless `position` is supplied.
+    #' @param y (`numeric(1)`)
+    #'   Absolute y-coordinate. Optional for 1D visualizers, required for 2D. Ignored when `position` is used with figure coordinates.
+    #' @param z (`numeric(1)`)
+    #'   Absolute z-coordinate for surface visualizers. Optional otherwise.
+    #' @template param_annotation_position
+    #' @param hjust (`numeric(1)`)
+    #'   Horizontal justification, following ggplot2 semantics.
+    #' @param vjust (`numeric(1)`)
+    #'   Vertical justification, following ggplot2 semantics.
+    #' @return Invisible self.
+    add_annotation = function(text,
+                              latex = FALSE,
+                              color = "auto",
+                              size = NULL,
+                              opacity = NULL,
+                              x = NULL,
+                              y = NULL,
+                              z = NULL,
+                              position = NULL,
+                              hjust = 0.5,
+                              vjust = 0.5) {
+      checkmate::assert_string(text, min.chars = 1)
+      checkmate::assert_flag(latex)
+      checkmate::assert_string(color, null.ok = FALSE)
+      checkmate::assert_number(size, lower = 0, null.ok = TRUE)
+      checkmate::assert_number(opacity, lower = 0, upper = 1, null.ok = TRUE)
+      checkmate::assert_number(x, null.ok = TRUE)
+      checkmate::assert_number(y, null.ok = TRUE)
+      checkmate::assert_number(z, null.ok = TRUE)
+      checkmate::assert_number(hjust)
+      checkmate::assert_number(vjust)
+
+      has_position = !is.null(position)
+      has_coords = any(!vapply(list(x, y, z), is.null, logical(1)))
+      if (has_position && has_coords) {
+        stop("Supply either 'position' or explicit coordinates (x/y/z), not both.")
+      }
+      if (!has_position && !has_coords) {
+        stop("Provide absolute coordinates or a 'position' specification for annotations.")
+      }
+
+      if (has_position) {
+        checkmate::assert_list(position, any.missing = FALSE, null.ok = FALSE)
+        if (is.null(names(position)) || any(names(position) == "")) {
+          stop("Position must be a named list with elements 'x', 'y', 'z', 'reference'.")
+        }
+        allowed_keys = c("x", "y", "z", "reference")
+        if (!all(names(position) %in% allowed_keys)) {
+          stop("Position must only contain the elements 'x', 'y', 'z', and 'reference'.")
+        }
+        if (!is.null(position$x)) checkmate::assert_number(position$x, lower = 0, upper = 1)
+        if (!is.null(position$y)) checkmate::assert_number(position$y, lower = 0, upper = 1)
+        if (!is.null(position$z)) checkmate::assert_number(position$z, lower = 0, upper = 1)
+        if (is.null(position$reference)) {
+          position$reference = "panel"
+        } else {
+          checkmate::assert_choice(position$reference, choices = c("panel", "figure"))
+        }
+      }
+
+      spec = list(
+        text = text,
+        latex = latex,
+        color = color,
+        size = size,
+        opacity = opacity,
+        coords = list(x = x, y = y, z = z),
+        position = if (has_position) position else NULL,
+        hjust = hjust,
+        vjust = vjust
+      )
+
+      private$store_layer("annotation", spec)
+      invisible(self)
     }
   ),
   private = list(
@@ -548,6 +637,17 @@ Visualizer = R6::R6Class("Visualizer",
       for (i in seq_along(private$.layers_to_add)) {
         layer = private$.layers_to_add[[i]]
 
+        if (layer$type == "annotation") {
+          eff = if (is.null(private$.effective_theme)) get_pkg_theme_default() else private$.effective_theme
+          if (identical(layer$spec$color, "auto")) {
+            layer$spec$color = private$get_auto_color_with_palette()
+          }
+          if (is.null(layer$spec$size)) layer$spec$size = eff$text_size
+          if (is.null(layer$spec$opacity)) layer$spec$opacity = eff$alpha
+          private$.layers_to_add[[i]] = layer
+          next
+        }
+
         # For training_data layers, handle "auto" colors context-aware for classification vs regression
         if (layer$type == "training_data") {
           # Resolve colors outside of style normally
@@ -582,6 +682,348 @@ Visualizer = R6::R6Class("Visualizer",
         # Update the stored layer
         private$.layers_to_add[[i]] = layer
       }
+    },
+
+    get_axis_limits = function(axis, fallback_values = NULL) {
+      rp = private$.render_params
+      limit_name = switch(axis,
+        "x" = "x_limits",
+        "y" = "y_limits",
+        "z" = "z_limits",
+        stop("Unsupported axis")
+      )
+      limits = if (!is.null(rp)) rp[[limit_name]] else NULL
+      if (!is.null(limits)) {
+        return(limits)
+      }
+
+      values = fallback_values
+      if (!is.null(values)) {
+        values = as.numeric(values)
+        values = values[is.finite(values)]
+        if (length(values)) {
+          rng = range(values)
+          if (!all(is.finite(rng))) {
+            values = values[is.finite(values)]
+            if (length(values)) rng = range(values)
+          }
+          if (length(rng) == 2 && all(is.finite(rng))) {
+            if (identical(rng[1], rng[2])) {
+              delta = if (rng[1] == 0) 1 else max(abs(rng[1]) * 0.05, 1e-6)
+              rng = c(rng[1] - delta, rng[2] + delta)
+            }
+            return(rng)
+          }
+        }
+      }
+
+      c(0, 1)
+    },
+
+    compute_relative_coordinate = function(value, limits) {
+      if (is.null(value)) return(NULL)
+      if (is.null(limits) || length(limits) != 2 || any(!is.finite(limits))) {
+        stop("Cannot place annotation relatively because axis limits are not finite.")
+      }
+      limits[1] + value * (limits[2] - limits[1])
+    },
+
+    default_axis_midpoint = function(limits) {
+      if (is.null(limits) || length(limits) != 2 || any(!is.finite(limits))) {
+        return(0)
+      }
+      mean(limits)
+    },
+
+    compute_annotation_coordinates = function(spec, dimensionality, ranges) {
+      dims = tolower(as.character(dimensionality))
+      dim_value = switch(dims,
+        "1d" = 1L,
+        "2d" = 2L,
+        "contour" = 2L,
+        "2" = 2L,
+        "3d" = 3L,
+        "surface" = 3L,
+        "3" = 3L,
+        stop("Unsupported dimensionality for annotations.")
+      )
+
+      coords = spec$coords
+      if (is.null(coords)) coords = list()
+      coords = modifyList(list(x = NULL, y = NULL, z = NULL), coords)
+
+      placement = if (!is.null(spec$position)) "relative" else "absolute"
+      reference = "panel"
+      normalized = spec$position
+
+      if (identical(placement, "relative")) {
+        position = spec$position
+        reference = if (is.null(position$reference)) "panel" else position$reference
+        if (is.null(position$x)) {
+          stop("Relative annotations must specify 'position$x'.")
+        }
+        if (dim_value >= 2 && is.null(position$y)) {
+          stop("Relative annotations on 2D/3D plots must specify 'position$y'.")
+        }
+        if (dim_value == 3 && !identical(reference, "figure") && is.null(position$z)) {
+          stop("Relative annotations on surface plots must specify 'position$z'.")
+        }
+
+        coords$x = private$compute_relative_coordinate(position$x, ranges$x)
+        if (dim_value >= 2) {
+          coords$y = private$compute_relative_coordinate(position$y, ranges$y)
+        }
+        if (dim_value == 3 && !identical(reference, "figure")) {
+          coords$z = private$compute_relative_coordinate(position$z, ranges$z)
+        }
+      }
+
+      if (dim_value == 1) {
+        if (is.null(coords$x)) {
+          stop("Annotations on 1D plots require an x coordinate.")
+        }
+        if (is.null(coords$y)) {
+          coords$y = private$default_axis_midpoint(ranges$y)
+        }
+      } else if (dim_value == 2) {
+        if (is.null(coords$x) || is.null(coords$y)) {
+          stop("Annotations on 2D plots require x and y coordinates.")
+        }
+      } else {
+        if (is.null(coords$x) || is.null(coords$y)) {
+          stop("Annotations on surface plots require x and y coordinates.")
+        }
+        if (is.null(coords$z) && !identical(reference, "figure")) {
+          coords$z = private$default_axis_midpoint(ranges$z)
+        }
+      }
+
+      list(coords = coords, reference = reference, placement = placement, normalized = normalized)
+    },
+
+    map_just_to_anchor = function(value, axis = "x") {
+      val = if (is.null(value)) 0.5 else value
+      if (!is.finite(val)) val = 0.5
+      val = max(min(val, 1), 0)
+      if (axis == "y") {
+        if (val <= 0.25) return("bottom")
+        if (val >= 0.75) return("top")
+        return("middle")
+      }
+      if (axis == "align") {
+        if (val <= 0.25) return("left")
+        if (val >= 0.75) return("right")
+        return("center")
+      }
+      if (val <= 0.25) return("left")
+      if (val >= 0.75) return("right")
+      "center"
+    },
+
+    add_annotations_to_ggplot = function(plot_obj, dimensionality, ranges_override = list()) {
+      annotation_layers = private$get_layers_by_type("annotation")
+      if (length(annotation_layers) == 0) {
+        return(plot_obj)
+      }
+
+      dims = tolower(as.character(dimensionality))
+      dim_value = switch(dims,
+        "1d" = 1L,
+        "2d" = 2L,
+        "contour" = 2L,
+        stop("Unsupported dimensionality for ggplot annotations.")
+      )
+
+      fallback_x = if (!is.null(ranges_override$x)) as.numeric(ranges_override$x) else NULL
+      fallback_y = if (!is.null(ranges_override$y)) as.numeric(ranges_override$y) else NULL
+      x_limits = private$get_axis_limits("x", fallback_x)
+      y_limits = private$get_axis_limits("y", fallback_y)
+      ranges = list(x = x_limits, y = y_limits, z = NULL)
+
+      for (spec in annotation_layers) {
+        coords_info = private$compute_annotation_coordinates(spec, dims, ranges)
+        coords = coords_info$coords
+        label_text = spec$text
+        parse_flag = isTRUE(spec$latex)
+        if (parse_flag) {
+          if (!requireNamespace("latex2exp", quietly = TRUE)) {
+            stop("Package 'latex2exp' is required for LaTeX annotations. Install it or call with latex = FALSE.")
+          }
+          label_text = private$sanitize_latex_text(label_text)
+          label_text = latex2exp::TeX(label_text, output = "character")
+        }
+        size_mm = spec$size / ggplot2::.pt
+        plot_obj = plot_obj + ggplot2::annotate(
+          geom = "text",
+          x = coords$x,
+          y = coords$y,
+          label = label_text,
+          color = spec$color,
+          size = size_mm,
+          alpha = spec$opacity,
+          hjust = spec$hjust,
+          vjust = spec$vjust,
+          parse = parse_flag
+        )
+      }
+
+      plot_obj
+    },
+
+    add_annotations_to_plotly = function(plot_obj, dimensionality, ranges_override = list()) {
+      if (is.null(plot_obj)) {
+        return(plot_obj)
+      }
+
+      annotation_layers = private$get_layers_by_type("annotation")
+      if (length(annotation_layers) == 0) {
+        return(plot_obj)
+      }
+
+      dims = tolower(as.character(dimensionality))
+      dim_value = switch(dims,
+        "2d" = 2L,
+        "contour" = 2L,
+        "surface" = 3L,
+        "3d" = 3L,
+        "3" = 3L,
+        stop("Unsupported dimensionality for plotly annotations.")
+      )
+
+      fallback_x = if (!is.null(ranges_override$x)) as.numeric(ranges_override$x) else NULL
+      fallback_y = if (!is.null(ranges_override$y)) as.numeric(ranges_override$y) else NULL
+      fallback_z = if (!is.null(ranges_override$z)) as.numeric(ranges_override$z) else NULL
+
+      x_limits = private$get_axis_limits("x", fallback_x)
+      y_limits = if (dim_value >= 2) private$get_axis_limits("y", fallback_y) else NULL
+      z_limits = if (dim_value == 3) private$get_axis_limits("z", fallback_z) else NULL
+      ranges = list(x = x_limits, y = y_limits, z = z_limits)
+
+      for (spec in annotation_layers) {
+        coords_info = private$compute_annotation_coordinates(spec, dims, ranges)
+        coords = coords_info$coords
+        reference = coords_info$reference
+        normalized = coords_info$normalized
+
+        text_val = spec$text
+        if (isTRUE(spec$latex)) {
+          text_val = private$sanitize_latex_text(text_val)
+          if (!grepl("^\\$.*\\$$", text_val)) {
+            text_val = paste0("$", text_val, "$")
+          }
+        }
+        annotation = list(
+          text = text_val,
+          showarrow = FALSE,
+          font = list(color = spec$color, size = spec$size),
+          opacity = spec$opacity,
+          xanchor = private$map_just_to_anchor(spec$hjust, "x"),
+          yanchor = private$map_just_to_anchor(spec$vjust, "y"),
+          align = private$map_just_to_anchor(spec$hjust, "align")
+        )
+
+        if (dim_value == 3) {
+          if (is.null(plot_obj$x$layout$scene)) {
+            plot_obj$x$layout$scene = list()
+          }
+          if (identical(reference, "figure")) {
+            annotation$xref = "paper"
+            annotation$yref = "paper"
+            annotation$zref = "paper"
+            annotation$x = if (!is.null(normalized$x)) normalized$x else 0.5
+            annotation$y = if (!is.null(normalized$y)) normalized$y else 0.5
+            annotation$z = if (!is.null(normalized$z)) normalized$z else 0.5
+          } else {
+            annotation$xref = "x"
+            annotation$yref = "y"
+            annotation$zref = "z"
+            annotation$x = coords$x
+            annotation$y = coords$y
+            annotation$z = coords$z
+          }
+
+          existing = plot_obj$x$layout$scene$annotations
+          if (is.null(existing)) existing = list()
+          existing[[length(existing) + 1L]] = annotation
+          plot_obj$x$layout$scene$annotations = existing
+        } else {
+          if (identical(reference, "figure")) {
+            annotation$xref = "paper"
+            annotation$yref = "paper"
+            annotation$x = if (!is.null(normalized$x)) normalized$x else 0.5
+            annotation$y = if (!is.null(normalized$y)) normalized$y else 0.5
+          } else {
+            annotation$xref = "x"
+            annotation$yref = "y"
+            annotation$x = coords$x
+            annotation$y = coords$y
+          }
+
+          existing = plot_obj$x$layout$annotations
+          if (is.null(existing)) existing = list()
+          existing[[length(existing) + 1L]] = annotation
+          plot_obj$x$layout$annotations = existing
+        }
+      }
+
+      plot_obj
+    },
+
+    sanitize_latex_text = function(text) {
+      if (!is.character(text) || length(text) != 1L || !nzchar(text)) {
+        return(text)
+      }
+
+      code_points = utf8ToInt(text)
+      if (!length(code_points)) {
+        return(text)
+      }
+
+      control_map = c(
+        "7" = "a",   # \a -> alpha, approx, ...
+        "8" = "b",   # \b -> beta, bigcup, ...
+        "12" = "f",  # \f -> frac, f, ...
+        "10" = "n",  # \n -> nabla, nwarrow, ...
+        "13" = "r",  # \r -> rho, rangle, ...
+        "9" = "t",   # \t -> tan, theta, ...
+        "11" = "v"   # \v -> varphi, vline, ...
+      )
+
+      has_control = any(as.character(code_points) %in% names(control_map))
+      if (!has_control) {
+        return(text)
+      }
+
+      rebuild = character()
+      i = 1L
+      n = length(code_points)
+      while (i <= n) {
+        key = as.character(code_points[i])
+        if (key %in% names(control_map)) {
+          prefix_letter = control_map[[key]]
+          j = i + 1L
+          suffix_codes = integer()
+          while (j <= n) {
+            ch = intToUtf8(code_points[j])
+            if (grepl("^[A-Za-z]$", ch)) {
+              suffix_codes = c(suffix_codes, code_points[j])
+              j = j + 1L
+            } else {
+              break
+            }
+          }
+
+          suffix = if (length(suffix_codes)) intToUtf8(suffix_codes) else ""
+          rebuild = c(rebuild, paste0("\\", prefix_letter, suffix))
+          i = j
+          next
+        }
+
+        rebuild = c(rebuild, intToUtf8(code_points[i]))
+        i = i + 1L
+      }
+
+      paste0(rebuild, collapse = "")
     },
 
     # Recursively resolve colors in a data structure

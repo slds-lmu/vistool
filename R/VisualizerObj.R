@@ -188,20 +188,25 @@ VisualizerObj = R6::R6Class("VisualizerObj",
 
     # Render all stored layers in the order they were added
     render_all_layers = function() {
-      if (is.null(private$.layers_to_add)) {
-        return()
-      }
+      if (!is.null(private$.layers_to_add)) {
+        # 1) Render optimization traces together so they share a combined legend
+        private$render_optimization_trace_layers()
 
-      # 1) Render optimization traces together so they share a combined legend
-      private$render_optimization_trace_layers()
-
-      # 2) Render other generic layers
-      for (layer in private$.layers_to_add) {
-        if (layer$type == "points") {
-          # Handle points layer using the base class method
-          private$.plot = private$add_points_to_ggplot(private$.plot, private$.dimensionality)
+        # 2) Render other generic layers
+        for (layer in private$.layers_to_add) {
+          if (layer$type == "points") {
+            # Handle points layer using the base class method
+            private$.plot = private$add_points_to_ggplot(private$.plot, private$.dimensionality)
+          }
         }
       }
+
+      ranges = list(
+        x = private$.data_structure$coordinates$x1,
+        y = if (private$.dimensionality == "1d") private$.data_structure$coordinates$y else private$.data_structure$coordinates$x2,
+        z = if (private$.dimensionality == "2d") private$.data_structure$coordinates$y else NULL
+      )
+      private$.plot = private$add_annotations_to_ggplot(private$.plot, private$.dimensionality, ranges)
     },
 
     # Initialize data structure for 1D objectives

@@ -1,5 +1,5 @@
 # vistool 0.4.1
-* `add_annotation`
+* Added `add_annotation()` for all visualizers, enabling styled text and LaTeX annotations across ggplot2 and plotly backends.
 * `AGENTS.md`
 
 # vistool 0.4.0

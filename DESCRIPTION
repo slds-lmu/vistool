@@ -37,6 +37,7 @@ Imports:
 Suggests:
     e1071,
     knitr,
+    latex2exp,
     mlr3learners,
     mlr3pipelines,
     patchwork,

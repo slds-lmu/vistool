@@ -388,6 +388,14 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
         private$.plot = private$add_points_to_plotly(private$.plot, "contour")
       }
 
+      annotation_ranges = list(
+        x = self$grid$x1,
+        y = self$grid$x2,
+        z = as.numeric(self$zmat)
+      )
+      dim_label = if (private$.layer_primary == "surface") "3d" else "2d"
+      private$.plot = private$add_annotations_to_plotly(private$.plot, dim_label, annotation_ranges)
+
       private$.last_plot = private$.plot
       return(private$.plot)
     }
