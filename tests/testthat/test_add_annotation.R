@@ -55,20 +55,39 @@ test_that("plotly contour latex annotations keep mathjax text", {
   skip_if_not_installed("plotly")
   obj2d = obj("TF_branin")
   vis = as_visualizer(obj2d, type = "surface")
-  vis$add_annotation(text = "$\alpha$", latex = TRUE, x = vis$grid$x1[5], y = vis$grid$x2[10])
+  vis$add_annotation(text = "$\\alpha$", latex = TRUE, x = vis$grid$x1[5], y = vis$grid$x2[10])
   plt = vis$plot(flatten = TRUE)
   ann = plt$x$layout$annotations[[length(plt$x$layout$annotations)]]
-  expect_match(ann$text, "\\$\\\\alpha\\$")
+  expect_s3_class(ann$text, "TeX")
+  expect_match(as.character(ann$text), "\\$\\\\alpha\\$")
 })
 
 test_that("plotly surface latex annotations keep mathjax text", {
   skip_if_not_installed("plotly")
   obj2d = obj("TF_branin")
   vis = as_visualizer(obj2d, type = "surface")
-  vis$add_annotation(text = "$\beta$", latex = TRUE, x = vis$grid$x1[3], y = vis$grid$x2[7], z = vis$zmat[3, 7])
+  vis$add_annotation(text = "$\\beta$", latex = TRUE, x = vis$grid$x1[3], y = vis$grid$x2[7], z = vis$zmat[3, 7])
   plt = vis$plot(flatten = FALSE)
   ann = plt$x$layout$scene$annotations[[length(plt$x$layout$scene$annotations)]]
-  expect_match(ann$text, "\\$\\\\beta\\$")
+  expect_s3_class(ann$text, "TeX")
+  expect_match(as.character(ann$text), "\\$\\\\beta\\$")
+})
+
+test_that("plotly latex annotations configure mathjax", {
+  skip_if_not_installed("plotly")
+  obj2d = obj("TF_branin")
+
+  vis2d = as_visualizer(obj2d, type = "surface")
+  vis2d$add_annotation(text = "$\\gamma$", latex = TRUE, x = vis2d$grid$x1[4], y = vis2d$grid$x2[8])
+  plt2d = vis2d$plot(flatten = TRUE)
+  dep2d = vapply(plt2d$dependencies, `[[`, character(1), "name")
+  expect_true("mathjax" %in% dep2d)
+
+  vis3d = as_visualizer(obj2d, type = "surface")
+  vis3d$add_annotation(text = "$\\theta$", latex = TRUE, x = vis3d$grid$x1[2], y = vis3d$grid$x2[5], z = vis3d$zmat[2, 5])
+  plt3d = vis3d$plot(flatten = FALSE)
+  dep3d = vapply(plt3d$dependencies, `[[`, character(1), "name")
+  expect_true("mathjax" %in% dep3d)
 })
 
 test_that("latex annotations require latex2exp", {

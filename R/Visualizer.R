@@ -899,6 +899,8 @@ Visualizer = R6::R6Class("Visualizer",
       z_limits = if (dim_value == 3) private$get_axis_limits("z", fallback_z) else NULL
       ranges = list(x = x_limits, y = y_limits, z = z_limits)
 
+      latex_required = FALSE
+
       for (spec in annotation_layers) {
         coords_info = private$compute_annotation_coordinates(spec, dims, ranges)
         coords = coords_info$coords
@@ -907,10 +909,12 @@ Visualizer = R6::R6Class("Visualizer",
 
         text_val = spec$text
         if (isTRUE(spec$latex)) {
+          latex_required = TRUE
           text_val = private$sanitize_latex_text(text_val)
           if (!grepl("^\\$.*\\$$", text_val)) {
             text_val = paste0("$", text_val, "$")
           }
+          text_val = plotly::TeX(text_val)
         }
         annotation = list(
           text = text_val,
@@ -964,6 +968,11 @@ Visualizer = R6::R6Class("Visualizer",
           existing[[length(existing) + 1L]] = annotation
           plot_obj$x$layout$annotations = existing
         }
+      }
+
+      if (latex_required) {
+        # ensure MathJax dependency is registered so latex content renders on client
+        plot_obj = plotly::config(plot_obj, mathjax = "cdn")
       }
 
       plot_obj
