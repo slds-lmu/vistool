@@ -6,6 +6,19 @@
 \description{
 Represents a loss function for regression or classification tasks.
 }
+\details{
+Loss functions are expected to be vectorized and to accept a single numeric
+argument representing the input on the chosen scale:
+* `"score"`: residuals `y_true - y_pred` for regression, or signed margins
+  `y_true * f(x)` for binary classification.
+* `"probability"`: predicted probabilities for the positive class. Visualizers
+  obtain the loss for `y = 0` by evaluating the function at `1 - p`.
+
+The returned value must be a numeric vector of losses with the same length as
+the input. Additional optional parameters can be encoded via closures and are
+configurable through [lss()], which wraps the stored functions with the
+supplied arguments.
+}
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
@@ -26,8 +39,9 @@ All input scales this loss can be expressed on (subset of
 `c("score", "probability")`).}
 
 \item{\code{fun}}{(`function` or `list`)\cr
-The loss function itself. Can be a single function (for single input type)
-or a named list of functions for different input types.}
+The loss function itself. Provide either a vectorized closure matching the
+active input scale or a named list of such closures keyed by `"score"` and
+/ or `"probability"`.}
 }
 \if{html}{\out{</div>}}
 }
@@ -68,8 +82,8 @@ Label for the loss function.}
 Task type: `"regr"` or `"classif"`.}
 
 \item{\code{fun}}{(`function` or `list`)\cr
-The loss function. Can be a single function or a named list of functions
-for different input types (e.g., list(score = function(r) ..., probability = function(pi) ...)).}
+The loss function. Supply a vectorized closure matching the active
+input scale or a named list of closures keyed by `"score"` / `"probability"`.}
 
 \item{\code{input_default}}{(`character(1)`)\cr
 Default input scale (`"score"` or `"probability"`).}

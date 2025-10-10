@@ -112,6 +112,27 @@ vis$add_optimization_trace(
 )
 ```
 
+### `add_annotation()`
+`add_annotation()` attaches text callouts to any visualizer. Supply absolute coordinates via `x`, `y`, and `z` (surface plots), or pass `position = list(...)` with values in `[0, 1]` for relative placement. The method honors the current theme, resolving `color = "auto"`, default text size, and opacity automatically; you can still override them per annotation. Set `latex = TRUE` to typeset the label (requires `latex2exp` for ggplot2).
+
+```{r, eval=FALSE}
+# Absolute placement in data space
+vis$add_annotation(
+  text = "Optimum",
+  x = 0, y = 0,
+  color = "auto",
+  opacity = 0.8
+)
+
+# Relative placement in the plot window
+vis$add_annotation(
+  text = "${}\\nabla f = 0$",
+  latex = TRUE,
+  position = list(x = 0.85, y = 0.2, reference = "figure"),
+  color = "auto"
+)
+```
+
 ## Plot-Level Customization
 
 The `plot()` method accepts theme overrides and functional parameters:

@@ -16,6 +16,7 @@ and saving plots across different plotting backends (ggplot2 for 1D/2D, plotly f
 \item \href{#method-Visualizer-resolve_layer_colors}{\code{Visualizer$resolve_layer_colors()}}
 \item \href{#method-Visualizer-save}{\code{Visualizer$save()}}
 \item \href{#method-Visualizer-add_points}{\code{Visualizer$add_points()}}
+\item \href{#method-Visualizer-add_annotation}{\code{Visualizer$add_annotation()}}
 \item \href{#method-Visualizer-clone}{\code{Visualizer$clone()}}
 }
 }
@@ -213,6 +214,73 @@ Color of arrows when ordered = TRUE. If NULL, uses point color.}
 Length/size of arrows when `ordered = TRUE`. Default is 0.3 units in the coordinate system.}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Visualizer-add_annotation"></a>}}
+\if{latex}{\out{\hypertarget{method-Visualizer-add_annotation}{}}}
+\subsection{Method \code{add_annotation()}}{
+Add a textual annotation that is resolved during plotting.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer$add_annotation(
+  text,
+  latex = FALSE,
+  color = "auto",
+  size = NULL,
+  opacity = NULL,
+  x = NULL,
+  y = NULL,
+  z = NULL,
+  position = NULL,
+  hjust = 0.5,
+  vjust = 0.5
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{text}}{(`character(1)`)
+The annotation text. Must be non-empty.}
+
+\item{\code{latex}}{(`logical(1)`)
+If `TRUE`, interpret `text` as LaTeX. Requires the `latex2exp` package for ggplot backends.}
+
+\item{\code{color}}{(`character(1)`)
+Text color. Use "auto" to draw from the active theme palette. Defaults to "auto".}
+
+\item{\code{size}}{(`numeric(1)`)
+Text size in points. Defaults to the effective theme `text_size`.}
+
+\item{\code{opacity}}{(`numeric(1)`)
+Text opacity in `[0, 1]`. Defaults to the effective theme `alpha`.}
+
+\item{\code{x}}{(`numeric(1)`)
+Absolute x-coordinate for the annotation. Required unless `position` is supplied.}
+
+\item{\code{y}}{(`numeric(1)`)
+Absolute y-coordinate. Optional for 1D visualizers, required for 2D. Ignored when `position` is used with figure coordinates.}
+
+\item{\code{z}}{(`numeric(1)`)
+Absolute z-coordinate for surface visualizers. Optional otherwise.}
+
+\item{\code{position}}{(`list()`|`NULL`)\cr
+Optional relative placement specification for the annotation. Provide a named list
+with entries `x`, `y`, `z` (depending on dimensionality) holding values in `[0, 1]`
+and an optional `reference` that is either `"panel"` (default, data coordinates)
+or `"figure"` (normalized figure coordinates). When `position` is supplied, do not
+pass absolute coordinates via `x`, `y`, or `z`.}
+
+\item{\code{hjust}}{(`numeric(1)`)
+Horizontal justification, following ggplot2 semantics.}
+
+\item{\code{vjust}}{(`numeric(1)`)
+Vertical justification, following ggplot2 semantics.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Invisible self.
 }
 }
 \if{html}{\out{<hr>}}
