@@ -2,7 +2,7 @@
 % Please edit documentation in R/LossFunction.R
 \name{LossFunction}
 \alias{LossFunction}
-\title{Loss Function}
+\title{Loss function}
 \description{
 Represents a loss function for regression or classification tasks.
 }

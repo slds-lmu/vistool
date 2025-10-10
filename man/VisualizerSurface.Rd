@@ -2,7 +2,7 @@
 % Please edit documentation in R/VisualizerSurface.R
 \name{VisualizerSurface}
 \alias{VisualizerSurface}
-\title{Visualize 2D Functions as Interactive Surfaces}
+\title{Visualize 2D functions as interactive surfaces}
 \description{
 Visualizes a two-dimensional function \eqn{f: \mathbb{R}^2 \to \mathbb{R}} via interactive plotly renderings.
 Creates 3D surface and contour plots for better visualization of 2D functions.

@@ -1,4 +1,4 @@
-#' @title Color Management for vistool
+#' @title Color management for vistool
 #'
 #' @description
 #' Unified color management system for consistent colors across

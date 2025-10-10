@@ -2,7 +2,7 @@
 % Please edit documentation in R/VisualizerSurfaceObj.R
 \name{VisualizerSurfaceObj}
 \alias{VisualizerSurfaceObj}
-\title{Visualize Objective as Interactive Surface}
+\title{Visualize objective as interactive surface}
 \description{
 This class is used to create interactive surface visualizations and animations of optimization traces
 for 2D objectives using plotly.

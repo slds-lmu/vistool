@@ -292,7 +292,7 @@ if (requireNamespace("TestFunctions", quietly = TRUE)) {
   message("Package 'TestFunctions' not available; skipping registration of test functions in dict_objective.")
 }
 
-#' @title Retrieve Objective Functions
+#' @title Retrieve objective functions
 #'
 #' @description
 #' Retrieve an objective function from the dictionary.

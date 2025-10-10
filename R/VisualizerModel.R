@@ -1,4 +1,4 @@
-#' @title Visualize Model (Unified 1D/2D)
+#' @title Visualize model (unified 1D/2D)
 #'
 #' @description
 #' This class provides a unified interface for visualizing machine learning models

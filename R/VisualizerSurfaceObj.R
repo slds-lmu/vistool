@@ -1,4 +1,4 @@
-#' @title Visualize Objective as Interactive Surface
+#' @title Visualize objective as interactive surface
 #'
 #' @description
 #' This class is used to create interactive surface visualizations and animations of optimization traces

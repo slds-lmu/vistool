@@ -1,4 +1,4 @@
-#' @title Visualizer for Loss Functions
+#' @title Visualizer for loss functions
 #'
 #' @description
 #' Visualize one or multiple loss functions.

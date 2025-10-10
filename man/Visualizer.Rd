@@ -2,7 +2,7 @@
 % Please edit documentation in R/Visualizer.R
 \name{Visualizer}
 \alias{Visualizer}
-\title{Base Visualizer Class}
+\title{Base visualizer class}
 \description{
 Base class for all visualizers. Provides a common interface for creating
 and saving plots across different plotting backends (ggplot2 for 1D/2D, plotly for 3D).

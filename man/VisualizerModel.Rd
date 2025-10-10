@@ -2,7 +2,7 @@
 % Please edit documentation in R/VisualizerModel.R
 \name{VisualizerModel}
 \alias{VisualizerModel}
-\title{Visualize Model (Unified 1D/2D)}
+\title{Visualize model (unified 1D/2D)}
 \value{
 Returns self invisibly.
 

@@ -1,4 +1,4 @@
-#' @title Base Visualizer Class
+#' @title Base visualizer class
 #'
 #' @description
 #' Base class for all visualizers. Provides a common interface for creating

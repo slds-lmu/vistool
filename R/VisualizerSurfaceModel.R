@@ -1,4 +1,4 @@
-#' @title Visualize Model as Interactive Surface
+#' @title Visualize model as interactive surface
 #'
 #' @description
 #' This class is used to create interactive 3D surface visualizations of learners and tasks

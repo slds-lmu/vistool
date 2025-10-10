@@ -2,7 +2,7 @@
 % Please edit documentation in R/VisualizerLossFuns.R
 \name{VisualizerLossFuns}
 \alias{VisualizerLossFuns}
-\title{Visualizer for Loss Functions}
+\title{Visualizer for loss functions}
 \description{
 Visualize one or multiple loss functions.
 }

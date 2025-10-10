@@ -2,7 +2,7 @@
 % Please edit documentation in R/Objective.R
 \name{obj}
 \alias{obj}
-\title{Retrieve Objective Functions}
+\title{Retrieve objective functions}
 \usage{
 obj(.key, ...)
 }

@@ -1,4 +1,4 @@
-#' @title Visualize 2D Functions as Interactive Surfaces
+#' @title Visualize 2D functions as interactive surfaces
 #'
 #' @description
 #' Visualizes a two-dimensional function \eqn{f: \mathbb{R}^2 \to \mathbb{R}} via interactive plotly renderings.

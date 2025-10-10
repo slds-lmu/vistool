@@ -1,4 +1,4 @@
-#' @title Loss Function
+#' @title Loss function
 #'
 #' @description
 #' Represents a loss function for regression or classification tasks.
@@ -119,7 +119,7 @@ LossFunction = R6::R6Class("LossFunction",
   )
 )
 
-#' @title Dictionary of Loss Functions
+#' @title Dictionary of loss functions
 #'
 #' @description
 #' Dictionary of loss functions.
@@ -127,7 +127,7 @@ LossFunction = R6::R6Class("LossFunction",
 #' @export
 dict_loss = R6::R6Class("DictionaryLoss", inherit = Dictionary, cloneable = FALSE)$new()
 
-#' @title Retrieve Loss Function
+#' @title Retrieve loss function
 #'
 #' @description
 #' Retrieve a loss function from the dictionary. If additional parameters are provided,
@@ -311,7 +311,7 @@ dict_loss$add(
 )
 
 
-#' @title Convert Dictionary to Data Table
+#' @title Convert dictionary to data table
 #'
 #' @description
 #' Converts a loss function dictionary to a data table.

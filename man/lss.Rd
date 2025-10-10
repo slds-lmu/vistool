@@ -2,7 +2,7 @@
 % Please edit documentation in R/LossFunction.R
 \name{lss}
 \alias{lss}
-\title{Retrieve Loss Function}
+\title{Retrieve loss function}
 \usage{
 lss(.key, ...)
 }

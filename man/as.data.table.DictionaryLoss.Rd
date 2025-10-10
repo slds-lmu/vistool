@@ -2,7 +2,7 @@
 % Please edit documentation in R/LossFunction.R
 \name{as.data.table.DictionaryLoss}
 \alias{as.data.table.DictionaryLoss}
-\title{Convert Dictionary to Data Table}
+\title{Convert dictionary to data table}
 \usage{
 \method{as.data.table}{DictionaryLoss}(x, ..., objects = FALSE)
 }

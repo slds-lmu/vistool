@@ -3,7 +3,7 @@
 \name{mlr_learners_regr.lm_formula}
 \alias{mlr_learners_regr.lm_formula}
 \alias{LearnerRegrLMFormula}
-\title{Linear Model Regression Learner with Formula}
+\title{Linear model regression learner with formula}
 \description{
 Ordinary linear regression with formula.
 Calls [stats::lm()].

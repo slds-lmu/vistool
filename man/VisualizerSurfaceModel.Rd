@@ -2,7 +2,7 @@
 % Please edit documentation in R/VisualizerSurfaceModel.R
 \name{VisualizerSurfaceModel}
 \alias{VisualizerSurfaceModel}
-\title{Visualize Model as Interactive Surface}
+\title{Visualize model as interactive surface}
 \description{
 This class is used to create interactive 3D surface visualizations of learners and tasks
 for 2D input data using plotly.

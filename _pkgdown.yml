@@ -11,17 +11,17 @@ navbar:
       text: Articles
       menu:
       - text: "Core"
-      - text: "Loss Functions"
+      - text: "Loss functions"
         href: articles/loss_functions.html
-      - text: "Model Predictions"
+      - text: "Model predictions"
         href: articles/model.html
-      - text: "Objective Functions"
+      - text: "Objective functions"
         href: articles/objective.html
-      - text: "Optimization & Traces"
+      - text: "Optimization & traces"
         href: articles/optimization_traces.html
       - text: -------
       - text: "Customization"
-      - text: "Customization Guide"
+      - text: "Customization guide"
         href: articles/customization_guide.html
-      - text: "Advanced Visualization"
+      - text: "Advanced visualization"
         href: articles/advanced_visualization.html

@@ -1,8 +1,8 @@
 ---
-title: "Objective Functions"
+title: "Objective functions"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Objective Functions}
+  %\VignetteIndexEntry{Objective functions}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -27,7 +27,7 @@ set.seed(1)
 
 This vignette covers the basic usage of objective functions in `vistool`, including predefined objectives and how to define custom objectives.
 
-## Predefined Objectives
+## Predefined objectives
 
 The package provides a dictionary of objective functions:
 
@@ -50,7 +50,7 @@ obj_branin$grad(x)
 obj_branin$hess(x)
 ```
 
-## Visualizing Objectives
+## Visualizing objectives
 
 Use `as_visualizer()` to create a visualizer for an objective. For 1D and 2D objectives, the appropriate visualizer is selected automatically.
 
@@ -72,7 +72,7 @@ Transformed to a contour plot:
 viz_surface$plot(flatten = TRUE)
 ```
 
-## Custom Objectives
+## Custom objectives
 
 You can define your own objective function.
 Let's define a loss for a linear model on the iris data with target `Sepal.Width` and feature `Petal.Width`. First, an `Objective` requires a function for evaluation:
@@ -113,7 +113,7 @@ viz_lm$plot()
 ```
 
 You can also add custom points directly to the visualizer using `$add_points()`, which supports many customization options (see below).
-For adding actual optimization traces, see the [Optimization & Traces vignette](optimization_traces.html).
+For adding actual optimization traces, see the [Optimization & traces vignette](optimization_traces.html).
 
 ```{r, out.width='100%', out.height='700px'}
 archive_data = data.frame(
@@ -131,7 +131,7 @@ viz_lm_surface$add_points(base::data.frame(x = 2, y = 0), color = "orange", size
 
 *Customization options include: `points` (as data.frame/matrix/list), `color`, `size`, `shape`, `alpha`, `annotations`, `ordered`, and more. See the documentation for all arguments.*
 
-## All 2D Objectives
+## All 2D objectives
 
 From the package `mlr3misc`.
 
@@ -164,8 +164,8 @@ subplot(visualizers, nrows = 8)
 
 ## See also
 
-- [Loss Functions](loss_functions.html)
-- [Model Predictions](model.html)
-- [Optimization & Traces](optimization_traces.html)
-- [Customization Guide](customization_guide.html)
-- [Advanced Visualization](advanced_visualization.html)
+- [Loss functions](loss_functions.html)
+- [Model predictions](model.html)
+- [Optimization & traces](optimization_traces.html)
+- [Customization guide](customization_guide.html)
+- [Advanced visualization](advanced_visualization.html)

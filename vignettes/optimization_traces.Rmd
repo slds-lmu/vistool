@@ -1,8 +1,8 @@
 ---
-title: "Optimization & Traces"
+title: "Optimization & traces"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Optimization & Traces}
+  %\VignetteIndexEntry{Optimization & traces}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -57,7 +57,7 @@ opt$archive
 opt$objective$archive
 ```
 
-## Visualize Optimization Traces
+## Visualize optimization traces
 
 A layer of the `Visualizer` class is `$add_optimization_trace()` that gets the optimizer as argument and adds the optimization trace to the plot:
 
@@ -159,7 +159,7 @@ tail(my_oo$archive)
 
 ## Customization options
 
-Let's optimize a custom linear model objective (see the [Objective Functions vignette](objective.html)) using the three available optimizers.
+Let's optimize a custom linear model objective (see the [Objective functions vignette](objective.html)) using the three available optimizers.
 ```{r}
 # Define the linear model loss function as SSE:
 l2norm = function(x) sqrt(sum(crossprod(x)))
@@ -183,7 +183,7 @@ oo2$optimize(steps = 100)
 oo3$optimize(steps = 100)
 ```
 
-Optimization traces support many customization options (see the [Customization Guide](customization_guide.html)):
+Optimization traces support many customization options (see the [Customization guide](customization_guide.html)):
 
 ```{r, out.width='100%', out.height='700px'}
 viz = as_visualizer(obj_lm, x1_limits = c(-0.5, 5), x2_limits = c(-3.2, 2.8), type = "surface")
@@ -220,8 +220,8 @@ viz_2d$plot()
 
 ## See also
 
-- [Loss Functions](loss_functions.html)
-- [Model Predictions](model.html)
-- [Objective Functions](objective.html)
-- [Customization Guide](customization_guide.html)
-- [Advanced Visualization](advanced_visualization.html)
+- [Loss functions](loss_functions.html)
+- [Model predictions](model.html)
+- [Objective functions](objective.html)
+- [Customization guide](customization_guide.html)
+- [Advanced visualization](advanced_visualization.html)

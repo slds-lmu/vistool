@@ -2,7 +2,7 @@
 % Please edit documentation in R/VisualizerObj.R
 \name{VisualizerObj}
 \alias{VisualizerObj}
-\title{Visualize Objective (Unified 1D/2D)}
+\title{Visualize objective (unified 1D/2D)}
 \value{
 Returns self invisibly.
 }

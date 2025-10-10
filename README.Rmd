@@ -26,89 +26,28 @@ RECREATE_ALL_2DFIGS = FALSE
 [![r-cmd-check](https://github.com/slds-lmu/vistool/actions/workflows/r-cmd-check.yaml/badge.svg)](https://github.com/slds-lmu/vistool/actions/workflows/r-cmd-check.yaml)
 <!-- badges: end -->
 
-The goal of `vistool` is to visualize optimization traces and aid in teaching optimization-related concepts. 
+The goal of `vistool` is to visualize optimization traces and aid in teaching optimization-related concepts.
 
-## Installation
+`vistool` helps you:
+- explore loss landscapes and objective functions in one or two dimensions;
+- inspect optimization runs for gradient descent variants;
+- communicate model behavior with publication-ready plots.
 
-You can install the development version of vistool from [GitHub](https://github.com/) with:
+## Get started
 
-``` r
-# install.packages("pak")
-pak::pak("slds-lmu/vistool")
-```
+Installation steps, optional Python requirements, and hands-on examples now live in the “Getting started” vignette:
+- Local: `vignette("vistool", package = "vistool")`
+- Online: <https://slds-lmu.github.io/vistool/articles/vistool.html>
 
-Please note that surface visualization features (`plotly` backend) rely on [`plotly`](https://plotly.com/r/) which in turn relies on certain functionality provided by Python packages, accessed via [`reticulate`](https://rstudio.github.io/reticulate/).  
-
-### Optional: Setup for Saving Plotly Plots
-The `$save()` functionality for surface plots uses `plotly::save_image()` internally, which in turn relies on the Python package `kaleido`.
-
-`vistool` (via `reticulate >= 1.41`) declares this requirement automatically on load using `py_require("kaleido")`. When you first trigger Python usage (e.g. by calling `$save()` on a surface visualizer), an ephemeral, cached Python environment will be provisioned automatically with `kaleido`—no manual Miniconda setup needed for most users.
-
-If you prefer to manage Python yourself, simply make sure `kaleido` is installed and that `reticulate` points to that Python. For example:
-
-```r
-install.packages("reticulate")
-# OPTIONAL: point reticulate to a specific python before loading vistool
-# Sys.setenv(RETICULATE_PYTHON = "/path/to/python")
-# Ensure kaleido is available in that environment
-reticulate::py_install("kaleido")
-```
-
-## Example
-
-```{r example-setup}
-library(vistool)
-library(mlr3verse)
-```
-
-
-This example shows how to visualize the prediction surface of an SVM on the `pima` task included in `mlr3`:
-
-```{r example}
-# Create an example task, add missing data imputation and select 2 features
-task = tsk("pima")
-task = po("imputemean")$train(list(task))[[1]]
-task$select(c("insulin", "mass"))
-
-# Select example learner
-learner = lrn("classif.svm", predict_type = "prob")
-
-# Create 2D ggplot2 visualization
-vis_2d = as_visualizer(task, learner = learner)
-vis_2d$plot()
-```
-
-For interactive exploration, you can create surface visualizations with `plotly`:
-
-```{r example-surface, eval=FALSE}
-# Create surface visualization for interactive plotly surface plot
-vis_surface = as_visualizer(task, learner = learner, type = "surface")
-
-# Define a 3D scene
-vis_surface$set_scene(x = 1.4, y = 1.4, z = 1.4)
-
-# View interactively
-vis_surface$plot()
-```
-
-![](man/figures/demo_1.png)
-
-Save static version as png:
-
-```{r example-save, eval=FALSE}
-# only works if Python kaleido package is installed
-# see installation instructions above for setting up plotly save functionality
-vis_surface$save("man/figures/demo_1.png", width = 500, height = 500)
-```
+The vignette walks through package setup, plotly surface rendering, and a complete mlr3-based workflow.
 
 ## Contributing
 
-For anyone interested in contributing to `vistool`, please see the [Developer Reference](DEVELOPMENT.md).
+For anyone interested in contributing to `vistool`, please see the [Developer reference](DEVELOPMENT.md).
 
-## Resources 
+## Additional resources
 
-For visualization of...
-
-* [Loss Functions](https://slds-lmu.github.io/vistool/articles/loss_functions.html)
-* [Model Predictions](https://slds-lmu.github.io/vistool/articles/model.html)
-* [Objective Functions](https://slds-lmu.github.io/vistool/articles/objective.html)
+For visualization of…
+- [Loss functions](https://slds-lmu.github.io/vistool/articles/loss_functions.html)
+- [Model predictions](https://slds-lmu.github.io/vistool/articles/model.html)
+- [Objective functions](https://slds-lmu.github.io/vistool/articles/objective.html)

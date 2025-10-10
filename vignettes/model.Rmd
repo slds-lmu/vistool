@@ -1,8 +1,8 @@
 ---
-title: "Model Predictions"
+title: "Model predictions"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Model Predictions}
+  %\VignetteIndexEntry{Model predictions}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -180,8 +180,8 @@ The translucent squares represent the squared error areas; the vertical segments
 
 ## See also
 
-- [Loss Functions](loss_functions.html)
-- [Objective Functions](objective.html)
-- [Optimization & Traces](optimization_traces.html)
-- [Customization Guide](customization_guide.html)
-- [Advanced Visualization](advanced_visualization.html)
+- [Loss functions](loss_functions.html)
+- [Objective functions](objective.html)
+- [Optimization & traces](optimization_traces.html)
+- [Customization guide](customization_guide.html)
+- [Advanced visualization](advanced_visualization.html)
