@@ -26,28 +26,60 @@ RECREATE_ALL_2DFIGS = FALSE
 [![r-cmd-check](https://github.com/slds-lmu/vistool/actions/workflows/r-cmd-check.yaml/badge.svg)](https://github.com/slds-lmu/vistool/actions/workflows/r-cmd-check.yaml)
 <!-- badges: end -->
 
-The goal of `vistool` is to visualize optimization traces and aid in teaching optimization-related concepts.
+`vistool` helps you explore optimization concepts and model behavior with a consistent R6 API. Use it to:
 
-`vistool` helps you:
-- explore loss landscapes and objective functions in one or two dimensions;
-- inspect optimization runs for gradient descent variants;
-- communicate model behavior with publication-ready plots.
+- visualize regression and classification loss functions;
+- inspect one- and two-dimensional objectives, including custom definitions;
+- follow optimization traces for gradient descent, momentum, and Nesterov variants;
+- compare model prediction surfaces and decision boundaries.
 
-## Get started
+Every visualizer follows a three-step workflow: initialize with `as_visualizer()`, add optional layers, then render via `plot()` (and optionally `save()`).
 
-Installation steps, optional Python requirements, and hands-on examples now live in the “Getting started” vignette:
-- Local: `vignette("vistool", package = "vistool")`
-- Online: <https://slds-lmu.github.io/vistool/articles/vistool.html>
+## Example
 
-The vignette walks through package setup, plotly surface rendering, and a complete mlr3-based workflow.
+```{r quick-start, eval=TRUE, out.height='700px'}
+library(vistool)
+
+objective = obj("TF_GoldsteinPriceLog")
+vis = as_visualizer(objective)
+opt = OptimizerGD$new(objective, x_start = c(0.22, 0.77), lr = 0.01)
+opt$optimize(10L)
+vis$add_optimization_trace(opt, name = "GD")
+vis$plot()
+```
+
+## Installation
+
+You can install the development version from GitHub with [`pak`](https://pak.r-lib.org/):
+
+```{r install, eval=FALSE}
+# install.packages("pak")
+pak::pak("slds-lmu/vistool")
+```
+
+Prefer base R tooling? `remotes::install_github("slds-lmu/vistool")` works as well.
+
+### Plotly backend and static export
+
+Interactive surfaces rely on `plotly`, which accesses Python functionality through `reticulate`. `vistool` (via `reticulate >= 1.41`) calls `reticulate::py_require("kaleido")` on demand, provisioning a cached Python environment automatically when you first save a surface plot.
+
+If you manage Python yourself, point `reticulate` to your interpreter and ensure `kaleido` is installed:
+
+```{r plotly-backend, eval=FALSE}
+install.packages("reticulate")
+# Sys.setenv(RETICULATE_PYTHON = "/path/to/python")
+reticulate::py_install("kaleido")
+```
+
+## Documentation roadmap
+
+- [Loss functions](https://slds-lmu.github.io/vistool/articles/loss_functions.html) – Open when you need to compare predefined and custom regression or classification losses side by side.
+- [Model predictions](https://slds-lmu.github.io/vistool/articles/model.html) – Visit to inspect 1D/2D mlr3 learners, add boundaries, and overlay training data.
+- [Objective functions](https://slds-lmu.github.io/vistool/articles/objective.html) – Read when you explore built-in objectives, define custom ones, or visualize evaluation archives.
+- [Optimization & traces](https://slds-lmu.github.io/vistool/articles/optimization_traces.html) – Use to understand optimizers, step size control, and how to display optimization progress.
+- [Customization guide](https://slds-lmu.github.io/vistool/articles/customization_guide.html) – Start here when you want to tweak themes, colors, and styling precedence.
+- [Advanced visualization](https://slds-lmu.github.io/vistool/articles/advanced_visualization.html) – Open for surface overlays, manual plot augmentations, and animation workflows.
 
 ## Contributing
 
 For anyone interested in contributing to `vistool`, please see the [Developer reference](DEVELOPMENT.md).
-
-## Additional resources
-
-For visualization of…
-- [Loss functions](https://slds-lmu.github.io/vistool/articles/loss_functions.html)
-- [Model predictions](https://slds-lmu.github.io/vistool/articles/model.html)
-- [Objective functions](https://slds-lmu.github.io/vistool/articles/objective.html)

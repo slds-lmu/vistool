@@ -33,18 +33,18 @@ It complements the core vignettes and focuses on fine control and composition.
 You can customize the appearance using the theme system:
 
 ```{r, out.width='100%', out.height='700px'}
-viz = as_visualizer(obj("TF_franke"), type = "surface")
-viz$plot(theme = list(palette = "grayscale"))
+vis = as_visualizer(obj("TF_franke"), type = "surface")
+vis$plot(theme = list(palette = "grayscale"))
 ```
 
 The `add_contours()` method allows you to add custom contour lines to the surface:
 
 ```{r, out.width='100%', out.height='700px'}
-llower = viz$objective$limits_lower
-lupper = viz$objective$limits_upper
+llower = vis$objective$limits_lower
+lupper = vis$objective$limits_upper
 ssize = (lupper - llower) / 10
 
-viz$add_contours(contours = list(
+vis$add_contours(contours = list(
   y = list(show = TRUE, start = llower[2], end = lupper[2], size = ssize[2], color = "red")
 ))$plot(theme = list(palette = "grayscale"))
 ```
@@ -54,15 +54,15 @@ viz$add_contours(contours = list(
 You can customize layout and scene directly in the `plot()` method:
 
 ```{r, out.width='100%', out.height='700px'}
-viz = as_visualizer(obj("TF_franke"), type = "surface")
-viz$plot(layout = list(
+vis = as_visualizer(obj("TF_franke"), type = "surface")
+vis$plot(layout = list(
   title = list(text = "Custom Title", font = list(size = 20)),
   showlegend = TRUE
 ))
 ```
 
 ```{r, out.width='100%', out.height='700px'}
-viz$plot(scene = list(camera = list(eye = list(x = 1.5, y = 1.5, z = 1.5))))
+vis$plot(scene = list(camera = list(eye = list(x = 1.5, y = 1.5, z = 1.5))))
 ```
 
 ### View presets via `set_scene()`
@@ -70,16 +70,16 @@ viz$plot(scene = list(camera = list(eye = list(x = 1.5, y = 1.5, z = 1.5))))
 For repeated exploration, you can set camera presets using the helper method `set_scene()` and then render.
 
 ```{r, out.width='100%', out.height='700px'}
-viz = as_visualizer(obj("TF_branin"), type = "surface")
+vis = as_visualizer(obj("TF_branin"), type = "surface")
 # classic three-quarter view
-viz$set_scene(x = 1.3, y = 1.2, z = 1.0)
-viz$plot()
+vis$set_scene(x = 1.3, y = 1.2, z = 1.0)
+vis$plot()
 ```
 
 ```{r, out.width='100%', out.height='700px'}
 # top-down shallow angle
-viz$set_scene(x = 0.7, y = 0.7, z = 2.0)
-viz$plot()
+vis$set_scene(x = 0.7, y = 0.7, z = 2.0)
+vis$plot()
 ```
 
 
@@ -88,13 +88,13 @@ viz$plot()
 ```{r, out.width='100%', out.height='700px'}
 obj = obj("TF_banana")
 # Use surface visualizer for Taylor/Hessian overlays
-viz = as_visualizer(obj, type = "surface")
+vis = as_visualizer(obj, type = "surface")
 
 # Point of expansion (choose a point of interest)
 x0 = c(0.85, 0.47)
 
 # First-order Taylor plane with compact extent and visible grid contours
-viz$add_taylor(
+vis$add_taylor(
   x0,
   degree = 1,
   npoints_per_dim = 11,
@@ -107,23 +107,23 @@ viz$add_taylor(
 )
 
 # Add Hessian eigen-directions anchored at x0
-viz$add_hessian(x0, x1length = 0.25, x2length = 0.25)
-viz$plot()
+vis$add_hessian(x0, x1length = 0.25, x2length = 0.25)
+vis$plot()
 ```
 
 ```{r, out.width='100%', out.height='700px'}
 # Second-order Taylor surface (narrow z-limits for clarity)
-viz2 = as_visualizer(obj, type = "surface")
-viz2$add_taylor(
+vis2 = as_visualizer(obj, type = "surface")
+vis2$add_taylor(
   x0,
   degree = 2,
   npoints_per_dim = 21,
   x1margin = 0.35,
   x2margin = 0.35,
-  zlim = range(viz2$zmat, na.rm = TRUE)
+  zlim = range(vis2$zmat, na.rm = TRUE)
 )
-viz2$add_hessian(x0, x1length = 0.25, x2length = 0.25)
-viz2$plot()
+vis2$add_hessian(x0, x1length = 0.25, x2length = 0.25)
+vis2$plot()
 ```
 
 ## Manual layers
@@ -133,29 +133,29 @@ You can extend the returned plot objects directly:
 - ggplot2: modify the ggplot result with standard layers and themes
 
 ```{r, eval=FALSE}
-viz2d = as_visualizer(obj("TF_franke"))
-p = viz2d$plot(show_title = FALSE)
+vis2d = as_visualizer(obj("TF_franke"))
+p = vis2d$plot(show_title = FALSE)
 p + ggplot2::labs(title = "Franke Function") + ggplot2::theme_minimal()
 ```
 
 - plotly: add traces or update layout/scene
 
 ```{r, eval=FALSE}
-viz3d = as_visualizer(obj("TF_branin"), type = "surface")
-p = viz3d$plot()
+vis3d = as_visualizer(obj("TF_branin"), type = "surface")
+p = vis3d$plot()
 plotly::add_markers(p, x = c(0.5), y = c(0.5), z = c(0.0), name = "mark")
 ```
 
 ```{r, out.width='100%', out.height='700px'}
 obj = obj("TF_banana")
-viz = as_visualizer(obj, type = "surface")
-viz$set_theme(vistool_theme(alpha = 0.5))
-p = viz$plot()
+vis = as_visualizer(obj, type = "surface")
+vis$set_theme(vistool_theme(alpha = 0.5))
+p = vis$plot()
 
 # Create some synthetic points to overlay as 3D markers
 nsim = 100
 grid = data.frame(x = runif(nsim), y = runif(nsim))
-grid$z = apply(grid, 1, viz$objective$eval) + rnorm(nsim, sd = 0.05)
+grid$z = apply(grid, 1, vis$objective$eval) + rnorm(nsim, sd = 0.05)
 
 # Add manual plotly layer on top of vistool’s plotly object
 p %>% add_trace(
@@ -175,11 +175,11 @@ obj = obj("TF_GoldsteinPriceLog")
 oo = OptimizerGD$new(obj, x_start = c(0.22, 0.77), lr = 0.01)
 oo$optimize(steps = 30)
 
-viz = as_visualizer(obj, type = "surface")
-viz$add_optimization_trace(oo)
+vis = as_visualizer(obj, type = "surface")
+vis$add_optimization_trace(oo)
 
 dir.create("animation", showWarnings = FALSE)
-viz$animate(
+vis$animate(
   dir = "animation",
   nframes = 20,
   view_start = list(x = 1.2, y = 1.2, z = 1.1),

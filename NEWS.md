@@ -1,6 +1,5 @@
 # vistool 0.4.1
-* Added `add_annotation()` for all visualizers, enabling styled text and LaTeX annotations across ggplot2 and plotly backends.
-* `AGENTS.md`
+* Implemented `add_annotation()` for all visualizers, enabling styled text and LaTeX annotations across ggplot2 and plotly backends.
 
 # vistool 0.4.0
 * New `Hypothesis` R6 class and `hypothesis()` constructor: wrap user-defined functions for regression or classification (1D/2D), with optional link and domain.

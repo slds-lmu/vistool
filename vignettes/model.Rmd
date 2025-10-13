@@ -117,16 +117,6 @@ vis$add_training_data(
 )$plot()
 ```
 
-For surface plots, the same class-specific styling is supported.
-
-```{r, out.width='100%', out.height='700px'}
-vis_surface = as_visualizer(task, learner = learner, type = "surface")
-vis_surface$add_training_data(
-  color = c(pos = "red", neg = "blue"),
-  shape = c(pos = 0, neg = 1)
-)$plot()
-```
-
 ## Hypothesis-only visualization
 
 You can visualize simple functional hypotheses without a Task/Learner by providing a `Hypothesis` and a plotting domain.

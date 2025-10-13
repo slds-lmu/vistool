@@ -53,23 +53,11 @@ obj_branin$hess(x)
 ## Visualizing objectives
 
 Use `as_visualizer()` to create a visualizer for an objective. For 1D and 2D objectives, the appropriate visualizer is selected automatically.
+2D objectives additionally support interactive surface visualization:
 
 ```{r, out.width='100%', out.height='700px'}
-viz = as_visualizer(obj_branin)
-viz$plot()
-```
-
-For interactive surface visualization (2D objectives):
-
-```{r, out.width='100%', out.height='700px'}
-viz_surface = as_visualizer(obj_branin, type = "surface")
-viz_surface$plot()
-```
-
-Transformed to a contour plot:
-
-```{r, out.width='100%', out.height='700px'}
-viz_surface$plot(flatten = TRUE)
+vis_surface = as_visualizer(obj_branin, type = "surface")
+vis_surface$plot()
 ```
 
 ## Custom objectives
@@ -108,8 +96,8 @@ obj_lm$archive
 Visualize the custom objective:
 
 ```{r, out.width='100%', out.height='700px'}
-viz_lm = as_visualizer(obj_lm, x1_limits = c(-0.5, 5), x2_limits = c(-3.2, 2.8))
-viz_lm$plot()
+vis_lm = as_visualizer(obj_lm, x1_limits = c(-0.5, 5), x2_limits = c(-3.2, 2.8))
+vis_lm$plot()
 ```
 
 You can also add custom points directly to the visualizer using `$add_points()`, which supports many customization options (see below).
@@ -120,20 +108,14 @@ archive_data = data.frame(
   x = sapply(obj_lm$archive$x, function(x) x[1]),
   y = sapply(obj_lm$archive$x, function(x) x[2])
 )
-viz_lm$add_points(archive_data, color = "orange", size = 3, shape = 17, alpha = 0.8, ordered = TRUE)$plot()
-```
-
-```{r, out.width='100%', out.height='700px'}
-# Add a labeled point to the surface (plotly) visualizer
-viz_lm_surface = as_visualizer(obj_lm, x1_limits = c(-0.5, 5), x2_limits = c(-3.2, 2.8), type = "surface")
-viz_lm_surface$add_points(base::data.frame(x = 2, y = 0), color = "orange", size = 8, alpha = 0.9, annotations = "The z values are inferred!")$plot()
+vis_lm$add_points(archive_data, color = "orange", size = 3, shape = 17, alpha = 0.8, ordered = TRUE)$plot()
 ```
 
 *Customization options include: `points` (as data.frame/matrix/list), `color`, `size`, `shape`, `alpha`, `annotations`, `ordered`, and more. See the documentation for all arguments.*
 
 ## All 2D objectives
 
-From the package `mlr3misc`.
+From the [`TestFunctions`](https://CRAN.R-project.org/web/packages/TestFunctions/vignettes/AnIntroductiontoTestFunctions.html) package.
 
 ```{r, out.width='100%', out.height='4000px', echo=FALSE}
 library(plotly)
