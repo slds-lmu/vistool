@@ -2,7 +2,7 @@
 % Please edit documentation in R/VisualizerSurfaceObj.R
 \name{VisualizerSurfaceObj}
 \alias{VisualizerSurfaceObj}
-\title{Visualize Objective as Interactive Surface}
+\title{Visualize objective as interactive surface}
 \description{
 This class is used to create interactive surface visualizations and animations of optimization traces
 for 2D objectives using plotly.
@@ -13,7 +13,7 @@ for 2D objectives using plotly.
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{objective}}{(`Objective`)\cr
+\item{\code{objective}}{(\code{Objective})\cr
 The objective function.}
 }
 \if{html}{\out{</div>}}
@@ -33,6 +33,7 @@ The objective function.}
 \if{html}{\out{
 <details><summary>Inherited methods</summary>
 <ul>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="add_annotation"><a href='../../vistool/html/Visualizer.html#method-Visualizer-add_annotation'><code>vistool::Visualizer$add_annotation()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="add_points"><a href='../../vistool/html/Visualizer.html#method-Visualizer-add_points'><code>vistool::Visualizer$add_points()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="resolve_layer_colors"><a href='../../vistool/html/Visualizer.html#method-Visualizer-resolve_layer_colors'><code>vistool::Visualizer$resolve_layer_colors()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href='../../vistool/html/Visualizer.html#method-Visualizer-save'><code>vistool::Visualizer$save()</code></a></span></li>
@@ -50,57 +51,50 @@ The objective function.}
 \if{html}{\out{<a id="method-VisualizerSurfaceObj-new"></a>}}
 \if{latex}{\out{\hypertarget{method-VisualizerSurfaceObj-new}{}}}
 \subsection{Method \code{new()}}{
-Creates a new instance of this [R6][R6::R6Class] class.
+Creates a new instance of this \link[R6:R6Class]{R6} class.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{VisualizerSurfaceObj$new(
   objective,
   x1_limits = NULL,
   x2_limits = NULL,
   padding = 0,
-  n_points = 100L,
-  allow_extrapolation = FALSE
+  n_points = 100L
 )}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{objective}}{(`Objective`)\cr
+\item{\code{objective}}{(\code{Objective})\cr
 The objective to optimize.}
 
-\item{\code{x1_limits}}{(`numeric(2)`)\cr
+\item{\code{x1_limits}}{(\code{numeric(2)})\cr
 The x1 limits.}
 
-\item{\code{x1_limits}}{(`numeric(2)`)\cr
+\item{\code{x1_limits}}{(\code{numeric(2)})\cr
 The x1 limits.}
 
-\item{\code{x2_limits}}{(`numeric(2)`)\cr
+\item{\code{x2_limits}}{(\code{numeric(2)})\cr
 The x2 limits.}
 
-\item{\code{x2_limits}}{(`numeric(2)`)\cr
+\item{\code{x2_limits}}{(\code{numeric(2)})\cr
 The x2 limits.}
 
-\item{\code{padding}}{(`numeric(1)`)\cr
+\item{\code{padding}}{(\code{numeric(1)})\cr
 A margin that is added to x1limits and x2limits.
-The x1 margin is calculated by `max(x1lmits) - min(x1limits) * padding`.}
+The x1 margin is calculated by \code{max(x1lmits) - min(x1limits) * padding}.}
 
-\item{\code{padding}}{(`numeric(1)`)\cr
+\item{\code{padding}}{(\code{numeric(1)})\cr
 A margin that is added to x1limits and x2limits.
-The x1 margin is calculated by `max(x1lmits) - min(x1limits) * padding`.}
+The x1 margin is calculated by \code{max(x1lmits) - min(x1limits) * padding}.}
 
-\item{\code{n_points}}{(`integer(1)`)\cr
+\item{\code{n_points}}{(\code{integer(1)})\cr
 The number of generated point per dimension.
-Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
+Note that a grid of \code{npoints^2} values is generated and evaluated by \code{objective$eval(x)} to plot the surface.}
 
-\item{\code{n_points}}{(`integer(1)`)\cr
+\item{\code{n_points}}{(\code{integer(1)})\cr
 The number of generated point per dimension.
-Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
-
-\item{\code{allow_extrapolation}}{(`logical(1)`)
-Whether to evaluate the objective outside its evaluation (canonical) bounds when plot limits
-extend further. If `FALSE` (default), values outside are masked (set to `NA`) producing blank
-regions in the plot; if `TRUE`, the objective is called on the extended region (may yield
-misleading or numerically extreme values depending on the function definition).}
+Note that a grid of \code{npoints^2} values is generated and evaluated by \code{objective$eval(x)} to plot the surface.}
 }
 \if{html}{\out{</div>}}
 }
@@ -131,51 +125,51 @@ Add an optimization trace.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{opt}}{(`Optimizer`)\cr
+\item{\code{opt}}{(\code{Optimizer})\cr
 The optimizer from which the archive is extracted and used to plot the trace.}
 
-\item{\code{line_color}}{(`character(1)`)\cr
+\item{\code{line_color}}{(\code{character(1)})\cr
 The color of the trace.}
 
-\item{\code{mcolor_out}}{(`character(1)`)\cr
+\item{\code{mcolor_out}}{(\code{character(1)})\cr
 The outer line color of the marker.}
 
-\item{\code{line_width}}{(`numeric(1)`)\cr
-Width of the optimization trace line. If `NULL`, uses theme$line_width.}
+\item{\code{line_width}}{(\code{numeric(1)})\cr
+Width of the optimization trace line. If \code{NULL}, uses theme$line_width.}
 
-\item{\code{npoints}}{(`integer(1)`)\cr
+\item{\code{npoints}}{(\code{integer(1)})\cr
 The number of used points from the archive.
-Default is `NULL` which means that all points are used.
-If set, a sequence from 1 to `nrow(opt$archive)` is created.}
+Default is \code{NULL} which means that all points are used.
+If set, a sequence from 1 to \code{nrow(opt$archive)} is created.}
 
-\item{\code{npmax}}{(`integer(1)`)\cr
-The number of points used from the sequence `seq_len(nrow(opt$archive))[seq_len(npmax)]`}
+\item{\code{npmax}}{(\code{integer(1)})\cr
+The number of points used from the sequence \code{seq_len(nrow(opt$archive))[seq_len(npmax)]}}
 
-\item{\code{name}}{(`character(1)`)\cr
+\item{\code{name}}{(\code{character(1)})\cr
 The name of the trace in the legend.
-Default is `NULL` which uses only `opt$id` (optimizer ID).}
+Default is \code{NULL} which uses only \code{opt$id} (optimizer ID).}
 
-\item{\code{offset}}{(`numeric(3)`)\cr
+\item{\code{offset}}{(\code{numeric(3)})\cr
 Trace shift in direction (x, y, z).}
 
-\item{\code{add_marker_at}}{(`integer()`)\cr
+\item{\code{add_marker_at}}{(\code{integer()})\cr
 Vector of iterations at which a marker is added.}
 
-\item{\code{marker_shape}}{(`character()`)\cr
+\item{\code{marker_shape}}{(\code{character()})\cr
 Vector indicating the shape of the markers.
-If `length(marker_shape) == 1`, all markers get the same shape.
-The other option is to specify all markers individually by passing a vector of `length(add_marker_at)`.
-For a list of all shapes see `schema(F)$traces$XXX$attributes$marker$symbol$values` with `XXX` one of `scatter` or `scatter3d`.
-If `marker_shape = NA`, no marker are added.}
+If \code{length(marker_shape) == 1}, all markers get the same shape.
+The other option is to specify all markers individually by passing a vector of \code{length(add_marker_at)}.
+For a list of all shapes see \code{schema(F)$traces$XXX$attributes$marker$symbol$values} with \code{XXX} one of \code{scatter} or \code{scatter3d}.
+If \code{marker_shape = NA}, no marker are added.}
 
-\item{\code{marker_color}}{(`character()`)\cr
+\item{\code{marker_color}}{(\code{character()})\cr
 The colors for the markers.}
 
-\item{\code{line_type}}{(`character(1)`)
+\item{\code{line_type}}{(\code{character(1)})
 Line type for the optimization trace (e.g., "solid", "dashed", "dotted", "dash", "dot", "dashdot").
-Mapped to Plotly's `line$dash`. If `NULL`, defaults to solid.}
+Mapped to Plotly's \code{line$dash}. If \code{NULL}, defaults to solid.}
 
-\item{\code{...}}{Further arguments passed to `add_trace(...)`.}
+\item{\code{...}}{Further arguments passed to \code{add_trace(...)}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -192,7 +186,7 @@ Renders the surface plot with all added layers.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{(`any`)\cr
+\item{\code{...}}{(\code{any})\cr
 Additional arguments passed to the parent plot method.}
 }
 \if{html}{\out{</div>}}
@@ -221,27 +215,27 @@ Add a Taylor approximation (for 1 and 2 degrees).
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{x0}}{(`numeric()) `\cr
+\item{\code{x0}}{(\verb{numeric()) }\cr
 The point around which the approximation is done.}
 
-\item{\code{degree}}{(`integer(1)`)\cr
+\item{\code{degree}}{(\code{integer(1)})\cr
 The degree of the approximation (only 1 and 2 is implemented).}
 
-\item{\code{x1margin}}{(`numeric(1)`)\cr
+\item{\code{x1margin}}{(\code{numeric(1)})\cr
 The "length" of the hyperplane in direction x1.}
 
-\item{\code{x2margin}}{(`numeric(1)`)\cr
+\item{\code{x2margin}}{(\code{numeric(1)})\cr
 The "length" of the hyperplane in direction x2.}
 
-\item{\code{npoints_per_dim}}{(`integer(1)`)\cr
+\item{\code{npoints_per_dim}}{(\code{integer(1)})\cr
 Number of points per dimension for the plotting grid.}
 
-\item{\code{zlim}}{(`numeric(2)`)\cr
+\item{\code{zlim}}{(\code{numeric(2)})\cr
 The limits for z.
 Can be helpful if the hyperplane as a huge z range and therefore the plot looks ugly.}
 
-\item{\code{...}}{(`any`)\cr
-Additional parameter passed to `add_surface()`.}
+\item{\code{...}}{(\code{any})\cr
+Additional parameter passed to \code{add_surface()}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -258,17 +252,17 @@ Add two "arrows" as eigenvectors of the Hessian.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{x0}}{(`numeric(2)`)\cr
+\item{\code{x0}}{(\code{numeric(2)})\cr
 The point at which the Hessian is calculated.}
 
-\item{\code{x1length}}{(`numeric(1)`)\cr
+\item{\code{x1length}}{(\code{numeric(1)})\cr
 The length of the first eigenvector.}
 
-\item{\code{x2length}}{(`numeric(1)`)\cr
+\item{\code{x2length}}{(\code{numeric(1)})\cr
 The length of the second eigenvector.}
 
-\item{\code{...}}{(`any`)\cr
-Additional arguments passed to `add_trace`.}
+\item{\code{...}}{(\code{any})\cr
+Additional arguments passed to \code{add_trace}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -277,7 +271,7 @@ Additional arguments passed to `add_trace`.}
 \if{html}{\out{<a id="method-VisualizerSurfaceObj-animate"></a>}}
 \if{latex}{\out{\hypertarget{method-VisualizerSurfaceObj-animate}{}}}
 \subsection{Method \code{animate()}}{
-Create an animation of `$plot()`.
+Create an animation of \verb{$plot()}.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{VisualizerSurfaceObj$animate(
   dir = "animation",
@@ -293,28 +287,28 @@ Create an animation of `$plot()`.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{dir}}{(`character(1)`)\cr
+\item{\code{dir}}{(\code{character(1)})\cr
 The directory in which all the images are saved.}
 
-\item{\code{nframes}}{(`integer(1)`)\cr
+\item{\code{nframes}}{(\code{integer(1)})\cr
 The number of frames.}
 
-\item{\code{view_start}}{(`list()`)\cr
+\item{\code{view_start}}{(\code{list()})\cr
 The start view of the animation.}
 
-\item{\code{view_end}}{(`list()`)\cr
+\item{\code{view_end}}{(\code{list()})\cr
 The end view of the animation.}
 
-\item{\code{fext}}{(`character(1)`)\cr
-The file extension (default is `png`).}
+\item{\code{fext}}{(\code{character(1)})\cr
+The file extension (default is \code{png}).}
 
-\item{\code{stops}}{(`integer()`)\cr
-The step / iteration in the archives of the optimizers added by `$addLayerOptimizationTrace()` at which a frame is taken.
-Must have exact the same length as defined in `nframes`.
-By default, a sequence with equidistant points is generated for `stops`.}
+\item{\code{stops}}{(\code{integer()})\cr
+The step / iteration in the archives of the optimizers added by \verb{$add_optimization_trace()} at which a frame is taken.
+Must have exact the same length as defined in \code{nframes}.
+By default, a sequence with equidistant points is generated for \code{stops}.}
 
-\item{\code{...}}{(`any`)\cr
-Additional arguments passed to `$save(...)`.}
+\item{\code{...}}{(\code{any})\cr
+Additional arguments passed to \verb{$save(...)}.}
 }
 \if{html}{\out{</div>}}
 }

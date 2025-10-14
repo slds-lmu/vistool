@@ -1,7 +1,7 @@
 test_that("Unified save method works for all visualizers", {
   # Test VisualizerObj (1D) save
   obj_1d = obj("TF_gaussian1", xdim = 1)
-  vis1d = as_visualizer(obj_1d, type = "1d")
+  vis1d = as_visualizer(obj_1d, type = "1d", x1_limits = c(-3, 3))
 
   # Create temporary file for testing
   temp_file_1d = tempfile(fileext = ".png")
@@ -48,7 +48,7 @@ test_that("Base Visualizer class methods work correctly", {
 
   # Test inheritance structure with unified visualizers
   obj_1d = obj("TF_gaussian1", xdim = 1)
-  vis1d = as_visualizer(obj_1d, type = "1d")
+  vis1d = as_visualizer(obj_1d, type = "1d", x1_limits = c(-3, 3))
   expect_s3_class(vis1d, "VisualizerObj")
   expect_s3_class(vis1d, "Visualizer")
   expect_true("save" %in% names(vis1d))

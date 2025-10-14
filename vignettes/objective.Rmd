@@ -1,8 +1,8 @@
 ---
-title: "Objective Functions"
+title: "Objective functions"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Objective Functions}
+  %\VignetteIndexEntry{Objective functions}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -27,7 +27,7 @@ set.seed(1)
 
 This vignette covers the basic usage of objective functions in `vistool`, including predefined objectives and how to define custom objectives.
 
-## Predefined Objectives
+## Predefined objectives
 
 The package provides a dictionary of objective functions:
 
@@ -41,20 +41,6 @@ To retrieve an objective function:
 obj_branin = obj("TF_branin")
 ```
 
----
-
-__Note: Extrapolation__
-
-We explicitly distinguish between:
-
-* Evaluation (canonical) bounds: The domain on which the objective is defined (stored in `objective$lower` / `objective$upper`). For `TF_branin` this is $x_1 \in [-5,10], x_2 \in [0,15]$.
-* Plot bounds: The region you choose to visualize (via `x1_limits` / `x2_limits`). These may extend beyond the evaluation bounds.
-
-By default, any area outside the evaluation bounds is **masked** (rendered as blank/NA) so you immediately see the true defined region of the function.
-If you really want to look at extrapolated values, set `allow_extrapolation = TRUE` when creating a visualizer.
-
----
-
 You can evaluate the objective, gradient, and Hessian at a point:
 
 ```{r}
@@ -64,29 +50,17 @@ obj_branin$grad(x)
 obj_branin$hess(x)
 ```
 
-## Visualizing Objectives
+## Visualizing objectives
 
 Use `as_visualizer()` to create a visualizer for an objective. For 1D and 2D objectives, the appropriate visualizer is selected automatically.
+2D objectives additionally support interactive surface visualization:
 
 ```{r, out.width='100%', out.height='700px'}
-viz = as_visualizer(obj_branin)
-viz$plot()
+vis_surface = as_visualizer(obj_branin, type = "surface")
+vis_surface$plot()
 ```
 
-For interactive surface visualization (2D objectives):
-
-```{r, out.width='100%', out.height='700px'}
-viz_surface = as_visualizer(obj_branin, type = "surface")
-viz_surface$plot()
-```
-
-Transformed to a contour plot:
-
-```{r, out.width='100%', out.height='700px'}
-viz_surface$plot(flatten = TRUE)
-```
-
-## Custom Objectives
+## Custom objectives
 
 You can define your own objective function.
 Let's define a loss for a linear model on the iris data with target `Sepal.Width` and feature `Petal.Width`. First, an `Objective` requires a function for evaluation:
@@ -112,9 +86,9 @@ y = iris$Sepal.Width
 # Create a new object:
 obj_lm = Objective$new(id = "iris LM", fun = mylm, xdim = 2, Xmat = Xmat, y = y, minimize = TRUE)
 
-obj_lm$evalStore(c(1, 2))
-obj_lm$evalStore(c(2, 3))
-obj_lm$evalStore(coef(lm(Sepal.Width ~ Petal.Width, data = iris)))
+obj_lm$eval_store(c(1, 2))
+obj_lm$eval_store(c(2, 3))
+obj_lm$eval_store(coef(lm(Sepal.Width ~ Petal.Width, data = iris)))
 
 obj_lm$archive
 ```
@@ -122,32 +96,26 @@ obj_lm$archive
 Visualize the custom objective:
 
 ```{r, out.width='100%', out.height='700px'}
-viz_lm = as_visualizer(obj_lm, x1_limits = c(-0.5, 5), x2_limits = c(-3.2, 2.8))
-viz_lm$plot()
+vis_lm = as_visualizer(obj_lm, x1_limits = c(-0.5, 5), x2_limits = c(-3.2, 2.8))
+vis_lm$plot()
 ```
 
 You can also add custom points directly to the visualizer using `$add_points()`, which supports many customization options (see below).
-For adding actual optimization traces, see the [Optimization & Traces vignette](optimization_traces.html).
+For adding actual optimization traces, see the [Optimization & traces vignette](optimization_traces.html).
 
 ```{r, out.width='100%', out.height='700px'}
 archive_data = data.frame(
   x = sapply(obj_lm$archive$x, function(x) x[1]),
   y = sapply(obj_lm$archive$x, function(x) x[2])
 )
-viz_lm$add_points(archive_data, color = "orange", size = 3, shape = 17, alpha = 0.8, ordered = TRUE)$plot()
-```
-
-```{r, out.width='100%', out.height='700px'}
-# Add a labeled point to the surface (plotly) visualizer
-viz_lm_surface = as_visualizer(obj_lm, x1_limits = c(-0.5, 5), x2_limits = c(-3.2, 2.8), type = "surface")
-viz_lm_surface$add_points(base::data.frame(x = 2, y = 0), color = "orange", size = 8, alpha = 0.9, annotations = "The z values are inferred!")$plot()
+vis_lm$add_points(archive_data, color = "orange", size = 3, shape = 17, alpha = 0.8, ordered = TRUE)$plot()
 ```
 
 *Customization options include: `points` (as data.frame/matrix/list), `color`, `size`, `shape`, `alpha`, `annotations`, `ordered`, and more. See the documentation for all arguments.*
 
-## All 2D Objectives
+## All 2D objectives
 
-From the package `mlr3misc`.
+From the [`TestFunctions`](https://CRAN.R-project.org/web/packages/TestFunctions/vignettes/AnIntroductiontoTestFunctions.html) package.
 
 ```{r, out.width='100%', out.height='4000px', echo=FALSE}
 library(plotly)
@@ -178,8 +146,8 @@ subplot(visualizers, nrows = 8)
 
 ## See also
 
-- [Loss Functions](loss_functions.html)
-- [Model Predictions](model.html)
-- [Optimization & Traces](optimization_traces.html)
-- [Customization Guide](customization_guide.html)
-- [Advanced Visualization](advanced_visualization.html)
+- [Loss functions](loss_functions.html)
+- [Model predictions](model.html)
+- [Optimization & traces](optimization_traces.html)
+- [Customization guide](customization_guide.html)
+- [Advanced visualization](advanced_visualization.html)

@@ -1,6 +1,6 @@
-# Developer Reference
+# Developer reference
 
-## Essential Commands
+## Essential commands
 
 ```r
 # Load package for development
@@ -66,7 +66,7 @@ vistool/
 └── .github/workflows/  # CI/CD
 ```
 
-## Core Architecture (Visualization)
+## Core architecture (visualization)
 
 ```
 Visualizer
@@ -85,9 +85,9 @@ Visualizer
   - `VisualizerSurface*`: Interactive surface plotting with plotly for 2D functions *only*
 - **`as_visualizer()`**: Smart constructor that selects appropriate visualizer
 
-## API Design Principles
+## API design principles
 
-### Constructor vs. Styling Separation
+### Constructor vs. styling separation
 
 **Constructors** (`as_visualizer()`, `VisualizerModel$new()`, etc.) accept only:
 - **Domain objects**: tasks, learners, objectives, loss functions
@@ -98,7 +98,7 @@ Visualizer
 - **Plot theme**: `vis$plot(theme = list(...), ...)`
 - **Layer styling**: `vis$add_points(color = "red", size = 3)`
 
-### Example Workflow
+### Example workflow
 ```r
 # 1. Create visualizer (computational setup only)
 vis <- as_visualizer(task, learner = learner, n_points = 200, padding = 0.1)
@@ -117,17 +117,17 @@ p <- vis$plot(theme = list(alpha = 0.7))
 vis$save("plot.png")
 ```
 
-## Theme System
+## Theme system
 
 vistool uses a flexible theme system that separates "what to plot" from "how to plot":
 
-### Theme Hierarchy (Precedence)
+### Theme hierarchy (precedence)
 1. **Layer-specific style** (highest): `add_points(color = "red")`
 2. **Plot theme override**: `plot(theme = list(palette = "plasma"))`
 3. **Instance theme**: `vis$set_theme(vistool_theme(...))`
 4. **Package default** (lowest): Set via `options(vistool.theme = ...)`
 
-### Theme Usage
+### Theme usage
 ```r
 # Set instance theme
 vis$set_theme(vistool_theme(palette = "plasma", text_size = 14, alpha = 0.7))
@@ -139,12 +139,12 @@ vis$plot(theme = list(text_size = 12, theme = "bw"))
 vis$add_points(data, color = "red", size = 3)
 ```
 
-## Deferred Rendering
+## Deferred rendering
 
 All visualizer classes in vistool follow a standardized `plot()` method structure that leverages the deferred rendering architecture.
 This ensures consistent behavior, proper color resolution, and maintainable code.
 
-### Standard Pattern
+### Standard pattern
 
 #### 1. `Visualizer.R`
 
@@ -180,9 +180,9 @@ plot = function(...) {
 }
 ```
 
-### Implementation Examples
+### Implementation examples
 
-#### ggplot2-based Classes (1D, 2D)
+#### ggplot2-based classes (1D, 2D)
 
 ```r
 plot = function(...) {
@@ -226,7 +226,7 @@ private = list(
 )
 ```
 
-#### plotly-based Classes (Surface)
+#### plotly-based classes (surface)
 
 ```r
 # Good Example: VisualizerSurfaceObj  
@@ -257,9 +257,9 @@ private = list(
 ```
 
 
-## Development Workflow
+## Development workflow
 
-### 1. Setup Development Environment
+### 1. Setup development environment
 
 ```bash
 git clone https://github.com/slds-lmu/vistool.git
@@ -271,7 +271,7 @@ devtools::load_all()
 devtools::install_deps(dependencies = TRUE)
 ```
 
-### 2. Make Changes
+### 2. Make changes
 
 Edit files in `R/`, add roxygen2 documentation:
 
@@ -290,14 +290,14 @@ my_function = function(x) {
 
 For reusable documentation blocks, consider using templates from `man-roxygen/` directory.
 
-### 3. Update Documentation
+### 3. Update documentation
 
 ```r
 devtools::document()  # Generate man/ files
 devtools::build_readme()  # Update README.md
 ```
 
-### 4. Add Tests
+### 4. Add tests
 
 Test all public functions using `testthat`:
 
@@ -308,7 +308,7 @@ test_that("my feature works", {
 })
 ```
 
-### 5. Check Package
+### 5. Check package
 
 ```r
 devtools::test()    # Run tests
@@ -322,6 +322,21 @@ pkgdown::build_site()
 ```
 
 ## Guidelines
+
+### Naming conventions
+
+- Classes (R6 generators and class-like objects): CamelCase
+  - Examples: `Visualizer`, `VisualizerModel`, `Objective`, `OptimizerGD`
+- Everything else: snake_case
+  - Functions: `as_visualizer()`, `merge_theme()`, `get_vistool_color()`
+  - Variables/fields/args: `n_points`, `x_limits`, `effective_theme`
+  - Files: snake_case where feasible (e.g., `as_visualizer.R`); class files should retain CamelCase to match class names (e.g., `VisualizerModel.R`).
+
+Tooling:
+- lintr: `.lintr` config allows both `snake_case` and `CamelCase`. It cannot distinguish classes from other objects, so we enforce “CamelCase only for classes” via code review and PRs. If you must use a non-conforming name due to external APIs, add a short comment and, if necessary, a targeted `# nolint: object_name_linter.` on that line.
+- styler: formatting only; it does not rename identifiers. See `.styler` for formatting configuration.
+
+Documentation titles should use __Sentence case__.
 
 ### Testing
 

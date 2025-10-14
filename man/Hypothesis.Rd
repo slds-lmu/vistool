@@ -15,26 +15,28 @@ hypothesis(
 )
 }
 \arguments{
-\item{fun}{(`function`)
+\item{fun}{(\code{function})
 Function defining the hypothesis. Accepted signatures:
-- 1D: `fun(x, ...)` or `fun(data)` where `data` is a data.frame with one predictor column
-- 2D: `fun(x, y, ...)` or `fun(data)` where `data` is a data.frame with two predictor columns}
+\itemize{
+\item 1D: \code{fun(x, ...)} or \code{fun(data)} where \code{data} is a data.frame with one predictor column
+\item 2D: \code{fun(x, y, ...)} or \code{fun(data)} where \code{data} is a data.frame with two predictor columns
+}}
 
-\item{type}{(`character(1)`) One of "regr" or "classif".}
+\item{type}{(\code{character(1)}) One of "regr" or "classif".}
 
-\item{predictors}{(`character()`) Names of the predictor columns. Length must be 1 or 2.}
+\item{predictors}{(\code{character()}) Names of the predictor columns. Length must be 1 or 2.}
 
-\item{link}{(`character(1)`) Link for classif outputs: "identity" (default) or "logit".
+\item{link}{(\code{character(1)}) Link for classif outputs: "identity" (default) or "logit".
 For regression, only "identity" is used.}
 
-\item{domain}{(`list`|`NULL`) Named list with limits per predictor, e.g.,
-`list(x = c(-3, 3))` for 1D or `list(x = c(-3,3), y = c(-3,3))` for 2D. Used
+\item{domain}{(\code{list}|\code{NULL}) Named list with limits per predictor, e.g.,
+\code{list(x = c(-3, 3))} for 1D or \code{list(x = c(-3,3), y = c(-3,3))} for 2D. Used
 when no Task is provided.}
 
-\item{levels}{(`character(2)`|`NULL`) Class labels for binary classification.}
+\item{levels}{(\code{character(2)}|\code{NULL}) Class labels for binary classification.}
 }
 \value{
-An `R6` Hypothesis object with a `predict(newdata)` method.
+An \code{R6} Hypothesis object with a \code{predict(newdata)} method.
 }
 \description{
 Construct a hypothesis object that wraps a user-supplied function with minimal
@@ -46,19 +48,19 @@ visualized like a learner on 1D or 2D inputs.
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{fun}}{(`function`) User-provided function implementing the hypothesis.}
+\item{\code{fun}}{(\code{function}) User-provided function implementing the hypothesis.}
 
-\item{\code{type}}{(`character(1)`) Prediction type, one of "regr" or "classif".}
+\item{\code{type}}{(\code{character(1)}) Prediction type, one of "regr" or "classif".}
 
-\item{\code{predictors}}{(`character()`) Names of predictor columns (length 1 or 2).}
+\item{\code{predictors}}{(\code{character()}) Names of predictor columns (length 1 or 2).}
 
-\item{\code{input_dim}}{(`integer(1)`) Number of predictors, derived from `predictors`.}
+\item{\code{input_dim}}{(\code{integer(1)}) Number of predictors, derived from \code{predictors}.}
 
-\item{\code{link}}{(`character(1)`) Link for classif output: "identity" or "logit".}
+\item{\code{link}}{(\code{character(1)}) Link for classif output: "identity" or "logit".}
 
-\item{\code{domain}}{(`list`|`NULL`) Named list with limits per predictor for plotting without a Task.}
+\item{\code{domain}}{(\code{list}|\code{NULL}) Named list with limits per predictor for plotting without a Task.}
 
-\item{\code{levels}}{(`character(2)`|`NULL`) Class labels for binary classification.}
+\item{\code{levels}}{(\code{character(2)}|\code{NULL}) Class labels for binary classification.}
 }
 \if{html}{\out{</div>}}
 }
@@ -89,17 +91,17 @@ Create a new Hypothesis instance
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{fun}}{(`function`) See class field `fun`.}
+\item{\code{fun}}{(\code{function}) See class field \code{fun}.}
 
-\item{\code{type}}{(`character(1)`) See class field `type`.}
+\item{\code{type}}{(\code{character(1)}) See class field \code{type}.}
 
-\item{\code{predictors}}{(`character()`) See class field `predictors`.}
+\item{\code{predictors}}{(\code{character()}) See class field \code{predictors}.}
 
-\item{\code{link}}{(`character(1)`) See class field `link`.}
+\item{\code{link}}{(\code{character(1)}) See class field \code{link}.}
 
-\item{\code{domain}}{(`list`|`NULL`) See class field `domain`.}
+\item{\code{domain}}{(\code{list}|\code{NULL}) See class field \code{domain}.}
 
-\item{\code{levels}}{(`character(2)`|`NULL`) See class field `levels`.}
+\item{\code{levels}}{(\code{character(2)}|\code{NULL}) See class field \code{levels}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -116,12 +118,12 @@ Predict on newdata
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{newdata}}{(`data.frame`) with columns matching `predictors` in order}
+\item{\code{newdata}}{(\code{data.frame}) with columns matching \code{predictors} in order}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-numeric vector of predictions (regression) or probabilities in [0,1] (classification)
+numeric vector of predictions (regression) or probabilities in \eqn{[0, 1]} (classification)
 }
 }
 \if{html}{\out{<hr>}}

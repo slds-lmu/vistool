@@ -1,4 +1,4 @@
-#' @title Visualize Objective (Unified 1D/2D)
+#' @title Visualize objective (unified 1D/2D)
 #'
 #' @description
 #' This class provides a unified interface for visualizing objective functions
@@ -9,8 +9,7 @@
 #' @template param_x2_limits
 #' @template param_padding
 #' @template param_n_points
-#' @template param_allow_extrapolation
-#' @template param_allow_extrapolation
+#'
 #'
 #' @export
 VisualizerObj = R6::R6Class("VisualizerObj",
@@ -36,16 +35,13 @@ VisualizerObj = R6::R6Class("VisualizerObj",
     #'   Optional visualization type ("1d" or "2d") to override automatic dimension detection.
     #'   Useful when objective dimensions are unknown but visualization type is explicitly specified.
     initialize = function(objective, x1_limits = NULL, x2_limits = NULL,
-                          padding = 0, n_points = 100L, type = NULL,
-                          allow_extrapolation = FALSE) {
+                          padding = 0, n_points = 100L, type = NULL) {
       # Validate inputs
       self$objective = checkmate::assert_r6(objective, "Objective")
       checkmate::assert_numeric(x1_limits, len = 2, null.ok = TRUE)
       checkmate::assert_numeric(x2_limits, len = 2, null.ok = TRUE)
       checkmate::assert_number(padding, lower = 0)
       checkmate::assert_count(n_points)
-      checkmate::assert_flag(allow_extrapolation)
-      private$.allow_extrapolation = allow_extrapolation
 
       # Determine dimensionality and validate
       n_dim = objective$xdim
@@ -188,24 +184,29 @@ VisualizerObj = R6::R6Class("VisualizerObj",
     .dimensionality = NULL, # "1d" or "2d"
     .data_structure = NULL, # Unified data container
     .plot = NULL, # The actual ggplot2 object
-    .allow_extrapolation = FALSE,
+
 
     # Render all stored layers in the order they were added
     render_all_layers = function() {
-      if (is.null(private$.layers_to_add)) {
-        return()
-      }
+      if (!is.null(private$.layers_to_add)) {
+        # 1) Render optimization traces together so they share a combined legend
+        private$render_optimization_trace_layers()
 
-      # 1) Render optimization traces together so they share a combined legend
-      private$render_optimization_trace_layers()
-
-      # 2) Render other generic layers
-      for (layer in private$.layers_to_add) {
-        if (layer$type == "points") {
-          # Handle points layer using the base class method
-          private$.plot = private$add_points_to_ggplot(private$.plot, private$.dimensionality)
+        # 2) Render other generic layers
+        for (layer in private$.layers_to_add) {
+          if (layer$type == "points") {
+            # Handle points layer using the base class method
+            private$.plot = private$add_points_to_ggplot(private$.plot, private$.dimensionality)
+          }
         }
       }
+
+      ranges = list(
+        x = private$.data_structure$coordinates$x1,
+        y = if (private$.dimensionality == "1d") private$.data_structure$coordinates$y else private$.data_structure$coordinates$x2,
+        z = if (private$.dimensionality == "2d") private$.data_structure$coordinates$y else NULL
+      )
+      private$.plot = private$add_annotations_to_ggplot(private$.plot, private$.dimensionality, ranges)
     },
 
     # Initialize data structure for 1D objectives
@@ -213,28 +214,24 @@ VisualizerObj = R6::R6Class("VisualizerObj",
       # Determine x limits from objective bounds
       x1_limits = if (is.null(x1_limits)) c(self$objective$lower, self$objective$upper) else x1_limits
       if (any(is.na(x1_limits))) {
-        # Provide reasonable default limits when objective bounds are not available
-        x1_limits = c(-5, 5)
-        message("Objective bounds not available, using default limits: [-5, 5]. Use 'x1_limits' parameter for custom range.")
+        stop("Objective bounds not available; please specify 'x1_limits' explicitly.")
+      }
+
+      # Warn if user-specified (or padded) limits exceed objective bounds
+      eval_lower = self$objective$lower
+      eval_upper = self$objective$upper
+      if (!any(is.na(c(eval_lower, eval_upper)))) {
+        if (x1_limits[1] < eval_lower || x1_limits[2] > eval_upper) {
+          warning(sprintf(
+            "Plot limits (x1_limits = [%s, %s]) exceed objective bounds [%s, %s]; evaluating outside the defined domain.",
+            format(x1_limits[1]), format(x1_limits[2]), format(eval_lower), format(eval_upper)
+          ))
+        }
       }
 
       # Generate evaluation grid
       x_vals = seq(x1_limits[1], x1_limits[2], length.out = n_points)
-      eval_lower = self$objective$lower
-      eval_upper = self$objective$upper
-      if (!any(is.na(c(eval_lower, eval_upper)))) {
-        inside = x_vals >= eval_lower & x_vals <= eval_upper
-        if (private$.allow_extrapolation) {
-          y_vals = sapply(x_vals, function(x) self$objective$eval(x))
-        } else {
-          y_vals = rep(NA_real_, length(x_vals))
-          if (any(inside)) {
-            y_vals[inside] = sapply(x_vals[inside], function(x) self$objective$eval(x))
-          }
-        }
-      } else {
-        y_vals = sapply(x_vals, function(x) self$objective$eval(x))
-      }
+      y_vals = sapply(x_vals, function(x) self$objective$eval(x))
 
       # Store in unified data structure
       private$.data_structure = list(
@@ -264,7 +261,7 @@ VisualizerObj = R6::R6Class("VisualizerObj",
       x2_limits = if (is.null(x2_limits)) c(self$objective$lower[2], self$objective$upper[2]) else x2_limits
 
       if (any(is.na(x1_limits)) || any(is.na(x2_limits))) {
-        stop("Limits could not be extracted from the objective. Please use 'x1_limits' and 'x2_limits'.")
+        stop("Objective bounds not available; please specify both 'x1_limits' and 'x2_limits' explicitly.")
       }
 
       # Apply padding
@@ -276,23 +273,23 @@ VisualizerObj = R6::R6Class("VisualizerObj",
       x2 = unique(seq(x2_limits[1] - x2_pad, x2_limits[2] + x2_pad, length.out = n_points))
       grid = CJ(x1, x2)
 
-      # Evaluate objective on grid with masking based on evaluation bounds
+      # Warn if limits exceed objective bounds
       eval_lower = self$objective$lower
       eval_upper = self$objective$upper
       if (!any(is.na(c(eval_lower, eval_upper)))) {
-        inside = (grid$x1 >= eval_lower[1] & grid$x1 <= eval_upper[1]) &
-          (grid$x2 >= eval_lower[2] & grid$x2 <= eval_upper[2])
-        if (private$.allow_extrapolation) {
-          y_vals = apply(grid, 1, function(row) self$objective$eval(c(row[1], row[2])))
-        } else {
-          y_vals = rep(NA_real_, nrow(grid))
-          if (any(inside)) {
-            y_vals[inside] = apply(as.matrix(grid[inside, ]), 1, function(row) self$objective$eval(c(row[1], row[2])))
-          }
+        warn_x1 = (x1_limits[1] < eval_lower[1]) || (x1_limits[2] > eval_upper[1])
+        warn_x2 = (x2_limits[1] < eval_lower[2]) || (x2_limits[2] > eval_upper[2])
+        if (warn_x1 || warn_x2) {
+          warning(sprintf(
+            "Plot limits exceed objective bounds: x1_limits=[%s,%s], x2_limits=[%s,%s]; bounds x1=[%s,%s], x2=[%s,%s]. Evaluating outside the defined domain.",
+            format(x1_limits[1]), format(x1_limits[2]), format(x2_limits[1]), format(x2_limits[2]),
+            format(eval_lower[1]), format(eval_upper[1]), format(eval_lower[2]), format(eval_upper[2])
+          ))
         }
-      } else {
-        y_vals = apply(grid, 1, function(row) self$objective$eval(c(row[1], row[2])))
       }
+
+      # Evaluate objective on the full grid
+      y_vals = apply(grid, 1, function(row) self$objective$eval(c(row[1], row[2])))
 
       # Store in unified data structure
       private$.data_structure = list(

@@ -1,10 +1,20 @@
-# FIXME: doc API of funs better
-
-
-#' @title Loss Function
+#' @title Loss function
 #'
 #' @description
 #' Represents a loss function for regression or classification tasks.
+#'
+#' @details
+#' Loss functions are expected to be vectorized and to accept a single numeric
+#' argument representing the input on the chosen scale:
+#' * `"score"`: residuals `y_true - y_pred` for regression, or signed margins
+#'   `y_true * f(x)` for binary classification.
+#' * `"probability"`: predicted probabilities for the positive class. Visualizers
+#'   obtain the loss for `y = 0` by evaluating the function at `1 - p`.
+#'
+#' The returned value must be a numeric vector of losses with the same length as
+#' the input. Additional optional parameters can be encoded via closures and are
+#' configurable through [lss()], which wraps the stored functions with the
+#' supplied arguments.
 #'
 #' @export
 LossFunction = R6::R6Class("LossFunction",
@@ -32,8 +42,9 @@ LossFunction = R6::R6Class("LossFunction",
     input_supported = NULL,
 
     #' @field fun (`function` or `list`)\cr
-    #' The loss function itself. Can be a single function (for single input type)
-    #' or a named list of functions for different input types.
+    #' The loss function itself. Provide either a vectorized closure matching the
+    #' active input scale or a named list of such closures keyed by `"score"` and
+    #' / or `"probability"`.
     fun = NULL,
 
     #' @description
@@ -46,8 +57,8 @@ LossFunction = R6::R6Class("LossFunction",
     #' @param task_type (`character(1)`)\cr
     #'   Task type: `"regr"` or `"classif"`.
     #' @param fun (`function` or `list`)\cr
-    #'   The loss function. Can be a single function or a named list of functions
-    #'   for different input types (e.g., list(score = function(r) ..., probability = function(pi) ...)).
+    #'   The loss function. Supply a vectorized closure matching the active
+    #'   input scale or a named list of closures keyed by `"score"` / `"probability"`.
     #' @param input_default (`character(1)`)\cr
     #'   Default input scale (`"score"` or `"probability"`).
     #' @param input_supported (`character()`)\cr
@@ -108,7 +119,7 @@ LossFunction = R6::R6Class("LossFunction",
   )
 )
 
-#' @title Dictionary of Loss Functions
+#' @title Dictionary of loss functions
 #'
 #' @description
 #' Dictionary of loss functions.
@@ -116,7 +127,7 @@ LossFunction = R6::R6Class("LossFunction",
 #' @export
 dict_loss = R6::R6Class("DictionaryLoss", inherit = Dictionary, cloneable = FALSE)$new()
 
-#' @title Retrieve Loss Function
+#' @title Retrieve loss function
 #'
 #' @description
 #' Retrieve a loss function from the dictionary. If additional parameters are provided,
@@ -300,7 +311,7 @@ dict_loss$add(
 )
 
 
-#' @title Convert Dictionary to Data Table
+#' @title Convert dictionary to data table
 #'
 #' @description
 #' Converts a loss function dictionary to a data table.

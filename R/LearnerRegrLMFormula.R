@@ -1,4 +1,4 @@
-#' @title Linear Model Regression Learner with Formula
+#' @title Linear model regression learner with formula
 #'
 #' @name mlr_learners_regr.lm_formula
 #'

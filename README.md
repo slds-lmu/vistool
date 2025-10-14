@@ -8,107 +8,103 @@
 [![r-cmd-check](https://github.com/slds-lmu/vistool/actions/workflows/r-cmd-check.yaml/badge.svg)](https://github.com/slds-lmu/vistool/actions/workflows/r-cmd-check.yaml)
 <!-- badges: end -->
 
-The goal of `vistool` is to visualize optimization traces and aid in
-teaching optimization-related concepts.
+`vistool` helps you explore optimization concepts and model behavior
+with a consistent R6 API. Use it to:
+
+- visualize regression and classification loss functions;
+- inspect one- and two-dimensional objectives, including custom
+  definitions;
+- follow optimization traces for gradient descent, momentum, and
+  Nesterov variants;
+- compare model prediction surfaces and decision boundaries.
+
+Every visualizer follows a three-step workflow: initialize with
+`as_visualizer()`, add optional layers, then render via `plot()` (and
+optionally `save()`).
+
+## Example
+
+``` r
+library(vistool)
+
+objective = obj("TF_GoldsteinPriceLog")
+vis = as_visualizer(objective)
+opt = OptimizerGD$new(objective, x_start = c(0.22, 0.77), lr = 0.01)
+opt$optimize(10L)
+#> TF_GoldsteinPriceLog: Batch 1 step 1: f(x) = 0.9158, x = c(0.219, 0.7186)
+#> TF_GoldsteinPriceLog: Batch 1 step 2: f(x) = 0.4217, x = c(0.211, 0.6549)
+#> TF_GoldsteinPriceLog: Batch 1 step 3: f(x) = -0.6741, x = c(0.1844, 0.5649)
+#> TF_GoldsteinPriceLog: Batch 1 step 4: f(x) = -0.9819, x = c(0.2182, 0.5224)
+#> TF_GoldsteinPriceLog: Batch 1 step 5: f(x) = -0.9876, x = c(0.2992, 0.5105)
+#> TF_GoldsteinPriceLog: Batch 1 step 6: f(x) = -1.1018, x = c(0.2625, 0.3598)
+#> TF_GoldsteinPriceLog: Batch 1 step 7: f(x) = -2.168, x = c(0.3405, 0.4107)
+#> TF_GoldsteinPriceLog: Batch 1 step 8: f(x) = -2.1246, x = c(0.3448, 0.3898)
+#> TF_GoldsteinPriceLog: Batch 1 step 9: f(x) = -1.3408, x = c(0.4093, 0.4614)
+#> TF_GoldsteinPriceLog: Batch 1 step 10: f(x) = -2.1225, x = c(0.3729, 0.3911)
+vis$add_optimization_trace(opt, name = "GD")
+vis$plot()
+```
+
+<img src="man/figures/README-quick-start-1.png" width="100%" height="700px" />
 
 ## Installation
 
-You can install the development version of vistool from
-[GitHub](https://github.com/) with:
+You can install the development version from GitHub with
+[`pak`](https://pak.r-lib.org/):
 
 ``` r
 # install.packages("pak")
 pak::pak("slds-lmu/vistool")
 ```
 
-Please note that surface visualization features (`plotly` backend) rely
-on [`plotly`](https://plotly.com/r/) which in turn relies on certain
-functionality provided by Python packages, accessed via
-[`reticulate`](https://rstudio.github.io/reticulate/).
+Prefer base R tooling? `remotes::install_github("slds-lmu/vistool")`
+works as well.
 
-### Optional: Setup for Saving Plotly Plots
+### Plotly backend and static export
 
-The `$save()` functionality for surface plots uses `plotly::save_image()`
-internally, which in turn relies on the Python package `kaleido`.
+Interactive surfaces rely on `plotly`, which accesses Python
+functionality through `reticulate`. `vistool` (via `reticulate >= 1.41`)
+calls `reticulate::py_require("kaleido")` on demand, provisioning a
+cached Python environment automatically when you first save a surface
+plot.
 
-`vistool` (via `reticulate >= 1.41`) declares this requirement on load
-using `py_require("kaleido")`. The first time Python is needed, an
-ephemeral, cached Python environment is provisioned automatically with
-`kaleido`—no manual Miniconda setup required for typical users.
-
-If you prefer to manage Python yourself, ensure `kaleido` is installed
-in the Python environment that `reticulate` uses. Example:
+If you manage Python yourself, point `reticulate` to your interpreter
+and ensure `kaleido` is installed:
 
 ``` r
 install.packages("reticulate")
-# OPTIONAL: point reticulate to a specific python before loading vistool
 # Sys.setenv(RETICULATE_PYTHON = "/path/to/python")
 reticulate::py_install("kaleido")
 ```
 
-## Example
+## Documentation roadmap
 
-``` r
-library(vistool)
-library(mlr3verse)
-#> Loading required package: mlr3
-```
-
-This example shows how to visualize the prediction surface of an SVM on
-the `pima` task included in `mlr3`:
-
-``` r
-# Create an example task, add missing data imputation and select 2 features
-task = tsk("pima")
-task = po("imputemean")$train(list(task))[[1]]
-task$select(c("insulin", "mass"))
-
-# Select example learner
-learner = lrn("classif.svm", predict_type = "prob")
-
-# Create 2D ggplot2 visualization
-vis_2d = as_visualizer(task, learner = learner)
-vis_2d$plot()
-```
-
-<img src="man/figures/README-example-1.png" width="100%" />
-
-For interactive exploration, you can create surface visualizations with
-`plotly`:
-
-``` r
-# Create surface visualization for interactive plotly surface plot
-vis_surface = as_visualizer(task, learner = learner, type = "surface")
-
-# Define a 3D scene
-vis_surface$set_scene(x = 1.4, y = 1.4, z = 1.4)
-
-# View interactively
-vis_surface$plot()
-```
-
-![](man/figures/demo_1.png)
-
-Save static version as png:
-
-``` r
-# only works if Python kaleido package is installed
-# see installation instructions above for setting up plotly save functionality
-vis_surface$save("man/figures/demo_1.png", width = 500, height = 500)
-```
+- [Loss
+  functions](https://slds-lmu.github.io/vistool/articles/loss_functions.html)
+  – Open when you need to compare predefined and custom regression or
+  classification losses side by side.
+- [Model
+  predictions](https://slds-lmu.github.io/vistool/articles/model.html) –
+  Visit to inspect 1D/2D mlr3 learners, add boundaries, and overlay
+  training data.
+- [Objective
+  functions](https://slds-lmu.github.io/vistool/articles/objective.html)
+  – Read when you explore built-in objectives, define custom ones, or
+  visualize evaluation archives.
+- [Optimization &
+  traces](https://slds-lmu.github.io/vistool/articles/optimization_traces.html)
+  – Use to understand optimizers, step size control, and how to display
+  optimization progress.
+- [Customization
+  guide](https://slds-lmu.github.io/vistool/articles/customization_guide.html)
+  – Start here when you want to tweak themes, colors, and styling
+  precedence.
+- [Advanced
+  visualization](https://slds-lmu.github.io/vistool/articles/advanced_visualization.html)
+  – Open for surface overlays, manual plot augmentations, and animation
+  workflows.
 
 ## Contributing
 
 For anyone interested in contributing to `vistool`, please see the
-[Developer Reference](DEVELOPMENT.md).
-
-## Resources
-
-For visualization of…
-
-- [Loss
-  Functions](https://slds-lmu.github.io/vistool/articles/loss_functions.html)
-- [Model
-  Predictions](https://slds-lmu.github.io/vistool/articles/model.html)
-- [Objective
-  Functions](https://slds-lmu.github.io/vistool/articles/objective.html)
+[Developer reference](DEVELOPMENT.md).

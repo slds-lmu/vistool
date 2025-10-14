@@ -3,7 +3,7 @@
 \docType{data}
 \name{dict_loss}
 \alias{dict_loss}
-\title{Dictionary of Loss Functions}
+\title{Dictionary of loss functions}
 \format{
 An object of class \code{DictionaryLoss} (inherits from \code{Dictionary}, \code{R6}) of length 12.
 }

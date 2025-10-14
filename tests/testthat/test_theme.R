@@ -18,7 +18,7 @@ test_that("vistool_theme creates valid theme objects", {
 
 test_that("Theme precedence works correctly", {
   obj_1d = obj("TF_gaussian1", xdim = 1)
-  vis = as_visualizer(obj_1d, type = "1d")
+  vis = as_visualizer(obj_1d, type = "1d", x1_limits = c(-3, 3))
 
   # Test instance theme override
   vis$set_theme(vistool_theme(palette = "plasma", text_size = 14))
@@ -37,7 +37,7 @@ test_that("Theme precedence works correctly", {
 
 test_that("set_theme and theme methods work", {
   obj_1d = obj("TF_gaussian1", xdim = 1)
-  vis = as_visualizer(obj_1d, type = "1d")
+  vis = as_visualizer(obj_1d, type = "1d", x1_limits = c(-3, 3))
 
   # Test setting theme
   custom_theme = vistool_theme(palette = "plasma", alpha = 0.5)
@@ -60,7 +60,7 @@ test_that("set_theme and theme methods work", {
 
 test_that("Auto color resolution respects theme changes", {
   obj_1d = obj("TF_gaussian1", xdim = 1)
-  vis = as_visualizer(obj_1d, type = "1d")
+  vis = as_visualizer(obj_1d, type = "1d", x1_limits = c(-3, 3))
 
   # Change theme and plot without adding points first
   vis$set_theme(vistool_theme(palette = "plasma"))
@@ -76,7 +76,7 @@ test_that("Auto color resolution respects theme changes", {
 
 test_that("save() uses last rendered plot", {
   obj_1d = obj("TF_gaussian1", xdim = 1)
-  vis = as_visualizer(obj_1d, type = "1d")
+  vis = as_visualizer(obj_1d, type = "1d", x1_limits = c(-3, 3))
 
   # Plot once
   p1 = vis$plot()
@@ -88,7 +88,7 @@ test_that("save() uses last rendered plot", {
   unlink(temp_file)
 
   # Test save when no plot cached yet
-  vis2 = as_visualizer(obj_1d, type = "1d")
+  vis2 = as_visualizer(obj_1d, type = "1d", x1_limits = c(-3, 3))
   temp_file2 = tempfile(fileext = ".png")
   expect_no_error(vis2$save(temp_file2)) # Should render and save
   expect_true(file.exists(temp_file2))

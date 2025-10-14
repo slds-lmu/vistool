@@ -2,7 +2,13 @@ linters: linters_with_defaults(
     # lintr defaults: https://lintr.r-lib.org/reference/default_linters.html
     # the following setup changes/removes certain linters
     assignment_linter = NULL, # do not force using <- for assignments
-    object_name_linter = object_name_linter(c("snake_case", "CamelCase")), # only allow snake case and camel case object names
+    # Naming convention policy for this repo:
+    # - R6 class generators (e.g., Visualizer, VisualizerModel, Objective, Optimizer*) MUST be CamelCase.
+    # - Everything else (functions, variables, arguments, files) MUST be snake_case.
+    # Limitation: lintr's object_name_linter cannot distinguish "class objects" from other objects,
+    # so we allow both styles globally and rely on code review for enforcement where needed.
+    # If you see a non-class object named in CamelCase, please rename it to snake_case.
+    object_name_linter = object_name_linter(c("snake_case", "CamelCase")), # allow CamelCase for classes, snake_case for everything else (policy), though not strictly enforceable here
     cyclocomp_linter = NULL, # do not check function complexity
     commented_code_linter = NULL, # allow code in comments
     line_length_linter = line_length_linter(180L),

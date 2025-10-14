@@ -2,15 +2,15 @@
 % Please edit documentation in R/LossFunction.R
 \name{lss}
 \alias{lss}
-\title{Retrieve Loss Function}
+\title{Retrieve loss function}
 \usage{
 lss(.key, ...)
 }
 \arguments{
-\item{.key}{(`character(1)`)\cr
-Key passed to the respective [dictionary][mlr3misc::Dictionary] to retrieve the object.}
+\item{.key}{(\code{character(1)})\cr
+Key passed to the respective \link[mlr3misc:Dictionary]{dictionary} to retrieve the object.}
 
-\item{...}{(`any`)\cr
+\item{...}{(\code{any})\cr
 Additional arguments.}
 }
 \description{

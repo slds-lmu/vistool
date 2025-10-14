@@ -2,7 +2,7 @@
 % Please edit documentation in R/VisualizerModel.R
 \name{VisualizerModel}
 \alias{VisualizerModel}
-\title{Visualize Model (Unified 1D/2D)}
+\title{Visualize model (unified 1D/2D)}
 \value{
 Returns self invisibly.
 
@@ -19,10 +19,10 @@ creates appropriate visualizations using ggplot2.
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{task}}{(`mlr3::Task`)\cr
+\item{\code{task}}{(\code{mlr3::Task})\cr
 Task used to train the model.}
 
-\item{\code{learner}}{(`mlr3::Learner`)\cr
+\item{\code{learner}}{(\code{mlr3::Learner})\cr
 Learner used to train the model.}
 }
 \if{html}{\out{</div>}}
@@ -41,6 +41,7 @@ Learner used to train the model.}
 \if{html}{\out{
 <details open><summary>Inherited methods</summary>
 <ul>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="add_annotation"><a href='../../vistool/html/Visualizer.html#method-Visualizer-add_annotation'><code>vistool::Visualizer$add_annotation()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="resolve_layer_colors"><a href='../../vistool/html/Visualizer.html#method-Visualizer-resolve_layer_colors'><code>vistool::Visualizer$resolve_layer_colors()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="save"><a href='../../vistool/html/Visualizer.html#method-Visualizer-save'><code>vistool::Visualizer$save()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="vistool" data-topic="Visualizer" data-id="set_theme"><a href='../../vistool/html/Visualizer.html#method-Visualizer-set_theme'><code>vistool::Visualizer$set_theme()</code></a></span></li>
@@ -52,7 +53,7 @@ Learner used to train the model.}
 \if{html}{\out{<a id="method-VisualizerModel-new"></a>}}
 \if{latex}{\out{\hypertarget{method-VisualizerModel-new}{}}}
 \subsection{Method \code{new()}}{
-Creates a new instance of this [R6][R6::R6Class] class.
+Creates a new instance of this \link[R6:R6Class]{R6} class.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{VisualizerModel$new(
   task,
@@ -70,48 +71,48 @@ Creates a new instance of this [R6][R6::R6Class] class.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{task}}{([mlr3::Task])\cr
+\item{\code{task}}{(\link[mlr3:Task]{mlr3::Task})\cr
 The task to train the model on.}
 
-\item{\code{learner}}{(`mlr3::Learner`)\cr
+\item{\code{learner}}{(\code{mlr3::Learner})\cr
 The learner to train the model with.}
 
-\item{\code{x1_limits}}{(`numeric(2)`)\cr
+\item{\code{x1_limits}}{(\code{numeric(2)})\cr
 Limits for the first feature axis. For 1D tasks, this controls the x-axis range.
 If NULL, will be determined from task data.}
 
-\item{\code{x2_limits}}{(`numeric(2)`)\cr
+\item{\code{x2_limits}}{(\code{numeric(2)})\cr
 Limits for the second feature axis (2D tasks only). Ignored for 1D tasks.
 If NULL, will be determined from task data.}
 
-\item{\code{padding}}{(`numeric(1)`)\cr
+\item{\code{padding}}{(\code{numeric(1)})\cr
 A margin that is added to x1limits and x2limits.
-The x1 margin is calculated by `max(x1lmits) - min(x1limits) * padding`.}
+The x1 margin is calculated by \code{max(x1lmits) - min(x1limits) * padding}.}
 
-\item{\code{padding}}{(`numeric(1)`)\cr
+\item{\code{padding}}{(\code{numeric(1)})\cr
 A margin that is added to x1limits and x2limits.
-The x1 margin is calculated by `max(x1lmits) - min(x1limits) * padding`.}
+The x1 margin is calculated by \code{max(x1lmits) - min(x1limits) * padding}.}
 
-\item{\code{n_points}}{(`integer(1)`)\cr
+\item{\code{n_points}}{(\code{integer(1)})\cr
 The number of generated point per dimension.
-Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
+Note that a grid of \code{npoints^2} values is generated and evaluated by \code{objective$eval(x)} to plot the surface.}
 
-\item{\code{n_points}}{(`integer(1)`)\cr
+\item{\code{n_points}}{(\code{integer(1)})\cr
 The number of generated point per dimension.
-Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
+Note that a grid of \code{npoints^2} values is generated and evaluated by \code{objective$eval(x)} to plot the surface.}
 
-\item{\code{hypothesis}}{(`Hypothesis`|`NULL`)
+\item{\code{hypothesis}}{(\code{Hypothesis}|\code{NULL})
 Optional hypothesis object that provides predictions instead of a learner.
-Supply either `learner` or `hypothesis`, but not both.}
+Supply either \code{learner} or \code{hypothesis}, but not both.}
 
-\item{\code{domain}}{(`list`|`NULL`)
+\item{\code{domain}}{(\code{list}|\code{NULL})
 Named list giving axis limits per predictor when no Task data is available,
-e.g., `list(x = c(-1, 1))` for 1D or `list(x = c(-1,1), y = c(-1,1))` for 2D.}
+e.g., \code{list(x = c(-1, 1))} for 1D or \code{list(x = c(-1,1), y = c(-1,1))} for 2D.}
 
-\item{\code{retrain}}{(`logical(1)`)
-Whether to (re)train the supplied learner on the task (default `TRUE`).
-Set to `FALSE` to reuse an already trained learner. If set to `FALSE` but the
-learner has not yet been trained (`learner$model` is `NULL`), a warning is emitted
+\item{\code{retrain}}{(\code{logical(1)})
+Whether to (re)train the supplied learner on the task (default \code{TRUE}).
+Set to \code{FALSE} to reuse an already trained learner. If set to \code{FALSE} but the
+learner has not yet been trained (\code{learner$model} is \code{NULL}), a warning is emitted
 and training is performed to ensure predictions are available.}
 }
 \if{html}{\out{</div>}}
@@ -122,7 +123,7 @@ and training is performed to ensure predictions are available.}
 \if{latex}{\out{\hypertarget{method-VisualizerModel-add_points}{}}}
 \subsection{Method \code{add_points()}}{
 Add points with optional residual loss geometry (1D regression only for now).
-Extends base add_points() with a `loss` argument to visualize residuals.
+Extends base add_points() with a \code{loss} argument to visualize residuals.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{VisualizerModel$add_points(
   points,
@@ -147,37 +148,37 @@ Extends base add_points() with a `loss` argument to visualize residuals.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{points}}{(`data.frame`|`matrix`|`list`) Points to add. For 1D these should contain columns `x` and `y` (observed y required for residuals).}
+\item{\code{points}}{(\code{data.frame}|\code{matrix}|\code{list}) Points to add. For 1D these should contain columns \code{x} and \code{y} (observed y required for residuals).}
 
-\item{\code{color}}{(`character(1)`) Color of the points or "auto". Default "auto".}
+\item{\code{color}}{(\code{character(1)}) Color of the points or "auto". Default "auto".}
 
-\item{\code{size}}{(`numeric(1)`|`NULL`) Point size. If NULL uses theme default.}
+\item{\code{size}}{(\code{numeric(1)}|\code{NULL}) Point size. If NULL uses theme default.}
 
-\item{\code{shape}}{(`integer(1)`|`character(1)`) Point shape. Default 19.}
+\item{\code{shape}}{(\code{integer(1)}|\code{character(1)}) Point shape. Default 19.}
 
-\item{\code{alpha}}{(`numeric(1)`|`NULL`) Alpha transparency for points.}
+\item{\code{alpha}}{(\code{numeric(1)}|\code{NULL}) Alpha transparency for points.}
 
-\item{\code{annotations}}{(`character()`|`NULL`) Optional text annotations for points.}
+\item{\code{annotations}}{(\code{character()}|\code{NULL}) Optional text annotations for points.}
 
-\item{\code{annotation_size}}{(`numeric(1)`|`NULL`) Size of annotation text.}
+\item{\code{annotation_size}}{(\code{numeric(1)}|\code{NULL}) Size of annotation text.}
 
-\item{\code{ordered}}{(`logical(1)`) Whether points should be connected in order (arrows). Default FALSE.}
+\item{\code{ordered}}{(\code{logical(1)}) Whether points should be connected in order (arrows). Default FALSE.}
 
-\item{\code{arrow_color}}{(`character(1)`|`NULL`) Arrow color when ordered = TRUE.}
+\item{\code{arrow_color}}{(\code{character(1)}|\code{NULL}) Arrow color when ordered = TRUE.}
 
-\item{\code{arrow_size}}{(`numeric(1)`) Arrow size when ordered = TRUE. Default 0.3.}
+\item{\code{arrow_size}}{(\code{numeric(1)}) Arrow size when ordered = TRUE. Default 0.3.}
 
-\item{\code{loss}}{(`character(1)`|`NULL`) One of `"l2_se"` (aliases: `"l2"`, `"se"`), `"l1_ae"` (aliases: `"l1"`, `"abs"`, `"mae"`), or `NULL` (no geometry).}
+\item{\code{loss}}{(\code{character(1)}|\code{NULL}) One of \code{"l2_se"} (aliases: \code{"l2"}, \code{"se"}), \code{"l1_ae"} (aliases: \code{"l1"}, \code{"abs"}, \code{"mae"}), or \code{NULL} (no geometry).}
 
-\item{\code{loss_params}}{(`list()`) Reserved for future loss-specific parameters (e.g. Huber delta).}
+\item{\code{loss_params}}{(\code{list()}) Reserved for future loss-specific parameters (e.g. Huber delta).}
 
-\item{\code{loss_fill}}{(`character(1)`) Fill color for L2 squares. "auto" draws from palette.}
+\item{\code{loss_fill}}{(\code{character(1)}) Fill color for L2 squares. "auto" draws from palette.}
 
-\item{\code{loss_alpha}}{(`numeric(1)`|`NULL`) Fill alpha for L2 squares (defaults to theme$alpha * 0.4).}
+\item{\code{loss_alpha}}{(\code{numeric(1)}|\code{NULL}) Fill alpha for L2 squares (defaults to theme$alpha * 0.4).}
 
-\item{\code{loss_color}}{(`character(1)`|`NA`) Color for residual segment / square border. If `NA`, derived from fill.}
+\item{\code{loss_color}}{(\code{character(1)}|\code{NA}) Color for residual segment / square border. If \code{NA}, derived from fill.}
 
-\item{\code{loss_linetype}}{(`character(1)`) Line type for residual segment. Default "solid".}
+\item{\code{loss_linetype}}{(\code{character(1)}) Line type for residual segment. Default "solid".}
 }
 \if{html}{\out{</div>}}
 }
@@ -204,26 +205,28 @@ Adds the training data to the plot.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{color}}{(`character(1)` or named `character`)\cr
+\item{\code{color}}{(\code{character(1)} or named \code{character})\cr
 Color of the points. For classification tasks:
-- `character(1)`: A single color for all points (e.g., `"blue"`) or `"auto"` for automatic color assignment.
-- `named character`: A vector mapping class labels to colors (e.g., `c(pos = "red", neg = "blue")`).
-For regression tasks, only single colors are supported. Default is `"auto"`.}
+\itemize{
+\item \code{character(1)}: A single color for all points (e.g., \code{"blue"}) or \code{"auto"} for automatic color assignment.
+\item \verb{named character}: A vector mapping class labels to colors (e.g., \code{c(pos = "red", neg = "blue")}).
+For regression tasks, only single colors are supported. Default is \code{"auto"}.
+}}
 
-\item{\code{size}}{(`numeric(1)`)\cr
+\item{\code{size}}{(\code{numeric(1)})\cr
 Size of the points. If NULL, uses theme$point_size. Default is NULL.}
 
-\item{\code{shape}}{(`numeric(1)` or named `numeric`)\cr
+\item{\code{shape}}{(\code{numeric(1)} or named \code{numeric})\cr
 Shape of the points. For classification tasks, can be a named vector mapping class labels to shapes.
 Default is 19 (filled circle).}
 
-\item{\code{alpha}}{(`numeric(1)`)\cr
+\item{\code{alpha}}{(\code{numeric(1)})\cr
 Alpha transparency of the points. If NULL, uses theme$alpha. Default is NULL.}
 
-\item{\code{show_labels}}{(`logical(1)`)\cr
+\item{\code{show_labels}}{(\code{logical(1)})\cr
 Whether to show data point labels. Default is FALSE.}
 
-\item{\code{label_size}}{(`numeric(1)`)\cr
+\item{\code{label_size}}{(\code{numeric(1)})\cr
 Size of data point labels. If NULL, defaults to smaller text.}
 }
 \if{html}{\out{</div>}}
@@ -247,21 +250,21 @@ Adds boundary lines/contours to the plot.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{values}}{(`numeric()`)\cr
+\item{\code{values}}{(\code{numeric()})\cr
 Values at which to draw boundaries. For 1D: horizontal lines (y-values).
 For 2D: contour lines (z-values). If NULL, uses sensible defaults based on prediction type.}
 
-\item{\code{color}}{(`character(1)`)\cr
+\item{\code{color}}{(\code{character(1)})\cr
 Color of the boundary lines. Default is "black".}
 
-\item{\code{linetype}}{(`character(1)`)\cr
+\item{\code{linetype}}{(\code{character(1)})\cr
 Line type for boundaries. For 1D: ggplot2 linetypes. For 2D: contour line types.
 Default is "dashed".}
 
-\item{\code{linewidth}}{(`numeric(1)`)\cr
+\item{\code{linewidth}}{(\code{numeric(1)})\cr
 Width of boundary lines. If NULL, uses theme$line_width.}
 
-\item{\code{alpha}}{(`numeric(1)`)\cr
+\item{\code{alpha}}{(\code{numeric(1)})\cr
 Alpha transparency of boundary lines. If NULL, uses theme$alpha.}
 }
 \if{html}{\out{</div>}}

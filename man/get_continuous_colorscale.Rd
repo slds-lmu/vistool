@@ -7,7 +7,7 @@
 get_continuous_colorscale(palette = "viridis")
 }
 \arguments{
-\item{palette}{(`character(1)`)\cr
+\item{palette}{(\code{character(1)})\cr
 Name of the color palette. One of "viridis", "plasma", "grayscale".}
 }
 \value{

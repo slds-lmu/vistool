@@ -45,8 +45,8 @@ test_that("Objective evaluation works", {
   result = obj$eval(c(1, 1))
   expect_equal(result, 2)
 
-  # Test evalStore
-  stored = obj$evalStore(c(0.5, 0.5))
+  # Test eval_store
+  stored = obj$eval_store(c(0.5, 0.5))
   expect_equal(stored$fval, 0.5)
   expect_length(stored$x[[1]], 2)
 
@@ -88,8 +88,8 @@ test_that("Objective input validation works", {
   expect_error(obj$eval(c(1)), "Assertion on 'x' failed")
   expect_error(obj$eval(c(1, 2, 3)), "Assertion on 'x' failed")
 
-  # Test boundary checking with assertX
-  valid_x = obj$assertX(c(0.5, 0.5))
+  # Test boundary checking with assert_x
+  valid_x = obj$assert_x(c(0.5, 0.5))
   expect_equal(valid_x, c(0.5, 0.5))
 })
 
@@ -106,15 +106,15 @@ test_that("Objective archive works", {
   expect_equal(nrow(obj$archive), 0)
 
   # Add some evaluations
-  obj$evalStore(c(0, 0))
-  obj$evalStore(c(1, 1))
+  obj$eval_store(c(0, 0))
+  obj$eval_store(c(1, 1))
 
   expect_equal(nrow(obj$archive), 2)
   expect_true("fval" %in% colnames(obj$archive))
   expect_true("x" %in% colnames(obj$archive))
 
   # Clear archive
-  obj$clearArchive()
+  obj$clear_archive()
   expect_equal(nrow(obj$archive), 0)
 })
 

@@ -167,7 +167,8 @@ test_that("VisualizerLossFuns as_visualizer integration works", {
   loss = lss("l2_se")
 
   # Test through as_visualizer
-  vis = as_visualizer(loss, y_pred = seq(-2, 2), y_true = 0)
+  preds = seq(-2, 2)
+  vis = as_visualizer(loss, y_pred = preds, y_true = rep(0, length(preds)))
 
   expect_s3_class(vis, "VisualizerLossFuns")
 

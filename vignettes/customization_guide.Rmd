@@ -1,8 +1,8 @@
 ---
-title: "Customization Guide"
+title: "Customization guide"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Customization Guide}
+  %\VignetteIndexEntry{Customization guide}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -25,25 +25,26 @@ library(mlr3learners)
 set.seed(1)
 ```
 
-The vistool package provides a flexible theme system that separates **what to plot** from **how to plot**.
-The three-step workflow:
+`vistool` cleanly separates **what to plot** from **how it should look**. Work through it in three quick moves:
 
-1. **Initialize** the Visualizer using `as_visualizer()` (computational setup only - the **what**) and set the theme,
-2. **Add** visualization layers with automatic color management,
-3. **Plot** using `plot()` with optional customization, and optionally `save()`,
+1. **Initialize** a visualizer with `as_visualizer()` to handle the computation and choose a theme,
+2. **add** layers that pick up colors automatically,
+3. **plot** with `plot()`, tweaking options as needed, and optionally call `save()`.
 
-supports consistent customization across all visualization types with a clear precedence hierarchy.
+> NOTE: The built-in themes (`viridis`, `plasma`, `grayscale`) are tuned to look great out of the box, so you can skip extra styling and still land on a polished plot.
 
-## Theme System Overview
+This keeps customization consistent across every visualization while respecting the theme precedence.
 
-### Theme Precedence (Highest to Lowest)
+## Theme system overview
+
+### Theme precedence (highest to lowest)
 
 1. **Layer-specific style**: `add_points(color = "red", size = 3)`
 2. **Plot theme override**: `plot(theme = list(palette = "plasma"))`
 3. **Instance theme**: `vis$set_theme(vistool_theme(...))`
 4. **Package default**: `options(vistool.theme = vistool_theme(...))`
 
-### Creating and Using Themes
+### Creating and using themes
 
 ```{r, eval=FALSE}
 my_theme = vistool_theme(
@@ -72,7 +73,7 @@ vis$add_contours(color = "auto")
 vis$plot(theme = list(text_size = 12, alpha = 0.9))
 ```
 
-## Layer-Specific Customization
+## Layer-specific customization
 
 All `add_*()` methods support style parameters that override theme defaults (see the reference!).
 Below are common examples:
@@ -112,7 +113,28 @@ vis$add_optimization_trace(
 )
 ```
 
-## Plot-Level Customization
+### `add_annotation()`
+`add_annotation()` attaches text callouts to any visualizer. Supply absolute coordinates via `x`, `y`, and `z` (surface plots), or pass `position = list(...)` with values in `[0, 1]` for relative placement. The method honors the current theme, resolving `color = "auto"`, default text size, and opacity automatically; you can still override them per annotation. Set `latex = TRUE` to typeset the label (requires `latex2exp` for ggplot2).
+
+```{r, eval=FALSE}
+# Absolute placement in data space
+vis$add_annotation(
+  text = "Optimum",
+  x = 0, y = 0,
+  color = "auto",
+  opacity = 0.8
+)
+
+# Relative placement in the plot window
+vis$add_annotation(
+  text = "${}\\nabla f = 0$",
+  latex = TRUE,
+  position = list(x = 0.85, y = 0.2, reference = "figure"),
+  color = "auto"
+)
+```
+
+## Plot-level customization
 
 The `plot()` method accepts theme overrides and functional parameters:
 
@@ -141,9 +163,9 @@ vis$plot(
 ```
 
 Note that you can further customize the returned plot objects directly by adding *manual layers*.
-For some examples, see the [Advanced Visualization](advanced_visualization.html) vignette.
+For some examples, see the [Advanced visualization](advanced_visualization.html) vignette.
 
-## Automatic Color Management
+## Automatic color management
 
 All visual elements support automatic color assignment using `color = "auto"`:
 
@@ -165,7 +187,7 @@ vis$add_points(custom_points, color = "auto")                # Gets third color
 p = vis$plot()
 ```
 
-## Example: Complete Workflow
+## Example: complete workflow
 
 ```{r, out.width='100%', out.height='700px'}
 # 1. Create visualizer (computational setup only)
@@ -194,7 +216,7 @@ vis$plot(theme = list(text_size = 14, legend_position = "top"), show_title = FAL
 vis$save("my_plot.png", width = 8, height = 6)
 ```
 
-## Package-Level Defaults
+## Package-level defaults
 
 Set global defaults that apply to all new visualizers:
 
@@ -216,8 +238,8 @@ vis1$set_theme(vistool_theme(palette = "grayscale"))  # Now uses grayscale
 
 ## See also
 
-- [Loss Functions](loss_functions.html)
-- [Model Predictions](model.html)
-- [Objective Functions](objective.html)
-- [Optimization & Traces](optimization_traces.html)
-- [Advanced Visualization](advanced_visualization.html)
+- [Loss functions](loss_functions.html)
+- [Model predictions](model.html)
+- [Objective functions](objective.html)
+- [Optimization & traces](optimization_traces.html)
+- [Advanced visualization](advanced_visualization.html)

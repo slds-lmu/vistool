@@ -12,27 +12,27 @@ This class defines the objective that is used for optimization.
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{id}}{(`character(1)`)\cr
+\item{\code{id}}{(\code{character(1)})\cr
 The id of the object.}
 
-\item{\code{label}}{(`character(1)` The label of the objective, i.e. a.}
+\item{\code{label}}{(\code{character(1)} The label of the objective, i.e. a.}
 
-\item{\code{lower}}{(`numeric()`) The lower limits for each dimension.}
+\item{\code{lower}}{(\code{numeric()}) The lower limits for each dimension.}
 
-\item{\code{upper}}{(`numeric()`) The upper limits for each dimension.}
+\item{\code{upper}}{(\code{numeric()}) The upper limits for each dimension.}
 
-\item{\code{minimize}}{(`logical(1)`) Is the problem a minimization problem?}
+\item{\code{minimize}}{(\code{logical(1)}) Is the problem a minimization problem?}
 }
 \if{html}{\out{</div>}}
 }
 \section{Active bindings}{
 \if{html}{\out{<div class="r6-active-bindings">}}
 \describe{
-\item{\code{archive}}{(`data.table()`) Archive of all calls to `$evalStore`.}
+\item{\code{archive}}{(\code{data.table()}) Archive of all calls to \verb{$eval_store}.}
 
-\item{\code{log_funs}}{(`list()`) A list containing logging functions. Each function must have argument.}
+\item{\code{log_funs}}{(\code{list()}) A list containing logging functions. Each function must have argument.}
 
-\item{\code{xdim}}{(`integer(1)`) Input dimension of `f`.}
+\item{\code{xdim}}{(\code{integer(1)}) Input dimension of \code{f}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -41,12 +41,12 @@ The id of the object.}
 \itemize{
 \item \href{#method-Objective-new}{\code{Objective$new()}}
 \item \href{#method-Objective-eval}{\code{Objective$eval()}}
-\item \href{#method-Objective-evalStore}{\code{Objective$evalStore()}}
-\item \href{#method-Objective-assertX}{\code{Objective$assertX()}}
+\item \href{#method-Objective-eval_store}{\code{Objective$eval_store()}}
+\item \href{#method-Objective-assert_x}{\code{Objective$assert_x()}}
 \item \href{#method-Objective-grad}{\code{Objective$grad()}}
 \item \href{#method-Objective-hess}{\code{Objective$hess()}}
-\item \href{#method-Objective-addLogFun}{\code{Objective$addLogFun()}}
-\item \href{#method-Objective-clearArchive}{\code{Objective$clearArchive()}}
+\item \href{#method-Objective-add_log_fun}{\code{Objective$add_log_fun()}}
+\item \href{#method-Objective-clear_archive}{\code{Objective$clear_archive()}}
 \item \href{#method-Objective-clone}{\code{Objective$clone()}}
 }
 }
@@ -54,7 +54,7 @@ The id of the object.}
 \if{html}{\out{<a id="method-Objective-new"></a>}}
 \if{latex}{\out{\hypertarget{method-Objective-new}{}}}
 \subsection{Method \code{new()}}{
-Creates a new instance of this [R6][R6::R6Class] class.
+Creates a new instance of this \link[R6:R6Class]{R6} class.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Objective$new(
   id,
@@ -72,27 +72,27 @@ Creates a new instance of this [R6][R6::R6Class] class.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{id}}{(`character(1)`)\cr
+\item{\code{id}}{(\code{character(1)})\cr
 Id of the object.}
 
-\item{\code{fun}}{(`function` The objective function. The first argument must be a numerical input of length `xdim`.}
+\item{\code{fun}}{(\code{function} The objective function. The first argument must be a numerical input of length \code{xdim}.}
 
-\item{\code{label}}{(`character(1)` The label of the objective, i.e. a.}
+\item{\code{label}}{(\code{character(1)} The label of the objective, i.e. a.}
 
-\item{\code{xdim}}{(`integer(1)`) The input dimension of `fun`. Use `xdim = NA` for an arbitrary input dimension.}
+\item{\code{xdim}}{(\code{integer(1)}) The input dimension of \code{fun}. Use \code{xdim = NA} for an arbitrary input dimension.}
 
-\item{\code{lower}}{(`numeric(xdim)`) The lower boundaries for inputs to `fun`. Must}
+\item{\code{lower}}{(\code{numeric(xdim)}) The lower boundaries for inputs to \code{fun}. Must}
 
-\item{\code{upper}}{(`numeric(xdim)`) The upper boundaries for inputs to `fun`. Must
-be of length `xdim`.}
+\item{\code{upper}}{(\code{numeric(xdim)}) The upper boundaries for inputs to \code{fun}. Must
+be of length \code{xdim}.}
 
-\item{\code{xtest}}{(`numeric()`) Test value for `fun` during initialization. If not defined,
-`xtest = rep(0, ifelse(is.na(xdim), 2, xdim))` is used.}
+\item{\code{xtest}}{(\code{numeric()}) Test value for \code{fun} during initialization. If not defined,
+\code{xtest = rep(0, ifelse(is.na(xdim), 2, xdim))} is used.}
 
-\item{\code{minimize}}{(`logical(1)`) Is the problem a minimization problem? Default is no (`FALSE`).}
+\item{\code{minimize}}{(\code{logical(1)}) Is the problem a minimization problem? Default is no (\code{FALSE}).}
 
 \item{\code{...}}{\cr
-Additional arguments passed to `fun`.}
+Additional arguments passed to \code{fun}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -109,29 +109,29 @@ Evaluate the objective function.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{x}}{(`numeric`) The numerical input of `fun`.}
+\item{\code{x}}{(\code{numeric}) The numerical input of \code{fun}.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-The result of `fun(x)`.
+The result of \code{fun(x)}.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Objective-evalStore"></a>}}
-\if{latex}{\out{\hypertarget{method-Objective-evalStore}{}}}
-\subsection{Method \code{evalStore()}}{
+\if{html}{\out{<a id="method-Objective-eval_store"></a>}}
+\if{latex}{\out{\hypertarget{method-Objective-eval_store}{}}}
+\subsection{Method \code{eval_store()}}{
 Evaluate the objective function and log into the archive. Each call logs
-the input vector `x`, result of fun `fval`, the gradient `grad`, the norm of the gradient
-`gnorm`, and additional logs that were added by `$addLogFun`.
+the input vector \code{x}, result of fun \code{fval}, the gradient \code{grad}, the norm of the gradient
+\code{gnorm}, and additional logs that were added by \verb{$add_log_fun}.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Objective$evalStore(x)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Objective$eval_store(x)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{x}}{(`numeric`) The numerical input of `fun`.}
+\item{\code{x}}{(\code{numeric}) The numerical input of \code{fun}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -140,20 +140,20 @@ Invisible list of logs that are added to the archive.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Objective-assertX"></a>}}
-\if{latex}{\out{\hypertarget{method-Objective-assertX}{}}}
-\subsection{Method \code{assertX()}}{
+\if{html}{\out{<a id="method-Objective-assert_x"></a>}}
+\if{latex}{\out{\hypertarget{method-Objective-assert_x}{}}}
+\subsection{Method \code{assert_x()}}{
 Assert a numeric input if it is suitable or not.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Objective$assertX(x, ...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Objective$assert_x(x, ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{x}}{(`numeric()`) Input value for `fun`.}
+\item{\code{x}}{(\code{numeric()}) Input value for \code{fun}.}
 
-\item{\code{...}}{Additional arguments passed to `assertNumeric(...)`.}
+\item{\code{...}}{Additional arguments passed to \code{assertNumeric(...)}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -170,7 +170,7 @@ Evaluate the gradient of the objective function at x.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{x}}{(`numeric`) The numerical input of `fun`.}
+\item{\code{x}}{(\code{numeric}) The numerical input of \code{fun}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -187,38 +187,38 @@ Evaluate the hessian of the objective function at x.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{x}}{(`numeric`) The numerical input of `fun`.}
+\item{\code{x}}{(\code{numeric}) The numerical input of \code{fun}.}
 }
 \if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Objective-addLogFun"></a>}}
-\if{latex}{\out{\hypertarget{method-Objective-addLogFun}{}}}
-\subsection{Method \code{addLogFun()}}{
+\if{html}{\out{<a id="method-Objective-add_log_fun"></a>}}
+\if{latex}{\out{\hypertarget{method-Objective-add_log_fun}{}}}
+\subsection{Method \code{add_log_fun()}}{
 Method to add custom logger to the objective.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Objective$addLogFun(l, label)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Objective$add_log_fun(l, label)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{l}}{(`function`) Function that returns a single numerical value or a string.
-The arguments of `l` must be `x`, `fval` and `grad`.}
+\item{\code{l}}{(\code{function}) Function that returns a single numerical value or a string.
+The arguments of \code{l} must be \code{x}, \code{fval} and \code{grad}.}
 
-\item{\code{label}}{(`character(1)`) The name of the logger.}
+\item{\code{label}}{(\code{character(1)}) The name of the logger.}
 }
 \if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Objective-clearArchive"></a>}}
-\if{latex}{\out{\hypertarget{method-Objective-clearArchive}{}}}
-\subsection{Method \code{clearArchive()}}{
+\if{html}{\out{<a id="method-Objective-clear_archive"></a>}}
+\if{latex}{\out{\hypertarget{method-Objective-clear_archive}{}}}
+\subsection{Method \code{clear_archive()}}{
 Delete the archive.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Objective$clearArchive()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Objective$clear_archive()}\if{html}{\out{</div>}}
 }
 
 }

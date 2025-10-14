@@ -2,18 +2,18 @@
 % Please edit documentation in R/LossFunction.R
 \name{as.data.table.DictionaryLoss}
 \alias{as.data.table.DictionaryLoss}
-\title{Convert Dictionary to Data Table}
+\title{Convert dictionary to data table}
 \usage{
 \method{as.data.table}{DictionaryLoss}(x, ..., objects = FALSE)
 }
 \arguments{
-\item{x}{(`DictionaryLoss`)\cr
+\item{x}{(\code{DictionaryLoss})\cr
 The dictionary to convert.}
 
-\item{...}{(`any`)\cr
+\item{...}{(\code{any})\cr
 Additional arguments.}
 
-\item{objects}{(`logical(1)`)\cr
+\item{objects}{(\code{logical(1)})\cr
 Whether to include the objects in the result.}
 }
 \description{

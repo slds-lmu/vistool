@@ -94,7 +94,7 @@ Hypothesis = R6::R6Class("Hypothesis",
 
     #' @description Predict on newdata
     #' @param newdata (`data.frame`) with columns matching `predictors` in order
-    #' @return numeric vector of predictions (regression) or probabilities in [0,1] (classification)
+    #' @return numeric vector of predictions (regression) or probabilities in \eqn{[0, 1]} (classification)
     predict = function(newdata) {
       checkmate::assert_data_frame(newdata)
       checkmate::assert_true(all(self$predictors %in% colnames(newdata)))
@@ -149,10 +149,10 @@ Hypothesis = R6::R6Class("Hypothesis",
 #' @param x (`Hypothesis`) The hypothesis object to validate.
 #'
 #' @return Invisibly `TRUE` on success, otherwise the function raises an error.
-#' @rdname assertHypothesis
+#' @rdname assert_hypothesis
 #' @keywords internal
 #' @noRd
-assertHypothesis = function(x) {
+assert_hypothesis = function(x) {
   if (!inherits(x, "Hypothesis")) stop("Object is not a Hypothesis")
   checkmate::assert_choice(x$type, c("regr", "classif"))
   checkmate::assert_character(x$predictors, min.len = 1, max.len = 2, any.missing = FALSE)
@@ -173,11 +173,11 @@ assertHypothesis = function(x) {
 #' @param newdata (`data.frame`) New data to predict on. Must contain the columns named in `h$predictors`.
 #'
 #' @return Invisibly `TRUE` on success, otherwise an error is raised.
-#' @rdname assertHypothesis
+#' @rdname assert_hypothesis
 #' @keywords internal
 #' @noRd
-assertHypothesisPredict = function(h, newdata) {
-  assertHypothesis(h)
+assert_hypothesis_predict = function(h, newdata) {
+  assert_hypothesis(h)
   checkmate::assert_data_frame(newdata)
   checkmate::assert_true(all(h$predictors %in% colnames(newdata)))
   p = h$predict(newdata)

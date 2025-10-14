@@ -21,10 +21,7 @@ test_that("VisualizerObj handles missing bounds with defaults", {
     fun = function(x) x^2,
     xdim = 1
   )
-  vis = VisualizerObj$new(obj)
-  expect_message(
-    VisualizerObj$new(obj),
-    regexp = "Objective bounds not available"
-  )
+  expect_error(VisualizerObj$new(obj), "Objective bounds not available; please specify 'x1_limits' explicitly.")
+  vis = VisualizerObj$new(obj, x1_limits = c(-2, 2))
   expect_s3_class(vis, "VisualizerObj")
 })

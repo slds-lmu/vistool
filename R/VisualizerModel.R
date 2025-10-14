@@ -1,4 +1,4 @@
-#' @title Visualize Model (Unified 1D/2D)
+#' @title Visualize model (unified 1D/2D)
 #'
 #' @description
 #' This class provides a unified interface for visualizing machine learning models
@@ -51,7 +51,7 @@ VisualizerModel = R6::R6Class("VisualizerModel",
       if (!is.null(learner) && !is.null(hypothesis)) stop("Provide only one of learner or hypothesis")
       if (!is.null(task)) self$task = mlr3::assert_task(task)
       if (!is.null(learner)) self$learner = mlr3::assert_learner(learner, task = self$task)
-      if (!is.null(hypothesis)) assertHypothesis(hypothesis)
+      if (!is.null(hypothesis)) assert_hypothesis(hypothesis)
       private$.hypothesis = hypothesis
       private$.domain = domain
       checkmate::assert_numeric(x1_limits, len = 2, null.ok = TRUE)
@@ -342,22 +342,27 @@ VisualizerModel = R6::R6Class("VisualizerModel",
 
     # Render all stored layers in the order they were added
     render_all_layers = function() {
-      if (is.null(private$.layers_to_add)) {
-        return()
-      }
-
-      for (layer in private$.layers_to_add) {
-        if (layer$type == "training_data") {
-          private$render_training_data_layer(layer$spec)
-        } else if (layer$type == "boundary") {
-          private$render_boundary_layer(layer$spec)
-        } else if (layer$type == "points") {
-          # Handle points layer using the base class method
-          private$.plot = private$add_points_to_ggplot(private$.plot, private$.dimensionality)
-        } else if (layer$type == "loss_geom") {
-          private$render_loss_geom_layer(layer$spec)
+      if (!is.null(private$.layers_to_add)) {
+        for (layer in private$.layers_to_add) {
+          if (layer$type == "training_data") {
+            private$render_training_data_layer(layer$spec)
+          } else if (layer$type == "boundary") {
+            private$render_boundary_layer(layer$spec)
+          } else if (layer$type == "points") {
+            # Handle points layer using the base class method
+            private$.plot = private$add_points_to_ggplot(private$.plot, private$.dimensionality)
+          } else if (layer$type == "loss_geom") {
+            private$render_loss_geom_layer(layer$spec)
+          }
         }
       }
+
+      ranges = list(
+        x = private$.data_structure$coordinates$x1,
+        y = if (private$.dimensionality == "1d") private$.data_structure$coordinates$y else private$.data_structure$coordinates$x2,
+        z = if (private$.dimensionality == "2d") private$.data_structure$coordinates$y else NULL
+      )
+      private$.plot = private$add_annotations_to_ggplot(private$.plot, private$.dimensionality, ranges)
     },
 
     # Initialize 1D plot with function line
