@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">vistool</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -31,20 +31,19 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item"><a class="nav-link" href="articles/vistool.html">Get started</a></li>
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><h6 class="dropdown-header" data-toc-skip>Core</h6></li>
-    <li><a class="dropdown-item" href="articles/loss_functions.html">Loss Functions</a></li>
-    <li><a class="dropdown-item" href="articles/model.html">Model Predictions</a></li>
-    <li><a class="dropdown-item" href="articles/objective.html">Objective Functions</a></li>
-    <li><a class="dropdown-item" href="articles/optimization_traces.html">Optimization &amp; Traces</a></li>
+    <li><a class="dropdown-item" href="articles/loss_functions.html">Loss functions</a></li>
+    <li><a class="dropdown-item" href="articles/model.html">Model predictions</a></li>
+    <li><a class="dropdown-item" href="articles/objective.html">Objective functions</a></li>
+    <li><a class="dropdown-item" href="articles/optimization_traces.html">Optimization &amp; traces</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Customization</h6></li>
-    <li><a class="dropdown-item" href="articles/customization_guide.html">Customization Guide</a></li>
-    <li><a class="dropdown-item" href="articles/advanced_visualization.html">Advanced Visualization</a></li>
+    <li><a class="dropdown-item" href="articles/customization_guide.html">Customization guide</a></li>
+    <li><a class="dropdown-item" href="articles/advanced_visualization.html">Advanced visualization</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
@@ -65,80 +64,79 @@
 </h1></div>
 <!-- badges: start -->
 
-<p>The goal of <code>vistool</code> is to visualize optimization traces and aid in teaching optimization-related concepts.</p>
+<p><code>vistool</code> helps you explore optimization concepts and model behavior with a consistent R6 API. Use it to:</p>
+<ul>
+<li>visualize regression and classification loss functions;</li>
+<li>inspect one- and two-dimensional objectives, including custom definitions;</li>
+<li>follow optimization traces for gradient descent, momentum, and Nesterov variants;</li>
+<li>compare model prediction surfaces and decision boundaries.</li>
+</ul>
+<p>Every visualizer follows a three-step workflow: initialize with <code><a href="reference/as_visualizer.html">as_visualizer()</a></code>, add optional layers, then render via <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> (and optionally <code><a href="https://rdrr.io/r/base/save.html" class="external-link">save()</a></code>).</p>
+<div class="section level2">
+<h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
+</h2>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://slds-lmu.github.io/vistool/">vistool</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">objective</span> <span class="op">=</span> <span class="fu"><a href="reference/obj.html">obj</a></span><span class="op">(</span><span class="st">"TF_GoldsteinPriceLog"</span><span class="op">)</span></span>
+<span><span class="va">vis</span> <span class="op">=</span> <span class="fu"><a href="reference/as_visualizer.html">as_visualizer</a></span><span class="op">(</span><span class="va">objective</span><span class="op">)</span></span>
+<span><span class="va">opt</span> <span class="op">=</span> <span class="va"><a href="reference/OptimizerGD.html">OptimizerGD</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">objective</span>, x_start <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.22</span>, <span class="fl">0.77</span><span class="op">)</span>, lr <span class="op">=</span> <span class="fl">0.01</span><span class="op">)</span></span>
+<span><span class="va">opt</span><span class="op">$</span><span class="fu">optimize</span><span class="op">(</span><span class="fl">10L</span><span class="op">)</span></span>
+<span><span class="co">#&gt; TF_GoldsteinPriceLog: Batch 1 step 1: f(x) = 0.9158, x = c(0.219, 0.7186)</span></span>
+<span><span class="co">#&gt; TF_GoldsteinPriceLog: Batch 1 step 2: f(x) = 0.4217, x = c(0.211, 0.6549)</span></span>
+<span><span class="co">#&gt; TF_GoldsteinPriceLog: Batch 1 step 3: f(x) = -0.6741, x = c(0.1844, 0.5649)</span></span>
+<span><span class="co">#&gt; TF_GoldsteinPriceLog: Batch 1 step 4: f(x) = -0.9819, x = c(0.2182, 0.5224)</span></span>
+<span><span class="co">#&gt; TF_GoldsteinPriceLog: Batch 1 step 5: f(x) = -0.9876, x = c(0.2992, 0.5105)</span></span>
+<span><span class="co">#&gt; TF_GoldsteinPriceLog: Batch 1 step 6: f(x) = -1.1018, x = c(0.2625, 0.3598)</span></span>
+<span><span class="co">#&gt; TF_GoldsteinPriceLog: Batch 1 step 7: f(x) = -2.168, x = c(0.3405, 0.4107)</span></span>
+<span><span class="co">#&gt; TF_GoldsteinPriceLog: Batch 1 step 8: f(x) = -2.1246, x = c(0.3448, 0.3898)</span></span>
+<span><span class="co">#&gt; TF_GoldsteinPriceLog: Batch 1 step 9: f(x) = -1.3408, x = c(0.4093, 0.4614)</span></span>
+<span><span class="co">#&gt; TF_GoldsteinPriceLog: Batch 1 step 10: f(x) = -2.1225, x = c(0.3729, 0.3911)</span></span>
+<span><span class="va">vis</span><span class="op">$</span><span class="fu">add_optimization_trace</span><span class="op">(</span><span class="va">opt</span>, name <span class="op">=</span> <span class="st">"GD"</span><span class="op">)</span></span>
+<span><span class="va">vis</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-quick-start-1.png" width="100%" height="700px"></p>
+</div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>You can install the development version of vistool from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<p>You can install the development version from GitHub with <a href="https://pak.r-lib.org/" class="external-link"><code>pak</code></a>:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
 <span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"slds-lmu/vistool"</span><span class="op">)</span></span></code></pre></div>
-<p>Please note that surface visualization features (<code>plotly</code> backend) rely on <a href="https://plotly.com/r/" class="external-link"><code>plotly</code></a> which in turn relies on certain functionality provided by Python packages, accessed via <a href="https://rstudio.github.io/reticulate/" class="external-link"><code>reticulate</code></a>.</p>
+<p>Prefer base R tooling? <code>remotes::install_github("slds-lmu/vistool")</code> works as well.</p>
 <div class="section level3">
-<h3 id="optional-setup-for-saving-plotly-plots">Optional: Setup for Saving Plotly Plots<a class="anchor" aria-label="anchor" href="#optional-setup-for-saving-plotly-plots"></a>
+<h3 id="plotly-backend-and-static-export">Plotly backend and static export<a class="anchor" aria-label="anchor" href="#plotly-backend-and-static-export"></a>
 </h3>
-<p>The <code>$save()</code> functionality for surface plots uses <code><a href="https://rdrr.io/pkg/plotly/man/save_image.html" class="external-link">plotly::save_image()</a></code> internally, which in turn relies on the Python package <code>kaleido</code>.</p>
-<p><code>vistool</code> (via <code>reticulate &gt;= 1.41</code>) declares this requirement on load using <code>py_require("kaleido")</code>. The first time Python is needed, an ephemeral, cached Python environment is provisioned automatically with <code>kaleido</code>—no manual Miniconda setup required for typical users.</p>
-<p>If you prefer to manage Python yourself, ensure <code>kaleido</code> is installed in the Python environment that <code>reticulate</code> uses. Example:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<p>Interactive surfaces rely on <code>plotly</code>, which accesses Python functionality through <code>reticulate</code>. <code>vistool</code> (via <code>reticulate &gt;= 1.41</code>) calls <code>reticulate::py_require("kaleido")</code> on demand, provisioning a cached Python environment automatically when you first save a surface plot.</p>
+<p>If you manage Python yourself, point <code>reticulate</code> to your interpreter and ensure <code>kaleido</code> is installed:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"reticulate"</span><span class="op">)</span></span>
-<span><span class="co"># OPTIONAL: point reticulate to a specific python before loading vistool</span></span>
 <span><span class="co"># Sys.setenv(RETICULATE_PYTHON = "/path/to/python")</span></span>
 <span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/py_install.html" class="external-link">py_install</a></span><span class="op">(</span><span class="st">"kaleido"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
-<h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
+<h2 id="documentation-roadmap">Documentation roadmap<a class="anchor" aria-label="anchor" href="#documentation-roadmap"></a>
 </h2>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://slds-lmu.github.io/vistool/">vistool</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mlr3verse.mlr-org.com" class="external-link">mlr3verse</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Loading required package: mlr3</span></span></code></pre></div>
-<p>This example shows how to visualize the prediction surface of an SVM on the <code>pima</code> task included in <code>mlr3</code>:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Create an example task, add missing data imputation and select 2 features</span></span>
-<span><span class="va">task</span> <span class="op">=</span> <span class="fu">tsk</span><span class="op">(</span><span class="st">"pima"</span><span class="op">)</span></span>
-<span><span class="va">task</span> <span class="op">=</span> <span class="fu">po</span><span class="op">(</span><span class="st">"imputemean"</span><span class="op">)</span><span class="op">$</span><span class="fu">train</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">task</span><span class="op">)</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="va">task</span><span class="op">$</span><span class="fu">select</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"insulin"</span>, <span class="st">"mass"</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Select example learner</span></span>
-<span><span class="va">learner</span> <span class="op">=</span> <span class="fu">lrn</span><span class="op">(</span><span class="st">"classif.svm"</span>, predict_type <span class="op">=</span> <span class="st">"prob"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Create 2D ggplot2 visualization</span></span>
-<span><span class="va">vis_2d</span> <span class="op">=</span> <span class="fu"><a href="reference/as_visualizer.html">as_visualizer</a></span><span class="op">(</span><span class="va">task</span>, learner <span class="op">=</span> <span class="va">learner</span><span class="op">)</span></span>
-<span><span class="va">vis_2d</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-example-1.png" width="100%"></p>
-<p>For interactive exploration, you can create surface visualizations with <code>plotly</code>:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Create surface visualization for interactive plotly surface plot</span></span>
-<span><span class="va">vis_surface</span> <span class="op">=</span> <span class="fu"><a href="reference/as_visualizer.html">as_visualizer</a></span><span class="op">(</span><span class="va">task</span>, learner <span class="op">=</span> <span class="va">learner</span>, type <span class="op">=</span> <span class="st">"surface"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Define a 3D scene</span></span>
-<span><span class="va">vis_surface</span><span class="op">$</span><span class="fu">set_scene</span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1.4</span>, y <span class="op">=</span> <span class="fl">1.4</span>, z <span class="op">=</span> <span class="fl">1.4</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># View interactively</span></span>
-<span><span class="va">vis_surface</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/demo_1.png"></p>
-<p>Save static version as png:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># only works if Python kaleido package is installed</span></span>
-<span><span class="co"># see installation instructions above for setting up plotly save functionality</span></span>
-<span><span class="va">vis_surface</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span><span class="st">"man/figures/demo_1.png"</span>, width <span class="op">=</span> <span class="fl">500</span>, height <span class="op">=</span> <span class="fl">500</span><span class="op">)</span></span></code></pre></div>
+<ul>
+<li>
+<a href="https://slds-lmu.github.io/vistool/articles/loss_functions.html">Loss functions</a> – Open when you need to compare predefined and custom regression or classification losses side by side.</li>
+<li>
+<a href="https://slds-lmu.github.io/vistool/articles/model.html">Model predictions</a> – Visit to inspect 1D/2D mlr3 learners, add boundaries, and overlay training data.</li>
+<li>
+<a href="https://slds-lmu.github.io/vistool/articles/objective.html">Objective functions</a> – Read when you explore built-in objectives, define custom ones, or visualize evaluation archives.</li>
+<li>
+<a href="https://slds-lmu.github.io/vistool/articles/optimization_traces.html">Optimization &amp; traces</a> – Use to understand optimizers, step size control, and how to display optimization progress.</li>
+<li>
+<a href="https://slds-lmu.github.io/vistool/articles/customization_guide.html">Customization guide</a> – Start here when you want to tweak themes, colors, and styling precedence.</li>
+<li>
+<a href="https://slds-lmu.github.io/vistool/articles/advanced_visualization.html">Advanced visualization</a> – Open for surface overlays, manual plot augmentations, and animation workflows.</li>
+</ul>
 </div>
 <div class="section level2">
 <h2 id="contributing">Contributing<a class="anchor" aria-label="anchor" href="#contributing"></a>
 </h2>
-<p>For anyone interested in contributing to <code>vistool</code>, please see the <a href="DEVELOPMENT.html">Developer Reference</a>.</p>
-</div>
-<div class="section level2">
-<h2 id="resources">Resources<a class="anchor" aria-label="anchor" href="#resources"></a>
-</h2>
-<p>For visualization of…</p>
-<ul>
-<li><a href="https://slds-lmu.github.io/vistool/articles/loss_functions.html">Loss Functions</a></li>
-<li><a href="https://slds-lmu.github.io/vistool/articles/model.html">Model Predictions</a></li>
-<li><a href="https://slds-lmu.github.io/vistool/articles/objective.html">Objective Functions</a></li>
-</ul>
+<p>For anyone interested in contributing to <code>vistool</code>, please see the <a href="DEVELOPMENT.html">Developer reference</a>.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="license">

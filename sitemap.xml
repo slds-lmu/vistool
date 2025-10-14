@@ -1,5 +1,6 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://slds-lmu.github.io/vistool/404.html</loc></url>
+<url><loc>https://slds-lmu.github.io/vistool/AGENTS.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/DEVELOPMENT.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/LICENSE.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/articles/advanced_visualization.html</loc></url>
@@ -9,9 +10,7 @@
 <url><loc>https://slds-lmu.github.io/vistool/articles/model.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/articles/objective.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/articles/optimization_traces.html</loc></url>
-<url><loc>https://slds-lmu.github.io/vistool/articles/vistool.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/authors.html</loc></url>
-<url><loc>https://slds-lmu.github.io/vistool/copilot-instructions.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/index.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/news/index.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/Hypothesis.html</loc></url>
@@ -30,7 +29,7 @@
 <url><loc>https://slds-lmu.github.io/vistool/reference/VisualizerSurfaceObj.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/as.data.table.DictionaryLoss.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/as_visualizer.html</loc></url>
-<url><loc>https://slds-lmu.github.io/vistool/reference/assertStepSizeControl.html</loc></url>
+<url><loc>https://slds-lmu.github.io/vistool/reference/assert_step_size_control.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/assert_vistool_theme.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/dict_loss.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/dict_objective.html</loc></url>
@@ -41,17 +40,17 @@
 <url><loc>https://slds-lmu.github.io/vistool/reference/hex_to_rgba.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/index.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/lss.html</loc></url>
-<url><loc>https://slds-lmu.github.io/vistool/reference/mergeOptimArchives.html</loc></url>
+<url><loc>https://slds-lmu.github.io/vistool/reference/merge_optim_archives.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/merge_theme.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/mlr_learners_regr.lm_formula.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/obj.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/reexports.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/resolve_loss_key.html</loc></url>
-<url><loc>https://slds-lmu.github.io/vistool/reference/stepSizeControlDecayExp.html</loc></url>
-<url><loc>https://slds-lmu.github.io/vistool/reference/stepSizeControlDecayLinear.html</loc></url>
-<url><loc>https://slds-lmu.github.io/vistool/reference/stepSizeControlDecaySteps.html</loc></url>
-<url><loc>https://slds-lmu.github.io/vistool/reference/stepSizeControlDecayTime.html</loc></url>
-<url><loc>https://slds-lmu.github.io/vistool/reference/stepSizeControlLineSearch.html</loc></url>
+<url><loc>https://slds-lmu.github.io/vistool/reference/step_size_control_decay_exp.html</loc></url>
+<url><loc>https://slds-lmu.github.io/vistool/reference/step_size_control_decay_linear.html</loc></url>
+<url><loc>https://slds-lmu.github.io/vistool/reference/step_size_control_decay_steps.html</loc></url>
+<url><loc>https://slds-lmu.github.io/vistool/reference/step_size_control_decay_time.html</loc></url>
+<url><loc>https://slds-lmu.github.io/vistool/reference/step_size_control_line_search.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/validate_color.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/vistool_theme.html</loc></url>
 </urlset>

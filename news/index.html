@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">vistool</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -15,19 +15,18 @@
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/vistool.html">Get started</a></li>
-<li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><h6 class="dropdown-header" data-toc-skip>Core</h6></li>
-    <li><a class="dropdown-item" href="../articles/loss_functions.html">Loss Functions</a></li>
-    <li><a class="dropdown-item" href="../articles/model.html">Model Predictions</a></li>
-    <li><a class="dropdown-item" href="../articles/objective.html">Objective Functions</a></li>
-    <li><a class="dropdown-item" href="../articles/optimization_traces.html">Optimization &amp; Traces</a></li>
+    <li><a class="dropdown-item" href="../articles/loss_functions.html">Loss functions</a></li>
+    <li><a class="dropdown-item" href="../articles/model.html">Model predictions</a></li>
+    <li><a class="dropdown-item" href="../articles/objective.html">Objective functions</a></li>
+    <li><a class="dropdown-item" href="../articles/optimization_traces.html">Optimization &amp; traces</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Customization</h6></li>
-    <li><a class="dropdown-item" href="../articles/customization_guide.html">Customization Guide</a></li>
-    <li><a class="dropdown-item" href="../articles/advanced_visualization.html">Advanced Visualization</a></li>
+    <li><a class="dropdown-item" href="../articles/customization_guide.html">Customization guide</a></li>
+    <li><a class="dropdown-item" href="../articles/advanced_visualization.html">Advanced visualization</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -45,6 +44,10 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.4.1" id="vistool-041">vistool 0.4.1<a class="anchor" aria-label="anchor" href="#vistool-041"></a></h2>
+<ul><li>Implemented <code>add_annotation()</code> for all visualizers, enabling styled text and LaTeX annotations across ggplot2 and plotly backends.</li>
+</ul></div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.4.0" id="vistool-040">vistool 0.4.0<a class="anchor" aria-label="anchor" href="#vistool-040"></a></h2>
 <ul><li>New <code>Hypothesis</code> R6 class and <code><a href="../reference/Hypothesis.html">hypothesis()</a></code> constructor: wrap user-defined functions for regression or classification (1D/2D), with optional link and domain.</li>
 <li>
@@ -55,8 +58,7 @@
 <li>
 <code><a href="../reference/lss.html">lss()</a></code> now accepts <code>mlr3</code> measure keys (e.g., <code>regr.huber</code>).</li>
 <li>For 1D regression tasks, <code>add_points()</code> allows specifying a loss geometry for L1 (residuals) and L2 (squares) losses.</li>
-<li>
-<code>as_visualizer.Objective</code> accepts <code>allow_extrapolation</code>, whether to evaluate the objective outside its evaluation (canonical) bounds when plot limits; by default, only canonical bounds are plotted.</li>
+<li>Objective plotting: Plot limits now default to the objective’s canonical bounds if present. If no bounds are available, explicit <code>x1_limits</code>/<code>x2_limits</code> are required. If user-specified limits exceed the canonical bounds, the plot is still drawn and a warning is issued.</li>
 <li>Automatic declaration of Python <code>kaleido</code> dependency via <code><a href="https://rstudio.github.io/reticulate/reference/py_require.html" class="external-link">reticulate::py_require()</a></code> (reticulate &gt;= 1.41) to support saving surface plots without manual Miniconda setup.</li>
 <li>New theme system.</li>
 </ul></div>

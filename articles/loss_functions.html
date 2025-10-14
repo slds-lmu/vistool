@@ -5,12 +5,12 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Loss Functions • vistool</title>
+<title>Loss functions • vistool</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Loss Functions">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Loss functions">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">vistool</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -29,20 +29,19 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item"><a class="nav-link" href="../articles/vistool.html">Get started</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><h6 class="dropdown-header" data-toc-skip>Core</h6></li>
-    <li><a class="dropdown-item" href="../articles/loss_functions.html">Loss Functions</a></li>
-    <li><a class="dropdown-item" href="../articles/model.html">Model Predictions</a></li>
-    <li><a class="dropdown-item" href="../articles/objective.html">Objective Functions</a></li>
-    <li><a class="dropdown-item" href="../articles/optimization_traces.html">Optimization &amp; Traces</a></li>
+    <li><a class="dropdown-item" href="../articles/loss_functions.html">Loss functions</a></li>
+    <li><a class="dropdown-item" href="../articles/model.html">Model predictions</a></li>
+    <li><a class="dropdown-item" href="../articles/objective.html">Objective functions</a></li>
+    <li><a class="dropdown-item" href="../articles/optimization_traces.html">Optimization &amp; traces</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Customization</h6></li>
-    <li><a class="dropdown-item" href="../articles/customization_guide.html">Customization Guide</a></li>
-    <li><a class="dropdown-item" href="../articles/advanced_visualization.html">Advanced Visualization</a></li>
+    <li><a class="dropdown-item" href="../articles/customization_guide.html">Customization guide</a></li>
+    <li><a class="dropdown-item" href="../articles/advanced_visualization.html">Advanced visualization</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -64,7 +63,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>Loss Functions</h1>
+      <h1>Loss functions</h1>
             
       
 
@@ -108,9 +107,10 @@ call. Here we retrieve the pinball loss function for regression with a
 custom quantile parameter.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">loss_function</span> <span class="op">=</span> <span class="fu"><a href="../reference/lss.html">lss</a></span><span class="op">(</span><span class="st">"pinball"</span>, quantile <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span></code></pre></div>
-<p><em>You can also refer to loss functions via common mlr3
+<p><em>You can also refer to loss functions via common <code>mlr3</code>
 <strong>measure IDs</strong> (e.g., <code>regr.mse</code>). These are
-translated internally to the corresponding vistool loss keys.</em></p>
+translated internally to the corresponding <code>vistool</code> loss
+keys.</em></p>
 <div class="section level2">
 <h2 id="visualization">Visualization<a class="anchor" aria-label="anchor" href="#visualization"></a>
 </h2>
@@ -131,7 +131,7 @@ points for smooth curves.</p>
 <p><img src="loss_functions_files/figure-html/unnamed-chunk-6-1.png" width="100%"></p>
 </div>
 <div class="section level2">
-<h2 id="regression-loss-functions">Regression Loss Functions<a class="anchor" aria-label="anchor" href="#regression-loss-functions"></a>
+<h2 id="regression-loss-functions">Regression loss functions<a class="anchor" aria-label="anchor" href="#regression-loss-functions"></a>
 </h2>
 <p>Here we visualize multiple regression loss functions:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
@@ -150,13 +150,13 @@ points for smooth curves.</p>
 <p><img src="loss_functions_files/figure-html/unnamed-chunk-7-1.png" width="100%"></p>
 </div>
 <div class="section level2">
-<h2 id="classification-loss-functions">Classification Loss Functions<a class="anchor" aria-label="anchor" href="#classification-loss-functions"></a>
+<h2 id="classification-loss-functions">Classification loss functions<a class="anchor" aria-label="anchor" href="#classification-loss-functions"></a>
 </h2>
 <p>Classification loss functions can operate on different input scales
 depending on the loss function. Some work with scores, while others work
 with probabilities.</p>
 <div class="section level3">
-<h3 id="score-based-classification-losses">Score-based Classification Losses<a class="anchor" aria-label="anchor" href="#score-based-classification-losses"></a>
+<h3 id="score-based-classification-losses">Score-based classification losses<a class="anchor" aria-label="anchor" href="#score-based-classification-losses"></a>
 </h3>
 <p>Score-based losses operate on the margin
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi><mo>⋅</mo><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">y \cdot f(x)</annotation></semantics></math>
@@ -177,7 +177,7 @@ is the prediction score:</p>
 <p><img src="loss_functions_files/figure-html/unnamed-chunk-8-1.png" width="100%"></p>
 </div>
 <div class="section level3">
-<h3 id="probability-based-classification-losses">Probability-based Classification Losses<a class="anchor" aria-label="anchor" href="#probability-based-classification-losses"></a>
+<h3 id="probability-based-classification-losses">Probability-based classification losses<a class="anchor" aria-label="anchor" href="#probability-based-classification-losses"></a>
 </h3>
 <p>Probability-based losses operate on predicted probabilities
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>π</mi><mo>∈</mo><mrow><mo stretchy="true" form="prefix">[</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">\pi \in [0, 1]</annotation></semantics></math>.
@@ -194,7 +194,7 @@ forms, while the Brier score is naturally probability-based:</p>
 <p><img src="loss_functions_files/figure-html/unnamed-chunk-9-1.png" width="100%"></p>
 </div>
 <div class="section level3">
-<h3 id="controlling-which-class-curves-to-display">Controlling Which Class Curves to Display<a class="anchor" aria-label="anchor" href="#controlling-which-class-curves-to-display"></a>
+<h3 id="controlling-which-class-curves-to-display">Controlling which class curves to display<a class="anchor" aria-label="anchor" href="#controlling-which-class-curves-to-display"></a>
 </h3>
 <p>When visualizing probability-based losses, you can control whether to
 show curves for the positive class (<code>y = 1</code>), negative class
@@ -210,7 +210,7 @@ parameter:</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="adding-points-to-loss-function-visualizations">Adding Points to Loss Function Visualizations<a class="anchor" aria-label="anchor" href="#adding-points-to-loss-function-visualizations"></a>
+<h2 id="adding-points-to-loss-function-visualizations">Adding points to loss function visualizations<a class="anchor" aria-label="anchor" href="#adding-points-to-loss-function-visualizations"></a>
 </h2>
 <p>You can add specific points to loss function plots to highlight
 particular residual values and their corresponding loss values. The
@@ -247,7 +247,7 @@ x-coordinates.</p>
 <p><img src="loss_functions_files/figure-html/unnamed-chunk-11-1.png" width="100%"></p>
 </div>
 <div class="section level2">
-<h2 id="custom-loss-functions">Custom Loss Functions<a class="anchor" aria-label="anchor" href="#custom-loss-functions"></a>
+<h2 id="custom-loss-functions">Custom loss functions<a class="anchor" aria-label="anchor" href="#custom-loss-functions"></a>
 </h2>
 <p>We can also define and visualize custom loss functions:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
@@ -266,13 +266,13 @@ x-coordinates.</p>
 <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a>
 </h2>
 <ul>
-<li><a href="model.html">Model Predictions</a></li>
-<li><a href="objective.html">Objective Functions</a></li>
+<li><a href="model.html">Model predictions</a></li>
+<li><a href="objective.html">Objective functions</a></li>
 <li><a href="optimization_traces.html">Optimization &amp;
-Traces</a></li>
-<li><a href="customization_guide.html">Customization Guide</a></li>
+traces</a></li>
+<li><a href="customization_guide.html">Customization guide</a></li>
 <li><a href="advanced_visualization.html">Advanced
-Visualization</a></li>
+visualization</a></li>
 </ul>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

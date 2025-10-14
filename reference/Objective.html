@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">vistool</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -15,19 +15,18 @@
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/vistool.html">Get started</a></li>
-<li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+      <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><h6 class="dropdown-header" data-toc-skip>Core</h6></li>
-    <li><a class="dropdown-item" href="../articles/loss_functions.html">Loss Functions</a></li>
-    <li><a class="dropdown-item" href="../articles/model.html">Model Predictions</a></li>
-    <li><a class="dropdown-item" href="../articles/objective.html">Objective Functions</a></li>
-    <li><a class="dropdown-item" href="../articles/optimization_traces.html">Optimization &amp; Traces</a></li>
+    <li><a class="dropdown-item" href="../articles/loss_functions.html">Loss functions</a></li>
+    <li><a class="dropdown-item" href="../articles/model.html">Model predictions</a></li>
+    <li><a class="dropdown-item" href="../articles/objective.html">Objective functions</a></li>
+    <li><a class="dropdown-item" href="../articles/optimization_traces.html">Optimization &amp; traces</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Customization</h6></li>
-    <li><a class="dropdown-item" href="../articles/customization_guide.html">Customization Guide</a></li>
-    <li><a class="dropdown-item" href="../articles/advanced_visualization.html">Advanced Visualization</a></li>
+    <li><a class="dropdown-item" href="../articles/customization_guide.html">Customization guide</a></li>
+    <li><a class="dropdown-item" href="../articles/advanced_visualization.html">Advanced visualization</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -57,24 +56,24 @@
     <div class="section level2">
     <h2 id="public-fields">Public fields<a class="anchor" aria-label="anchor" href="#public-fields"></a></h2>
     <p></p><div class="r6-fields"><dl><dt><code>id</code></dt>
-<dd><p>(`character(1)`)<br>
+<dd><p>(<code>character(1)</code>)<br>
 The id of the object.</p></dd>
 
 
 <dt><code>label</code></dt>
-<dd><p>(`character(1)` The label of the objective, i.e. a.</p></dd>
+<dd><p>(<code>character(1)</code> The label of the objective, i.e. a.</p></dd>
 
 
 <dt><code>lower</code></dt>
-<dd><p>(`numeric()`) The lower limits for each dimension.</p></dd>
+<dd><p>(<code><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric()</a></code>) The lower limits for each dimension.</p></dd>
 
 
 <dt><code>upper</code></dt>
-<dd><p>(`numeric()`) The upper limits for each dimension.</p></dd>
+<dd><p>(<code><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric()</a></code>) The upper limits for each dimension.</p></dd>
 
 
 <dt><code>minimize</code></dt>
-<dd><p>(`logical(1)`) Is the problem a minimization problem?</p></dd>
+<dd><p>(<code>logical(1)</code>) Is the problem a minimization problem?</p></dd>
 
 
 </dl><p></p></div>
@@ -82,15 +81,15 @@ The id of the object.</p></dd>
     <div class="section level2">
     <h2 id="active-bindings">Active bindings<a class="anchor" aria-label="anchor" href="#active-bindings"></a></h2>
     <p></p><div class="r6-active-bindings"><dl><dt><code>archive</code></dt>
-<dd><p>(`data.table()`) Archive of all calls to `$evalStore`.</p></dd>
+<dd><p>(<code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table()</a></code>) Archive of all calls to <code>$eval_store</code>.</p></dd>
 
 
 <dt><code>log_funs</code></dt>
-<dd><p>(`list()`) A list containing logging functions. Each function must have argument.</p></dd>
+<dd><p>(<code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code>) A list containing logging functions. Each function must have argument.</p></dd>
 
 
 <dt><code>xdim</code></dt>
-<dd><p>(`integer(1)`) Input dimension of `f`.</p></dd>
+<dd><p>(<code>integer(1)</code>) Input dimension of <code>f</code>.</p></dd>
 
 
 </dl><p></p></div>
@@ -103,16 +102,16 @@ The id of the object.</p></dd>
 
 <ul><li><p><a href="#method-Objective-new"><code>Objective$new()</code></a></p></li>
 <li><p><a href="#method-Objective-eval"><code>Objective$eval()</code></a></p></li>
-<li><p><a href="#method-Objective-evalStore"><code>Objective$evalStore()</code></a></p></li>
-<li><p><a href="#method-Objective-assertX"><code>Objective$assertX()</code></a></p></li>
+<li><p><a href="#method-Objective-eval_store"><code>Objective$eval_store()</code></a></p></li>
+<li><p><a href="#method-Objective-assert_x"><code>Objective$assert_x()</code></a></p></li>
 <li><p><a href="#method-Objective-grad"><code>Objective$grad()</code></a></p></li>
 <li><p><a href="#method-Objective-hess"><code>Objective$hess()</code></a></p></li>
-<li><p><a href="#method-Objective-addLogFun"><code>Objective$addLogFun()</code></a></p></li>
-<li><p><a href="#method-Objective-clearArchive"><code>Objective$clearArchive()</code></a></p></li>
+<li><p><a href="#method-Objective-add_log_fun"><code>Objective$add_log_fun()</code></a></p></li>
+<li><p><a href="#method-Objective-clear_archive"><code>Objective$clear_archive()</code></a></p></li>
 <li><p><a href="#method-Objective-clone"><code>Objective$clone()</code></a></p></li>
 </ul></div><p></p><hr><a id="method-Objective-new"></a><div class="section">
 <h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
-<p>Creates a new instance of this [R6][R6::R6Class] class.</p><div class="section">
+<p>Creates a new instance of this <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> class.</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/Objective.html">Objective</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
 <span>  <span class="va">id</span>,</span>
@@ -130,43 +129,43 @@ The id of the object.</p></dd>
 <div class="section">
 <h4 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>id</code></dt>
-<dd><p>(`character(1)`)<br>
+<dd><p>(<code>character(1)</code>)<br>
 Id of the object.</p></dd>
 
 
 <dt><code>fun</code></dt>
-<dd><p>(`function` The objective function. The first argument must be a numerical input of length `xdim`.</p></dd>
+<dd><p>(<code>function</code> The objective function. The first argument must be a numerical input of length <code>xdim</code>.</p></dd>
 
 
 <dt><code>label</code></dt>
-<dd><p>(`character(1)` The label of the objective, i.e. a.</p></dd>
+<dd><p>(<code>character(1)</code> The label of the objective, i.e. a.</p></dd>
 
 
 <dt><code>xdim</code></dt>
-<dd><p>(`integer(1)`) The input dimension of `fun`. Use `xdim = NA` for an arbitrary input dimension.</p></dd>
+<dd><p>(<code>integer(1)</code>) The input dimension of <code>fun</code>. Use <code>xdim = NA</code> for an arbitrary input dimension.</p></dd>
 
 
 <dt><code>lower</code></dt>
-<dd><p>(`numeric(xdim)`) The lower boundaries for inputs to `fun`. Must</p></dd>
+<dd><p>(<code>numeric(xdim)</code>) The lower boundaries for inputs to <code>fun</code>. Must</p></dd>
 
 
 <dt><code>upper</code></dt>
-<dd><p>(`numeric(xdim)`) The upper boundaries for inputs to `fun`. Must
-be of length `xdim`.</p></dd>
+<dd><p>(<code>numeric(xdim)</code>) The upper boundaries for inputs to <code>fun</code>. Must
+be of length <code>xdim</code>.</p></dd>
 
 
 <dt><code>xtest</code></dt>
-<dd><p>(`numeric()`) Test value for `fun` during initialization. If not defined,
-`xtest = rep(0, ifelse(is.na(xdim), 2, xdim))` is used.</p></dd>
+<dd><p>(<code><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric()</a></code>) Test value for <code>fun</code> during initialization. If not defined,
+<code>xtest = rep(0, ifelse(is.na(xdim), 2, xdim))</code> is used.</p></dd>
 
 
 <dt><code>minimize</code></dt>
-<dd><p>(`logical(1)`) Is the problem a minimization problem? Default is no (`FALSE`).</p></dd>
+<dd><p>(<code>logical(1)</code>) Is the problem a minimization problem? Default is no (<code>FALSE</code>).</p></dd>
 
 
 <dt><code>...</code></dt>
 <dd><p><br>
-Additional arguments passed to `fun`.</p></dd>
+Additional arguments passed to <code>fun</code>.</p></dd>
 
 
 </dl><p></p></div>
@@ -182,29 +181,29 @@ Additional arguments passed to `fun`.</p></dd>
 <div class="section">
 <h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>x</code></dt>
-<dd><p>(`numeric`) The numerical input of `fun`.</p></dd>
+<dd><p>(<code>numeric</code>) The numerical input of <code>fun</code>.</p></dd>
 
 
 </dl><p></p></div>
 </div>
 <div class="section">
 <h4 id="returns">Returns<a class="anchor" aria-label="anchor" href="#returns"></a></h4>
-<p>The result of `fun(x)`.</p>
+<p>The result of <code>fun(x)</code>.</p>
 </div>
 
-</div><p></p><hr><a id="method-Objective-evalStore"></a><div class="section">
-<h3 id="method-evalstore-">Method <code>evalStore()</code><a class="anchor" aria-label="anchor" href="#method-evalstore-"></a></h3>
+</div><p></p><hr><a id="method-Objective-eval_store"></a><div class="section">
+<h3 id="method-eval-store-">Method <code>eval_store()</code><a class="anchor" aria-label="anchor" href="#method-eval-store-"></a></h3>
 <p>Evaluate the objective function and log into the archive. Each call logs
-the input vector `x`, result of fun `fval`, the gradient `grad`, the norm of the gradient
-`gnorm`, and additional logs that were added by `$addLogFun`.</p><div class="section">
+the input vector <code>x</code>, result of fun <code>fval</code>, the gradient <code>grad</code>, the norm of the gradient
+<code>gnorm</code>, and additional logs that were added by <code>$add_log_fun</code>.</p><div class="section">
 <h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Objective</span><span class="op">$</span><span class="fu">evalStore</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Objective</span><span class="op">$</span><span class="fu">eval_store</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
 <h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>x</code></dt>
-<dd><p>(`numeric`) The numerical input of `fun`.</p></dd>
+<dd><p>(<code>numeric</code>) The numerical input of <code>fun</code>.</p></dd>
 
 
 </dl><p></p></div>
@@ -214,21 +213,21 @@ the input vector `x`, result of fun `fval`, the gradient `grad`, the norm of the
 <p>Invisible list of logs that are added to the archive.</p>
 </div>
 
-</div><p></p><hr><a id="method-Objective-assertX"></a><div class="section">
-<h3 id="method-assertx-">Method <code>assertX()</code><a class="anchor" aria-label="anchor" href="#method-assertx-"></a></h3>
+</div><p></p><hr><a id="method-Objective-assert_x"></a><div class="section">
+<h3 id="method-assert-x-">Method <code>assert_x()</code><a class="anchor" aria-label="anchor" href="#method-assert-x-"></a></h3>
 <p>Assert a numeric input if it is suitable or not.</p><div class="section">
 <h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Objective</span><span class="op">$</span><span class="fu">assertX</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Objective</span><span class="op">$</span><span class="fu">assert_x</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
 <h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>x</code></dt>
-<dd><p>(`numeric()`) Input value for `fun`.</p></dd>
+<dd><p>(<code><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric()</a></code>) Input value for <code>fun</code>.</p></dd>
 
 
 <dt><code>...</code></dt>
-<dd><p>Additional arguments passed to `assertNumeric(...)`.</p></dd>
+<dd><p>Additional arguments passed to <code>assertNumeric(...)</code>.</p></dd>
 
 
 </dl><p></p></div>
@@ -244,7 +243,7 @@ the input vector `x`, result of fun `fval`, the gradient `grad`, the norm of the
 <div class="section">
 <h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>x</code></dt>
-<dd><p>(`numeric`) The numerical input of `fun`.</p></dd>
+<dd><p>(<code>numeric</code>) The numerical input of <code>fun</code>.</p></dd>
 
 
 </dl><p></p></div>
@@ -260,38 +259,38 @@ the input vector `x`, result of fun `fval`, the gradient `grad`, the norm of the
 <div class="section">
 <h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>x</code></dt>
-<dd><p>(`numeric`) The numerical input of `fun`.</p></dd>
+<dd><p>(<code>numeric</code>) The numerical input of <code>fun</code>.</p></dd>
 
 
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-Objective-addLogFun"></a><div class="section">
-<h3 id="method-addlogfun-">Method <code>addLogFun()</code><a class="anchor" aria-label="anchor" href="#method-addlogfun-"></a></h3>
+</div><p></p><hr><a id="method-Objective-add_log_fun"></a><div class="section">
+<h3 id="method-add-log-fun-">Method <code>add_log_fun()</code><a class="anchor" aria-label="anchor" href="#method-add-log-fun-"></a></h3>
 <p>Method to add custom logger to the objective.</p><div class="section">
 <h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Objective</span><span class="op">$</span><span class="fu">addLogFun</span><span class="op">(</span><span class="va">l</span>, <span class="va">label</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Objective</span><span class="op">$</span><span class="fu">add_log_fun</span><span class="op">(</span><span class="va">l</span>, <span class="va">label</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
 <h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>l</code></dt>
-<dd><p>(`function`) Function that returns a single numerical value or a string.
-The arguments of `l` must be `x`, `fval` and `grad`.</p></dd>
+<dd><p>(<code>function</code>) Function that returns a single numerical value or a string.
+The arguments of <code>l</code> must be <code>x</code>, <code>fval</code> and <code>grad</code>.</p></dd>
 
 
 <dt><code>label</code></dt>
-<dd><p>(`character(1)`) The name of the logger.</p></dd>
+<dd><p>(<code>character(1)</code>) The name of the logger.</p></dd>
 
 
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-Objective-clearArchive"></a><div class="section">
-<h3 id="method-cleararchive-">Method <code>clearArchive()</code><a class="anchor" aria-label="anchor" href="#method-cleararchive-"></a></h3>
+</div><p></p><hr><a id="method-Objective-clear_archive"></a><div class="section">
+<h3 id="method-clear-archive-">Method <code>clear_archive()</code><a class="anchor" aria-label="anchor" href="#method-clear-archive-"></a></h3>
 <p>Delete the archive.</p><div class="section">
 <h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Objective</span><span class="op">$</span><span class="fu">clearArchive</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Objective</span><span class="op">$</span><span class="fu">clear_archive</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 

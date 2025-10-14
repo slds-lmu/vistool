@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">vistool</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -15,19 +15,18 @@
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/vistool.html">Get started</a></li>
-<li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+      <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><h6 class="dropdown-header" data-toc-skip>Core</h6></li>
-    <li><a class="dropdown-item" href="../articles/loss_functions.html">Loss Functions</a></li>
-    <li><a class="dropdown-item" href="../articles/model.html">Model Predictions</a></li>
-    <li><a class="dropdown-item" href="../articles/objective.html">Objective Functions</a></li>
-    <li><a class="dropdown-item" href="../articles/optimization_traces.html">Optimization &amp; Traces</a></li>
+    <li><a class="dropdown-item" href="../articles/loss_functions.html">Loss functions</a></li>
+    <li><a class="dropdown-item" href="../articles/model.html">Model predictions</a></li>
+    <li><a class="dropdown-item" href="../articles/objective.html">Objective functions</a></li>
+    <li><a class="dropdown-item" href="../articles/optimization_traces.html">Optimization &amp; traces</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Customization</h6></li>
-    <li><a class="dropdown-item" href="../articles/customization_guide.html">Customization Guide</a></li>
-    <li><a class="dropdown-item" href="../articles/advanced_visualization.html">Advanced Visualization</a></li>
+    <li><a class="dropdown-item" href="../articles/customization_guide.html">Customization guide</a></li>
+    <li><a class="dropdown-item" href="../articles/advanced_visualization.html">Advanced visualization</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -57,7 +56,7 @@
     <div class="section level2">
     <h2 id="active-bindings">Active bindings<a class="anchor" aria-label="anchor" href="#active-bindings"></a></h2>
     <p></p><div class="r6-active-bindings"><dl><dt><code>momentum</code></dt>
-<dd><p>(`numeric(1)`) Momentum of the algorithm.</p></dd>
+<dd><p>(<code>numeric(1)</code>) Momentum of the algorithm.</p></dd>
 
 
 </dl><p></p></div>
@@ -72,12 +71,12 @@
 <li><p><a href="#method-OptimizerNAG-optimize"><code>OptimizerNAG$optimize()</code></a></p></li>
 <li><p><a href="#method-OptimizerNAG-update"><code>OptimizerNAG$update()</code></a></p></li>
 <li><p><a href="#method-OptimizerNAG-clone"><code>OptimizerNAG$clone()</code></a></p></li>
-</ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="vistool" data-topic="Optimizer" data-id="prepareUpdateForArchive"><a href="Optimizer.html#method-prepareUpdateForArchive"><code>vistool::Optimizer$prepareUpdateForArchive()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="Optimizer" data-id="setX"><a href="Optimizer.html#method-setX"><code>vistool::Optimizer$setX()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="vistool" data-topic="Optimizer" data-id="updateArchive"><a href="Optimizer.html#method-updateArchive"><code>vistool::Optimizer$updateArchive()</code></a></span></li>
+</ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="vistool" data-topic="Optimizer" data-id="prepare_update_for_archive"><a href="Optimizer.html#method-prepare_update_for_archive"><code>vistool::Optimizer$prepare_update_for_archive()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Optimizer" data-id="set_x"><a href="Optimizer.html#method-set_x"><code>vistool::Optimizer$set_x()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="vistool" data-topic="Optimizer" data-id="update_archive"><a href="Optimizer.html#method-update_archive"><code>vistool::Optimizer$update_archive()</code></a></span></li>
 </ul></details></p><hr><a id="method-OptimizerNAG-new"></a><div class="section">
 <h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
-<p>Creates a new instance of this [R6][R6::R6Class] class.</p><div class="section">
+<p>Creates a new instance of this <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> class.</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/OptimizerNAG.html">OptimizerNAG</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
 <span>  <span class="va">objective</span>,</span>
@@ -92,35 +91,35 @@
 <div class="section">
 <h4 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>objective</code></dt>
-<dd><p>(`Objective`)<br>
+<dd><p>(<code>Objective</code>)<br>
 The objective to optimize.</p></dd>
 
 
 <dt><code>x_start</code></dt>
-<dd><p>(`numeric()`)<br>
+<dd><p>(<code><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric()</a></code>)<br>
 Start value of the optimization. Note, after
-the first call of `$optimize()` the last value is used to continue
-optimization. Get this value with `$x`.</p></dd>
+the first call of <code>$optimize()</code> the last value is used to continue
+optimization. Get this value with <code>$x</code>.</p></dd>
 
 
 <dt><code>lr</code></dt>
-<dd><p>(`numeric(1)`)<br>
+<dd><p>(<code>numeric(1)</code>)<br>
 Step size with which the update is multiplied.</p></dd>
 
 
 <dt><code>momentum</code></dt>
-<dd><p>(`numeric(1)`)<br>
+<dd><p>(<code>numeric(1)</code>)<br>
 Momentum value.</p></dd>
 
 
 <dt><code>id</code></dt>
-<dd><p>(`character(1)`)<br>
+<dd><p>(<code>character(1)</code>)<br>
 Id of the object.</p></dd>
 
 
 <dt><code>print_trace</code></dt>
-<dd><p>(`logical(1)`)<br>
-Indicator whether to print the status of `$optimize()`.</p></dd>
+<dd><p>(<code>logical(1)</code>)<br>
+Indicator whether to print the status of <code>$optimize()</code>.</p></dd>
 
 
 </dl><p></p></div>
@@ -128,11 +127,11 @@ Indicator whether to print the status of `$optimize()`.</p></dd>
 
 </div><p></p><hr><a id="method-OptimizerNAG-optimize"></a><div class="section">
 <h3 id="method-optimize-">Method <code><a href="https://rdrr.io/r/stats/optimize.html" class="external-link">optimize()</a></code><a class="anchor" aria-label="anchor" href="#method-optimize-"></a></h3>
-<p>Optimize `steps` iteration.</p><div class="section">
+<p>Optimize <code>steps</code> iteration.</p><div class="section">
 <h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">OptimizerNAG</span><span class="op">$</span><span class="fu">optimize</span><span class="op">(</span></span>
 <span>  steps <span class="op">=</span> <span class="fl">1L</span>,</span>
-<span>  stepSizeControl <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">u</span>, <span class="va">obj</span>, <span class="va">opt</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  step_size_control <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">u</span>, <span class="va">obj</span>, <span class="va">opt</span><span class="op">)</span> <span class="op">{</span></span>
 <span>     <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span> <span class="op">}</span>,</span>
 <span>  minimize <span class="op">=</span> <span class="cn">NULL</span></span>
@@ -142,18 +141,18 @@ Indicator whether to print the status of `$optimize()`.</p></dd>
 <div class="section">
 <h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>steps</code></dt>
-<dd><p>(`integer(1)`)<br>
+<dd><p>(<code>integer(1)</code>)<br>
 Number of steps/iterations.</p></dd>
 
 
-<dt><code>stepSizeControl</code></dt>
-<dd><p>(`function()`) A function with arguments `x` (the old input value),
-`u` (the update generated by `$update()`), and `obj` (the objective object).</p></dd>
+<dt><code>step_size_control</code></dt>
+<dd><p>(<code>function()</code>) A function with arguments <code>x</code> (the old input value),
+<code>u</code> (the update generated by <code>$update()</code>), and <code>obj</code> (the objective object).</p></dd>
 
 
 <dt><code>minimize</code></dt>
-<dd><p>(`logical(1)`) Indicator to whether minimize or optimize the objective. The default (`NULL`)
-uses the option defined in `objective$minimize`.</p></dd>
+<dd><p>(<code>logical(1)</code>) Indicator to whether minimize or optimize the objective. The default (<code>NULL</code>)
+uses the option defined in <code>objective$minimize</code>.</p></dd>
 
 
 </dl><p></p></div>
@@ -161,7 +160,7 @@ uses the option defined in `objective$minimize`.</p></dd>
 
 </div><p></p><hr><a id="method-OptimizerNAG-update"></a><div class="section">
 <h3 id="method-update-">Method <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code><a class="anchor" aria-label="anchor" href="#method-update-"></a></h3>
-<p>Calculate the update for `x`</p><div class="section">
+<p>Calculate the update for <code>x</code></p><div class="section">
 <h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">OptimizerNAG</span><span class="op">$</span><span class="fu">update</span><span class="op">(</span><span class="va">lr</span>, <span class="va">mom</span>, <span class="va">minimize</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
@@ -169,15 +168,15 @@ uses the option defined in `objective$minimize`.</p></dd>
 <div class="section">
 <h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>lr</code></dt>
-<dd><p>(`numeric(1)`) The learning rate.</p></dd>
+<dd><p>(<code>numeric(1)</code>) The learning rate.</p></dd>
 
 
 <dt><code>mom</code></dt>
-<dd><p>(`numeric(1)`) The momentum.</p></dd>
+<dd><p>(<code>numeric(1)</code>) The momentum.</p></dd>
 
 
 <dt><code>minimize</code></dt>
-<dd><p>(`logical(1)`) Indicator to whether minimize or optimize the objective (default = `TRUE`).</p></dd>
+<dd><p>(<code>logical(1)</code>) Indicator to whether minimize or optimize the objective (default = <code>TRUE</code>).</p></dd>
 
 
 </dl><p></p></div>

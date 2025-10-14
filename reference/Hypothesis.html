@@ -13,7 +13,7 @@ visualized like a learner on 1D or 2D inputs."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">vistool</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -21,19 +21,18 @@ visualized like a learner on 1D or 2D inputs."></head><body>
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/vistool.html">Get started</a></li>
-<li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+      <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><h6 class="dropdown-header" data-toc-skip>Core</h6></li>
-    <li><a class="dropdown-item" href="../articles/loss_functions.html">Loss Functions</a></li>
-    <li><a class="dropdown-item" href="../articles/model.html">Model Predictions</a></li>
-    <li><a class="dropdown-item" href="../articles/objective.html">Objective Functions</a></li>
-    <li><a class="dropdown-item" href="../articles/optimization_traces.html">Optimization &amp; Traces</a></li>
+    <li><a class="dropdown-item" href="../articles/loss_functions.html">Loss functions</a></li>
+    <li><a class="dropdown-item" href="../articles/model.html">Model predictions</a></li>
+    <li><a class="dropdown-item" href="../articles/objective.html">Objective functions</a></li>
+    <li><a class="dropdown-item" href="../articles/optimization_traces.html">Optimization &amp; traces</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Customization</h6></li>
-    <li><a class="dropdown-item" href="../articles/customization_guide.html">Customization Guide</a></li>
-    <li><a class="dropdown-item" href="../articles/advanced_visualization.html">Advanced Visualization</a></li>
+    <li><a class="dropdown-item" href="../articles/customization_guide.html">Customization guide</a></li>
+    <li><a class="dropdown-item" href="../articles/advanced_visualization.html">Advanced visualization</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -75,67 +74,67 @@ visualized like a learner on 1D or 2D inputs.</p>
 
 
 <dl><dt id="arg-fun">fun<a class="anchor" aria-label="anchor" href="#arg-fun"></a></dt>
-<dd><p>(`function`)
-Function defining the hypothesis. Accepted signatures:
-- 1D: `fun(x, ...)` or `fun(data)` where `data` is a data.frame with one predictor column
-- 2D: `fun(x, y, ...)` or `fun(data)` where `data` is a data.frame with two predictor columns</p></dd>
+<dd><p>(<code>function</code>)
+Function defining the hypothesis. Accepted signatures:</p><ul><li><p>1D: <code>fun(x, ...)</code> or <code>fun(data)</code> where <code>data</code> is a data.frame with one predictor column</p></li>
+<li><p>2D: <code>fun(x, y, ...)</code> or <code>fun(data)</code> where <code>data</code> is a data.frame with two predictor columns</p></li>
+</ul></dd>
 
 
 <dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
-<dd><p>(`character(1)`) One of "regr" or "classif".</p></dd>
+<dd><p>(<code>character(1)</code>) One of "regr" or "classif".</p></dd>
 
 
 <dt id="arg-predictors">predictors<a class="anchor" aria-label="anchor" href="#arg-predictors"></a></dt>
-<dd><p>(`character()`) Names of the predictor columns. Length must be 1 or 2.</p></dd>
+<dd><p>(<code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code>) Names of the predictor columns. Length must be 1 or 2.</p></dd>
 
 
 <dt id="arg-link">link<a class="anchor" aria-label="anchor" href="#arg-link"></a></dt>
-<dd><p>(`character(1)`) Link for classif outputs: "identity" (default) or "logit".
+<dd><p>(<code>character(1)</code>) Link for classif outputs: "identity" (default) or "logit".
 For regression, only "identity" is used.</p></dd>
 
 
 <dt id="arg-domain">domain<a class="anchor" aria-label="anchor" href="#arg-domain"></a></dt>
-<dd><p>(`list`|`NULL`) Named list with limits per predictor, e.g.,
-`list(x = c(-3, 3))` for 1D or `list(x = c(-3,3), y = c(-3,3))` for 2D. Used
+<dd><p>(<code>list</code>|<code>NULL</code>) Named list with limits per predictor, e.g.,
+<code>list(x = c(-3, 3))</code> for 1D or <code>list(x = c(-3,3), y = c(-3,3))</code> for 2D. Used
 when no Task is provided.</p></dd>
 
 
 <dt id="arg-levels">levels<a class="anchor" aria-label="anchor" href="#arg-levels"></a></dt>
-<dd><p>(`character(2)`|`NULL`) Class labels for binary classification.</p></dd>
+<dd><p>(<code>character(2)</code>|<code>NULL</code>) Class labels for binary classification.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>An `R6` Hypothesis object with a `predict(newdata)` method.</p>
+    <p>An <code>R6</code> Hypothesis object with a <code>predict(newdata)</code> method.</p>
     </div>
     <div class="section level2">
     <h2 id="public-fields">Public fields<a class="anchor" aria-label="anchor" href="#public-fields"></a></h2>
     <p></p><div class="r6-fields"><dl><dt><code>fun</code></dt>
-<dd><p>(`function`) User-provided function implementing the hypothesis.</p></dd>
+<dd><p>(<code>function</code>) User-provided function implementing the hypothesis.</p></dd>
 
 
 <dt><code>type</code></dt>
-<dd><p>(`character(1)`) Prediction type, one of "regr" or "classif".</p></dd>
+<dd><p>(<code>character(1)</code>) Prediction type, one of "regr" or "classif".</p></dd>
 
 
 <dt><code>predictors</code></dt>
-<dd><p>(`character()`) Names of predictor columns (length 1 or 2).</p></dd>
+<dd><p>(<code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code>) Names of predictor columns (length 1 or 2).</p></dd>
 
 
 <dt><code>input_dim</code></dt>
-<dd><p>(`integer(1)`) Number of predictors, derived from `predictors`.</p></dd>
+<dd><p>(<code>integer(1)</code>) Number of predictors, derived from <code>predictors</code>.</p></dd>
 
 
 <dt><code>link</code></dt>
-<dd><p>(`character(1)`) Link for classif output: "identity" or "logit".</p></dd>
+<dd><p>(<code>character(1)</code>) Link for classif output: "identity" or "logit".</p></dd>
 
 
 <dt><code>domain</code></dt>
-<dd><p>(`list`|`NULL`) Named list with limits per predictor for plotting without a Task.</p></dd>
+<dd><p>(<code>list</code>|<code>NULL</code>) Named list with limits per predictor for plotting without a Task.</p></dd>
 
 
 <dt><code>levels</code></dt>
-<dd><p>(`character(2)`|`NULL`) Class labels for binary classification.</p></dd>
+<dd><p>(<code>character(2)</code>|<code>NULL</code>) Class labels for binary classification.</p></dd>
 
 
 </dl><p></p></div>
@@ -166,27 +165,27 @@ when no Task is provided.</p></dd>
 <div class="section">
 <h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>fun</code></dt>
-<dd><p>(`function`) See class field `fun`.</p></dd>
+<dd><p>(<code>function</code>) See class field <code>fun</code>.</p></dd>
 
 
 <dt><code>type</code></dt>
-<dd><p>(`character(1)`) See class field `type`.</p></dd>
+<dd><p>(<code>character(1)</code>) See class field <code>type</code>.</p></dd>
 
 
 <dt><code>predictors</code></dt>
-<dd><p>(`character()`) See class field `predictors`.</p></dd>
+<dd><p>(<code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code>) See class field <code>predictors</code>.</p></dd>
 
 
 <dt><code>link</code></dt>
-<dd><p>(`character(1)`) See class field `link`.</p></dd>
+<dd><p>(<code>character(1)</code>) See class field <code>link</code>.</p></dd>
 
 
 <dt><code>domain</code></dt>
-<dd><p>(`list`|`NULL`) See class field `domain`.</p></dd>
+<dd><p>(<code>list</code>|<code>NULL</code>) See class field <code>domain</code>.</p></dd>
 
 
 <dt><code>levels</code></dt>
-<dd><p>(`character(2)`|`NULL`) See class field `levels`.</p></dd>
+<dd><p>(<code>character(2)</code>|<code>NULL</code>) See class field <code>levels</code>.</p></dd>
 
 
 </dl><p></p></div>
@@ -202,14 +201,14 @@ when no Task is provided.</p></dd>
 <div class="section">
 <h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>newdata</code></dt>
-<dd><p>(`data.frame`) with columns matching `predictors` in order</p></dd>
+<dd><p>(<code>data.frame</code>) with columns matching <code>predictors</code> in order</p></dd>
 
 
 </dl><p></p></div>
 </div>
 <div class="section">
 <h4 id="returns">Returns<a class="anchor" aria-label="anchor" href="#returns"></a></h4>
-<p>numeric vector of predictions (regression) or probabilities in [0,1] (classification)</p>
+<p>numeric vector of predictions (regression) or probabilities in \([0, 1]\) (classification)</p>
 </div>
 
 </div><p></p><hr><a id="method-Hypothesis-clone"></a><div class="section">

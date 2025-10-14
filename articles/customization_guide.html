@@ -5,12 +5,12 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Customization Guide • vistool</title>
+<title>Customization guide • vistool</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Customization Guide">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Customization guide">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">vistool</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -29,20 +29,19 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item"><a class="nav-link" href="../articles/vistool.html">Get started</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><h6 class="dropdown-header" data-toc-skip>Core</h6></li>
-    <li><a class="dropdown-item" href="../articles/loss_functions.html">Loss Functions</a></li>
-    <li><a class="dropdown-item" href="../articles/model.html">Model Predictions</a></li>
-    <li><a class="dropdown-item" href="../articles/objective.html">Objective Functions</a></li>
-    <li><a class="dropdown-item" href="../articles/optimization_traces.html">Optimization &amp; Traces</a></li>
+    <li><a class="dropdown-item" href="../articles/loss_functions.html">Loss functions</a></li>
+    <li><a class="dropdown-item" href="../articles/model.html">Model predictions</a></li>
+    <li><a class="dropdown-item" href="../articles/objective.html">Objective functions</a></li>
+    <li><a class="dropdown-item" href="../articles/optimization_traces.html">Optimization &amp; traces</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Customization</h6></li>
-    <li><a class="dropdown-item" href="../articles/customization_guide.html">Customization Guide</a></li>
-    <li><a class="dropdown-item" href="../articles/advanced_visualization.html">Advanced Visualization</a></li>
+    <li><a class="dropdown-item" href="../articles/customization_guide.html">Customization guide</a></li>
+    <li><a class="dropdown-item" href="../articles/advanced_visualization.html">Advanced visualization</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -64,7 +63,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>Customization Guide</h1>
+      <h1>Customization guide</h1>
             
       
 
@@ -78,28 +77,32 @@
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mlr3.mlr-org.com" class="external-link">mlr3</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mlr3learners.mlr-org.com" class="external-link">mlr3learners</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<p>The vistool package provides a flexible theme system that separates
-<strong>what to plot</strong> from <strong>how to plot</strong>. The
-three-step workflow:</p>
+<p><code>vistool</code> cleanly separates <strong>what to plot</strong>
+from <strong>how it should look</strong>. Work through it in three quick
+moves:</p>
 <ol style="list-style-type: decimal">
 <li>
-<strong>Initialize</strong> the Visualizer using
-<code><a href="../reference/as_visualizer.html">as_visualizer()</a></code> (computational setup only - the
-<strong>what</strong>) and set the theme,</li>
+<strong>Initialize</strong> a visualizer with
+<code><a href="../reference/as_visualizer.html">as_visualizer()</a></code> to handle the computation and choose a
+theme,</li>
 <li>
-<strong>Add</strong> visualization layers with automatic color
-management,</li>
+<strong>add</strong> layers that pick up colors automatically,</li>
 <li>
-<strong>Plot</strong> using <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> with optional
-customization, and optionally <code><a href="https://rdrr.io/r/base/save.html" class="external-link">save()</a></code>,</li>
+<strong>plot</strong> with <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>, tweaking options as
+needed, and optionally call <code><a href="https://rdrr.io/r/base/save.html" class="external-link">save()</a></code>.</li>
 </ol>
-<p>supports consistent customization across all visualization types with
-a clear precedence hierarchy.</p>
+<blockquote>
+<p>NOTE: The built-in themes (<code>viridis</code>, <code>plasma</code>,
+<code>grayscale</code>) are tuned to look great out of the box, so you
+can skip extra styling and still land on a polished plot.</p>
+</blockquote>
+<p>This keeps customization consistent across every visualization while
+respecting the theme precedence.</p>
 <div class="section level2">
-<h2 id="theme-system-overview">Theme System Overview<a class="anchor" aria-label="anchor" href="#theme-system-overview"></a>
+<h2 id="theme-system-overview">Theme system overview<a class="anchor" aria-label="anchor" href="#theme-system-overview"></a>
 </h2>
 <div class="section level3">
-<h3 id="theme-precedence-highest-to-lowest">Theme Precedence (Highest to Lowest)<a class="anchor" aria-label="anchor" href="#theme-precedence-highest-to-lowest"></a>
+<h3 id="theme-precedence-highest-to-lowest">Theme precedence (highest to lowest)<a class="anchor" aria-label="anchor" href="#theme-precedence-highest-to-lowest"></a>
 </h3>
 <ol style="list-style-type: decimal">
 <li>
@@ -121,7 +124,7 @@ a clear precedence hierarchy.</p>
 </ol>
 </div>
 <div class="section level3">
-<h3 id="creating-and-using-themes">Creating and Using Themes<a class="anchor" aria-label="anchor" href="#creating-and-using-themes"></a>
+<h3 id="creating-and-using-themes">Creating and using themes<a class="anchor" aria-label="anchor" href="#creating-and-using-themes"></a>
 </h3>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">my_theme</span> <span class="op">=</span> <span class="fu"><a href="../reference/vistool_theme.html">vistool_theme</a></span><span class="op">(</span></span>
@@ -151,7 +154,7 @@ a clear precedence hierarchy.</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="layer-specific-customization">Layer-Specific Customization<a class="anchor" aria-label="anchor" href="#layer-specific-customization"></a>
+<h2 id="layer-specific-customization">Layer-specific customization<a class="anchor" aria-label="anchor" href="#layer-specific-customization"></a>
 </h2>
 <p>All <code>add_*()</code> methods support style parameters that
 override theme defaults (see the reference!). Below are common
@@ -195,13 +198,43 @@ examples:</p>
 <span>  alpha <span class="op">=</span> <span class="cn">NULL</span>              <span class="co"># Alpha transparency (NULL -&gt; theme$alpha)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
+<div class="section level3">
+<h3 id="add_annotation">
+<code>add_annotation()</code><a class="anchor" aria-label="anchor" href="#add_annotation"></a>
+</h3>
+<p><code>add_annotation()</code> attaches text callouts to any
+visualizer. Supply absolute coordinates via <code>x</code>,
+<code>y</code>, and <code>z</code> (surface plots), or pass
+<code>position = list(...)</code> with values in <code>[0, 1]</code> for
+relative placement. The method honors the current theme, resolving
+<code>color = "auto"</code>, default text size, and opacity
+automatically; you can still override them per annotation. Set
+<code>latex = TRUE</code> to typeset the label (requires
+<code>latex2exp</code> for ggplot2).</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Absolute placement in data space</span></span>
+<span><span class="va">vis</span><span class="op">$</span><span class="fu">add_annotation</span><span class="op">(</span></span>
+<span>  text <span class="op">=</span> <span class="st">"Optimum"</span>,</span>
+<span>  x <span class="op">=</span> <span class="fl">0</span>, y <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  color <span class="op">=</span> <span class="st">"auto"</span>,</span>
+<span>  opacity <span class="op">=</span> <span class="fl">0.8</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Relative placement in the plot window</span></span>
+<span><span class="va">vis</span><span class="op">$</span><span class="fu">add_annotation</span><span class="op">(</span></span>
+<span>  text <span class="op">=</span> <span class="st">"${}\\nabla f = 0$"</span>,</span>
+<span>  latex <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  position <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">0.85</span>, y <span class="op">=</span> <span class="fl">0.2</span>, reference <span class="op">=</span> <span class="st">"figure"</span><span class="op">)</span>,</span>
+<span>  color <span class="op">=</span> <span class="st">"auto"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
 </div>
 <div class="section level2">
-<h2 id="plot-level-customization">Plot-Level Customization<a class="anchor" aria-label="anchor" href="#plot-level-customization"></a>
+<h2 id="plot-level-customization">Plot-level customization<a class="anchor" aria-label="anchor" href="#plot-level-customization"></a>
 </h2>
 <p>The <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method accepts theme overrides and functional
 parameters:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">vis</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span></span>
 <span>  <span class="co"># Theme override (merged with instance theme)</span></span>
 <span>  theme <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
@@ -224,11 +257,11 @@ parameters:</p>
 <span>  z_limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">100</span><span class="op">)</span>          <span class="co"># For surface plots</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>Note that you can further customize the returned plot objects
-directly by adding <em>manual layers</em>. For some examples, see the <a href="advanced_visualization.html">Advanced Visualization</a>
+directly by adding <em>manual layers</em>. For some examples, see the <a href="advanced_visualization.html">Advanced visualization</a>
 vignette.</p>
 </div>
 <div class="section level2">
-<h2 id="automatic-color-management">Automatic Color Management<a class="anchor" aria-label="anchor" href="#automatic-color-management"></a>
+<h2 id="automatic-color-management">Automatic color management<a class="anchor" aria-label="anchor" href="#automatic-color-management"></a>
 </h2>
 <p>All visual elements support automatic color assignment using
 <code>color = "auto"</code>:</p>
@@ -240,7 +273,7 @@ multiple layers</li>
 <li>The color index resets on each <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> call</li>
 <li>Manual colors override automatic assignment</li>
 </ul>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Example: Multiple traces with auto colors</span></span>
 <span><span class="va">vis</span> <span class="op">=</span> <span class="fu"><a href="../reference/as_visualizer.html">as_visualizer</a></span><span class="op">(</span><span class="fu"><a href="../reference/obj.html">obj</a></span><span class="op">(</span><span class="st">"TF_branin"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"2d"</span><span class="op">)</span></span>
 <span><span class="va">vis</span><span class="op">$</span><span class="fu">set_theme</span><span class="op">(</span><span class="fu"><a href="../reference/vistool_theme.html">vistool_theme</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"plasma"</span><span class="op">)</span><span class="op">)</span></span>
@@ -253,9 +286,9 @@ multiple layers</li>
 <span><span class="va">p</span> <span class="op">=</span> <span class="va">vis</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="example-complete-workflow">Example: Complete Workflow<a class="anchor" aria-label="anchor" href="#example-complete-workflow"></a>
+<h2 id="example-complete-workflow">Example: complete workflow<a class="anchor" aria-label="anchor" href="#example-complete-workflow"></a>
 </h2>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 1. Create visualizer (computational setup only)</span></span>
 <span><span class="va">task</span> <span class="op">=</span> <span class="fu"><a href="https://mlr3.mlr-org.com/reference/mlr_sugar.html" class="external-link">tsk</a></span><span class="op">(</span><span class="st">"mtcars"</span><span class="op">)</span><span class="op">$</span><span class="fu">select</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"wt"</span>, <span class="st">"hp"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">learner</span> <span class="op">=</span> <span class="fu"><a href="https://mlr3.mlr-org.com/reference/mlr_sugar.html" class="external-link">lrn</a></span><span class="op">(</span><span class="st">"regr.lm"</span><span class="op">)</span></span>
@@ -275,16 +308,16 @@ multiple layers</li>
 <span></span>
 <span><span class="co"># 4. Plot with theme override for this render only</span></span>
 <span><span class="va">vis</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span>theme <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>text_size <span class="op">=</span> <span class="fl">14</span>, legend_position <span class="op">=</span> <span class="st">"top"</span><span class="op">)</span>, show_title <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="customization_guide_files/figure-html/unnamed-chunk-8-1.png" width="100%" height="700px"></p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<p><img src="customization_guide_files/figure-html/unnamed-chunk-9-1.png" width="100%" height="700px"></p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 5. Save uses the cached plot for efficiency</span></span>
 <span><span class="va">vis</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span><span class="st">"my_plot.png"</span>, width <span class="op">=</span> <span class="fl">8</span>, height <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="package-level-defaults">Package-Level Defaults<a class="anchor" aria-label="anchor" href="#package-level-defaults"></a>
+<h2 id="package-level-defaults">Package-level defaults<a class="anchor" aria-label="anchor" href="#package-level-defaults"></a>
 </h2>
 <p>Set global defaults that apply to all new visualizers:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Set package default theme</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>vistool.theme <span class="op">=</span> <span class="fu"><a href="../reference/vistool_theme.html">vistool_theme</a></span><span class="op">(</span></span>
 <span>  palette <span class="op">=</span> <span class="st">"plasma"</span>,</span>
@@ -303,13 +336,13 @@ multiple layers</li>
 <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a>
 </h2>
 <ul>
-<li><a href="loss_functions.html">Loss Functions</a></li>
-<li><a href="model.html">Model Predictions</a></li>
-<li><a href="objective.html">Objective Functions</a></li>
+<li><a href="loss_functions.html">Loss functions</a></li>
+<li><a href="model.html">Model predictions</a></li>
+<li><a href="objective.html">Objective functions</a></li>
 <li><a href="optimization_traces.html">Optimization &amp;
-Traces</a></li>
+traces</a></li>
 <li><a href="advanced_visualization.html">Advanced
-Visualization</a></li>
+visualization</a></li>
 </ul>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
