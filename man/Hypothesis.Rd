@@ -123,7 +123,7 @@ Predict on newdata
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-numeric vector of predictions (regression) or probabilities in \link{0,1} (classification)
+numeric vector of predictions (regression) or probabilities in \eqn{[0, 1]} (classification)
 }
 }
 \if{html}{\out{<hr>}}

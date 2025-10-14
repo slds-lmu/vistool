@@ -94,7 +94,7 @@ Hypothesis = R6::R6Class("Hypothesis",
 
     #' @description Predict on newdata
     #' @param newdata (`data.frame`) with columns matching `predictors` in order
-    #' @return numeric vector of predictions (regression) or probabilities in [0,1] (classification)
+    #' @return numeric vector of predictions (regression) or probabilities in \eqn{[0, 1]} (classification)
     predict = function(newdata) {
       checkmate::assert_data_frame(newdata)
       checkmate::assert_true(all(self$predictors %in% colnames(newdata)))
