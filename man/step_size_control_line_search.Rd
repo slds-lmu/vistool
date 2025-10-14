@@ -7,9 +7,9 @@
 step_size_control_line_search(lower = 0, upper = 10)
 }
 \arguments{
-\item{lower}{(`numeric(1)`) The lower bound for the step_size.}
+\item{lower}{(\code{numeric(1)}) The lower bound for the step_size.}
 
-\item{upper}{(`numeric(1)`) The upper bound for the step_size.}
+\item{upper}{(\code{numeric(1)}) The upper bound for the step_size.}
 }
 \value{
 The step size as number.

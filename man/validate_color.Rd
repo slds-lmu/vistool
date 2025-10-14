@@ -7,7 +7,7 @@
 validate_color(color)
 }
 \arguments{
-\item{color}{(`character(1)`)\cr
+\item{color}{(\code{character(1)})\cr
 Color specification. Can be hex code or named color.}
 }
 \value{

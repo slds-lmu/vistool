@@ -7,13 +7,13 @@
 \method{as.data.table}{DictionaryLoss}(x, ..., objects = FALSE)
 }
 \arguments{
-\item{x}{(`DictionaryLoss`)\cr
+\item{x}{(\code{DictionaryLoss})\cr
 The dictionary to convert.}
 
-\item{...}{(`any`)\cr
+\item{...}{(\code{any})\cr
 Additional arguments.}
 
-\item{objects}{(`logical(1)`)\cr
+\item{objects}{(\code{logical(1)})\cr
 Whether to include the objects in the result.}
 }
 \description{

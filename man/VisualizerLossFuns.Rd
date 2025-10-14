@@ -12,20 +12,20 @@ Visualize one or multiple loss functions.
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{losses}}{(`list`)\cr
+\item{\code{losses}}{(\code{list})\cr
 List of LossFunction objects.}
 
-\item{\code{task_type}}{(`character(1)`)\cr
+\item{\code{task_type}}{(\code{character(1)})\cr
 Task type (regr or classif).}
 
-\item{\code{y_pred}}{(`numeric()`)\cr
+\item{\code{y_pred}}{(\code{numeric()})\cr
 Predicted values.}
 
-\item{\code{y_true}}{(`numeric()`)\cr
+\item{\code{y_true}}{(\code{numeric()})\cr
 True values.}
 
-\item{\code{input_type}}{(`character(1)`)\cr
-Input scale for classification tasks: `"score"` (margin‑based, default) or `"probability"`.}
+\item{\code{input_type}}{(\code{character(1)})\cr
+Input scale for classification tasks: \code{"score"} (margin‑based, default) or \code{"probability"}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -53,7 +53,7 @@ Input scale for classification tasks: `"score"` (margin‑based, default) or `"p
 \if{html}{\out{<a id="method-VisualizerLossFuns-new"></a>}}
 \if{latex}{\out{\hypertarget{method-VisualizerLossFuns-new}{}}}
 \subsection{Method \code{new()}}{
-Creates a new instance of this [R6][R6::R6Class] class.
+Creates a new instance of this \link[R6:R6Class]{R6} class.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{VisualizerLossFuns$new(
   losses,
@@ -68,22 +68,22 @@ Creates a new instance of this [R6][R6::R6Class] class.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{losses}}{(`list`)\cr
+\item{\code{losses}}{(\code{list})\cr
 List of LossFunction objects.}
 
-\item{\code{y_pred}}{(`numeric()`)\cr
+\item{\code{y_pred}}{(\code{numeric()})\cr
 Predicted values. Optional.}
 
-\item{\code{y_true}}{(`numeric()`)\cr
+\item{\code{y_true}}{(\code{numeric()})\cr
 True values. Optional.}
 
-\item{\code{input_type}}{(`character(1)`)\cr
-Desired input scale. One of `"auto"`, `"score"`, `"probability"`.
-`"auto"` (default) chooses the common `input_default` of the supplied
+\item{\code{input_type}}{(\code{character(1)})\cr
+Desired input scale. One of \code{"auto"}, \code{"score"}, \code{"probability"}.
+\code{"auto"} (default) chooses the common \code{input_default} of the supplied
 losses.}
 
-\item{\code{n_points}}{(`integer(1)`)
-Default resolution used when calling `$plot()` without specifying `n_points`.
+\item{\code{n_points}}{(\code{integer(1)})
+Default resolution used when calling \verb{$plot()} without specifying \code{n_points}.
 Defaults to 1000.}
 
 \item{\code{...}}{Additional arguments (currently unused).}
@@ -110,21 +110,21 @@ Create and return the ggplot2 plot with model-specific layers.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{n_points}}{(`integer(1)`)\cr
+\item{\code{n_points}}{(\code{integer(1)})\cr
 Number of points to use for plotting the loss functions. Defaults to the
-value configured when constructing the visualizer (via `as_visualizer()`),
+value configured when constructing the visualizer (via \code{as_visualizer()}),
 falling back to 1000 if not set.}
 
-\item{\code{y_curves}}{(`character(1)`)\cr
-When `input_type = "probability"`, choose which curves to display: `"both"`, `"y1"`, or `"y0"`. Default is "both".}
+\item{\code{y_curves}}{(\code{character(1)})\cr
+When \code{input_type = "probability"}, choose which curves to display: \code{"both"}, \code{"y1"}, or \code{"y0"}. Default is "both".}
 
-\item{\code{line_width}}{(`numeric()`)\cr
+\item{\code{line_width}}{(\code{numeric()})\cr
 Line widths for different loss functions. If NULL, uses default width of 1.2 for all lines.}
 
-\item{\code{line_col}}{(`character()`)\cr
+\item{\code{line_col}}{(\code{character()})\cr
 Line colors for different loss functions. If NULL, uses automatic color assignment.}
 
-\item{\code{line_type}}{(`character()`)\cr
+\item{\code{line_type}}{(\code{character()})\cr
 Line types for different loss functions. If NULL, uses "solid" for all lines.}
 
 \item{\code{...}}{Additional arguments passed to the parent plot method.}
@@ -158,32 +158,32 @@ selected loss function at the given x-coordinates.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{x}}{(`numeric()`)\cr
+\item{\code{x}}{(\code{numeric()})\cr
 x-coordinates where to place points on the loss curves. These represent
 the residual values (y-f for regression, y*f for classification scores,
 or probabilities for classification probability mode).}
 
-\item{\code{loss_id}}{(`character(1)`)\cr
+\item{\code{loss_id}}{(\code{character(1)})\cr
 ID of the loss function to use for y-value calculation. If NULL (default),
 uses the first loss function.}
 
-\item{\code{show_line}}{(`logical(1)`)\cr
+\item{\code{show_line}}{(\code{logical(1)})\cr
 If TRUE (default), draws vertical lines from points to x-axis.}
 
-\item{\code{color}}{(`character(1)`)\cr
+\item{\code{color}}{(\code{character(1)})\cr
 Color of the points and lines. Use "auto" for automatic color assignment.
 Default is "auto".}
 
-\item{\code{size}}{(`numeric(1)`)\cr
+\item{\code{size}}{(\code{numeric(1)})\cr
 Size of the points. If NULL, uses theme$point_size. Default is NULL.}
 
-\item{\code{alpha}}{(`numeric(1)`)\cr
+\item{\code{alpha}}{(\code{numeric(1)})\cr
 Alpha transparency of points and lines. If NULL, uses theme$alpha. Default is NULL.}
 
-\item{\code{line_color}}{(`character(1)`)\cr
+\item{\code{line_color}}{(\code{character(1)})\cr
 Color of vertical lines. If NULL, uses the same color as points.}
 
-\item{\code{line_alpha}}{(`numeric(1)`)\cr
+\item{\code{line_alpha}}{(\code{numeric(1)})\cr
 Alpha transparency of vertical lines. If NULL, uses alpha * 0.7.}
 }
 \if{html}{\out{</div>}}

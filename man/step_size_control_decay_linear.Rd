@@ -8,7 +8,7 @@ See https://neptune.ai/blog/how-to-choose-a-learning-rate-scheduler}
 step_size_control_decay_linear(iter_zero = 100L)
 }
 \arguments{
-\item{iter_zero}{(`integer(1)`) The iteration at which the update is shrinked to zero.}
+\item{iter_zero}{(\code{integer(1)}) The iteration at which the update is shrinked to zero.}
 }
 \value{
 The step size as number.

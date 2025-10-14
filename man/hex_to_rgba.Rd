@@ -7,10 +7,10 @@
 hex_to_rgba(hex_color, alpha = 1)
 }
 \arguments{
-\item{hex_color}{(`character(1)`)\cr
+\item{hex_color}{(\code{character(1)})\cr
 Hex color code (e.g., "#1f77b4").}
 
-\item{alpha}{(`numeric(1)`)\cr
+\item{alpha}{(\code{numeric(1)})\cr
 Alpha transparency value between 0 and 1.}
 }
 \value{

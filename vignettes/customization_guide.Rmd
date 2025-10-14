@@ -25,14 +25,15 @@ library(mlr3learners)
 set.seed(1)
 ```
 
-The vistool package provides a flexible theme system that separates **what to plot** from **how to plot**.
-The three-step workflow:
+`vistool` cleanly separates **what to plot** from **how it should look**. Work through it in three quick moves:
 
-1. **Initialize** the Visualizer using `as_visualizer()` (computational setup only - the **what**) and set the theme,
-2. **Add** visualization layers with automatic color management,
-3. **Plot** using `plot()` with optional customization, and optionally `save()`,
+1. **Initialize** a visualizer with `as_visualizer()` to handle the computation and choose a theme,
+2. **add** layers that pick up colors automatically,
+3. **plot** with `plot()`, tweaking options as needed, and optionally call `save()`.
 
-supports consistent customization across all visualization types with a clear precedence hierarchy.
+> NOTE: The built-in themes (`viridis`, `plasma`, `grayscale`) are tuned to look great out of the box, so you can skip extra styling and still land on a polished plot.
+
+This keeps customization consistent across every visualization while respecting the theme precedence.
 
 ## Theme system overview
 

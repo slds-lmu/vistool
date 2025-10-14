@@ -7,12 +7,12 @@
 obj(.key, ...)
 }
 \arguments{
-\item{.key}{(`character(1)`)\cr
-Key passed to the respective [dictionary][mlr3misc::Dictionary] to retrieve the object.}
+\item{.key}{(\code{character(1)})\cr
+Key passed to the respective \link[mlr3misc:Dictionary]{dictionary} to retrieve the object.}
 
-\item{...}{(named `list()`)\cr
+\item{...}{(named \code{list()})\cr
 Named arguments passed to the constructor, or to be set as public field.
-See [mlr3misc::dictionary_sugar_get()] for more details.}
+See \code{\link[mlr3misc:dictionary_sugar_get]{mlr3misc::dictionary_sugar_get()}} for more details.}
 }
 \description{
 Retrieve an objective function from the dictionary.

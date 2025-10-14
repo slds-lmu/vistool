@@ -8,7 +8,7 @@ See https://neptune.ai/blog/how-to-choose-a-learning-rate-scheduler}
 step_size_control_decay_time(decay = 0.01)
 }
 \arguments{
-\item{decay}{(`numeric(1)`)\cr
+\item{decay}{(\code{numeric(1)})\cr
 The decay parameter indicating how fast the step size is reduced.}
 }
 \value{

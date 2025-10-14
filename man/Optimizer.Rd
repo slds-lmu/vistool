@@ -9,23 +9,23 @@ This class defines the optimization technique.
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{id}}{(`character(1)`)\cr
+\item{\code{id}}{(\code{character(1)})\cr
 The id of the object.}
 
-\item{\code{print_trace}}{(`logical(1)` Indicator whether to print the status of `$optimize()`.}
+\item{\code{print_trace}}{(\code{logical(1)} Indicator whether to print the status of \verb{$optimize()}.}
 }
 \if{html}{\out{</div>}}
 }
 \section{Active bindings}{
 \if{html}{\out{<div class="r6-active-bindings">}}
 \describe{
-\item{\code{lr}}{(`numeric(1`) Step size of the algorithm.}
+\item{\code{lr}}{(\verb{numeric(1}) Step size of the algorithm.}
 
-\item{\code{archive}}{(`data.table()`) Archive of all calls to `$eval_store`.}
+\item{\code{archive}}{(\code{data.table()}) Archive of all calls to \verb{$eval_store}.}
 
-\item{\code{objective}}{(`Objective`) The objective function.}
+\item{\code{objective}}{(\code{Objective}) The objective function.}
 
-\item{\code{x}}{(`numeric()`) The numerical input vector used as starting point by `$optimize()`.}
+\item{\code{x}}{(\code{numeric()}) The numerical input vector used as starting point by \verb{$optimize()}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -43,7 +43,7 @@ The id of the object.}
 \if{html}{\out{<a id="method-Optimizer-new"></a>}}
 \if{latex}{\out{\hypertarget{method-Optimizer-new}{}}}
 \subsection{Method \code{new()}}{
-Creates a new instance of this [R6][R6::R6Class] class.
+Creates a new instance of this \link[R6:R6Class]{R6} class.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Optimizer$new(objective, x_start, id = NULL, print_trace = TRUE)}\if{html}{\out{</div>}}
 }
@@ -51,19 +51,19 @@ Creates a new instance of this [R6][R6::R6Class] class.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{objective}}{(`Objective`)\cr
+\item{\code{objective}}{(\code{Objective})\cr
 The objective to optimize.}
 
-\item{\code{x_start}}{(`numeric()`)\cr
+\item{\code{x_start}}{(\code{numeric()})\cr
 Start value of the optimization. Note, after
-the first call of `$optimize()` the last value is used to continue
-optimization. Get this value with `$x`.}
+the first call of \verb{$optimize()} the last value is used to continue
+optimization. Get this value with \verb{$x}.}
 
-\item{\code{id}}{(`character(1)`)\cr
+\item{\code{id}}{(\code{character(1)})\cr
 Id of the object.}
 
-\item{\code{print_trace}}{(`logical(1)`)\cr
-Indicator whether to print the status of `$optimize()`.}
+\item{\code{print_trace}}{(\code{logical(1)})\cr
+Indicator whether to print the status of \verb{$optimize()}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -91,30 +91,30 @@ Prepare updates for adding them to the archive.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{x_out}}{(`numeric()`) The new proposed point by the optimizer.}
+\item{\code{x_out}}{(\code{numeric()}) The new proposed point by the optimizer.}
 
-\item{\code{x_in}}{(`numeric()`) The old input value which is updated to `x_out`.}
+\item{\code{x_in}}{(\code{numeric()}) The old input value which is updated to \code{x_out}.}
 
-\item{\code{update}}{(`numeric()`) The update from `x_in` to `x_out`.}
+\item{\code{update}}{(\code{numeric()}) The update from \code{x_in} to \code{x_out}.}
 
-\item{\code{fval_out}}{(`numeric(1)`) The objective value `objetive$eval(x_out)`.}
+\item{\code{fval_out}}{(\code{numeric(1)}) The objective value \code{objetive$eval(x_out)}.}
 
-\item{\code{fval_in}}{(`numeric(1)`) The objective value `objetive$eval(x_in)`.}
+\item{\code{fval_in}}{(\code{numeric(1)}) The objective value \code{objetive$eval(x_in)}.}
 
-\item{\code{lr}}{(`numeric(1)`) The learning rate used to multiply `update` with.}
+\item{\code{lr}}{(\code{numeric(1)}) The learning rate used to multiply \code{update} with.}
 
-\item{\code{step_size}}{(`numeric(1)`) The step_size used to multiply `lr * update` with.}
+\item{\code{step_size}}{(\code{numeric(1)}) The step_size used to multiply \code{lr * update} with.}
 
-\item{\code{objective}}{(`Objective`) The objective used by `$optimize()`.}
+\item{\code{objective}}{(\code{Objective}) The objective used by \verb{$optimize()}.}
 
-\item{\code{step}}{(`integer(1)`) The step or iteration.}
+\item{\code{step}}{(\code{integer(1)}) The step or iteration.}
 
-\item{\code{...}}{Additional objects added to the archive (e.g. `momentum`).}
+\item{\code{...}}{Additional objects added to the archive (e.g. \code{momentum}).}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-`data.table()` of the input arguments.
+\code{data.table()} of the input arguments.
 }
 }
 \if{html}{\out{<hr>}}
@@ -129,7 +129,7 @@ Add points to the archive.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{ain}}{`data.table()` with names "x_out", "x_in", "update", "fval_out",
+\item{\code{ain}}{\code{data.table()} with names "x_out", "x_in", "update", "fval_out",
 "fval_in", "lr", "objective", and "step".}
 }
 \if{html}{\out{</div>}}
@@ -139,7 +139,7 @@ Add points to the archive.
 \if{html}{\out{<a id="method-Optimizer-set_x"></a>}}
 \if{latex}{\out{\hypertarget{method-Optimizer-set_x}{}}}
 \subsection{Method \code{set_x()}}{
-Set the current input vector used as start point of `$optimize()`.
+Set the current input vector used as start point of \verb{$optimize()}.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Optimizer$set_x(x)}\if{html}{\out{</div>}}
 }
@@ -147,7 +147,7 @@ Set the current input vector used as start point of `$optimize()`.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{x}}{(`numeric()`) Input vector.}
+\item{\code{x}}{(\code{numeric()}) Input vector.}
 }
 \if{html}{\out{</div>}}
 }

@@ -112,93 +112,95 @@ as_visualizer(
 )
 }
 \arguments{
-\item{x}{(`any`)\cr
+\item{x}{(\code{any})\cr
 Object to convert to a visualizer.}
 
-\item{type}{(`character(1)`)\cr
-The type of visualization: "auto" (default), "1d", "2d", or "surface". 
+\item{type}{(\code{character(1)})\cr
+The type of visualization: "auto" (default), "1d", "2d", or "surface".
 If "auto", automatically chooses between 1D and 2D ggplot2 visualizations based on the number of features/dimensions.
 Use "surface" for interactive plotly surface plots (2D inputs only, Models and Objectives only).}
 
-\item{x1_limits}{(`numeric(2)`)\cr
+\item{x1_limits}{(\code{numeric(2)})\cr
 The x1 limits.}
 
-\item{x2_limits}{(`numeric(2)`)\cr
+\item{x2_limits}{(\code{numeric(2)})\cr
 The x2 limits.}
 
-\item{padding}{(`numeric(1)`)\cr
+\item{padding}{(\code{numeric(1)})\cr
 A margin that is added to x1limits and x2limits.
-The x1 margin is calculated by `max(x1lmits) - min(x1limits) * padding`.}
+The x1 margin is calculated by \code{max(x1lmits) - min(x1limits) * padding}.}
 
-\item{n_points}{(`integer(1)`)\cr
+\item{n_points}{(\code{integer(1)})\cr
 The number of generated point per dimension.
-Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
+Note that a grid of \code{npoints^2} values is generated and evaluated by \code{objective$eval(x)} to plot the surface.}
 
-\item{y_pred}{(`numeric()`)
+\item{y_pred}{(\code{numeric()})
 Predicted values (for loss function visualizations).}
 
-\item{y_true}{(`numeric()`)
+\item{y_true}{(\code{numeric()})
 True values (for loss function visualizations).}
 
-\item{input_type}{(`character(1)`)
-One of `"auto"` (default), `"score"`, or `"probability"`. Passed through to
+\item{input_type}{(\code{character(1)})
+One of \code{"auto"} (default), \code{"score"}, or \code{"probability"}. Passed through to
 the loss visualizer.}
 
-\item{y_curves}{(`character(1)`)
-Which response curve(s) to draw when `input_type = "probability"`.
-One of `"both"`, `"y1"`, or `"y0"`.}
+\item{y_curves}{(\code{character(1)})
+Which response curve(s) to draw when \code{input_type = "probability"}.
+One of \code{"both"}, \code{"y1"}, or \code{"y0"}.}
 
-\item{learner}{(`mlr3::Learner`)\cr
+\item{learner}{(\code{mlr3::Learner})\cr
 The learner to train the model with.}
 
-\item{hypothesis}{(`Hypothesis`|`NULL`)
+\item{hypothesis}{(\code{Hypothesis}|\code{NULL})
 Optional hypothesis object that provides predictions instead of a learner.
-Supply either `learner` or `hypothesis`, but not both.}
+Supply either \code{learner} or \code{hypothesis}, but not both.}
 
-\item{domain}{(`list`|`NULL`)
+\item{domain}{(\code{list}|\code{NULL})
 Named list giving axis limits per predictor when no Task data is available,
-e.g., `list(x = c(-1, 1))` for 1D or `list(x = c(-1,1), y = c(-1,1))` for 2D.}
+e.g., \code{list(x = c(-1, 1))} for 1D or \code{list(x = c(-1,1), y = c(-1,1))} for 2D.}
 
-\item{retrain}{(`logical(1)`)
-If a learner is supplied, whether it should be (re)trained on the task (`TRUE`, default)
-or reused as-is (`FALSE`). If `FALSE` but the learner is untrained, a warning is issued
+\item{retrain}{(\code{logical(1)})
+If a learner is supplied, whether it should be (re)trained on the task (\code{TRUE}, default)
+or reused as-is (\code{FALSE}). If \code{FALSE} but the learner is untrained, a warning is issued
 and training is performed.}
 }
 \value{
-An object inheriting from a Visualizer class (e.g. `VisualizerModel`,
-`VisualizerObj`, or `VisualizerLossFuns`) depending on the input and selected type.
+An object inheriting from a Visualizer class (e.g. \code{VisualizerModel},
+\code{VisualizerObj}, or \code{VisualizerLossFuns}) depending on the input and selected type.
 }
 \description{
-`as_visualizer()` inspects its input and instantiates the matching visualizer class.
+\code{as_visualizer()} inspects its input and instantiates the matching visualizer class.
 All common arguments are validated first so that incompatible combinations fail fast
 with informative messages before any expensive rendering work is scheduled.
 }
 \details{
-By default (`type = "auto"`), `as_visualizer()` chooses a ggplot2 backend for 1D and 2D
+By default (\code{type = "auto"}), \code{as_visualizer()} chooses a ggplot2 backend for 1D and 2D
 inputs. For 2D models or objectives you can opt into interactive plotly surfaces via
-`type = "surface"`. All inputs are checked by a shared validation helper that enforces
-mutual exclusivity of `learner`/`hypothesis`, ensures limits are finite and ordered, and
+\code{type = "surface"}. All inputs are checked by a shared validation helper that enforces
+mutual exclusivity of \code{learner}/\code{hypothesis}, ensures limits are finite and ordered, and
 rejects parameters that are irrelevant for the chosen input.
 }
 \section{Supported inputs}{
 
 \tabular{llll}{
-  Input & Auto `type` & Allowed overrides & Notes \\
-  `Task` & `"1d"` (1 feature) or `"2d"` (2 features) & `type = "surface"` (2D only) & Exactly one of `learner`/`hypothesis`; `domain` is ignored and therefore rejected. \\
-  `Hypothesis` & matches `input_dim` & `type = "surface"` (2D only) & Requires complete `domain`; `learner` not supported. \\
-  `Objective` & matches `xdim` when available & `type = "surface"` (2D only) & `learner`/`hypothesis` not supported. \\
-  `LossFunction` or list of losses & always `"1d"` & `n_points` & `input_type`, `y_pred`, `y_true`, `y_curves`, and `n_points` are forwarded to the loss visualizer. \\
+Input & Auto \code{type} & Allowed overrides & Notes \\
+\code{Task} & \code{"1d"} (1 feature) or \code{"2d"} (2 features) & \code{type = "surface"} (2D only) & Exactly one of \code{learner}/\code{hypothesis}; \code{domain} is ignored and therefore rejected. \\
+\code{Hypothesis} & matches \code{input_dim} & \code{type = "surface"} (2D only) & Requires complete \code{domain}; \code{learner} not supported. \\
+\code{Objective} & matches \code{xdim} when available & \code{type = "surface"} (2D only) & \code{learner}/\code{hypothesis} not supported. \\
+\code{LossFunction} or list of losses & always \code{"1d"} & \code{n_points} & \code{input_type}, \code{y_pred}, \code{y_true}, \code{y_curves}, and \code{n_points} are forwarded to the loss visualizer. \\
 }
 }
 
 \section{Validation}{
 
 Common argument validation is centralized so that:
-* unused parameters (e.g. 2D limits supplied for 1D losses) raise an error,
-* limits supplied manually are finite, strictly ordered, and match the dimensionality,
-* high grid resolutions for interactive surfaces trigger explicit warnings, and
-* probability inputs for loss visualizations are checked for consistency of
-  `input_type`, `y_pred`, `y_true`, and `y_curves`.
+\itemize{
+\item unused parameters (e.g. 2D limits supplied for 1D losses) raise an error,
+\item limits supplied manually are finite, strictly ordered, and match the dimensionality,
+\item high grid resolutions for interactive surfaces trigger explicit warnings, and
+\item probability inputs for loss visualizations are checked for consistency of
+\code{input_type}, \code{y_pred}, \code{y_true}, and \code{y_curves}.
+}
 }
 
 \examples{
@@ -213,6 +215,6 @@ tryCatch(
 
 }
 \seealso{
-[VisualizerModel], [VisualizerSurfaceModel], [VisualizerObj], [VisualizerSurfaceObj],
-[VisualizerLossFuns]
+\link{VisualizerModel}, \link{VisualizerSurfaceModel}, \link{VisualizerObj}, \link{VisualizerSurfaceObj},
+\link{VisualizerLossFuns}
 }

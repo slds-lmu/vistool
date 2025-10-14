@@ -13,11 +13,11 @@ Creates 3D surface and contour plots for better visualization of 2D functions.
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{grid}}{(`list()`)\cr
-List with the `x1` and `x2` grid.}
+\item{\code{grid}}{(\code{list()})\cr
+List with the \code{x1} and \code{x2} grid.}
 
-\item{\code{zmat}}{(`matrix()`)\cr
-The result of evaluation at each element of the cross product of `grid$x1` and `grid$x2`.}
+\item{\code{zmat}}{(\code{matrix()})\cr
+The result of evaluation at each element of the cross product of \code{grid$x1} and \code{grid$x2}.}
 
 \item{\code{plot_lab}}{(character(1)\cr
 Label of the plot.}
@@ -62,7 +62,7 @@ Label of the z axis.}
 \if{html}{\out{<a id="method-VisualizerSurface-new"></a>}}
 \if{latex}{\out{\hypertarget{method-VisualizerSurface-new}{}}}
 \subsection{Method \code{new()}}{
-Creates a new instance of this [R6][R6::R6Class] class.
+Creates a new instance of this \link[R6:R6Class]{R6} class.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{VisualizerSurface$new(
   grid,
@@ -77,22 +77,22 @@ Creates a new instance of this [R6][R6::R6Class] class.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{grid}}{(`list()`)\cr
-List with the `x1` and `x2` grid.}
+\item{\code{grid}}{(\code{list()})\cr
+List with the \code{x1} and \code{x2} grid.}
 
-\item{\code{zmat}}{(`matrix()`)\cr
-The result of evaluation at each element of the cross product of `grid$x1` and `grid$x2`.}
+\item{\code{zmat}}{(\code{matrix()})\cr
+The result of evaluation at each element of the cross product of \code{grid$x1} and \code{grid$x2}.}
 
-\item{\code{plot_lab}}{(`character(1)`)\cr
+\item{\code{plot_lab}}{(\code{character(1)})\cr
 Label of the plot.}
 
-\item{\code{x1_lab}}{(`character(1)`)\cr
+\item{\code{x1_lab}}{(\code{character(1)})\cr
 Label of the x1 axis.}
 
-\item{\code{x2_lab}}{(`character(1)`)\cr
+\item{\code{x2_lab}}{(\code{character(1)})\cr
 Label of the x2 axis.}
 
-\item{\code{z_lab}}{(`character(1)`)\cr
+\item{\code{z_lab}}{(\code{character(1)})\cr
 Label of the z axis.}
 }
 \if{html}{\out{</div>}}
@@ -116,20 +116,20 @@ This method is called automatically by plot() and should not be called directly.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{opacity}}{(`numeric(1)`)\cr
+\item{\code{opacity}}{(\code{numeric(1)})\cr
 Opacity of the contour plot (0-1). If NULL, uses theme default.}
 
-\item{\code{colorscale}}{(`list`)\cr
+\item{\code{colorscale}}{(\code{list})\cr
 Color scale for the contour plot. If NULL or "auto", uses theme palette.}
 
-\item{\code{show_title}}{(`logical(1)`)\cr
+\item{\code{show_title}}{(\code{logical(1)})\cr
 Whether to show the plot title. Default is TRUE.}
 
-\item{\code{...}}{(`any`)\cr
-Further arguments passed to `add_trace(...)`.}
+\item{\code{...}}{(\code{any})\cr
+Further arguments passed to \code{add_trace(...)}.}
 
-\item{\code{...}}{(`any`)\cr
-Further arguments passed to `add_trace(...)`.}
+\item{\code{...}}{(\code{any})\cr
+Further arguments passed to \code{add_trace(...)}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -152,20 +152,20 @@ This method is called automatically by plot() and should not be called directly.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{opacity}}{(`numeric(1)`)\cr
+\item{\code{opacity}}{(\code{numeric(1)})\cr
 Opacity of the surface plot (0-1). If NULL, uses theme default.}
 
-\item{\code{colorscale}}{(`list`)\cr
+\item{\code{colorscale}}{(\code{list})\cr
 Color scale for the surface plot. If NULL or "auto", uses theme palette.}
 
-\item{\code{show_title}}{(`logical(1)`)\cr
+\item{\code{show_title}}{(\code{logical(1)})\cr
 Whether to show the plot title. Default is TRUE.}
 
-\item{\code{...}}{(`any`)\cr
-Further arguments passed to `add_trace(...)`.}
+\item{\code{...}}{(\code{any})\cr
+Further arguments passed to \code{add_trace(...)}.}
 
-\item{\code{...}}{(`any`)\cr
-Further arguments passed to `add_trace(...)`.}
+\item{\code{...}}{(\code{any})\cr
+Further arguments passed to \code{add_trace(...)}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -183,7 +183,7 @@ This method is used internally by plot(layout = ...) and should not be called di
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{Layout options directly passed to `layout(...)`.}
+\item{\code{...}}{Layout options directly passed to \code{layout(...)}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -201,11 +201,11 @@ This method is used internally by plot(scene = ...) and should not be called dir
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{x}}{(`numeric(1)`) The view from which the "camera looks down" to the plot.}
+\item{\code{x}}{(\code{numeric(1)}) The view from which the "camera looks down" to the plot.}
 
-\item{\code{y}}{(`numeric(1)`) The view from which the "camera looks down" to the plot.}
+\item{\code{y}}{(\code{numeric(1)}) The view from which the "camera looks down" to the plot.}
 
-\item{\code{z}}{(`numeric(1)`) The view from which the "camera looks down" to the plot.}
+\item{\code{z}}{(\code{numeric(1)}) The view from which the "camera looks down" to the plot.}
 }
 \if{html}{\out{</div>}}
 }
@@ -222,8 +222,8 @@ Add contours to the surface plot.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{contours}}{(`list()` or `NULL`)\cr
-Custom contour configuration. If `NULL` (default), adds default z-projected contours.
+\item{\code{contours}}{(\code{list()} or \code{NULL})\cr
+Custom contour configuration. If \code{NULL} (default), adds default z-projected contours.
 Can specify x, y, and z contours with custom properties like start, end, size, and color.
 See plotly documentation for detailed contour options.}
 
@@ -247,13 +247,13 @@ Create and return the plotly plot with model-specific layers.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{flatten}}{(`logical(1)`)\cr
+\item{\code{flatten}}{(\code{logical(1)})\cr
 If TRUE, display as 2D contour plot. If FALSE, display as 3D surface plot.}
 
-\item{\code{layout}}{(`list()`)\cr
-Layout options passed to `plotly::layout()`. Ignored by other visualizer types. Default is NULL.}
+\item{\code{layout}}{(\code{list()})\cr
+Layout options passed to \code{plotly::layout()}. Ignored by other visualizer types. Default is NULL.}
 
-\item{\code{scene}}{(`list()`)\cr
+\item{\code{scene}}{(\code{list()})\cr
 Scene options for 3D plots. Ignored by other visualizer types. Default is NULL.}
 
 \item{\code{...}}{Additional arguments passed to the parent plot method.}

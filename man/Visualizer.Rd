@@ -32,7 +32,7 @@ Set the instance theme (partial override stored separately)
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{theme}}{(`list`) Partial theme created with vistool_theme() or a named list}
+\item{\code{theme}}{(\code{list}) Partial theme created with vistool_theme() or a named list}
 }
 \if{html}{\out{</div>}}
 }
@@ -55,7 +55,7 @@ Get the instance theme (merged with current package default)
 \if{latex}{\out{\hypertarget{method-Visualizer-plot}{}}}
 \subsection{Method \code{plot()}}{
 Base plot method that sets up common plot settings and resolves layer colors.
-This method should be called by all child classes via `super$plot(...)`.
+This method should be called by all child classes via \code{super$plot(...)}.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Visualizer$plot(
   theme = NULL,
@@ -76,40 +76,40 @@ This method should be called by all child classes via `super$plot(...)`.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{theme}}{(`list`)\cr
+\item{\code{theme}}{(\code{list})\cr
 Partial theme override for this render; see vistool_theme().}
 
-\item{\code{show_title}}{(`logical(1)`)\cr
+\item{\code{show_title}}{(\code{logical(1)})\cr
 Indicator whether to show the title of the plot.}
 
-\item{\code{plot_title}}{(`character(1)`)\cr
+\item{\code{plot_title}}{(\code{character(1)})\cr
 Main plot title. If NULL, uses the visualizer's default title. Default is NULL.}
 
-\item{\code{plot_subtitle}}{(`character(1)`)\cr
+\item{\code{plot_subtitle}}{(\code{character(1)})\cr
 Plot subtitle. If NULL, no subtitle is shown. Default is NULL.}
 
-\item{\code{show_legend}}{(`logical(1)`)\cr
+\item{\code{show_legend}}{(\code{logical(1)})\cr
 Whether to show the legend. Default is TRUE.}
 
-\item{\code{legend_title}}{(`character(1)`)\cr
+\item{\code{legend_title}}{(\code{character(1)})\cr
 Title for the legend. If NULL, uses default based on visualizer type. Default is NULL.}
 
-\item{\code{x_lab}}{(`character(1)`)\cr
+\item{\code{x_lab}}{(\code{character(1)})\cr
 X-axis label. If NULL, uses the visualizer's default label. Default is NULL.}
 
-\item{\code{y_lab}}{(`character(1)`)\cr
+\item{\code{y_lab}}{(\code{character(1)})\cr
 Y-axis label. If NULL, uses the visualizer's default label. Default is NULL.}
 
-\item{\code{z_lab}}{(`character(1)`)\cr
+\item{\code{z_lab}}{(\code{character(1)})\cr
 Z-axis label (for surface plots). If NULL, uses the visualizer's default label. Default is NULL.}
 
-\item{\code{x_limits}}{(`numeric(2)`)\cr
+\item{\code{x_limits}}{(\code{numeric(2)})\cr
 X-axis limits as c(min, max). If NULL, uses automatic limits. Default is NULL.}
 
-\item{\code{y_limits}}{(`numeric(2)`)\cr
+\item{\code{y_limits}}{(\code{numeric(2)})\cr
 Y-axis limits as c(min, max). If NULL, uses automatic limits. Default is NULL.}
 
-\item{\code{z_limits}}{(`numeric(2)`)\cr
+\item{\code{z_limits}}{(\code{numeric(2)})\cr
 Z-axis limits as c(min, max) (for surface plots). If NULL, uses automatic limits. Default is NULL.}
 }
 \if{html}{\out{</div>}}
@@ -141,16 +141,16 @@ Save the plot to a file. The format is determined by the file extension.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{filename}}{(`character(1)`)\cr
+\item{\code{filename}}{(\code{character(1)})\cr
 The filename to save the plot to. The file extension determines the format.}
 
-\item{\code{width}}{(`numeric(1)`)\cr
+\item{\code{width}}{(\code{numeric(1)})\cr
 Width of the plot in pixels (for plotly) or inches (for ggplot2).}
 
-\item{\code{height}}{(`numeric(1)`)\cr
+\item{\code{height}}{(\code{numeric(1)})\cr
 Height of the plot in pixels (for plotly) or inches (for ggplot2).}
 
-\item{\code{dpi}}{(`numeric(1)`)\cr
+\item{\code{dpi}}{(\code{numeric(1)})\cr
 Resolution for ggplot2 plots (ignored for plotly plots).}
 
 \item{\code{...}}{Additional arguments passed to the underlying save function.}
@@ -181,37 +181,39 @@ Add points to the plot. This method can be called multiple times to add differen
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{points}}{(`data.frame` or `matrix` or `list`)\cr
+\item{\code{points}}{(\code{data.frame} or \code{matrix} or \code{list})\cr
 The points to add.
-- For 1D: A `data.frame` or `matrix` with one column for x-values, or a numeric vector of x-values. If y-values are not provided, they will be inferred if possible (e.g., for objective functions).
-- For 2D/Surface: A `data.frame` or `matrix` with two columns (x1, x2), or a list of 2-element vectors.}
+\itemize{
+\item For 1D: A \code{data.frame} or \code{matrix} with one column for x-values, or a numeric vector of x-values. If y-values are not provided, they will be inferred if possible (e.g., for objective functions).
+\item For 2D/Surface: A \code{data.frame} or \code{matrix} with two columns (x1, x2), or a list of 2-element vectors.
+}}
 
-\item{\code{color}}{(`character(1)`)\cr
+\item{\code{color}}{(\code{character(1)})\cr
 Color of the points. Use "auto" for automatic color assignment from palette. Default is "auto".}
 
-\item{\code{size}}{(`numeric(1)`)\cr
+\item{\code{size}}{(\code{numeric(1)})\cr
 Size of the points. If NULL, uses theme$point_size. Default is NULL.}
 
-\item{\code{shape}}{(`integer(1)` or `character(1)`)\cr
+\item{\code{shape}}{(\code{integer(1)} or \code{character(1)})\cr
 Shape of the points. For ggplot2: integer codes (e.g., 19 for solid circle). For plotly: shape names. Default is 19/"circle".}
 
-\item{\code{alpha}}{(`numeric(1)`)\cr
+\item{\code{alpha}}{(\code{numeric(1)})\cr
 Alpha transparency of the points. If NULL, uses theme$alpha. Default is NULL.}
 
-\item{\code{annotations}}{(`character`)\cr
+\item{\code{annotations}}{(\code{character})\cr
 Optional text labels for each point. If provided, must be the same length as the number of points.}
 
-\item{\code{annotation_size}}{(`numeric(1)`)\cr
+\item{\code{annotation_size}}{(\code{numeric(1)})\cr
 Size of annotation text. If NULL, defaults to text_size - 2 from plot().}
 
-\item{\code{ordered}}{(`logical(1)`)\cr
-If `TRUE`, draws arrows between consecutive points to indicate order. Default is `FALSE`.}
+\item{\code{ordered}}{(\code{logical(1)})\cr
+If \code{TRUE}, draws arrows between consecutive points to indicate order. Default is \code{FALSE}.}
 
-\item{\code{arrow_color}}{(`character(1)`)\cr
+\item{\code{arrow_color}}{(\code{character(1)})\cr
 Color of arrows when ordered = TRUE. If NULL, uses point color.}
 
-\item{\code{arrow_size}}{(`numeric(1)`)\cr
-Length/size of arrows when `ordered = TRUE`. Default is 0.3 units in the coordinate system.}
+\item{\code{arrow_size}}{(\code{numeric(1)})\cr
+Length/size of arrows when \code{ordered = TRUE}. Default is 0.3 units in the coordinate system.}
 }
 \if{html}{\out{</div>}}
 }
@@ -240,41 +242,41 @@ Add a textual annotation that is resolved during plotting.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{text}}{(`character(1)`)
+\item{\code{text}}{(\code{character(1)})
 The annotation text. Must be non-empty.}
 
-\item{\code{latex}}{(`logical(1)`)
-If `TRUE`, interpret `text` as LaTeX. Requires the `latex2exp` package for ggplot backends.}
+\item{\code{latex}}{(\code{logical(1)})
+If \code{TRUE}, interpret \code{text} as LaTeX. Requires the \code{latex2exp} package for ggplot backends.}
 
-\item{\code{color}}{(`character(1)`)
+\item{\code{color}}{(\code{character(1)})
 Text color. Use "auto" to draw from the active theme palette. Defaults to "auto".}
 
-\item{\code{size}}{(`numeric(1)`)
-Text size in points. Defaults to the effective theme `text_size`.}
+\item{\code{size}}{(\code{numeric(1)})
+Text size in points. Defaults to the effective theme \code{text_size}.}
 
-\item{\code{opacity}}{(`numeric(1)`)
-Text opacity in `[0, 1]`. Defaults to the effective theme `alpha`.}
+\item{\code{opacity}}{(\code{numeric(1)})
+Text opacity in \verb{[0, 1]}. Defaults to the effective theme \code{alpha}.}
 
-\item{\code{x}}{(`numeric(1)`)
-Absolute x-coordinate for the annotation. Required unless `position` is supplied.}
+\item{\code{x}}{(\code{numeric(1)})
+Absolute x-coordinate for the annotation. Required unless \code{position} is supplied.}
 
-\item{\code{y}}{(`numeric(1)`)
-Absolute y-coordinate. Optional for 1D visualizers, required for 2D. Ignored when `position` is used with figure coordinates.}
+\item{\code{y}}{(\code{numeric(1)})
+Absolute y-coordinate. Optional for 1D visualizers, required for 2D. Ignored when \code{position} is used with figure coordinates.}
 
-\item{\code{z}}{(`numeric(1)`)
+\item{\code{z}}{(\code{numeric(1)})
 Absolute z-coordinate for surface visualizers. Optional otherwise.}
 
-\item{\code{position}}{(`list()`|`NULL`)\cr
+\item{\code{position}}{(\code{list()}|\code{NULL})\cr
 Optional relative placement specification for the annotation. Provide a named list
-with entries `x`, `y`, `z` (depending on dimensionality) holding values in `[0, 1]`
-and an optional `reference` that is either `"panel"` (default, data coordinates)
-or `"figure"` (normalized figure coordinates). When `position` is supplied, do not
-pass absolute coordinates via `x`, `y`, or `z`.}
+with entries \code{x}, \code{y}, \code{z} (depending on dimensionality) holding values in \verb{[0, 1]}
+and an optional \code{reference} that is either \code{"panel"} (default, data coordinates)
+or \code{"figure"} (normalized figure coordinates). When \code{position} is supplied, do not
+pass absolute coordinates via \code{x}, \code{y}, or \code{z}.}
 
-\item{\code{hjust}}{(`numeric(1)`)
+\item{\code{hjust}}{(\code{numeric(1)})
 Horizontal justification, following ggplot2 semantics.}
 
-\item{\code{vjust}}{(`numeric(1)`)
+\item{\code{vjust}}{(\code{numeric(1)})
 Vertical justification, following ggplot2 semantics.}
 }
 \if{html}{\out{</div>}}

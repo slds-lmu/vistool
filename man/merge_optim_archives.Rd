@@ -7,7 +7,7 @@
 merge_optim_archives(...)
 }
 \arguments{
-\item{...}{(`any`)\cr
+\item{...}{(\code{any})\cr
 Optimization objects.}
 }
 \description{

@@ -12,7 +12,7 @@ This class defines gradient descent
 \section{Active bindings}{
 \if{html}{\out{<div class="r6-active-bindings">}}
 \describe{
-\item{\code{momentum}}{(`numeric(1)`) Momentum of the algorithm.}
+\item{\code{momentum}}{(\code{numeric(1)}) Momentum of the algorithm.}
 }
 \if{html}{\out{</div>}}
 }
@@ -38,7 +38,7 @@ This class defines gradient descent
 \if{html}{\out{<a id="method-OptimizerGD-new"></a>}}
 \if{latex}{\out{\hypertarget{method-OptimizerGD-new}{}}}
 \subsection{Method \code{new()}}{
-Creates a new instance of this [R6][R6::R6Class] class.
+Creates a new instance of this \link[R6:R6Class]{R6} class.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{OptimizerGD$new(
   objective,
@@ -52,22 +52,22 @@ Creates a new instance of this [R6][R6::R6Class] class.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{objective}}{(`Objective`)\cr
+\item{\code{objective}}{(\code{Objective})\cr
 The objective to optimize.}
 
-\item{\code{x_start}}{(`numeric()`)\cr
+\item{\code{x_start}}{(\code{numeric()})\cr
 Start value of the optimization. Note, after
-the first call of `$optimize()` the last value is used to continue
-optimization. Get this value with `$x`.}
+the first call of \verb{$optimize()} the last value is used to continue
+optimization. Get this value with \verb{$x}.}
 
-\item{\code{lr}}{(`numeric(1)`)\cr
+\item{\code{lr}}{(\code{numeric(1)})\cr
 Step size with which the update is multiplied.}
 
-\item{\code{id}}{(`character(1)`)\cr
+\item{\code{id}}{(\code{character(1)})\cr
 Id of the object.}
 
-\item{\code{print_trace}}{(`logical(1)`)\cr
-Indicator whether to print the status of `$optimize()`.}
+\item{\code{print_trace}}{(\code{logical(1)})\cr
+Indicator whether to print the status of \verb{$optimize()}.}
 }
 \if{html}{\out{</div>}}
 }

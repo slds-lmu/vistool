@@ -17,7 +17,7 @@ the dimensionality and creates appropriate visualizations using ggplot2.
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{objective}}{(`Objective`)\cr
+\item{\code{objective}}{(\code{Objective})\cr
 The objective function.}
 }
 \if{html}{\out{</div>}}
@@ -47,7 +47,7 @@ The objective function.}
 \if{html}{\out{<a id="method-VisualizerObj-new"></a>}}
 \if{latex}{\out{\hypertarget{method-VisualizerObj-new}{}}}
 \subsection{Method \code{new()}}{
-Creates a new instance of this [R6][R6::R6Class] class.
+Creates a new instance of this \link[R6:R6Class]{R6} class.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{VisualizerObj$new(
   objective,
@@ -62,34 +62,34 @@ Creates a new instance of this [R6][R6::R6Class] class.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{objective}}{(`Objective`)\cr
+\item{\code{objective}}{(\code{Objective})\cr
 The objective to optimize.}
 
-\item{\code{x1_limits}}{(`numeric(2)`)\cr
+\item{\code{x1_limits}}{(\code{numeric(2)})\cr
 Limits for the first dimension. For 1D objectives, this controls the x-axis range.
 If NULL, will be determined from objective bounds.}
 
-\item{\code{x2_limits}}{(`numeric(2)`)\cr
+\item{\code{x2_limits}}{(\code{numeric(2)})\cr
 Limits for the second dimension (2D objectives only). Ignored for 1D objectives.
 If NULL, will be determined from objective bounds.}
 
-\item{\code{padding}}{(`numeric(1)`)\cr
+\item{\code{padding}}{(\code{numeric(1)})\cr
 A margin that is added to x1limits and x2limits.
-The x1 margin is calculated by `max(x1lmits) - min(x1limits) * padding`.}
+The x1 margin is calculated by \code{max(x1lmits) - min(x1limits) * padding}.}
 
-\item{\code{padding}}{(`numeric(1)`)\cr
+\item{\code{padding}}{(\code{numeric(1)})\cr
 A margin that is added to x1limits and x2limits.
-The x1 margin is calculated by `max(x1lmits) - min(x1limits) * padding`.}
+The x1 margin is calculated by \code{max(x1lmits) - min(x1limits) * padding}.}
 
-\item{\code{n_points}}{(`integer(1)`)\cr
+\item{\code{n_points}}{(\code{integer(1)})\cr
 The number of generated point per dimension.
-Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
+Note that a grid of \code{npoints^2} values is generated and evaluated by \code{objective$eval(x)} to plot the surface.}
 
-\item{\code{n_points}}{(`integer(1)`)\cr
+\item{\code{n_points}}{(\code{integer(1)})\cr
 The number of generated point per dimension.
-Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
+Note that a grid of \code{npoints^2} values is generated and evaluated by \code{objective$eval(x)} to plot the surface.}
 
-\item{\code{type}}{(`character(1)`)\cr
+\item{\code{type}}{(\code{character(1)})\cr
 Optional visualization type ("1d" or "2d") to override automatic dimension detection.
 Useful when objective dimensions are unknown but visualization type is explicitly specified.}
 }
@@ -122,43 +122,43 @@ Add optimization trace to the plot.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{optimizer}}{(`Optimizer`)\cr
+\item{\code{optimizer}}{(\code{Optimizer})\cr
 The optimizer to add to the plot. Must have been run and contain archive data.}
 
-\item{\code{line_color}}{(`character(1)`)\cr
+\item{\code{line_color}}{(\code{character(1)})\cr
 Color of the optimization trace line. If NULL, uses automatic color.}
 
-\item{\code{line_width}}{(`numeric(1)`)\cr
+\item{\code{line_width}}{(\code{numeric(1)})\cr
 Width of the trace line. If NULL, uses theme$line_width.}
 
-\item{\code{line_type}}{(`character(1)`)\cr
+\item{\code{line_type}}{(\code{character(1)})\cr
 Type of the trace line. One of "solid", "dashed", "dotted". Default is "solid".}
 
-\item{\code{npoints}}{(`integer(1)`)\cr
+\item{\code{npoints}}{(\code{integer(1)})\cr
 Number of points to show from the trace. If NULL, shows all points.}
 
-\item{\code{npmax}}{(`integer(1)`)\cr
+\item{\code{npmax}}{(\code{integer(1)})\cr
 Maximum number of points to show. If NULL, no limit.}
 
-\item{\code{name}}{(`character(1)`)\cr
+\item{\code{name}}{(\code{character(1)})\cr
 Name for the trace (used in legends). If NULL, uses optimizer ID.}
 
-\item{\code{add_marker_at}}{(`integer()`)\cr
+\item{\code{add_marker_at}}{(\code{integer()})\cr
 Iteration numbers where to add markers. For 2D plots only.}
 
-\item{\code{marker_size}}{(`numeric(1)`)\cr
+\item{\code{marker_size}}{(\code{numeric(1)})\cr
 Size of markers. Default is 3.}
 
-\item{\code{marker_shape}}{(`numeric(1)` or `character(1)`)\cr
+\item{\code{marker_shape}}{(\code{numeric(1)} or \code{character(1)})\cr
 Shape of markers. Default is 16 (filled circle).}
 
-\item{\code{marker_color}}{(`character(1)`)\cr
+\item{\code{marker_color}}{(\code{character(1)})\cr
 Color of markers. If NULL, uses line color.}
 
-\item{\code{show_start_end}}{(`logical(1)`)\cr
+\item{\code{show_start_end}}{(\code{logical(1)})\cr
 Whether to highlight start and end points. Default is TRUE for 2D plots.}
 
-\item{\code{alpha}}{(`numeric(1)`)\cr
+\item{\code{alpha}}{(\code{numeric(1)})\cr
 Alpha transparency. If NULL, uses theme$alpha.}
 }
 \if{html}{\out{</div>}}

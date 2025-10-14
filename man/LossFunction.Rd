@@ -9,39 +9,41 @@ Represents a loss function for regression or classification tasks.
 \details{
 Loss functions are expected to be vectorized and to accept a single numeric
 argument representing the input on the chosen scale:
-* `"score"`: residuals `y_true - y_pred` for regression, or signed margins
-  `y_true * f(x)` for binary classification.
-* `"probability"`: predicted probabilities for the positive class. Visualizers
-  obtain the loss for `y = 0` by evaluating the function at `1 - p`.
+\itemize{
+\item \code{"score"}: residuals \code{y_true - y_pred} for regression, or signed margins
+\code{y_true * f(x)} for binary classification.
+\item \code{"probability"}: predicted probabilities for the positive class. Visualizers
+obtain the loss for \code{y = 0} by evaluating the function at \code{1 - p}.
+}
 
 The returned value must be a numeric vector of losses with the same length as
 the input. Additional optional parameters can be encoded via closures and are
-configurable through [lss()], which wraps the stored functions with the
+configurable through \code{\link[=lss]{lss()}}, which wraps the stored functions with the
 supplied arguments.
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{id}}{(`character(1)`)\cr
+\item{\code{id}}{(\code{character(1)})\cr
 Identifier for the loss function.}
 
-\item{\code{label}}{(`character(1)`)\cr
+\item{\code{label}}{(\code{character(1)})\cr
 Label for the loss function.}
 
-\item{\code{task_type}}{(`character(1)`)\cr
-Task type: `"regr"` or `"classif"`.}
+\item{\code{task_type}}{(\code{character(1)})\cr
+Task type: \code{"regr"} or \code{"classif"}.}
 
-\item{\code{input_default}}{(`character(1)`)\cr
-The natural input scale for the loss: `"score"` or `"probability"`.}
+\item{\code{input_default}}{(\code{character(1)})\cr
+The natural input scale for the loss: \code{"score"} or \code{"probability"}.}
 
-\item{\code{input_supported}}{(`character()`)\cr
+\item{\code{input_supported}}{(\code{character()})\cr
 All input scales this loss can be expressed on (subset of
-`c("score", "probability")`).}
+\code{c("score", "probability")}).}
 
-\item{\code{fun}}{(`function` or `list`)\cr
+\item{\code{fun}}{(\code{function} or \code{list})\cr
 The loss function itself. Provide either a vectorized closure matching the
-active input scale or a named list of such closures keyed by `"score"` and
-/ or `"probability"`.}
+active input scale or a named list of such closures keyed by \code{"score"} and
+/ or \code{"probability"}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -57,7 +59,7 @@ active input scale or a named list of such closures keyed by `"score"` and
 \if{html}{\out{<a id="method-LossFunction-new"></a>}}
 \if{latex}{\out{\hypertarget{method-LossFunction-new}{}}}
 \subsection{Method \code{new()}}{
-Creates a new instance of this [R6][R6::R6Class] class.
+Creates a new instance of this \link[R6:R6Class]{R6} class.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{LossFunction$new(
   id,
@@ -72,25 +74,25 @@ Creates a new instance of this [R6][R6::R6Class] class.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{id}}{(`character(1)`)\cr
+\item{\code{id}}{(\code{character(1)})\cr
 Identifier for the loss function.}
 
-\item{\code{label}}{(`character(1)`)\cr
+\item{\code{label}}{(\code{character(1)})\cr
 Label for the loss function.}
 
-\item{\code{task_type}}{(`character(1)`)\cr
-Task type: `"regr"` or `"classif"`.}
+\item{\code{task_type}}{(\code{character(1)})\cr
+Task type: \code{"regr"} or \code{"classif"}.}
 
-\item{\code{fun}}{(`function` or `list`)\cr
+\item{\code{fun}}{(\code{function} or \code{list})\cr
 The loss function. Supply a vectorized closure matching the active
-input scale or a named list of closures keyed by `"score"` / `"probability"`.}
+input scale or a named list of closures keyed by \code{"score"} / \code{"probability"}.}
 
-\item{\code{input_default}}{(`character(1)`)\cr
-Default input scale (`"score"` or `"probability"`).}
+\item{\code{input_default}}{(\code{character(1)})\cr
+Default input scale (\code{"score"} or \code{"probability"}).}
 
-\item{\code{input_supported}}{(`character()`)\cr
+\item{\code{input_supported}}{(\code{character()})\cr
 Character vector of supported input scales. Must contain
-`input_default`.}
+\code{input_default}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -107,8 +109,8 @@ Get the loss function for a specific input type.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{input_type}}{(`character(1)`)\cr
-The input type: `"score"` or `"probability"`.}
+\item{\code{input_type}}{(\code{character(1)})\cr
+The input type: \code{"score"} or \code{"probability"}.}
 }
 \if{html}{\out{</div>}}
 }

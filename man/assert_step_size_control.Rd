@@ -2,19 +2,19 @@
 % Please edit documentation in R/step_size_control.R
 \name{assert_step_size_control}
 \alias{assert_step_size_control}
-\title{Assertion for the main signature of a `step_size_controlXX` function.}
+\title{Assertion for the main signature of a \code{step_size_controlXX} function.}
 \usage{
 assert_step_size_control(x, u, obj, opt)
 }
 \arguments{
-\item{x}{(`numeric()`) The "old" point.}
+\item{x}{(\code{numeric()}) The "old" point.}
 
-\item{u}{(`numeric()`) The update added to `x` without a step size control.}
+\item{u}{(\code{numeric()}) The update added to \code{x} without a step size control.}
 
-\item{obj}{(`Objective`) The usd objective object.}
+\item{obj}{(\code{Objective}) The usd objective object.}
 
-\item{opt}{(`Optimizer`) The optimizer object from which the function is called.}
+\item{opt}{(\code{Optimizer}) The optimizer object from which the function is called.}
 }
 \description{
-Assertion for the main signature of a `step_size_controlXX` function.
+Assertion for the main signature of a \code{step_size_controlXX} function.
 }

@@ -13,10 +13,10 @@ for 2D input data using plotly.
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{task}}{(`mlr3::Task`)\cr
+\item{\code{task}}{(\code{mlr3::Task})\cr
 Task used to train the model.}
 
-\item{\code{learner}}{(`mlr3::Learner`)\cr
+\item{\code{learner}}{(\code{mlr3::Learner})\cr
 Learner used to train the model.}
 }
 \if{html}{\out{</div>}}
@@ -52,7 +52,7 @@ Learner used to train the model.}
 \if{html}{\out{<a id="method-VisualizerSurfaceModel-new"></a>}}
 \if{latex}{\out{\hypertarget{method-VisualizerSurfaceModel-new}{}}}
 \subsection{Method \code{new()}}{
-Creates a new instance of this [R6][R6::R6Class] class.
+Creates a new instance of this \link[R6:R6Class]{R6} class.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{VisualizerSurfaceModel$new(
   task,
@@ -70,45 +70,45 @@ Creates a new instance of this [R6][R6::R6Class] class.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{task}}{([mlr3::Task])\cr
+\item{\code{task}}{(\link[mlr3:Task]{mlr3::Task})\cr
 The task to train the model on.}
 
-\item{\code{learner}}{(`mlr3::Learner`)\cr
+\item{\code{learner}}{(\code{mlr3::Learner})\cr
 The learner to train the model with.}
 
-\item{\code{x1_limits}}{(`numeric(2)`)\cr
+\item{\code{x1_limits}}{(\code{numeric(2)})\cr
 The x1 limits.}
 
-\item{\code{x1_limits}}{(`numeric(2)`)\cr
+\item{\code{x1_limits}}{(\code{numeric(2)})\cr
 The x1 limits.}
 
-\item{\code{x2_limits}}{(`numeric(2)`)\cr
+\item{\code{x2_limits}}{(\code{numeric(2)})\cr
 The x2 limits.}
 
-\item{\code{x2_limits}}{(`numeric(2)`)\cr
+\item{\code{x2_limits}}{(\code{numeric(2)})\cr
 The x2 limits.}
 
-\item{\code{padding}}{(`numeric(1)`)\cr
+\item{\code{padding}}{(\code{numeric(1)})\cr
 A margin that is added to x1limits and x2limits.
-The x1 margin is calculated by `max(x1lmits) - min(x1limits) * padding`.}
+The x1 margin is calculated by \code{max(x1lmits) - min(x1limits) * padding}.}
 
-\item{\code{padding}}{(`numeric(1)`)\cr
+\item{\code{padding}}{(\code{numeric(1)})\cr
 A margin that is added to x1limits and x2limits.
-The x1 margin is calculated by `max(x1lmits) - min(x1limits) * padding`.}
+The x1 margin is calculated by \code{max(x1lmits) - min(x1limits) * padding}.}
 
-\item{\code{n_points}}{(`integer(1)`)\cr
+\item{\code{n_points}}{(\code{integer(1)})\cr
 The number of generated point per dimension.
-Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
+Note that a grid of \code{npoints^2} values is generated and evaluated by \code{objective$eval(x)} to plot the surface.}
 
-\item{\code{n_points}}{(`integer(1)`)\cr
+\item{\code{n_points}}{(\code{integer(1)})\cr
 The number of generated point per dimension.
-Note that a grid of `npoints^2` values is generated and evaluated by `objective$eval(x)` to plot the surface.}
+Note that a grid of \code{npoints^2} values is generated and evaluated by \code{objective$eval(x)} to plot the surface.}
 
-\item{\code{hypothesis}}{(`Hypothesis`|`NULL`) Optional hypothesis used instead of a learner}
+\item{\code{hypothesis}}{(\code{Hypothesis}|\code{NULL}) Optional hypothesis used instead of a learner}
 
-\item{\code{domain}}{(`list`|`NULL`) Domain limits when visualizing a hypothesis without a task}
+\item{\code{domain}}{(\code{list}|\code{NULL}) Domain limits when visualizing a hypothesis without a task}
 
-\item{\code{retrain}}{(`logical(1)`) Whether to retrain the learner if it has already been trained on the task. Default is `TRUE`.}
+\item{\code{retrain}}{(\code{logical(1)}) Whether to retrain the learner if it has already been trained on the task. Default is \code{TRUE}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -130,23 +130,27 @@ Adds the training data to the plot.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{size}}{(`numeric(1)`)\cr
+\item{\code{size}}{(\code{numeric(1)})\cr
 Size of the points. If NULL, uses theme$point_size. Default is NULL.}
 
-\item{\code{color}}{(`character(1)` or named `character`)\cr
+\item{\code{color}}{(\code{character(1)} or named \code{character})\cr
 Color of the points. For classification tasks:
-- `character(1)`: A single color for all points (e.g., `"blue"`) or `"auto"` for automatic color assignment.
-- `named character`: A vector mapping class labels to colors (e.g., `c(pos = "red", neg = "blue")`).
-For regression tasks, only single colors are supported. Default is `"auto"`.}
+\itemize{
+\item \code{character(1)}: A single color for all points (e.g., \code{"blue"}) or \code{"auto"} for automatic color assignment.
+\item \verb{named character}: A vector mapping class labels to colors (e.g., \code{c(pos = "red", neg = "blue")}).
+For regression tasks, only single colors are supported. Default is \code{"auto"}.
+}}
 
-\item{\code{shape}}{(`numeric(1)` or named `numeric`)\cr
+\item{\code{shape}}{(\code{numeric(1)} or named \code{numeric})\cr
 Shape/symbol of the points. For classification tasks:
-- `numeric(1)`: A single symbol for all points (e.g., `0` for circle).
-- `named numeric`: A vector mapping class labels to symbols (e.g., `c(pos = 0, neg = 1)`).
-For regression tasks, only single symbols are supported. Default is 0 (circle).}
+\itemize{
+\item \code{numeric(1)}: A single symbol for all points (e.g., \code{0} for circle).
+\item \verb{named numeric}: A vector mapping class labels to symbols (e.g., \code{c(pos = 0, neg = 1)}).
+For regression tasks, only single symbols are supported. Default is 0 (circle).
+}}
 
-\item{\code{...}}{(`any`)\cr
-Further arguments passed to `add_trace(...)`.}
+\item{\code{...}}{(\code{any})\cr
+Further arguments passed to \code{add_trace(...)}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -163,15 +167,15 @@ Adds boundary surface(s) to the plot at specified values.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{values}}{(`numeric()`)\cr
+\item{\code{values}}{(\code{numeric()})\cr
 Vector of z-values where to draw boundary surfaces. For classification with probability predictions,
 defaults to 0.5. For regression or response predictions, defaults to the median of predictions.}
 
-\item{\code{color}}{(`character(1)` or `list()`)\cr
+\item{\code{color}}{(\code{character(1)} or \code{list()})\cr
 Color specification for boundary surfaces. Default uses a neutral colorscale.}
 
-\item{\code{...}}{(`any`)\cr
-Further arguments passed to `add_trace(...)` or `add_surface(...)`.}
+\item{\code{...}}{(\code{any})\cr
+Further arguments passed to \code{add_trace(...)} or \code{add_surface(...)}.}
 }
 \if{html}{\out{</div>}}
 }

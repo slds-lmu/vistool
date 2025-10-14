@@ -43,7 +43,7 @@ Here we retrieve the pinball loss function for regression with a custom quantile
 loss_function = lss("pinball", quantile = 0.3)
 ```
 
-*You can also refer to loss functions via common mlr3 **measure IDs** (e.g., `regr.mse`). These are translated internally to the corresponding vistool loss keys.*
+*You can also refer to loss functions via common `mlr3` **measure IDs** (e.g., `regr.mse`). These are translated internally to the corresponding `vistool` loss keys.*
 
 ## Visualization
 
