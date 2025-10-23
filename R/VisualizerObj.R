@@ -399,9 +399,9 @@ VisualizerObj = R6::R6Class("VisualizerObj",
         ),
         labels = list(
           title = if (is.null(self$objective$label)) self$objective$id else self$objective$label,
-          x1 = "x",
+          x1 = "$x$",
           x2 = NULL,
-          y = "y"
+          y = "$y$"
         ),
         limits = list(
           x1 = x1_limits,
@@ -457,9 +457,9 @@ VisualizerObj = R6::R6Class("VisualizerObj",
         ),
         labels = list(
           title = if (is.null(self$objective$label)) self$objective$id else self$objective$label,
-          x1 = "x1",
-          x2 = "x2",
-          y = "y"
+          x1 = "$x_1$",
+          x2 = "$x_2$",
+          y = "$y$"
         ),
         limits = list(
           x1 = x1_limits,
@@ -567,7 +567,13 @@ VisualizerObj = R6::R6Class("VisualizerObj",
 
         # Apply manual color scale (legend title optional)
         legend_title = if (!is.null(rp$legend_title)) rp$legend_title else "Trace"
-        private$.plot = private$.plot + ggplot2::scale_color_manual(values = color_map, name = legend_title)
+        legend_name_res = private$format_label(legend_title, "legend", "ggplot")
+        legend_labels_res = private$format_label(names(color_map), "legend", "ggplot")
+        private$.plot = private$.plot + ggplot2::scale_color_manual(
+          values = color_map,
+          name = legend_name_res$values,
+          labels = legend_labels_res$values
+        )
         # linewidth/linetype not applied for points; ignore in 1D
       } else {
         # 2D traces: combine paths and then add markers separately without affecting legend
@@ -594,9 +600,12 @@ VisualizerObj = R6::R6Class("VisualizerObj",
 
         # Manual scales: color/linetype show in legend; linewidth hidden to avoid duplicate legends
         legend_title = if (!is.null(rp$legend_title)) rp$legend_title else "Trace"
+        legend_name_res = private$format_label(legend_title, "legend", "ggplot")
+        legend_label_candidates = names(color_map)
+        legend_labels_res = private$format_label(legend_label_candidates, "legend", "ggplot")
         private$.plot = private$.plot +
-          ggplot2::scale_color_manual(values = color_map, name = legend_title) +
-          ggplot2::scale_linetype_manual(values = ltype_map, name = legend_title) +
+          ggplot2::scale_color_manual(values = color_map, name = legend_name_res$values, labels = legend_labels_res$values) +
+          ggplot2::scale_linetype_manual(values = ltype_map, name = legend_name_res$values, labels = legend_labels_res$values) +
           ggplot2::scale_linewidth_manual(values = lw_map, guide = "none")
 
         # Add markers and start/end indicators (no legend)

@@ -48,7 +48,7 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
     #' @template param_x1_lab
     #' @template param_x2_lab
     #' @template param_z_lab
-    initialize = function(grid, zmat, plot_lab = NULL, x1_lab = "x1", x2_lab = "x2", z_lab = "z") {
+    initialize = function(grid, zmat, plot_lab = NULL, x1_lab = "$x_1$", x2_lab = "$x_2$", z_lab = "$y$") {
       self$grid = checkmate::assert_list(grid)
       self$zmat = checkmate::assert_matrix(zmat)
       self$plot_lab = checkmate::assert_character(plot_lab, null.ok = TRUE)
@@ -319,6 +319,17 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
         final_y_lab = if (!is.null(rp$y_lab)) rp$y_lab else self$x2_lab
         final_z_lab = if (!is.null(rp$z_lab)) rp$z_lab else self$z_lab
 
+        title_res = private$format_label(final_title, "title", "plotly")
+        x_res = private$format_label(final_x_lab, "x", "plotly")
+        y_res = private$format_label(final_y_lab, "y", "plotly")
+        z_res = private$format_label(final_z_lab, "z", "plotly")
+
+        legend_layout = NULL
+        if (!is.null(rp$legend_title)) {
+          legend_res = private$format_label(rp$legend_title, "legend", "plotly")
+          legend_layout = list(title = list(text = legend_res$values, font = list(size = eff$text_size)))
+        }
+
         # Determine legend visibility from theme and render params
         legend_pos = if (is.null(eff$legend_position)) "right" else eff$legend_position
         legend_on = isTRUE(rp$show_legend) && !identical(legend_pos, "none")
@@ -327,37 +338,39 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
           # For 3D surface plots
           private$.plot = private$.plot %>%
             plotly::layout(
-              title = list(text = final_title, font = list(size = eff$title_size)),
+              title = list(text = title_res$values, font = list(size = eff$title_size)),
               scene = list(
                 xaxis = list(
-                  title = list(text = final_x_lab, font = list(size = eff$text_size)),
+                  title = list(text = x_res$values, font = list(size = eff$text_size)),
                   range = rp$x_limits
                 ),
                 yaxis = list(
-                  title = list(text = final_y_lab, font = list(size = eff$text_size)),
+                  title = list(text = y_res$values, font = list(size = eff$text_size)),
                   range = rp$y_limits
                 ),
                 zaxis = list(
-                  title = list(text = final_z_lab, font = list(size = eff$text_size)),
+                  title = list(text = z_res$values, font = list(size = eff$text_size)),
                   range = rp$z_limits
                 )
               ),
-              showlegend = legend_on
+              showlegend = legend_on,
+              legend = if (!is.null(legend_layout) && legend_on) legend_layout else NULL
             )
         } else {
           # For 2D contour plots
           private$.plot = private$.plot %>%
             plotly::layout(
-              title = list(text = final_title, font = list(size = eff$title_size)),
+              title = list(text = title_res$values, font = list(size = eff$title_size)),
               xaxis = list(
-                title = list(text = final_x_lab, font = list(size = eff$text_size)),
+                title = list(text = x_res$values, font = list(size = eff$text_size)),
                 range = rp$x_limits
               ),
               yaxis = list(
-                title = list(text = final_y_lab, font = list(size = eff$text_size)),
+                title = list(text = y_res$values, font = list(size = eff$text_size)),
                 range = rp$y_limits
               ),
-              showlegend = legend_on
+              showlegend = legend_on,
+              legend = if (!is.null(legend_layout) && legend_on) legend_layout else NULL
             )
         }
       }
@@ -394,6 +407,8 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
       )
       dim_label = if (private$.layer_primary == "surface") "3d" else "2d"
       private$.plot = private$add_annotations_to_plotly(private$.plot, dim_label, annotation_ranges)
+
+      private$.plot = private$ensure_mathjax_dependency(private$.plot)
 
       private$.last_plot = private$.plot
       return(private$.plot)

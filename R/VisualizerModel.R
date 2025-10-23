@@ -590,13 +590,15 @@ VisualizerModel = R6::R6Class("VisualizerModel",
 
           # Add manual scales if needed
           if (length(style$color) > 1) {
-            private$.plot = private$.plot + ggplot2::scale_color_manual(values = style$color, name = self$task$target_names)
+            legend_name_res = private$format_label(self$task$target_names, "legend", "ggplot")
+            private$.plot = private$.plot + ggplot2::scale_color_manual(values = style$color, name = legend_name_res$values)
           } else if (style$color[1] == "auto") {
             # Apply themed discrete color scale for automatic colors
             private$.plot = private$apply_ggplot_color_scale(private$.plot, eff$palette, "color", discrete = TRUE)
           }
           if (length(style$shape) > 1) {
-            private$.plot = private$.plot + ggplot2::scale_shape_manual(values = style$shape, name = self$task$target_names)
+            legend_name_res = private$format_label(self$task$target_names, "legend", "ggplot")
+            private$.plot = private$.plot + ggplot2::scale_shape_manual(values = style$shape, name = legend_name_res$values)
           }
         } else {
           # Single styling - color should already be resolved by base class
@@ -646,13 +648,15 @@ VisualizerModel = R6::R6Class("VisualizerModel",
 
           # Add manual scales if needed
           if (length(style$color) > 1) {
-            private$.plot = private$.plot + ggplot2::scale_color_manual(values = style$color, name = self$task$target_names)
+            legend_name_res = private$format_label(self$task$target_names, "legend", "ggplot")
+            private$.plot = private$.plot + ggplot2::scale_color_manual(values = style$color, name = legend_name_res$values)
           } else if (style$color[1] == "auto") {
             # Apply themed discrete color scale for automatic colors
             private$.plot = private$apply_ggplot_color_scale(private$.plot, eff$palette, "color", discrete = TRUE)
           }
           if (length(style$shape) > 1) {
-            private$.plot = private$.plot + ggplot2::scale_shape_manual(values = style$shape, name = self$task$target_names)
+            legend_name_res = private$format_label(self$task$target_names, "legend", "ggplot")
+            private$.plot = private$.plot + ggplot2::scale_shape_manual(values = style$shape, name = legend_name_res$values)
           }
         } else {
           # Single styling - color should already be resolved by base class
@@ -670,18 +674,46 @@ VisualizerModel = R6::R6Class("VisualizerModel",
       if (style$show_labels) {
         label_size = if (!is.null(style$label_size)) style$label_size else 3
         if (private$.dimensionality == "1d") {
+          label_res = private$format_label(
+            text = rownames(points_data),
+            context = "annotations",
+            backend = "ggplot"
+          )
+          label_data = points_data
+          if (label_res$as_list_column) {
+            label_data$label = I(label_res$values)
+          } else if (label_res$any_latex) {
+            label_data$label = I(list(label_res$values))
+          } else {
+            label_data$label = label_res$values
+          }
           private$.plot = private$.plot + ggplot2::geom_text(
-            data = points_data,
-            ggplot2::aes(x = x, y = y, label = rownames(points_data)),
+            data = label_data,
+            ggplot2::aes(x = x, y = y, label = label),
             size = label_size, nudge_y = 0.02 * diff(range(points_data$y)),
-            inherit.aes = FALSE
+            inherit.aes = FALSE,
+            parse = FALSE
           )
         } else {
+          label_res = private$format_label(
+            text = rownames(points_data),
+            context = "annotations",
+            backend = "ggplot"
+          )
+          label_data = points_data
+          if (label_res$as_list_column) {
+            label_data$label = I(label_res$values)
+          } else if (label_res$any_latex) {
+            label_data$label = I(list(label_res$values))
+          } else {
+            label_data$label = label_res$values
+          }
           private$.plot = private$.plot + ggplot2::geom_text(
-            data = points_data,
-            ggplot2::aes(x = x1, y = x2, label = rownames(points_data)),
+            data = label_data,
+            ggplot2::aes(x = x1, y = x2, label = label),
             size = label_size, nudge_y = 0.02 * diff(range(points_data$x2)),
-            inherit.aes = FALSE
+            inherit.aes = FALSE,
+            parse = FALSE
           )
         }
       }

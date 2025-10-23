@@ -76,9 +76,9 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
         grid = grid,
         zmat = zmat,
         plot_lab = self$objective$label,
-        x1_lab = "x1",
-        x2_lab = "x2",
-        z_lab = "y"
+        x1_lab = "$x_1$",
+        x2_lab = "$x_2$",
+        z_lab = "$y$"
       )
 
       # Initialize trace counter for consistent coloring
@@ -435,6 +435,10 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
       add_marker_at = add_marker_at[add_marker_at <= npmax]
 
       if (is.null(name)) name = opt$id
+      if (!is.null(name)) {
+        name_res = private$format_label(name, "legend", "plotly")
+        name = name_res$values
+      }
 
       # Resolve effective line width from theme or layer override
       eff = private$.effective_theme

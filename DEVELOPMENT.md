@@ -256,6 +256,10 @@ private = list(
 )
 ```
 
+### LaTeX handling
+
+Run plot-bound strings through `private$format_label()` rather than manual TeX glue. The helper honours `plot(latex = ...)` preferences, layer-level overrides such as `annotations_latex`, and manages both `latex2exp` (ggplot2 expressions) and MathJax configuration for plotly traces. When you add labels to data frames, wrap expression vectors with `I(list(...))` so ggplot2 keeps them list-valued.
+
 
 ## Development workflow
 

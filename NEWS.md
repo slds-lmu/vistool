@@ -1,9 +1,11 @@
+<!-- # vistool 0.5.1
+* Removed `kaleido` dependency: Plotly figures are now saved using a custom built solution (essentially a pipeline of `htmlwidget::save() -> magick`).
+* Cleaned up `roxygen2` documentation. -->
+
 # vistool 0.5.0
 
 * Implemented `add_contours()` for `ggplot2` backends.
-* Titles, axis labels, legend titles and `add_points()` annotations support LaTeX annotations.
-* Removed `kaleido` dependency: Plotly figures are now saved using a custom built solution (essentially a pipeline of `htmlwidget::save() -> magick`).
-* Cleaned up `roxygen2` documentation.
+* Added a centralized LaTeX formatter: `plot(latex = ...)` toggles math parsing, `add_points(..., annotations_latex = ...)` handles per-point flags, MathJax is wired automatically for plotly layers, and default axis labels now ship as TeX-ready `$x_1$`, `$x_2$`, `$y$`.
 * Includes definitions of the `0-1` loss and objectives (including penalization terms) for the logistic and linear regression.
 
 # vistool 0.4.1

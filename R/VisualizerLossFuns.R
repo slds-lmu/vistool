@@ -436,7 +436,13 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
         eff = if (is.null(private$.effective_theme)) get_pkg_theme_default() else private$.effective_theme
         color_values = sapply(1:n_losses, function(i) get_vistool_color(i, "discrete", base_palette = eff$palette))
       }
-      pl = pl + ggplot2::scale_color_manual(values = color_values, labels = loss_labels, name = final_legend_title)
+      legend_name_res = private$format_label(final_legend_title, "legend", "ggplot")
+      loss_labels_res = private$format_label(loss_labels, "legend", "ggplot")
+      pl = pl + ggplot2::scale_color_manual(
+        values = color_values,
+        labels = loss_labels_res$values,
+        name = legend_name_res$values
+      )
 
       # Handle custom line widths for multiple loss functions
       if (!is.null(loss_settings$line_width) && length(unique(dd$loss_fun)) > 1) {
@@ -453,7 +459,7 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
             )
           ) +
             ggplot2::geom_line() +
-            ggplot2::scale_color_manual(values = color_values, labels = loss_labels, name = final_legend_title) +
+            ggplot2::scale_color_manual(values = color_values, labels = loss_labels_res$values, name = legend_name_res$values) +
             ggplot2::scale_linewidth_manual(values = loss_settings$line_width, guide = "none")
         } else {
           # For regression/score classification, only add linetype aesthetic if we have custom line types
@@ -468,7 +474,7 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
               )
             ) +
               ggplot2::geom_line() +
-              ggplot2::scale_color_manual(values = color_values, labels = loss_labels, name = final_legend_title) +
+              ggplot2::scale_color_manual(values = color_values, labels = loss_labels_res$values, name = legend_name_res$values) +
               ggplot2::scale_linewidth_manual(values = loss_settings$line_width, guide = "none")
           } else {
             pl = ggplot2::ggplot(
@@ -480,7 +486,7 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
               )
             ) +
               ggplot2::geom_line() +
-              ggplot2::scale_color_manual(values = color_values, labels = loss_labels, name = final_legend_title) +
+              ggplot2::scale_color_manual(values = color_values, labels = loss_labels_res$values, name = legend_name_res$values) +
               ggplot2::scale_linewidth_manual(values = loss_settings$line_width, guide = "none")
           }
         }
@@ -489,18 +495,34 @@ VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
       # Apply custom line types only if specified and not for probability-based classification
       if (!(self$task_type == "classif" && self$input_type == "probability")) {
         if (!is.null(loss_settings$line_type)) {
-          pl = pl + ggplot2::scale_linetype_manual(values = loss_settings$line_type, labels = loss_labels, name = final_legend_title)
+          pl = pl + ggplot2::scale_linetype_manual(
+            values = loss_settings$line_type,
+            labels = loss_labels_res$values,
+            name = legend_name_res$values
+          )
         }
       } else {
         # For probability-based classification, handle y_val linetype
         if (length(unique(dd$y_val)) == 1L) {
-          pl = pl + ggplot2::scale_linetype_manual(values = "solid", labels = unique(dd$y_val), name = "Class")
+          class_labels_res = private$format_label(unique(dd$y_val), "legend", "ggplot")
+          class_name_res = private$format_label("Class", "legend", "ggplot")
+          pl = pl + ggplot2::scale_linetype_manual(
+            values = "solid",
+            labels = class_labels_res$values,
+            name = class_name_res$values
+          )
         } else {
           # Get the unique y_val levels in the order they will appear as factor levels
           y_levels = sort(unique(dd$y_val)) # This gives alphabetical order like factor()
           # Create corresponding line types: solid for y=1, dashed for y=0
           line_types = ifelse(y_levels == "y = 1", "solid", "dashed")
-          pl = pl + ggplot2::scale_linetype_manual(values = line_types, labels = y_levels, name = "Class")
+          class_labels_res = private$format_label(y_levels, "legend", "ggplot")
+          class_name_res = private$format_label("Class", "legend", "ggplot")
+          pl = pl + ggplot2::scale_linetype_manual(
+            values = line_types,
+            labels = class_labels_res$values,
+            name = class_name_res$values
+          )
         }
       }
 

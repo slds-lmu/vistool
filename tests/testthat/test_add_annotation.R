@@ -58,8 +58,7 @@ test_that("plotly contour latex annotations keep mathjax text", {
   vis$add_annotation(text = "$\\alpha$", latex = TRUE, x = vis$grid$x1[5], y = vis$grid$x2[10])
   plt = vis$plot(flatten = TRUE)
   ann = plt$x$layout$annotations[[length(plt$x$layout$annotations)]]
-  expect_s3_class(ann$text, "TeX")
-  expect_match(as.character(ann$text), "\\$\\\\alpha\\$")
+  expect_equal(ann$text, "$\\alpha$")
 })
 
 test_that("plotly surface latex annotations keep mathjax text", {
@@ -69,8 +68,7 @@ test_that("plotly surface latex annotations keep mathjax text", {
   vis$add_annotation(text = "$\\beta$", latex = TRUE, x = vis$grid$x1[3], y = vis$grid$x2[7], z = vis$zmat[3, 7])
   plt = vis$plot(flatten = FALSE)
   ann = plt$x$layout$scene$annotations[[length(plt$x$layout$scene$annotations)]]
-  expect_s3_class(ann$text, "TeX")
-  expect_match(as.character(ann$text), "\\$\\\\beta\\$")
+  expect_equal(ann$text, "$\\beta$")
 })
 
 test_that("plotly latex annotations configure mathjax", {
