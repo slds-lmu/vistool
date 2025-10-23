@@ -15,7 +15,6 @@
 VisualizerSurfaceModel = R6::R6Class("VisualizerSurfaceModel",
   inherit = VisualizerSurface,
   public = list(
-
     #' @field task (`mlr3::Task`)\cr
     #' Task used to train the model.
     task = NULL,

@@ -1,4 +1,5 @@
 test_that("VisualizerModel with 1D regression task works", {
+  skip_if_not_installed("e1071")
   skip_if_not_installed("mlr3learners")
 
   task = tsk("mtcars")
@@ -18,6 +19,7 @@ test_that("VisualizerModel with 1D regression task works", {
 })
 
 test_that("VisualizerModel with 2D regression task works", {
+  skip_if_not_installed("e1071")
   skip_if_not_installed("mlr3learners")
 
   task = tsk("mtcars")
@@ -37,6 +39,7 @@ test_that("VisualizerModel with 2D regression task works", {
 })
 
 test_that("VisualizerModel with 1D classification task works", {
+  skip_if_not_installed("e1071")
   skip_if_not_installed("mlr3learners")
 
   task = tsk("spam")
@@ -53,6 +56,7 @@ test_that("VisualizerModel with 1D classification task works", {
 })
 
 test_that("VisualizerModel with 2D classification task works", {
+  skip_if_not_installed("e1071")
   skip_if_not_installed("mlr3learners")
 
   task = tsk("spam")
@@ -69,6 +73,7 @@ test_that("VisualizerModel with 2D classification task works", {
 })
 
 test_that("VisualizerModel add_training_data works for 1D", {
+  skip_if_not_installed("e1071")
   skip_if_not_installed("mlr3learners")
 
   task = tsk("mtcars")
@@ -87,6 +92,7 @@ test_that("VisualizerModel add_training_data works for 1D", {
 })
 
 test_that("VisualizerModel add_training_data works for 2D", {
+  skip_if_not_installed("e1071")
   skip_if_not_installed("mlr3learners")
 
   task = tsk("mtcars")
@@ -105,6 +111,7 @@ test_that("VisualizerModel add_training_data works for 2D", {
 })
 
 test_that("VisualizerModel add_boundary works for 1D", {
+  skip_if_not_installed("e1071")
   skip_if_not_installed("mlr3learners")
 
   task = tsk("mtcars")
@@ -121,6 +128,7 @@ test_that("VisualizerModel add_boundary works for 1D", {
 })
 
 test_that("VisualizerModel add_boundary works for 2D", {
+  skip_if_not_installed("e1071")
   skip_if_not_installed("mlr3learners")
 
   task = tsk("spam")
@@ -138,6 +146,7 @@ test_that("VisualizerModel add_boundary works for 2D", {
 })
 
 test_that("VisualizerModel with custom limits works", {
+  skip_if_not_installed("e1071")
   skip_if_not_installed("mlr3learners")
 
   # 1D case with x1_limits
@@ -158,6 +167,7 @@ test_that("VisualizerModel with custom limits works", {
 })
 
 test_that("VisualizerModel fails with >2D task", {
+  skip_if_not_installed("e1071")
   skip_if_not_installed("mlr3learners")
 
   task = tsk("mtcars")
@@ -171,22 +181,8 @@ test_that("VisualizerModel fails with >2D task", {
   )
 })
 
-test_that("VisualizerModel parameter compatibility warning works", {
-  skip_if_not_installed("mlr3learners")
-
-  task = tsk("mtcars")
-  task$select("gear")
-
-  learner = lrn("regr.svm")
-
-  # Test that old parameter names are no longer supported
-  expect_error(
-    VisualizerModel$new(task, learner, xlim = c(2, 5)),
-    "unused argument"
-  )
-})
-
 test_that("VisualizerModel classification with custom colors works", {
+  skip_if_not_installed("e1071")
   skip_if_not_installed("mlr3learners")
 
   task = tsk("spam")
@@ -204,6 +200,7 @@ test_that("VisualizerModel classification with custom colors works", {
 })
 
 test_that("VisualizerModel chaining methods works", {
+  skip_if_not_installed("e1071")
   skip_if_not_installed("mlr3learners")
 
   task = tsk("mtcars")

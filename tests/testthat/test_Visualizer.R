@@ -1,4 +1,5 @@
 test_that("Unified save method works for all visualizers", {
+  skip_if_not_installed("mlr3learners")
   # Test VisualizerObj (1D) save
   obj_1d = obj("TF_gaussian1", xdim = 1)
   vis1d = as_visualizer(obj_1d, type = "1d", x1_limits = c(-3, 3))
@@ -40,6 +41,7 @@ test_that("Unified save method works for all visualizers", {
 })
 
 test_that("Base Visualizer class methods work correctly", {
+  skip_if_not_installed("mlr3learners")
   # Test that the base class plot method works (sets up plot settings and returns self)
   base_vis = Visualizer$new()
   result = base_vis$plot()

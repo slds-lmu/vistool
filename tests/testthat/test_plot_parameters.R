@@ -1,4 +1,5 @@
 test_that("plot() methods accept theme override with text_size and theme", {
+  skip_if_not_installed("mlr3learners")
   # Test VisualizerObj (1D) - using gaussian1 which supports any dimension
   obj_1d = obj("TF_gaussian1", xdim = 1)
   vis1d = as_visualizer(obj_1d, type = "1d", x1_limits = c(-3, 3))
@@ -47,6 +48,7 @@ test_that("plot() methods validate parameters correctly", {
 })
 
 test_that("plot() methods work without parameters", {
+  skip_if_not_installed("mlr3learners")
   # Test VisualizerObj
   obj_1d = obj("TF_gaussian1", xdim = 1)
   vis1d = as_visualizer(obj_1d, type = "1d", x1_limits = c(-3, 3))

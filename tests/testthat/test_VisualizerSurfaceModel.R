@@ -63,6 +63,7 @@ test_that("VisualizerSurfaceModel training data works", {
 })
 
 test_that("VisualizerSurfaceModel with classification works", {
+  skip_if_not_installed("e1071")
   skip_if_not_installed("mlr3learners")
 
   task = tsk("spam")

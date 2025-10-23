@@ -14,7 +14,6 @@
 VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
   inherit = VisualizerSurface,
   public = list(
-
     #' @template field_objective
     objective = NULL,
 

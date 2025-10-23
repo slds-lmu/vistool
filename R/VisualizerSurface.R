@@ -13,7 +13,6 @@
 VisualizerSurface = R6::R6Class("VisualizerSurface",
   inherit = Visualizer,
   public = list(
-
     #' @template field_grid_x1x2
     grid = NULL,
 

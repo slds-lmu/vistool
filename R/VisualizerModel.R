@@ -21,7 +21,6 @@
 VisualizerModel = R6::R6Class("VisualizerModel",
   inherit = Visualizer,
   public = list(
-
     #' @field task (`mlr3::Task`)\cr
     #' Task used to train the model.
     task = NULL,

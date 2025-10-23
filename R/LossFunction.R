@@ -19,7 +19,6 @@
 #' @export
 LossFunction = R6::R6Class("LossFunction",
   public = list(
-
     #' @field id (`character(1)`)\cr
     #' Identifier for the loss function.
     id = NULL,

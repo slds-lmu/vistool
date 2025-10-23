@@ -7,7 +7,6 @@
 #' @export
 Visualizer = R6::R6Class("Visualizer",
   public = list(
-
     #' @description Set the instance theme (partial override stored separately)
     #' @param theme (`list`) Partial theme created with vistool_theme() or a named list
     #' @return Invisible self

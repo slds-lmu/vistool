@@ -7,7 +7,6 @@
 VisualizerLossFuns = R6::R6Class("VisualizerLossFuns",
   inherit = Visualizer,
   public = list(
-
     #' @field losses (`list`)\cr
     #' List of LossFunction objects.
     losses = NULL,

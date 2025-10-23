@@ -15,7 +15,6 @@
 VisualizerObj = R6::R6Class("VisualizerObj",
   inherit = Visualizer,
   public = list(
-
     #' @template field_objective
     objective = NULL,
 
