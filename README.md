@@ -60,22 +60,26 @@ pak::pak("slds-lmu/vistool")
 Prefer base R tooling? `remotes::install_github("slds-lmu/vistool")`
 works as well.
 
-### Plotly backend and static export
+### Plotly backend, MathJax, and static export
 
-Interactive surfaces rely on `plotly`, which accesses Python
-functionality through `reticulate`. `vistool` (via `reticulate >= 1.41`)
-calls `reticulate::py_require("kaleido")` on demand, provisioning a
-cached Python environment automatically when you first save a surface
-plot.
+Plotly surfaces receive MathJax automatically whenever a label contains
+LaTeX markers. Control the MathJax source globally via
+`options(vistool.mathjax = "cdn")` (default), `"local"` to reuse a system
+installation, or a fully qualified URL when you host MathJax yourself.
 
-If you manage Python yourself, point `reticulate` to your interpreter
-and ensure `kaleido` is installed:
+Static exports no longer rely on Python or Kaleido. When you call
+`save()` with an image extension, `vistool` writes a self-contained HTML
+snapshot, captures it through `webshot2` (headless Chrome/Chromium), and
+trims the result with `magick`. These dependencies (`htmlwidgets`,
+`webshot2`, `magick`) are now imported automatically; ensure a recent
+Chrome/Chromium is available on your system and `vis$save("plot.png")`
+just works.
 
-``` r
-install.packages("reticulate")
-# Sys.setenv(RETICULATE_PYTHON = "/path/to/python")
-reticulate::py_install("kaleido")
-```
+You can still call `save()` with `.html` to persist the interactive
+widget directly.
+
+Pkgdown builds automatically inherit this MathJax wiring, so no extra
+`<script>` tags are required.
 
 ## Documentation roadmap
 

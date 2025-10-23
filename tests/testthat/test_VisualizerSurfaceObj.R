@@ -120,14 +120,45 @@ test_that("VisualizerSurfaceObj scene setting works", {
 })
 
 test_that("VisualizerSurfaceObj save functionality works", {
-  skip_if_not_installed("reticulate")
+  skip_if_not_installed("webshot2")
+  skip_if_not_installed("magick")
   skip_on_ci()
 
   obj = obj("TF_branin")
   vis = VisualizerSurfaceObj$new(obj, n_points = 5L)
   vis$init_layer_surface()
-  temp_file = tempfile(fileext = ".png")
-  expect_true("save" %in% names(vis))
+  tmp = tempfile(fileext = ".png")
+  expect_no_error(vis$plot(plot_title = "$f(x)$"))
+  expect_no_error(vis$save(tmp, width = 320, height = 240))
+  expect_true(file.exists(tmp))
+
+  info = magick::image_info(magick::image_read(tmp))
+  expect_true(info$width <= 320)
+  expect_true(info$height <= 240)
+  unlink(tmp)
+})
+
+test_that("Plotly MathJax configuration respects vistool.mathjax option", {
+  skip_if_not_installed("plotly")
+
+  obj = obj("TF_branin")
+  original = getOption("vistool.mathjax")
+  on.exit(options(vistool.mathjax = original), add = TRUE)
+
+  options(vistool.mathjax = "local")
+  vis_local = VisualizerSurfaceObj$new(obj, n_points = 5L)
+  vis_local$init_layer_surface()
+  plot_local = vis_local$plot(plot_title = "$f(x)$")
+  expect_equal(plot_local$x$config$mathjax, "local")
+  expect_true(isTRUE(plot_local$x$config$typesetMath))
+
+  custom_url = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+  options(vistool.mathjax = custom_url)
+  vis_custom = VisualizerSurfaceObj$new(obj, n_points = 5L)
+  vis_custom$init_layer_surface()
+  plot_custom = vis_custom$plot(plot_title = "$g(x)$")
+  expect_equal(plot_custom$x$config$mathjax, custom_url)
+  expect_true(isTRUE(plot_custom$x$config$typesetMath))
 })
 
 test_that("VisualizerSurfaceObj multiple optimization traces work", {

@@ -378,12 +378,41 @@ Visualizer = R6::R6Class("Visualizer",
       )
     },
 
-    # save a plotly object via JSON -> Python (plotly.io + kaleido >= 1.0)
+    # save a plotly object either as HTML widget or rasterized image
     save_plotly = function(plot_obj, filename, width, height, ...) {
       # default dimensions for plotly (in pixels)
       if (is.null(width)) width = 800
       if (is.null(height)) height = 600
-      .vistool_write_plotly_image(plot_obj, filename, width = width, height = height, opts = list(...))
+
+      plot_obj = private$ensure_mathjax_dependency(plot_obj)
+
+      ext = tolower(tools::file_ext(filename))
+      extra = list(...)
+
+      if (identical(ext, "html") || identical(ext, "htm")) {
+        background = if (!is.null(extra$background)) extra$background else "transparent"
+        selfcontained = if (!is.null(extra$selfcontained)) extra$selfcontained else TRUE
+        extra$background = NULL
+        extra$selfcontained = NULL
+        widget_args = c(
+          list(
+            widget = plot_obj,
+            path = filename,
+            selfcontained = selfcontained,
+            background = background
+          ),
+          extra
+        )
+        do.call(.vistool_save_plotly_widget, widget_args)
+      } else {
+        .vistool_save_plotly_image(
+          plot_obj,
+          path = filename,
+          width = width,
+          height = height,
+          options = extra
+        )
+      }
     },
 
     # Helper method to add points to ggplot2 objects
@@ -504,6 +533,15 @@ Visualizer = R6::R6Class("Visualizer",
         eff = if (is.null(private$.effective_theme)) get_pkg_theme_default() else private$.effective_theme
         size = if (is.null(point_spec$size)) eff$point_size else point_spec$size
         alpha = if (is.null(point_spec$alpha)) eff$alpha else point_spec$alpha
+        label_res = NULL
+        if (!is.null(point_spec$annotations)) {
+          label_res = private$format_label(
+            text = point_spec$annotations,
+            context = "annotations",
+            backend = "plotly",
+            explicit_latex = point_spec$annotations_latex
+          )
+        }
 
         if (visualizer_type == "surface") {
           # For 3D surface plots, need z values
@@ -530,22 +568,21 @@ Visualizer = R6::R6Class("Visualizer",
 
           # Add annotations if provided (3D text)
           if (!is.null(point_spec$annotations)) {
-            for (i in seq_along(point_spec$annotations)) {
-              # Wrap single values in list() so plotly receives array-like inputs
-              plot_obj = plot_obj %>% add_trace(
-                x = list(points_data$x[i]),
-                y = list(points_data$y[i]),
-                z = list(points_data$z[i]),
-                type = "scatter3d",
-                mode = "text",
-                text = point_spec$annotations[i],
-                textfont = list(
-                  color = point_spec$color,
-                  size = if (!is.null(point_spec$annotation_size)) point_spec$annotation_size else (eff$text_size + 1)
-                ),
-                showlegend = FALSE
-              )
-            }
+            text_vals = label_res$values
+            ann_size = if (!is.null(point_spec$annotation_size)) point_spec$annotation_size else (eff$text_size + 1)
+            plot_obj = plot_obj %>% add_trace(
+              x = if (length(points_data$x) == 1) list(points_data$x[[1]]) else points_data$x,
+              y = if (length(points_data$y) == 1) list(points_data$y[[1]]) else points_data$y,
+              z = if (length(points_data$z) == 1) list(points_data$z[[1]]) else points_data$z,
+              type = "scatter3d",
+              mode = "text",
+              text = if (length(text_vals) == 1) list(text_vals) else text_vals,
+              textfont = list(
+                color = point_spec$color,
+                size = ann_size
+              ),
+              showlegend = FALSE
+            )
           }
 
           # Add ordered path if requested
@@ -612,12 +649,6 @@ Visualizer = R6::R6Class("Visualizer",
 
           # Add annotations if provided (2D text)
           if (!is.null(point_spec$annotations)) {
-            label_res = private$format_label(
-              text = point_spec$annotations,
-              context = "annotations",
-              backend = "plotly",
-              explicit_latex = point_spec$annotations_latex
-            )
             plot_obj = plot_obj %>% plotly::add_annotations(
               x = points_data$x,
               y = points_data$y,
@@ -1321,15 +1352,30 @@ Visualizer = R6::R6Class("Visualizer",
         }
       } else if (identical(backend, "plotly")) {
         if (any_latex) {
-          proc = processed
-          for (idx in which(latex_flags)) {
-            sanitized = private$sanitize_latex_text(proc[idx])
-            if (!grepl("^\\$.*\\$$", sanitized)) {
-              sanitized = paste0("$", sanitized, "$")
+          value_list = vector("list", n)
+          latex_indices = which(latex_flags)
+          if (length(latex_indices)) {
+            for (idx in latex_indices) {
+              sanitized = private$sanitize_latex_text(processed[idx])
+              if (!grepl("^\\$.*\\$$", sanitized)) {
+                sanitized = paste0("$", sanitized, "$")
+              }
+              value_list[[idx]] = plotly::TeX(sanitized)
             }
-            proc[idx] = plotly::TeX(sanitized)
           }
-          processed = proc
+          plain_indices = setdiff(seq_len(n), latex_indices)
+          if (length(plain_indices)) {
+            for (idx in plain_indices) {
+              value_list[[idx]] = processed[idx]
+            }
+          }
+
+          if (n == 1L) {
+            processed = value_list[[1L]]
+          } else {
+            processed = value_list
+            as_list_column = TRUE
+          }
           private$.mathjax_needed = TRUE
         }
       } else {
@@ -1353,7 +1399,33 @@ Visualizer = R6::R6Class("Visualizer",
         return(plot_obj)
       }
 
-      plot_obj = plotly::config(plot_obj, mathjax = "cdn")
+      mathjax_pref = getOption("vistool.mathjax", "cdn")
+      mathjax_value = "cdn"
+
+      if (is.character(mathjax_pref) && length(mathjax_pref) == 1L && nzchar(mathjax_pref)) {
+        pref_trim = trimws(mathjax_pref)
+        if (identical(pref_trim, "cdn")) {
+          mathjax_value = "cdn"
+        } else if (identical(pref_trim, "local")) {
+          mathjax_value = "local"
+        } else if (grepl("^https?://", pref_trim, ignore.case = TRUE)) {
+          mathjax_value = pref_trim
+        } else {
+          warning(sprintf(
+            "Unsupported 'vistool.mathjax' option '%s'; falling back to 'cdn'.",
+            mathjax_pref
+          ), call. = FALSE)
+        }
+      } else if (!is.null(mathjax_pref)) {
+        warning("Option 'vistool.mathjax' must be a single character value; falling back to 'cdn'.", call. = FALSE)
+      }
+
+      plot_obj = plotly::config(plot_obj, mathjax = mathjax_value)
+      if (is.null(plot_obj$x$config)) {
+        plot_obj$x$config = list()
+      }
+      plot_obj$x$config$typesetMath <- TRUE
+
       private$.mathjax_applied = TRUE
       plot_obj
     },

@@ -70,7 +70,8 @@ This method should be called by all child classes via \code{super$plot(...)}.
   z_lab = NULL,
   x_limits = NULL,
   y_limits = NULL,
-  z_limits = NULL
+  z_limits = NULL,
+  latex = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -112,6 +113,12 @@ Y-axis limits as c(min, max). If NULL, uses automatic limits. Default is NULL.}
 
 \item{\code{z_limits}}{(\code{numeric(2)})\cr
 Z-axis limits as c(min, max) (for surface plots). If NULL, uses automatic limits. Default is NULL.}
+
+\item{\code{latex}}{(\code{NULL}|\code{logical(1)}|\code{list})
+Controls LaTeX parsing for plot text. Supply \code{NULL} to auto-detect LaTeX markers,
+a logical scalar to toggle parsing globally, or a named list (keys such as
+\code{title}, \code{subtitle}, \code{legend}, \code{x}, \code{y}, \code{z}, \code{annotations}) to override
+individual components.}
 }
 \if{html}{\out{</div>}}
 }
@@ -175,7 +182,8 @@ Add points to the plot. This method can be called multiple times to add differen
   annotation_size = NULL,
   ordered = FALSE,
   arrow_color = NULL,
-  arrow_size = 0.3
+  arrow_size = 0.3,
+  annotations_latex = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -215,6 +223,10 @@ Color of arrows when ordered = TRUE. If NULL, uses point color.}
 
 \item{\code{arrow_size}}{(\code{numeric(1)})\cr
 Length/size of arrows when \code{ordered = TRUE}. Default is 0.3 units in the coordinate system.}
+
+\item{\code{annotations_latex}}{(\code{NULL}|\code{logical()})\cr
+Optional LaTeX flags for point annotations. Supply a single logical value to
+apply to all annotations or a vector matching \code{annotations}.}
 }
 \if{html}{\out{</div>}}
 }

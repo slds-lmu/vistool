@@ -23,7 +23,7 @@
 - Tests live in `tests/testthat/`; plotly/Python-dependent cases skip on CI using `skip_on_ci()` or `skip_if_not_installed("plotly")`.
 
 ## Integration notes
-- Surface visualizations depend on `plotly` + `reticulate`; `$save()` calls `plotly::save_image()` and expects Python `kaleido` (auto via `py_require("kaleido")`, but document manual setup if interacting with reticulate envs).
+- Surface visualizations depend on `plotly`; MathJax sourcing is controlled through `options(vistool.mathjax)` (`"cdn"`, `"local"`, or a custom URL). Static exports render via `htmlwidgets` + `webshot2` (headless Chrome/Chromium) + `magick`.
 - mlr3 tasks/learners supply model data; objectives and losses are defined under `R/Objective*.R` and `R/LossFunction*.R`.
 
 ## Conventions

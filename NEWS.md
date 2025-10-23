@@ -1,6 +1,8 @@
-<!-- # vistool 0.5.1
-* Removed `kaleido` dependency: Plotly figures are now saved using a custom built solution (essentially a pipeline of `htmlwidget::save() -> magick`).
-* Cleaned up `roxygen2` documentation. -->
+# vistool (development)
+
+* Added `options(vistool.mathjax = c("cdn", "local", "<url>"))` to control how MathJax is sourced for plotly widgets.
+* Plotly exports now depend on `htmlwidgets`, `webshot2`, and `magick` directly; `webshot2` (headless Chrome/Chromium) is required for static surface captures.
+* Replaced the Kaleido/Python export path with an `htmlwidgets` + `webshot2` + `magick` pipeline and updated documentation.
 
 # vistool 0.5.0
 
