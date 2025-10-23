@@ -1,7 +1,7 @@
 Type: Package
 Package: vistool
 Title: Visualize optimization methods
-Version: 0.4.1
+Version: 0.5.0
 Authors@R: c(
     person("Marc", "Becker", , "marcbecker@posteo.de", role = "aut",
            comment = c(ORCID = "0000-0002-8115-0400")),
@@ -49,5 +49,5 @@ VignetteBuilder:
     knitr
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Config/testthat/edition: 3

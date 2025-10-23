@@ -97,7 +97,7 @@ Visualize the custom objective:
 
 ```{r, out.width='100%', out.height='700px'}
 vis_lm = as_visualizer(obj_lm, x1_limits = c(-0.5, 5), x2_limits = c(-3.2, 2.8))
-vis_lm$plot()
+vis_lm$add_contours()$plot()
 ```
 
 You can also add custom points directly to the visualizer using `$add_points()`, which supports many customization options (see below).

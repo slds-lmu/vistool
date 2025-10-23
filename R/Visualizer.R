@@ -177,6 +177,65 @@ Visualizer = R6::R6Class("Visualizer",
       invisible(self)
     },
 
+    #' @description
+    #' Add contour lines for grid-based visualizers (2D ggplot backends).
+    #' @param breaks (`numeric()`)
+    #'   Numeric vector of contour levels. Passed to `ggplot2::geom_contour()`. Default `NULL`.
+    #' @param bins (`integer(1)`)
+    #'   Number of contour bins when `breaks` is not supplied. Default `NULL` (ggplot default).
+    #' @param binwidth (`numeric(1)`)
+    #'   Spacing between contour levels. Ignored when `breaks` supplied. Default `NULL`.
+    #' @param color (`character(1)`)
+    #'   Line color used when `mode = "single"`. Set to "auto" to draw from the active palette or
+    #'   provide an explicit hex/name. Ignored when `mode = "scale"`.
+    #' @param linewidth (`numeric(1)`)
+    #'   Line width. Falls back to the active theme when `NULL`.
+    #' @param linetype (`character(1)`)
+    #'   Line type for contour strokes. Default "solid".
+    #' @param alpha (`numeric(1)`)
+    #'   Opacity in `[0, 1]`. Uses the active theme when `NULL`.
+    #' @param mode (`character(1)`)
+    #'   Either "scale" (default) to colour individual contour levels using a continuous palette or
+    #'   "single" to draw all contours in the same colour.
+    #' @param palette (`character(1)`)
+    #'   Optional palette override ("viridis", "plasma", "grayscale") when `mode = "scale"`.
+    #' @param ... Additional arguments forwarded to `ggplot2::geom_contour()`.
+    #' @return Invisible self.
+    add_contours = function(breaks = NULL, bins = NULL, binwidth = NULL,
+                            color = "auto", linewidth = NULL, linetype = "solid",
+                            alpha = NULL, mode = c("scale", "single"), palette = NULL, ...) {
+      checkmate::assert_numeric(breaks, any.missing = FALSE, null.ok = TRUE)
+      checkmate::assert_count(bins, positive = TRUE, null.ok = TRUE)
+      checkmate::assert_number(binwidth, lower = 0, null.ok = TRUE)
+      checkmate::assert_string(color, null.ok = TRUE)
+      checkmate::assert_number(linewidth, lower = 0, null.ok = TRUE)
+      checkmate::assert_string(linetype)
+      checkmate::assert_number(alpha, lower = 0, upper = 1, null.ok = TRUE)
+      mode = match.arg(mode)
+      checkmate::assert_choice(palette, choices = c("viridis", "plasma", "grayscale"), null.ok = TRUE)
+
+      if (mode == "scale" && !is.null(color) && !identical(color, "auto")) {
+        warning("Ignoring 'color' because contours use a colour scale when mode = 'scale'.", call. = FALSE)
+      }
+
+      store_color = if (mode == "scale") NULL else color
+
+      private$store_layer("contour", list(
+        breaks = breaks,
+        bins = bins,
+        binwidth = binwidth,
+        color = store_color,
+        linewidth = linewidth,
+        linetype = linetype,
+        alpha = alpha,
+        mode = mode,
+        palette = palette,
+        extra_args = list(...)
+      ))
+
+      invisible(self)
+    },
+
     #' @description Add a textual annotation that is resolved during plotting.
     #' @param text (`character(1)`)
     #'   The annotation text. Must be non-empty.
@@ -643,6 +702,16 @@ Visualizer = R6::R6Class("Visualizer",
           }
           if (is.null(layer$spec$size)) layer$spec$size = eff$text_size
           if (is.null(layer$spec$opacity)) layer$spec$opacity = eff$alpha
+          private$.layers_to_add[[i]] = layer
+          next
+        }
+
+        if (layer$type == "contour") {
+          if (identical(layer$spec$mode, "single")) {
+            if (is.null(layer$spec$color) || identical(layer$spec$color, "auto")) {
+              layer$spec$color = private$get_auto_color_with_palette()
+            }
+          }
           private$.layers_to_add[[i]] = layer
           next
         }

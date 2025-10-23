@@ -1,9 +1,7 @@
 test_that("step_size_control_decay_time works", {
-  # Create step size control function
   control = step_size_control_decay_time(decay = 0.1)
   expect_true(is.function(control))
 
-  # Mock objects for testing
   obj = Objective$new(
     id = "test",
     fun = function(x) sum(x^2),
@@ -137,10 +135,7 @@ test_that("assert_step_size_control works", {
 
   opt = OptimizerGD$new(obj, x_start = 1, lr = 0.1, print_trace = FALSE)
 
-  # Valid inputs should not throw error
   expect_silent(assert_step_size_control(x = 1, u = 0.1, obj = obj, opt = opt))
-
-  # Invalid inputs should throw errors
   expect_error(assert_step_size_control(x = "invalid", u = 0.1, obj = obj, opt = opt))
   expect_error(assert_step_size_control(x = 1, u = "invalid", obj = obj, opt = opt))
 })
@@ -171,16 +166,10 @@ test_that("Step size control integration with optimizer works", {
 })
 
 test_that("Step size control parameter validation works", {
-  # Invalid decay parameter
   expect_error(step_size_control_decay_time(decay = -0.1), "Assertion on 'decay' failed")
   expect_error(step_size_control_decay_time(decay = 1.1), "Assertion on 'decay' failed")
-
   expect_error(step_size_control_decay_exp(decay = -0.1), "Assertion on 'decay' failed")
   expect_error(step_size_control_decay_exp(decay = 1.1), "Assertion on 'decay' failed")
-
-  # Invalid iter_zero
   expect_error(step_size_control_decay_linear(iter_zero = -1), "Assertion on 'iter_zero' failed")
-
-  # Invalid line search bounds
   expect_error(step_size_control_line_search(lower = 1, upper = 0.5), "Assertion on 'upper' failed")
 })

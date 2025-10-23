@@ -1,7 +1,17 @@
+# vistool 0.5.0
+
+* Implemented `add_contours()` for `ggplot2` backends.
+* Titles, axis labels, legend titles and `add_points()` annotations support LaTeX annotations.
+* Removed `kaleido` dependency: Plotly figures are now saved using a custom built solution (essentially a pipeline of `htmlwidget::save() -> magick`).
+* Cleaned up `roxygen2` documentation.
+* Includes definitions of the `0-1` loss and objectives (including penalization terms) for the logistic and linear regression.
+
 # vistool 0.4.1
-* Implemented `add_annotation()` for all visualizers, enabling styled text and LaTeX annotations across ggplot2 and plotly backends.
+
+* Implemented `add_annotation()` for all visualizers, enabling styled text and LaTeX annotations across `ggplot2` and `plotly` backends.
 
 # vistool 0.4.0
+
 * New `Hypothesis` R6 class and `hypothesis()` constructor: wrap user-defined functions for regression or classification (1D/2D), with optional link and domain.
 * `as_visualizer()` now accepts a `hypothesis` argument for `Task` objects (mutually exclusive with `learner`), and supports direct visualization of `Hypothesis` objects (standalone, with required `domain`).
 * Domain parameter (`domain`) allows specifying plotting limits for hypothesis-only visualizations.
