@@ -218,14 +218,373 @@ Objective = R6::R6Class("Objective",
 
 l2norm = function(x) sqrt(sum(crossprod(x)))
 
-#' @title Dictionary for test functions
+# Internal helper to build elastic net penalty components.
+build_penalty_components = function(lambda_l1, lambda_l2, mask) {
+  mask = assertLogical(mask, any.missing = FALSE)
+  p = length(mask)
+  idx = which(mask)
+
+  zero_grad = rep(0, p)
+  zero_hessian = matrix(0, p, p)
+
+  value_fun = function(theta) {
+    if (length(idx) == 0) {
+      return(0)
+    }
+
+    value = 0
+    if (lambda_l2 > 0) {
+      value = value + 0.5 * lambda_l2 * sum(theta[idx]^2)
+    }
+    if (lambda_l1 > 0) {
+      value = value + lambda_l1 * sum(abs(theta[idx]))
+    }
+    value
+  }
+
+  grad_fun = if (lambda_l2 > 0 || lambda_l1 > 0) {
+    function(theta) {
+      grad = zero_grad
+      if (length(idx) > 0) {
+        if (lambda_l2 > 0) {
+          grad[idx] = grad[idx] + lambda_l2 * theta[idx]
+        }
+        if (lambda_l1 > 0) {
+          grad[idx] = grad[idx] + lambda_l1 * sign(theta[idx])
+        }
+      }
+      grad
+    }
+  } else {
+    function(theta) zero_grad
+  }
+
+  hess_fun = if (lambda_l2 > 0 && length(idx) > 0) {
+    diag_template = zero_grad
+    diag_template[idx] = lambda_l2
+    function(theta) diag(diag_template)
+  } else {
+    function(theta) zero_hessian
+  }
+
+  list(value = value_fun, grad = grad_fun, hess = hess_fun)
+}
+
+#' @title Logistic regression objective
+#'
+#' @description
+#' Builds a logistic regression objective with optional elastic net penalization.
+#'
+#' @param x (`matrix()`)
+#'   Design matrix without an intercept column. Rows correspond to observations.
+#' @param y (`numeric()`)
+#'   Binary responses taking values in `{0, 1}`.
+#' @param weights (`numeric()`)
+#'   Optional non-negative weights with length `nrow(x)`.
+#' @param lambda (`numeric(1)`)
+#'   Overall penalty strength used together with `alpha` for elastic net penalties.
+#' @param alpha (`numeric(1)`)
+#'   Elastic net mixing parameter in `[0, 1]`. `0` corresponds to ridge, `1` to lasso.
+#' @param lambda_l1 (`numeric(1)`)
+#'   Optional direct specification of the L1 penalty weight. Overrides `lambda * alpha` when provided.
+#' @param lambda_l2 (`numeric(1)`)
+#'   Optional direct specification of the L2 penalty weight. Overrides `lambda * (1 - alpha)` when provided.
+#' @param include_intercept (`logical(1)`)
+#'   If `TRUE`, an intercept column is prepended to `x` before constructing the objective.
+#' @param penalize_intercept (`logical(1)`)
+#'   If `FALSE` and `include_intercept = TRUE`, the intercept term is excluded from the penalties.
+#' @param loss_scale (`numeric(1)`)
+#'   Scaling factor applied to the empirical risk. Defaults to `1 / (2 * sum(weights))`.
+#' @param id (`character(1)`)
+#'   Identifier forwarded to [Objective]. Defaults to `"logreg"`.
+#' @param label (`character(1)`)
+#'   Label used for the resulting objective. Defaults to `"logistic risk"`.
+#'
+#' @return An [Objective] instance capturing the logistic regression risk.
+#' @importFrom stats plogis
+#' @export
+objective_logistic = function(x, y, weights = NULL, lambda = 0, alpha = 0,
+                              lambda_l1 = NULL, lambda_l2 = NULL,
+                              include_intercept = TRUE, penalize_intercept = FALSE,
+                              loss_scale = NULL, id = NULL, label = NULL) {
+  x = as.matrix(x)
+  assertMatrix(x, mode = "numeric", any.missing = FALSE)
+  n = nrow(x)
+  if (n == 0) {
+    stop("`x` must contain at least one observation.")
+  }
+
+  y = as.numeric(y)
+  assertNumeric(y, len = n, any.missing = FALSE)
+  if (!all(y %in% c(0, 1))) {
+    stop("`y` must contain only 0/1 values.")
+  }
+
+  if (is.null(weights)) {
+    weights = rep(1, n)
+  } else {
+    weights = as.numeric(weights)
+    assertNumeric(weights, len = n, any.missing = FALSE)
+    if (any(weights < 0)) {
+      stop("`weights` must be non-negative.")
+    }
+  }
+
+  include_intercept = assertFlag(include_intercept)
+  penalize_intercept = assertFlag(penalize_intercept)
+
+  assertNumber(lambda, lower = 0)
+  assertNumber(alpha, lower = 0, upper = 1)
+
+  if (is.null(lambda_l1)) {
+    lambda_l1 = lambda * alpha
+  } else {
+    lambda_l1 = assertNumber(lambda_l1, lower = 0)
+  }
+
+  if (is.null(lambda_l2)) {
+    lambda_l2 = lambda * (1 - alpha)
+  } else {
+    lambda_l2 = assertNumber(lambda_l2, lower = 0)
+  }
+
+  sum_weights = sum(weights)
+  if (sum_weights <= 0) {
+    stop("`weights` must sum to a positive value.")
+  }
+
+  if (is.null(loss_scale)) {
+    loss_scale = 1 / (2 * sum_weights)
+  } else {
+    loss_scale = assertNumber(loss_scale, lower = 0)
+  }
+
+  if (include_intercept) {
+    x = cbind(Intercept = 1, x)
+  }
+
+  mask = rep(TRUE, ncol(x))
+  if (include_intercept && !penalize_intercept) {
+    mask[1L] = FALSE
+  }
+
+  penalty = build_penalty_components(lambda_l1, lambda_l2, mask)
+
+  logistic_value = function(x, design, y, weights, loss_scale, penalty) {
+    theta = x
+    eta = drop(design %*% theta)
+    base = loss_scale * sum(weights * (log1p(exp(eta)) - y * eta))
+    base + penalty$value(theta)
+  }
+
+  logistic_grad = function(x, design, y, weights, loss_scale, penalty) {
+    theta = x
+    eta = drop(design %*% theta)
+    probs = plogis(eta)
+    diff = (probs - y) * weights
+    grad = as.numeric(loss_scale * crossprod(design, diff))
+    grad + penalty$grad(theta)
+  }
+
+  logistic_hess = function(x, design, y, weights, loss_scale, penalty) {
+    theta = x
+    eta = drop(design %*% theta)
+    probs = plogis(eta)
+    weight_vec = weights * probs * (1 - probs)
+    if (all(weight_vec == 0)) {
+      base = matrix(0, ncol(design), ncol(design))
+    } else {
+      scaled_design = design * sqrt(weight_vec)
+      colnames(scaled_design) = NULL
+      base = loss_scale * crossprod(scaled_design, scaled_design)
+    }
+    base + penalty$hess(theta)
+  }
+
+  objective = Objective$new(
+    id = if (is.null(id)) "logreg" else assertString(id),
+    label = if (is.null(label)) "logistic risk" else assertString(label),
+    fun = logistic_value,
+    xdim = ncol(x),
+    minimize = TRUE,
+    design = x,
+    y = y,
+    weights = weights,
+    loss_scale = loss_scale,
+    penalty = penalty
+  )
+
+  objective$.__enclos_env__$private$p_gradient = logistic_grad
+  objective$.__enclos_env__$private$p_hessian = logistic_hess
+
+  objective
+}
+
+#' @title Linear regression objective
+#'
+#' @description
+#' Builds a squared-error regression objective with optional elastic net penalization.
+#'
+#' @inheritParams objective_logistic
+#' @param y (`numeric()`)
+#'   Numeric responses for the regression task.
+#' @param loss_scale (`numeric(1)`)
+#'   Scaling factor applied to the summed squared errors. Defaults to `1 / (2 * sum(weights))`.
+#' @return An [Objective] instance capturing the squared-error regression risk.
+#' @export
+objective_linear = function(x, y, weights = NULL, lambda = 0, alpha = 0,
+                            lambda_l1 = NULL, lambda_l2 = NULL,
+                            include_intercept = TRUE, penalize_intercept = FALSE,
+                            loss_scale = NULL, id = NULL, label = NULL) {
+  x = as.matrix(x)
+  assertMatrix(x, mode = "numeric", any.missing = FALSE)
+  n = nrow(x)
+  if (n == 0) {
+    stop("`x` must contain at least one observation.")
+  }
+
+  y = as.numeric(y)
+  assertNumeric(y, len = n, any.missing = FALSE)
+
+  if (is.null(weights)) {
+    weights = rep(1, n)
+  } else {
+    weights = as.numeric(weights)
+    assertNumeric(weights, len = n, any.missing = FALSE)
+    if (any(weights < 0)) {
+      stop("`weights` must be non-negative.")
+    }
+  }
+
+  include_intercept = assertFlag(include_intercept)
+  penalize_intercept = assertFlag(penalize_intercept)
+
+  assertNumber(lambda, lower = 0)
+  assertNumber(alpha, lower = 0, upper = 1)
+
+  if (is.null(lambda_l1)) {
+    lambda_l1 = lambda * alpha
+  } else {
+    lambda_l1 = assertNumber(lambda_l1, lower = 0)
+  }
+
+  if (is.null(lambda_l2)) {
+    lambda_l2 = lambda * (1 - alpha)
+  } else {
+    lambda_l2 = assertNumber(lambda_l2, lower = 0)
+  }
+
+  sum_weights = sum(weights)
+  if (sum_weights <= 0) {
+    stop("`weights` must sum to a positive value.")
+  }
+
+  if (is.null(loss_scale)) {
+    loss_scale = 1 / (2 * sum_weights)
+  } else {
+    loss_scale = assertNumber(loss_scale, lower = 0)
+  }
+
+  if (include_intercept) {
+    x = cbind(Intercept = 1, x)
+  }
+
+  mask = rep(TRUE, ncol(x))
+  if (include_intercept && !penalize_intercept) {
+    mask[1L] = FALSE
+  }
+
+  penalty = build_penalty_components(lambda_l1, lambda_l2, mask)
+
+  linear_value = function(x, design, y, weights, loss_scale, penalty) {
+    theta = x
+    residual = y - drop(design %*% theta)
+    base = loss_scale * sum(weights * residual^2)
+    base + penalty$value(theta)
+  }
+
+  linear_grad = function(x, design, y, weights, loss_scale, penalty) {
+    theta = x
+    residual = y - drop(design %*% theta)
+    grad = -2 * loss_scale * as.numeric(crossprod(design, weights * residual))
+    grad + penalty$grad(theta)
+  }
+
+  linear_hess = function(x, design, y, weights, loss_scale, penalty) {
+    theta = x
+    if (all(weights == 0)) {
+      base = matrix(0, ncol(design), ncol(design))
+    } else {
+      scaled_design = design * sqrt(weights)
+      colnames(scaled_design) = NULL
+      base = 2 * loss_scale * crossprod(scaled_design, scaled_design)
+    }
+    base + penalty$hess(theta)
+  }
+
+  objective = Objective$new(
+    id = if (is.null(id)) "linreg" else assertString(id),
+    label = if (is.null(label)) "squared error risk" else assertString(label),
+    fun = linear_value,
+    xdim = ncol(x),
+    minimize = TRUE,
+    design = x,
+    y = y,
+    weights = weights,
+    loss_scale = loss_scale,
+    penalty = penalty
+  )
+
+  objective$.__enclos_env__$private$p_gradient = linear_grad
+  objective$.__enclos_env__$private$p_hessian = linear_hess
+
+  objective
+}
+
+#' @title Objective dictionary
+#'
+#' @description
+#' Lookup table for reusable [Objective] definitions. The dictionary ships with
+#' vistool and comes pre-populated with regularized regression objectives as
+#' well as a selection of benchmark test functions when the optional
+#' `TestFunctions` package is available. New objectives can be registered at
+#' runtime via [mlr3misc::Dictionary] methods such as `$add()`.
+#'
+#' @format A [mlr3misc::Dictionary] where each entry is an [Objective] instance.
+#'
 #' @examples
 #' dict_objective$get("TF_branin")
+#'
+#' @seealso [obj()] for convenient retrieval.
+#'
 #' @export
 dict_objective = R6::R6Class("DictionaryObjective",
   inherit = mlr3misc::Dictionary,
   cloneable = FALSE
 )$new()
+
+# Register regression objectives provided by vistool.
+if (!dict_objective$has("logreg")) {
+  # Supply minimal prototypes so callers can inspect metadata without user data
+  dict_objective$add(
+    "logreg",
+    objective_logistic,
+    .prototype_args = list(
+      x = matrix(0, nrow = 1, ncol = 1),
+      y = c(0)
+    )
+  )
+}
+if (!dict_objective$has("linreg")) {
+  dict_objective$add(
+    "linreg",
+    objective_linear,
+    .prototype_args = list(
+      x = matrix(0, nrow = 1, ncol = 1),
+      y = c(0)
+    )
+  )
+}
 
 tfuns = c(
   # Canonical domains stored as evaluation bounds.
@@ -311,7 +670,7 @@ obj = function(.key, ...) {
 #' @export
 as.data.table.DictionaryObjective = function(x, ..., objects = FALSE) {
   data.table::setkeyv(mlr3misc::map_dtr(x$keys(), function(key) {
-    t = x$get(key)
+    t = x$get(key, .prototype = TRUE)
     mlr3misc::insert_named(
       c(list(
         key = key, label = t$label, xdim = t$xdim, lower = list(t$lower),

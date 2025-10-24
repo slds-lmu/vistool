@@ -14,7 +14,6 @@
 VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
   inherit = VisualizerSurface,
   public = list(
-
     #' @template field_objective
     objective = NULL,
 
@@ -436,6 +435,10 @@ VisualizerSurfaceObj = R6::R6Class("VisualizerSurfaceObj",
       add_marker_at = add_marker_at[add_marker_at <= npmax]
 
       if (is.null(name)) name = opt$id
+      if (!is.null(name)) {
+        name_res = private$format_label(name, "legend", "plotly")
+        name = name_res$values
+      }
 
       # Resolve effective line width from theme or layer override
       eff = private$.effective_theme

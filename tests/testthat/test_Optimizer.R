@@ -59,7 +59,6 @@ test_that("OptimizerMomentum works", {
   expect_s3_class(opt, "OptimizerMomentum")
   expect_equal(opt$momentum, 0.9)
 
-  # Test optimization
   opt$optimize(steps = 3L)
   expect_equal(nrow(opt$archive), 3)
   expect_true("momentum" %in% colnames(opt$archive))
@@ -80,7 +79,6 @@ test_that("OptimizerNAG works", {
   expect_s3_class(opt, "OptimizerNAG")
   expect_equal(opt$momentum, 0.9)
 
-  # Test optimization
   opt$optimize(steps = 3L)
   expect_equal(nrow(opt$archive), 3)
 })
@@ -97,11 +95,9 @@ test_that("Optimizer parameter updates work", {
 
   opt = OptimizerGD$new(obj, x_start = 1, lr = 0.1, print_trace = FALSE)
 
-  # Test learning rate updates
   opt$lr = 0.2
   expect_equal(opt$lr, 0.2)
 
-  # Test position updates
   opt$set_x(2)
   expect_equal(opt$x, 2)
 })
@@ -118,7 +114,6 @@ test_that("Optimizer with step size control works", {
 
   opt = OptimizerGD$new(obj, x_start = c(1, 1), lr = 0.1, print_trace = FALSE)
 
-  # Test with custom step size control
   step_control = function(x, u, obj, opt) 0.5 # Half step size
   opt$optimize(steps = 2L, step_size_control = step_control)
 
@@ -159,13 +154,11 @@ test_that("Optimizer input validation works", {
     upper = c(5, 5)
   )
 
-  # Invalid learning rate
   expect_error(
     OptimizerGD$new(obj, x_start = c(1, 1), lr = -0.1),
     "Assertion on 'lr' failed"
   )
 
-  # Invalid momentum
   expect_error(
     OptimizerMomentum$new(obj, x_start = c(1, 1), lr = 0.1, momentum = -0.1),
     "Assertion on 'momentum' failed"

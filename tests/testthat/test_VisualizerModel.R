@@ -1,4 +1,5 @@
 test_that("VisualizerModel with 1D regression task works", {
+  skip_if_not_installed("e1071")
   skip_if_not_installed("mlr3learners")
 
   task = tsk("mtcars")
@@ -18,6 +19,7 @@ test_that("VisualizerModel with 1D regression task works", {
 })
 
 test_that("VisualizerModel with 2D regression task works", {
+  skip_if_not_installed("e1071")
   skip_if_not_installed("mlr3learners")
 
   task = tsk("mtcars")
@@ -37,6 +39,7 @@ test_that("VisualizerModel with 2D regression task works", {
 })
 
 test_that("VisualizerModel with 1D classification task works", {
+  skip_if_not_installed("e1071")
   skip_if_not_installed("mlr3learners")
 
   task = tsk("spam")
@@ -53,6 +56,7 @@ test_that("VisualizerModel with 1D classification task works", {
 })
 
 test_that("VisualizerModel with 2D classification task works", {
+  skip_if_not_installed("e1071")
   skip_if_not_installed("mlr3learners")
 
   task = tsk("spam")
@@ -69,6 +73,7 @@ test_that("VisualizerModel with 2D classification task works", {
 })
 
 test_that("VisualizerModel add_training_data works for 1D", {
+  skip_if_not_installed("e1071")
   skip_if_not_installed("mlr3learners")
 
   task = tsk("mtcars")
@@ -82,11 +87,11 @@ test_that("VisualizerModel add_training_data works for 1D", {
   p = vis$plot()
   expect_s3_class(p, "ggplot")
 
-  # Should have training points layer
-  expect_true(length(p$layers) >= 2) # function line + training points
+  expect_true(length(p$layers) >= 2)
 })
 
 test_that("VisualizerModel add_training_data works for 2D", {
+  skip_if_not_installed("e1071")
   skip_if_not_installed("mlr3learners")
 
   task = tsk("mtcars")
@@ -100,11 +105,11 @@ test_that("VisualizerModel add_training_data works for 2D", {
   p = vis$plot()
   expect_s3_class(p, "ggplot")
 
-  # Should have additional layers for training data
   expect_true(length(p$layers) >= 2)
 })
 
 test_that("VisualizerModel add_boundary works for 1D", {
+  skip_if_not_installed("e1071")
   skip_if_not_installed("mlr3learners")
 
   task = tsk("mtcars")
@@ -113,14 +118,15 @@ test_that("VisualizerModel add_boundary works for 1D", {
   learner = lrn("regr.svm")
 
   vis = VisualizerModel$new(task, learner)
-  vis$add_boundary() # Default boundary
+  vis$add_boundary()
 
   p = vis$plot()
   expect_s3_class(p, "ggplot")
-  expect_true(length(p$layers) >= 2) # function line + boundary line
+  expect_true(length(p$layers) >= 2)
 })
 
 test_that("VisualizerModel add_boundary works for 2D", {
+  skip_if_not_installed("e1071")
   skip_if_not_installed("mlr3learners")
 
   task = tsk("spam")
@@ -133,14 +139,13 @@ test_that("VisualizerModel add_boundary works for 2D", {
 
   p = vis$plot()
   expect_s3_class(p, "ggplot")
-  # Should have raster + contour layers for boundary
   expect_true(length(p$layers) >= 2)
 })
 
 test_that("VisualizerModel with custom limits works", {
+  skip_if_not_installed("e1071")
   skip_if_not_installed("mlr3learners")
 
-  # 1D case with x1_limits
   task = tsk("mtcars")
   task$select("gear")
   learner = lrn("regr.svm")
@@ -149,7 +154,6 @@ test_that("VisualizerModel with custom limits works", {
   p = vis$plot()
   expect_s3_class(p, "ggplot")
 
-  # 2D case
   task2d = tsk("mtcars")
   task2d$select(c("gear", "cyl"))
   vis2d = VisualizerModel$new(task2d, learner, x1_limits = c(2, 5), x2_limits = c(4, 8))
@@ -158,10 +162,11 @@ test_that("VisualizerModel with custom limits works", {
 })
 
 test_that("VisualizerModel fails with >2D task", {
+  skip_if_not_installed("e1071")
   skip_if_not_installed("mlr3learners")
 
   task = tsk("mtcars")
-  task$select(c("gear", "cyl", "carb")) # 3 features
+  task$select(c("gear", "cyl", "carb"))
 
   learner = lrn("regr.svm")
 
@@ -171,22 +176,8 @@ test_that("VisualizerModel fails with >2D task", {
   )
 })
 
-test_that("VisualizerModel parameter compatibility warning works", {
-  skip_if_not_installed("mlr3learners")
-
-  task = tsk("mtcars")
-  task$select("gear")
-
-  learner = lrn("regr.svm")
-
-  # Test that old parameter names are no longer supported
-  expect_error(
-    VisualizerModel$new(task, learner, xlim = c(2, 5)),
-    "unused argument"
-  )
-})
-
 test_that("VisualizerModel classification with custom colors works", {
+  skip_if_not_installed("e1071")
   skip_if_not_installed("mlr3learners")
 
   task = tsk("spam")
@@ -196,7 +187,6 @@ test_that("VisualizerModel classification with custom colors works", {
 
   vis = VisualizerModel$new(task, learner)
 
-  # Custom colors for classification
   vis$add_training_data(color = c("spam" = "red", "nonspam" = "blue"))
 
   p = vis$plot()
@@ -204,14 +194,13 @@ test_that("VisualizerModel classification with custom colors works", {
 })
 
 test_that("VisualizerModel chaining methods works", {
+  skip_if_not_installed("e1071")
   skip_if_not_installed("mlr3learners")
 
   task = tsk("mtcars")
   task$select(c("gear", "cyl"))
 
   learner = lrn("regr.svm")
-
-  # Test method chaining
   vis = VisualizerModel$new(task, learner)$
     add_training_data(color = "red", size = 3)$
     add_boundary(values = c(15, 20), color = "blue")

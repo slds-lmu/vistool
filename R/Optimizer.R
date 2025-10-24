@@ -6,7 +6,6 @@
 #' @export
 Optimizer = R6::R6Class("Optimizer",
   public = list(
-
     #' @template field_id
     id = NULL,
 
@@ -131,7 +130,6 @@ Optimizer = R6::R6Class("Optimizer",
 OptimizerMomentum = R6::R6Class("OptimizerMomentum",
   inherit = Optimizer,
   public = list(
-
     #' @description Creates a new instance of this [R6][R6::R6Class] class.
     #' @template param_objective
     #' @template param_x_start
@@ -233,7 +231,6 @@ OptimizerMomentum = R6::R6Class("OptimizerMomentum",
 OptimizerGD = R6::R6Class("OptimizerGD",
   inherit = OptimizerMomentum,
   public = list(
-
     #' @description Creates a new instance of this [R6][R6::R6Class] class.
     #' @template param_objective
     #' @template param_x_start
@@ -264,7 +261,6 @@ OptimizerGD = R6::R6Class("OptimizerGD",
 OptimizerNAG = R6::R6Class("OptimizerNAG",
   inherit = Optimizer,
   public = list(
-
     #' @description Creates a new instance of this [R6][R6::R6Class] class.
     #' @template param_objective
     #' @template param_x_start

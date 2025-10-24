@@ -7,7 +7,6 @@
 #' @export
 Visualizer = R6::R6Class("Visualizer",
   public = list(
-
     #' @description Set the instance theme (partial override stored separately)
     #' @param theme (`list`) Partial theme created with vistool_theme() or a named list
     #' @return Invisible self
@@ -41,13 +40,19 @@ Visualizer = R6::R6Class("Visualizer",
     #' @template param_x_limits
     #' @template param_y_limits
     #' @template param_z_limits
+    #' @param latex (`NULL`|`logical(1)`|`list`)
+    #'   Controls LaTeX parsing for plot text. Supply `NULL` to auto-detect LaTeX markers,
+    #'   a logical scalar to toggle parsing globally, or a named list (keys such as
+    #'   `title`, `subtitle`, `legend`, `x`, `y`, `z`) to override individual
+    #'   components.
     #' @return Invisible self for method chaining (child classes handle actual plot creation).
     plot = function(theme = NULL,
                     show_title = TRUE,
                     plot_title = NULL, plot_subtitle = NULL,
                     show_legend = TRUE, legend_title = NULL,
                     x_lab = NULL, y_lab = NULL, z_lab = NULL,
-                    x_limits = NULL, y_limits = NULL, z_limits = NULL) {
+                    x_limits = NULL, y_limits = NULL, z_limits = NULL,
+                    latex = NULL) {
       # Validate and store render params
       checkmate::assert_flag(show_title)
       checkmate::assert_string(plot_title, null.ok = TRUE)
@@ -70,6 +75,9 @@ Visualizer = R6::R6Class("Visualizer",
       private$.effective_theme = eff
       # Title size derived if needed
       private$.effective_theme$title_size = if (is.null(eff$title_size)) (eff$text_size + 2) else eff$title_size
+      latex_control = private$normalize_latex_control(latex)
+      private$.latex_control = latex_control
+      private$.mathjax_needed = FALSE
       private$.render_params = list(
         plot_title = plot_title,
         plot_subtitle = plot_subtitle,
@@ -81,8 +89,11 @@ Visualizer = R6::R6Class("Visualizer",
         z_limits = z_limits,
         show_legend = show_legend,
         legend_title = legend_title,
-        show_title = show_title
+        show_title = show_title,
+        latex = latex_control
       )
+
+      private$.mathjax_applied = FALSE
 
       return(invisible(self))
     },
@@ -166,15 +177,87 @@ Visualizer = R6::R6Class("Visualizer",
     #'   Color of arrows when ordered = TRUE. If NULL, uses point color.
     #' @param arrow_size (`numeric(1)`)\cr
     #'   Length/size of arrows when `ordered = TRUE`. Default is 0.3 units in the coordinate system.
+    #' @param annotations_latex (`NULL`|`logical()`)\cr
+    #'   Optional LaTeX flags for point annotations. Supply a single logical value to
+    #'   apply to all annotations or a vector matching `annotations`.
     add_points = function(points, color = "auto", size = NULL, shape = 19, alpha = NULL,
                           annotations = NULL, annotation_size = NULL, ordered = FALSE,
-                          arrow_color = NULL, arrow_size = 0.3) {
+                          arrow_color = NULL, arrow_size = 0.3, annotations_latex = NULL) {
+      if (!is.null(annotations_latex)) {
+        if (is.null(annotations)) {
+          stop("`annotations_latex` requires `annotations` to be provided.")
+        }
+        checkmate::assert_logical(annotations_latex, any.missing = FALSE)
+        if (!(length(annotations_latex) %in% c(1L, length(annotations)))) {
+          stop("`annotations_latex` must be length 1 or match the number of annotations.")
+        }
+      }
+
       # Store layer specification
       private$store_layer("points", list(
         points = points, color = color, size = size, shape = shape, alpha = alpha,
         annotations = annotations, annotation_size = annotation_size, ordered = ordered,
-        arrow_color = arrow_color, arrow_size = arrow_size
+        arrow_color = arrow_color, arrow_size = arrow_size, annotations_latex = annotations_latex
       ))
+      invisible(self)
+    },
+
+    #' @description
+    #' Add contour lines for grid-based visualizers (2D ggplot backends).
+    #' @param breaks (`numeric()`)
+    #'   Numeric vector of contour levels. Passed to `ggplot2::geom_contour()`. Default `NULL`.
+    #' @param bins (`integer(1)`)
+    #'   Number of contour bins when `breaks` is not supplied. Default `NULL` (ggplot default).
+    #' @param binwidth (`numeric(1)`)
+    #'   Spacing between contour levels. Ignored when `breaks` supplied. Default `NULL`.
+    #' @param color (`character(1)`)
+    #'   Line color used when `mode = "single"`. Set to "auto" to draw from the active palette or
+    #'   provide an explicit hex/name. Ignored when `mode = "scale"`.
+    #' @param linewidth (`numeric(1)`)
+    #'   Line width. Falls back to the active theme when `NULL`.
+    #' @param linetype (`character(1)`)
+    #'   Line type for contour strokes. Default "solid".
+    #' @param alpha (`numeric(1)`)
+    #'   Opacity in `[0, 1]`. Uses the active theme when `NULL`.
+    #' @param mode (`character(1)`)
+    #'   Either "scale" (default) to colour individual contour levels using a continuous palette or
+    #'   "single" to draw all contours in the same colour.
+    #' @param palette (`character(1)`)
+    #'   Optional palette override ("viridis", "plasma", "grayscale") when `mode = "scale"`.
+    #' @param ... Additional arguments forwarded to `ggplot2::geom_contour()`.
+    #' @return Invisible self.
+    add_contours = function(breaks = NULL, bins = NULL, binwidth = NULL,
+                            color = "auto", linewidth = NULL, linetype = "solid",
+                            alpha = NULL, mode = c("scale", "single"), palette = NULL, ...) {
+      checkmate::assert_numeric(breaks, any.missing = FALSE, null.ok = TRUE)
+      checkmate::assert_count(bins, positive = TRUE, null.ok = TRUE)
+      checkmate::assert_number(binwidth, lower = 0, null.ok = TRUE)
+      checkmate::assert_string(color, null.ok = TRUE)
+      checkmate::assert_number(linewidth, lower = 0, null.ok = TRUE)
+      checkmate::assert_string(linetype)
+      checkmate::assert_number(alpha, lower = 0, upper = 1, null.ok = TRUE)
+      mode = match.arg(mode)
+      checkmate::assert_choice(palette, choices = c("viridis", "plasma", "grayscale"), null.ok = TRUE)
+
+      if (mode == "scale" && !is.null(color) && !identical(color, "auto")) {
+        warning("Ignoring 'color' because contours use a colour scale when mode = 'scale'.", call. = FALSE)
+      }
+
+      store_color = if (mode == "scale") NULL else color
+
+      private$store_layer("contour", list(
+        breaks = breaks,
+        bins = bins,
+        binwidth = binwidth,
+        color = store_color,
+        linewidth = linewidth,
+        linetype = linetype,
+        alpha = alpha,
+        mode = mode,
+        palette = palette,
+        extra_args = list(...)
+      ))
+
       invisible(self)
     },
 
@@ -274,6 +357,10 @@ Visualizer = R6::R6Class("Visualizer",
     .effective_theme = NULL, # per-render effective theme
     .render_params = NULL, # per-render non-style params
     .last_plot = NULL, # last built plot object
+    .latex_control = list(default = NULL, overrides = list()), # latex preferences per render
+    .mathjax_needed = FALSE, # track if MathJax is required for current plotly render
+    .mathjax_applied = FALSE, # ensure MathJax config is only added once per render
+    .latex_warning_emitted = FALSE, # suppress repeated dependency warnings
 
     # save a ggplot2 object
     save_ggplot = function(plot_obj, filename, width, height, dpi, ...) {
@@ -291,12 +378,41 @@ Visualizer = R6::R6Class("Visualizer",
       )
     },
 
-    # save a plotly object via JSON -> Python (plotly.io + kaleido >= 1.0)
+    # save a plotly object either as HTML widget or rasterized image
     save_plotly = function(plot_obj, filename, width, height, ...) {
       # default dimensions for plotly (in pixels)
       if (is.null(width)) width = 800
       if (is.null(height)) height = 600
-      .vistool_write_plotly_image(plot_obj, filename, width = width, height = height, opts = list(...))
+
+      plot_obj = private$ensure_mathjax_dependency(plot_obj)
+
+      ext = tolower(tools::file_ext(filename))
+      extra = list(...)
+
+      if (identical(ext, "html") || identical(ext, "htm")) {
+        background = if (!is.null(extra$background)) extra$background else "transparent"
+        selfcontained = if (!is.null(extra$selfcontained)) extra$selfcontained else TRUE
+        extra$background = NULL
+        extra$selfcontained = NULL
+        widget_args = c(
+          list(
+            widget = plot_obj,
+            path = filename,
+            selfcontained = selfcontained,
+            background = background
+          ),
+          extra
+        )
+        do.call(.vistool_save_plotly_widget, widget_args)
+      } else {
+        .vistool_save_plotly_image(
+          plot_obj,
+          path = filename,
+          width = width,
+          height = height,
+          options = extra
+        )
+      }
     },
 
     # Helper method to add points to ggplot2 objects
@@ -326,16 +442,30 @@ Visualizer = R6::R6Class("Visualizer",
 
         # Add annotations if provided
         if (!is.null(point_spec$annotations)) {
-          # Use annotation_size if provided, otherwise default to smaller text
           ann_size = if (!is.null(point_spec$annotation_size)) point_spec$annotation_size else max(3, eff$text_size - 2)
+          label_res = private$format_label(
+            text = point_spec$annotations,
+            context = "annotations",
+            backend = "ggplot",
+            explicit_latex = point_spec$annotations_latex
+          )
+          annotation_df = points_data
+          if (label_res$as_list_column) {
+            annotation_df$label = I(label_res$values)
+          } else if (label_res$any_latex) {
+            annotation_df$label = I(list(label_res$values))
+          } else {
+            annotation_df$label = label_res$values
+          }
 
           plot_obj = plot_obj + ggplot2::geom_text(
-            data = cbind(points_data, label = point_spec$annotations),
+            data = annotation_df,
             ggplot2::aes(x = x, y = y, label = label),
             color = point_spec$color,
             size = ann_size,
             vjust = -0.5,
-            inherit.aes = FALSE
+            inherit.aes = FALSE,
+            parse = FALSE
           )
         }
 
@@ -354,16 +484,12 @@ Visualizer = R6::R6Class("Visualizer",
             dist = sqrt(dx^2 + dy^2)
 
             if (dist > 0) {
-              # Normalize direction vector
               dx_norm = dx / dist
               dy_norm = dy / dist
 
-              # Calculate arrow endpoints based on arrow_size
               arrow_size = point_spec$arrow_size
               arrow_x2 = x1 + dx_norm * arrow_size
               arrow_y2 = y1 + dy_norm * arrow_size
-
-              # Create arrow data frame
               arrow_data = data.frame(
                 x = x1,
                 y = y1,
@@ -371,10 +497,7 @@ Visualizer = R6::R6Class("Visualizer",
                 yend = arrow_y2
               )
 
-              # Add arrow segment
-              # Use the same color as points if arrow_color is not specified
               arrow_color = if (is.null(point_spec$arrow_color)) point_spec$color else point_spec$arrow_color
-
               plot_obj = plot_obj + ggplot2::geom_segment(
                 data = arrow_data,
                 ggplot2::aes(x = x, y = y, xend = xend, yend = yend),
@@ -391,7 +514,6 @@ Visualizer = R6::R6Class("Visualizer",
       return(plot_obj)
     },
 
-    # Helper method to add points to plotly objects
     add_points_to_plotly = function(plot_obj, visualizer_type = "surface") {
       points_layers = private$get_layers_by_type("points")
       if (length(points_layers) == 0) {
@@ -403,15 +525,20 @@ Visualizer = R6::R6Class("Visualizer",
         eff = if (is.null(private$.effective_theme)) get_pkg_theme_default() else private$.effective_theme
         size = if (is.null(point_spec$size)) eff$point_size else point_spec$size
         alpha = if (is.null(point_spec$alpha)) eff$alpha else point_spec$alpha
+        label_res = NULL
+        if (!is.null(point_spec$annotations)) {
+          label_res = private$format_label(
+            text = point_spec$annotations,
+            context = "annotations",
+            backend = "plotly",
+            explicit_latex = point_spec$annotations_latex
+          )
+        }
 
         if (visualizer_type == "surface") {
-          # For 3D surface plots, need z values
           if (!"z" %in% names(points_data)) {
-            # Try to infer z values if the visualizer has a way to evaluate the function
             points_data$z = private$infer_z_values(points_data)
           }
-
-          # Add 3D scatter trace
           plot_obj = plot_obj %>% add_trace(
             x = if (length(points_data$x) == 1) list(points_data$x) else points_data$x,
             y = if (length(points_data$y) == 1) list(points_data$y) else points_data$y,
@@ -427,29 +554,25 @@ Visualizer = R6::R6Class("Visualizer",
             showlegend = FALSE
           )
 
-          # Add annotations if provided (3D text)
           if (!is.null(point_spec$annotations)) {
-            for (i in seq_along(point_spec$annotations)) {
-              # Wrap single values in list() so plotly receives array-like inputs
-              plot_obj = plot_obj %>% add_trace(
-                x = list(points_data$x[i]),
-                y = list(points_data$y[i]),
-                z = list(points_data$z[i]),
-                type = "scatter3d",
-                mode = "text",
-                text = point_spec$annotations[i],
-                textfont = list(
-                  color = point_spec$color,
-                  size = if (!is.null(point_spec$annotation_size)) point_spec$annotation_size else (eff$text_size + 1)
-                ),
-                showlegend = FALSE
-              )
-            }
+            text_vals = label_res$values
+            ann_size = if (!is.null(point_spec$annotation_size)) point_spec$annotation_size else (eff$text_size + 1)
+            plot_obj = plot_obj %>% add_trace(
+              x = if (length(points_data$x) == 1) list(points_data$x[[1]]) else points_data$x,
+              y = if (length(points_data$y) == 1) list(points_data$y[[1]]) else points_data$y,
+              z = if (length(points_data$z) == 1) list(points_data$z[[1]]) else points_data$z,
+              type = "scatter3d",
+              mode = "text",
+              text = if (length(text_vals) == 1) list(text_vals) else text_vals,
+              textfont = list(
+                color = point_spec$color,
+                size = ann_size
+              ),
+              showlegend = FALSE
+            )
           }
 
-          # Add ordered path if requested
           if (point_spec$ordered && nrow(points_data) > 1) {
-            # For 3D plots, we'll use lines but with shorter segments
             for (i in 1:(nrow(points_data) - 1)) {
               x1 = points_data$x[i]
               y1 = points_data$y[i]
@@ -458,25 +581,21 @@ Visualizer = R6::R6Class("Visualizer",
               y2 = points_data$y[i + 1]
               z2 = points_data$z[i + 1]
 
-              # Calculate direction vector and normalize it
               dx = x2 - x1
               dy = y2 - y1
               dz = z2 - z1
               dist = sqrt(dx^2 + dy^2 + dz^2)
 
               if (dist > 0) {
-                # Normalize direction vector
                 dx_norm = dx / dist
                 dy_norm = dy / dist
                 dz_norm = dz / dist
 
-                # Calculate arrow endpoints based on arrow_size
                 arrow_size = point_spec$arrow_size
                 arrow_x2 = x1 + dx_norm * arrow_size
                 arrow_y2 = y1 + dy_norm * arrow_size
                 arrow_z2 = z1 + dz_norm * arrow_size
 
-                # Add arrow segment
                 plot_obj = plot_obj %>% add_trace(
                   x = c(x1, arrow_x2),
                   y = c(y1, arrow_y2),
@@ -494,7 +613,6 @@ Visualizer = R6::R6Class("Visualizer",
             }
           }
         } else {
-          # For 2D contour plots
           plot_obj = plot_obj %>% add_trace(
             x = points_data$x,
             y = points_data$y,
@@ -509,12 +627,11 @@ Visualizer = R6::R6Class("Visualizer",
             showlegend = FALSE
           )
 
-          # Add annotations if provided (2D text)
           if (!is.null(point_spec$annotations)) {
             plot_obj = plot_obj %>% plotly::add_annotations(
               x = points_data$x,
               y = points_data$y,
-              text = point_spec$annotations,
+              text = label_res$values,
               showarrow = FALSE,
               font = list(
                 color = point_spec$color,
@@ -523,31 +640,25 @@ Visualizer = R6::R6Class("Visualizer",
             )
           }
 
-          # Add ordered path if requested
           if (point_spec$ordered && nrow(points_data) > 1) {
-            # For 2D plots, use shorter line segments
             for (i in 1:(nrow(points_data) - 1)) {
               x1 = points_data$x[i]
               y1 = points_data$y[i]
               x2 = points_data$x[i + 1]
               y2 = points_data$y[i + 1]
 
-              # Calculate direction vector and normalize it
               dx = x2 - x1
               dy = y2 - y1
               dist = sqrt(dx^2 + dy^2)
 
               if (dist > 0) {
-                # Normalize direction vector
                 dx_norm = dx / dist
                 dy_norm = dy / dist
 
-                # Calculate arrow endpoints based on arrow_size
                 arrow_size = point_spec$arrow_size
                 arrow_x2 = x1 + dx_norm * arrow_size
                 arrow_y2 = y1 + dy_norm * arrow_size
 
-                # Add arrow segment
                 plot_obj = plot_obj %>% add_trace(
                   x = c(x1, arrow_x2),
                   y = c(y1, arrow_y2),
@@ -566,22 +677,19 @@ Visualizer = R6::R6Class("Visualizer",
         }
       }
 
+      plot_obj = private$ensure_mathjax_dependency(plot_obj)
       return(plot_obj)
     },
 
-    # Helper method to prepare points data into consistent format
     prepare_points_data = function(points, visualizer_type) {
       if (is.null(points)) {
         stop("Points cannot be NULL")
       }
 
-      # Convert different input formats to data.frame
       if (is.numeric(points) && visualizer_type == "1D") {
-        # For 1D: numeric vector of x values
         points_data = data.frame(x = points, y = NA_real_)
       } else if (is.matrix(points) || is.data.frame(points)) {
         points_data = as.data.frame(points)
-        # Ensure consistent column names
         if (ncol(points_data) == 1 && visualizer_type == "1D") {
           names(points_data) = "x"
           points_data$y = NA_real_
@@ -592,7 +700,6 @@ Visualizer = R6::R6Class("Visualizer",
           }
         }
       } else if (is.list(points) && !is.data.frame(points)) {
-        # List of vectors - convert to data.frame
         if (all(sapply(points, length) == 2)) {
           points_data = data.frame(
             x = sapply(points, function(p) p[1]),
@@ -604,8 +711,6 @@ Visualizer = R6::R6Class("Visualizer",
       } else {
         stop("Unsupported points format")
       }
-
-      # Validate dimensions
       if (visualizer_type == "1D" && !"x" %in% names(points_data)) {
         stop("1D visualizers require x coordinates")
       } else if (visualizer_type %in% c("2D", "surface") && (!("x" %in% names(points_data)) || !("y" %in% names(points_data)))) {
@@ -623,9 +728,7 @@ Visualizer = R6::R6Class("Visualizer",
       return(rep(0, nrow(points_data)))
     },
 
-    # Resolve colors in all stored layers
     resolve_all_layer_colors = function() {
-      # Initialize layers_to_add if it doesn't exist
       if (is.null(private$.layers_to_add)) {
         private$.layers_to_add = list()
       }
@@ -644,6 +747,16 @@ Visualizer = R6::R6Class("Visualizer",
           }
           if (is.null(layer$spec$size)) layer$spec$size = eff$text_size
           if (is.null(layer$spec$opacity)) layer$spec$opacity = eff$alpha
+          private$.layers_to_add[[i]] = layer
+          next
+        }
+
+        if (layer$type == "contour") {
+          if (identical(layer$spec$mode, "single")) {
+            if (is.null(layer$spec$color) || identical(layer$spec$color, "auto")) {
+              layer$spec$color = private$get_auto_color_with_palette()
+            }
+          }
           private$.layers_to_add[[i]] = layer
           next
         }
@@ -843,27 +956,30 @@ Visualizer = R6::R6Class("Visualizer",
       for (spec in annotation_layers) {
         coords_info = private$compute_annotation_coordinates(spec, dims, ranges)
         coords = coords_info$coords
-        label_text = spec$text
-        parse_flag = isTRUE(spec$latex)
-        if (parse_flag) {
-          if (!requireNamespace("latex2exp", quietly = TRUE)) {
-            stop("Package 'latex2exp' is required for LaTeX annotations. Install it or call with latex = FALSE.")
-          }
-          label_text = private$sanitize_latex_text(label_text)
-          label_text = latex2exp::TeX(label_text, output = "character")
+        label_res = private$format_label(
+          text = spec$text,
+          context = "annotations",
+          backend = "ggplot",
+          explicit_latex = spec$latex
+        )
+        label_value = label_res$values
+        if (isTRUE(label_res$as_list_column)) {
+          label_value = I(label_value)
+        } else if (isTRUE(label_res$any_latex)) {
+          label_value = I(list(label_value))
         }
         size_mm = spec$size / ggplot2::.pt
         plot_obj = plot_obj + ggplot2::annotate(
           geom = "text",
           x = coords$x,
           y = coords$y,
-          label = label_text,
+          label = label_value,
           color = spec$color,
           size = size_mm,
           alpha = spec$opacity,
           hjust = spec$hjust,
           vjust = spec$vjust,
-          parse = parse_flag
+          parse = FALSE
         )
       }
 
@@ -899,23 +1015,19 @@ Visualizer = R6::R6Class("Visualizer",
       z_limits = if (dim_value == 3) private$get_axis_limits("z", fallback_z) else NULL
       ranges = list(x = x_limits, y = y_limits, z = z_limits)
 
-      latex_required = FALSE
-
       for (spec in annotation_layers) {
         coords_info = private$compute_annotation_coordinates(spec, dims, ranges)
         coords = coords_info$coords
         reference = coords_info$reference
         normalized = coords_info$normalized
 
-        text_val = spec$text
-        if (isTRUE(spec$latex)) {
-          latex_required = TRUE
-          text_val = private$sanitize_latex_text(text_val)
-          if (!grepl("^\\$.*\\$$", text_val)) {
-            text_val = paste0("$", text_val, "$")
-          }
-          text_val = plotly::TeX(text_val)
-        }
+        label_res = private$format_label(
+          text = spec$text,
+          context = "annotations",
+          backend = "plotly",
+          explicit_latex = spec$latex
+        )
+        text_val = label_res$values
         annotation = list(
           text = text_val,
           showarrow = FALSE,
@@ -970,10 +1082,7 @@ Visualizer = R6::R6Class("Visualizer",
         }
       }
 
-      if (latex_required) {
-        # ensure MathJax dependency is registered so latex content renders on client
-        plot_obj = plotly::config(plot_obj, mathjax = "cdn")
-      }
+      plot_obj = private$ensure_mathjax_dependency(plot_obj)
 
       plot_obj
     },
@@ -1033,6 +1142,256 @@ Visualizer = R6::R6Class("Visualizer",
       }
 
       paste0(rebuild, collapse = "")
+    },
+
+    normalize_latex_control = function(latex_value) {
+      ctrl = list(default = NULL, overrides = list())
+      if (is.null(latex_value)) {
+        return(ctrl)
+      }
+
+      if (checkmate::test_flag(latex_value)) {
+        ctrl$default = latex_value
+        return(ctrl)
+      }
+
+      if (!is.list(latex_value)) {
+        stop("`latex` must be NULL, a logical scalar, or a named list.", call. = FALSE)
+      }
+
+      if (length(latex_value) == 0) {
+        return(ctrl)
+      }
+
+      if (is.null(names(latex_value)) || any(names(latex_value) == "")) {
+        stop("Named list entries required for `latex` control.", call. = FALSE)
+      }
+
+      allowed = c("default", "title", "subtitle", "legend", "legend_title", "x", "y", "z", "axes")
+      unknown = setdiff(names(latex_value), allowed)
+      if (length(unknown)) {
+        stop(sprintf("Unsupported latex control key(s): %s", paste(unknown, collapse = ", ")), call. = FALSE)
+      }
+
+      spec = latex_value
+      if ("default" %in% names(spec)) {
+        checkmate::assert_flag(spec$default, .var.name = "latex[['default']]")
+        ctrl$default = spec$default
+        spec$default = NULL
+      }
+
+      overrides = list()
+      if ("axes" %in% names(spec)) {
+        checkmate::assert_flag(spec$axes, .var.name = "latex[['axes']]")
+        overrides$x = spec$axes
+        overrides$y = spec$axes
+        overrides$z = spec$axes
+        spec$axes = NULL
+      }
+
+      if ("legend_title" %in% names(spec)) {
+        checkmate::assert_flag(spec$legend_title, .var.name = "latex[['legend_title']]")
+        overrides$legend = spec$legend_title
+        spec$legend_title = NULL
+      }
+
+      for (nm in names(spec)) {
+        val = spec[[nm]]
+        checkmate::assert_flag(val, .var.name = sprintf("latex[['%s']]", nm))
+        overrides[[nm]] = val
+      }
+
+      if (length(overrides)) {
+        ctrl$overrides = utils::modifyList(ctrl$overrides, overrides, keep.null = TRUE)
+      }
+
+      ctrl
+    },
+
+    get_latex_pref = function(context) {
+      if (is.null(private$.latex_control)) {
+        return(NULL)
+      }
+
+      overrides = private$.latex_control$overrides
+      if (length(overrides) && !is.null(overrides[[context]])) {
+        return(overrides[[context]])
+      }
+
+      private$.latex_control$default
+    },
+
+    detect_latex_intent = function(text_vec) {
+      if (is.null(text_vec) || !length(text_vec)) {
+        return(logical(length(text_vec)))
+      }
+
+      text_vec = as.character(text_vec)
+      text_vec[is.na(text_vec)] = ""
+
+      has_dollar = grepl("(^|[^\\\\])\\$[^$]+\\$", text_vec)
+      has_inline = grepl("\\\\\\(", text_vec, fixed = TRUE) | grepl("\\\\\\)", text_vec, fixed = TRUE)
+      has_block = grepl("\\\\\\[", text_vec, fixed = TRUE) | grepl("\\\\\\]", text_vec, fixed = TRUE)
+      has_command = grepl("\\\\[A-Za-z]+", text_vec)
+
+      has_dollar | has_inline | has_block | has_command
+    },
+
+    warn_missing_latex2exp = function() {
+      if (!private$.latex_warning_emitted) {
+        warning("Package 'latex2exp' is required for LaTeX labels on ggplot2 backends; falling back to plain text.", call. = FALSE)
+        private$.latex_warning_emitted = TRUE
+      }
+    },
+
+    strip_math_delimiters = function(text_vec) {
+      if (is.null(text_vec)) {
+        return(text_vec)
+      }
+
+      vapply(text_vec, function(txt) {
+        if (is.na(txt) || !nzchar(txt)) {
+          return(txt)
+        }
+        stripped = gsub("^\\s*\\$([^$]+)\\$\\s*$", "\\1", txt)
+        stripped = gsub("^\\\\\\((.*)\\\\\\)$", "\\1", stripped)
+        stripped = gsub("^\\\\\\[(.*)\\\\\\]$", "\\1", stripped)
+        stripped
+      }, FUN.VALUE = character(1), USE.NAMES = FALSE)
+    },
+
+    format_label = function(text, context, backend, explicit_latex = NULL) {
+      if (is.null(text)) {
+        return(list(values = text, latex_flags = logical(), any_latex = FALSE, as_list_column = FALSE))
+      }
+
+      if (!is.character(text)) {
+        text = as.character(text)
+      }
+
+      n = length(text)
+      latex_flags = rep(FALSE, n)
+      if (!is.null(explicit_latex)) {
+        checkmate::assert_logical(explicit_latex, any.missing = FALSE)
+        if (!(length(explicit_latex) %in% c(1L, n))) {
+          stop("Explicit LaTeX flags must be length 1 or match the number of labels.", call. = FALSE)
+        }
+        latex_flags = if (length(explicit_latex) == 1L) rep(explicit_latex, n) else explicit_latex
+      } else {
+        pref = private$get_latex_pref(context)
+        if (!is.null(pref)) {
+          latex_flags[] = pref
+        } else {
+          latex_flags = private$detect_latex_intent(text)
+        }
+      }
+
+      any_latex = any(latex_flags)
+      processed = text
+      as_list_column = FALSE
+
+      if (identical(backend, "ggplot")) {
+        if (any_latex) {
+          if (!requireNamespace("latex2exp", quietly = TRUE)) {
+            private$warn_missing_latex2exp()
+            processed = private$strip_math_delimiters(processed)
+            latex_flags[] = FALSE
+            any_latex = FALSE
+          } else {
+            if (n == 1L) {
+              processed = latex2exp::TeX(private$sanitize_latex_text(processed))
+            } else {
+              processed_list = vector("list", n)
+              for (i in seq_len(n)) {
+                if (isTRUE(latex_flags[i])) {
+                  processed_list[[i]] = latex2exp::TeX(private$sanitize_latex_text(processed[i]))
+                } else {
+                  processed_list[[i]] = processed[i]
+                }
+              }
+              processed = processed_list
+              as_list_column = TRUE
+            }
+          }
+        }
+      } else if (identical(backend, "plotly")) {
+        if (any_latex) {
+          value_list = vector("list", n)
+          latex_indices = which(latex_flags)
+          if (length(latex_indices)) {
+            for (idx in latex_indices) {
+              sanitized = private$sanitize_latex_text(processed[idx])
+              if (!grepl("^\\$.*\\$$", sanitized)) {
+                sanitized = paste0("$", sanitized, "$")
+              }
+              value_list[[idx]] = plotly::TeX(sanitized)
+            }
+          }
+          plain_indices = setdiff(seq_len(n), latex_indices)
+          if (length(plain_indices)) {
+            for (idx in plain_indices) {
+              value_list[[idx]] = processed[idx]
+            }
+          }
+
+          if (n == 1L) {
+            processed = value_list[[1L]]
+          } else {
+            processed = value_list
+            as_list_column = TRUE
+          }
+          private$.mathjax_needed = TRUE
+        }
+      } else {
+        stop("Unknown backend specified for format_label().", call. = FALSE)
+      }
+
+      list(
+        values = processed,
+        latex_flags = latex_flags,
+        any_latex = any_latex,
+        as_list_column = as_list_column
+      )
+    },
+
+    ensure_mathjax_dependency = function(plot_obj) {
+      if (is.null(plot_obj) || !inherits(plot_obj, "plotly")) {
+        return(plot_obj)
+      }
+
+      if (!isTRUE(private$.mathjax_needed) || isTRUE(private$.mathjax_applied)) {
+        return(plot_obj)
+      }
+
+      mathjax_pref = getOption("vistool.mathjax", "cdn")
+      mathjax_value = "cdn"
+
+      if (is.character(mathjax_pref) && length(mathjax_pref) == 1L && nzchar(mathjax_pref)) {
+        pref_trim = trimws(mathjax_pref)
+        if (identical(pref_trim, "cdn")) {
+          mathjax_value = "cdn"
+        } else if (identical(pref_trim, "local")) {
+          mathjax_value = "local"
+        } else if (grepl("^https?://", pref_trim, ignore.case = TRUE)) {
+          mathjax_value = pref_trim
+        } else {
+          warning(sprintf(
+            "Unsupported 'vistool.mathjax' option '%s'; falling back to 'cdn'.",
+            mathjax_pref
+          ), call. = FALSE)
+        }
+      } else if (!is.null(mathjax_pref)) {
+        warning("Option 'vistool.mathjax' must be a single character value; falling back to 'cdn'.", call. = FALSE)
+      }
+
+      plot_obj = plotly::config(plot_obj, mathjax = mathjax_value)
+      if (is.null(plot_obj$x$config)) {
+        plot_obj$x$config = list()
+      }
+      plot_obj$x$config$typesetMath = TRUE
+
+      private$.mathjax_applied = TRUE
+      plot_obj
     },
 
     # Recursively resolve colors in a data structure
@@ -1221,19 +1580,13 @@ Visualizer = R6::R6Class("Visualizer",
       eff = private$.effective_theme
       rp = private$.render_params
 
-      # Create base data for the function line
       plot_data = data.frame(
         x = data_structure$coordinates$x1,
         y = data_structure$coordinates$y
       )
 
-      # Create base ggplot
       private$.plot = private$init_ggplot(plot_data, "x", "y")
-
-      # Add the visualization layer (line for functions, points for objectives)
       private$.plot = geom_layer_func(private$.plot, plot_data, eff)
-
-      # Apply common styling
       private$gg_apply_labels_limits_theme(data_structure)
     },
 
@@ -1242,20 +1595,13 @@ Visualizer = R6::R6Class("Visualizer",
       eff = private$.effective_theme
       rp = private$.render_params
 
-      # Create base data for the filled contour
       plot_data = data.frame(
         x1 = data_structure$coordinates$x1,
         x2 = data_structure$coordinates$x2,
         y = data_structure$coordinates$y
       )
-
-      # Create base ggplot
       private$.plot = private$init_ggplot(plot_data, "x1", "x2")
-
-      # Add the visualization layer (raster for both models and objectives)
       private$.plot = geom_layer_func(private$.plot, plot_data, eff)
-
-      # Apply common styling
       private$gg_apply_labels_limits_theme(data_structure, is_2d = TRUE)
     },
 
@@ -1263,33 +1609,37 @@ Visualizer = R6::R6Class("Visualizer",
     gg_apply_labels_limits_theme = function(data_structure, is_2d = FALSE) {
       eff = private$.effective_theme
       rp = private$.render_params
-
-      # Apply theme and styling
       private$.plot = private$apply_ggplot_theme(private$.plot, eff$text_size, eff$title_size, eff$theme, eff$background, eff$show_grid, eff$grid_color)
-
-      # Determine labels
       title_text = if (!is.null(rp$plot_title)) rp$plot_title else data_structure$labels$title
       x_text = if (!is.null(rp$x_lab)) rp$x_lab else data_structure$labels$x1
       y_text = if (!is.null(rp$y_lab)) rp$y_lab else if (is_2d) data_structure$labels$x2 else data_structure$labels$y
 
-      # Build labels list
-      labels_list = list(
-        title = if (rp$show_title) title_text else NULL,
-        subtitle = rp$plot_subtitle,
-        x = x_text,
-        y = y_text
-      )
-
-      # Add fill label for 2D plots
-      if (is_2d) {
-        fill_text = if (!is.null(rp$legend_title)) rp$legend_title else data_structure$labels$y
-        labels_list$fill = fill_text
+      labels_list = list()
+      if (rp$show_title && !is.null(title_text)) {
+        title_res = private$format_label(title_text, "title", "ggplot")
+        labels_list$title = title_res$values
+      } else if (!rp$show_title) {
+        labels_list$title = NULL
       }
 
-      # Add labels conditionally
+      if (!is.null(rp$plot_subtitle)) {
+        subtitle_res = private$format_label(rp$plot_subtitle, "subtitle", "ggplot")
+        labels_list$subtitle = subtitle_res$values
+      }
+
+      x_res = private$format_label(x_text, "x", "ggplot")
+      y_res = private$format_label(y_text, "y", "ggplot")
+      labels_list$x = x_res$values
+      labels_list$y = y_res$values
+
+      if (is_2d) {
+        fill_text = if (!is.null(rp$legend_title)) rp$legend_title else data_structure$labels$y
+        fill_res = private$format_label(fill_text, "legend", "ggplot")
+        labels_list$fill = fill_res$values
+      }
+
       private$.plot = private$.plot + do.call(ggplot2::labs, labels_list)
 
-      # Apply axis limits
       if (!is.null(rp$x_limits)) {
         private$.plot = private$.plot + ggplot2::xlim(rp$x_limits)
       }
@@ -1297,7 +1647,6 @@ Visualizer = R6::R6Class("Visualizer",
         private$.plot = private$.plot + ggplot2::ylim(rp$y_limits)
       }
 
-      # Apply legend settings: theme drives position; "none" disables legend
       legend_pos = if (is.null(eff$legend_position)) "right" else eff$legend_position
       if (!rp$show_legend || identical(legend_pos, "none")) {
         private$.plot = private$.plot + ggplot2::theme(legend.position = "none")

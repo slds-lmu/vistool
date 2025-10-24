@@ -15,7 +15,6 @@
 VisualizerObj = R6::R6Class("VisualizerObj",
   inherit = Visualizer,
   public = list(
-
     #' @template field_objective
     objective = NULL,
 
@@ -197,6 +196,8 @@ VisualizerObj = R6::R6Class("VisualizerObj",
           if (layer$type == "points") {
             # Handle points layer using the base class method
             private$.plot = private$add_points_to_ggplot(private$.plot, private$.dimensionality)
+          } else if (layer$type == "contour") {
+            private$render_contour_layer(layer$spec)
           }
         }
       }
@@ -207,6 +208,161 @@ VisualizerObj = R6::R6Class("VisualizerObj",
         z = if (private$.dimensionality == "2d") private$.data_structure$coordinates$y else NULL
       )
       private$.plot = private$add_annotations_to_ggplot(private$.plot, private$.dimensionality, ranges)
+    },
+
+    render_contour_layer = function(layer_spec) {
+      if (private$.dimensionality != "2d") {
+        warning("Contour layers require 2D objectives; ignoring request.", call. = FALSE)
+        return(invisible(NULL))
+      }
+
+      eff = private$.effective_theme
+      coords = private$.data_structure$coordinates
+
+      linewidth = if (!is.null(layer_spec$linewidth)) layer_spec$linewidth else eff$line_width
+      linetype = if (!is.null(layer_spec$linetype)) layer_spec$linetype else "solid"
+      alpha = if (!is.null(layer_spec$alpha)) layer_spec$alpha else eff$alpha
+      extra_args = layer_spec$extra_args
+      if (length(extra_args)) {
+        keep = !vapply(extra_args, is.null, logical(1))
+        extra_args = extra_args[keep]
+      }
+
+      if (!identical(layer_spec$mode, "scale")) {
+        data = data.frame(
+          x = coords$x1,
+          y = coords$x2,
+          z = coords$y,
+          stringsAsFactors = FALSE
+        )
+
+        args = list(
+          data = data,
+          mapping = ggplot2::aes(x = x, y = y, z = z),
+          inherit.aes = FALSE
+        )
+
+        if (!is.null(layer_spec$breaks)) args$breaks = layer_spec$breaks
+        if (!is.null(layer_spec$bins)) args$bins = layer_spec$bins
+        if (!is.null(layer_spec$binwidth)) args$binwidth = layer_spec$binwidth
+        if (!is.null(layer_spec$color)) args$colour = layer_spec$color
+        if (!is.null(linewidth)) args$linewidth = linewidth
+        if (!is.null(linetype)) args$linetype = linetype
+        if (!is.null(alpha)) args$alpha = alpha
+        if (length(extra_args)) args = c(args, extra_args)
+
+        private$.plot = private$.plot + do.call(ggplot2::geom_contour, args)
+        return(invisible(NULL))
+      }
+
+      x_vals = sort(unique(coords$x1))
+      y_vals = sort(unique(coords$x2))
+
+      if (!length(x_vals) || !length(y_vals)) {
+        warning("Unable to compute contours because the evaluation grid is empty.", call. = FALSE)
+        return(invisible(NULL))
+      }
+
+      z_vals = coords$y
+      if (any(!is.finite(z_vals))) {
+        warning("Cannot compute contours because the evaluation grid contains non-finite values.", call. = FALSE)
+        return(invisible(NULL))
+      }
+
+      z_range = range(z_vals)
+      if (!all(is.finite(z_range)) || diff(z_range) <= .Machine$double.eps) {
+        return(invisible(NULL))
+      }
+
+      z_matrix = matrix(z_vals, nrow = length(x_vals), ncol = length(y_vals), byrow = TRUE)
+
+      levels = layer_spec$breaks
+      if (!is.null(levels)) {
+        levels = sort(unique(levels))
+      } else if (!is.null(layer_spec$binwidth) && layer_spec$binwidth > 0) {
+        start = z_range[1]
+        end = z_range[2]
+        levels = seq(start, end, by = layer_spec$binwidth)
+      } else {
+        bins = if (is.null(layer_spec$bins)) 10L else layer_spec$bins
+        levels = pretty(z_range, n = bins)
+      }
+
+      levels = levels[levels > z_range[1] & levels < z_range[2]]
+      levels = sort(unique(levels))
+      if (!length(levels)) {
+        return(invisible(NULL))
+      }
+
+      contour_list = grDevices::contourLines(x = x_vals, y = y_vals, z = z_matrix, levels = levels)
+      if (!length(contour_list)) {
+        return(invisible(NULL))
+      }
+
+      palette_name = if (!is.null(layer_spec$palette)) layer_spec$palette else eff$palette
+      if (is.null(palette_name)) palette_name = "viridis"
+      scale_def = get_continuous_colorscale(palette_name)
+      palette_colors = vapply(scale_def, function(entry) entry[[2]], character(1))
+      palette_fun = grDevices::colorRampPalette(palette_colors)
+      color_values = palette_fun(max(2L, length(levels)))
+      color_map = stats::setNames(color_values[seq_along(levels)], as.character(levels))
+
+      contour_dfs = lapply(seq_along(contour_list), function(idx) {
+        line = contour_list[[idx]]
+        if (length(line$x) < 2L) {
+          return(NULL)
+        }
+        data.frame(
+          x = line$x,
+          y = line$y,
+          level = line$level,
+          group = sprintf("contour_%d", idx),
+          stringsAsFactors = FALSE
+        )
+      })
+      contour_dfs = Filter(Negate(is.null), contour_dfs)
+      if (!length(contour_dfs)) {
+        return(invisible(NULL))
+      }
+
+      contours_combined = do.call(rbind, contour_dfs)
+      split_levels = split(contours_combined, contours_combined$level)
+
+      for (lvl in names(split_levels)) {
+        df_lvl = split_levels[[lvl]]
+        if (nrow(df_lvl) < 2L) {
+          next
+        }
+
+        lvl_key = as.character(df_lvl$level[1])
+        colour_value = color_map[[lvl_key]]
+        if (is.null(colour_value)) {
+          numeric_keys = suppressWarnings(as.numeric(names(color_map)))
+          if (all(is.na(numeric_keys))) {
+            colour_value = color_map[[1L]]
+          } else {
+            closest_idx = which.min(abs(numeric_keys - df_lvl$level[1]))
+            colour_value = color_map[[closest_idx]]
+          }
+        }
+
+        path_args = list(
+          data = df_lvl,
+          mapping = ggplot2::aes(x = x, y = y, group = group),
+          inherit.aes = FALSE,
+          show.legend = FALSE,
+          colour = colour_value
+        )
+
+        if (!is.null(linewidth)) path_args$linewidth = linewidth
+        if (!is.null(linetype)) path_args$linetype = linetype
+        if (!is.null(alpha)) path_args$alpha = alpha
+        if (length(extra_args)) path_args = c(path_args, extra_args)
+
+        private$.plot = private$.plot + do.call(ggplot2::geom_path, path_args)
+      }
+
+      invisible(NULL)
     },
 
     # Initialize data structure for 1D objectives
@@ -243,9 +399,9 @@ VisualizerObj = R6::R6Class("VisualizerObj",
         ),
         labels = list(
           title = if (is.null(self$objective$label)) self$objective$id else self$objective$label,
-          x1 = "x",
+          x1 = "$x$",
           x2 = NULL,
-          y = "y"
+          y = "$y$"
         ),
         limits = list(
           x1 = x1_limits,
@@ -301,9 +457,9 @@ VisualizerObj = R6::R6Class("VisualizerObj",
         ),
         labels = list(
           title = if (is.null(self$objective$label)) self$objective$id else self$objective$label,
-          x1 = "x1",
-          x2 = "x2",
-          y = "y"
+          x1 = "$x_1$",
+          x2 = "$x_2$",
+          y = "$y$"
         ),
         limits = list(
           x1 = x1_limits,
@@ -411,7 +567,13 @@ VisualizerObj = R6::R6Class("VisualizerObj",
 
         # Apply manual color scale (legend title optional)
         legend_title = if (!is.null(rp$legend_title)) rp$legend_title else "Trace"
-        private$.plot = private$.plot + ggplot2::scale_color_manual(values = color_map, name = legend_title)
+        legend_name_res = private$format_label(legend_title, "legend", "ggplot")
+        legend_labels_res = private$format_label(names(color_map), "legend", "ggplot")
+        private$.plot = private$.plot + ggplot2::scale_color_manual(
+          values = color_map,
+          name = legend_name_res$values,
+          labels = legend_labels_res$values
+        )
         # linewidth/linetype not applied for points; ignore in 1D
       } else {
         # 2D traces: combine paths and then add markers separately without affecting legend
@@ -438,9 +600,12 @@ VisualizerObj = R6::R6Class("VisualizerObj",
 
         # Manual scales: color/linetype show in legend; linewidth hidden to avoid duplicate legends
         legend_title = if (!is.null(rp$legend_title)) rp$legend_title else "Trace"
+        legend_name_res = private$format_label(legend_title, "legend", "ggplot")
+        legend_label_candidates = names(color_map)
+        legend_labels_res = private$format_label(legend_label_candidates, "legend", "ggplot")
         private$.plot = private$.plot +
-          ggplot2::scale_color_manual(values = color_map, name = legend_title) +
-          ggplot2::scale_linetype_manual(values = ltype_map, name = legend_title) +
+          ggplot2::scale_color_manual(values = color_map, name = legend_name_res$values, labels = legend_labels_res$values) +
+          ggplot2::scale_linetype_manual(values = ltype_map, name = legend_name_res$values, labels = legend_labels_res$values) +
           ggplot2::scale_linewidth_manual(values = lw_map, guide = "none")
 
         # Add markers and start/end indicators (no legend)

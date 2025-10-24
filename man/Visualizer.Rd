@@ -16,6 +16,7 @@ and saving plots across different plotting backends (ggplot2 for 1D/2D, plotly f
 \item \href{#method-Visualizer-resolve_layer_colors}{\code{Visualizer$resolve_layer_colors()}}
 \item \href{#method-Visualizer-save}{\code{Visualizer$save()}}
 \item \href{#method-Visualizer-add_points}{\code{Visualizer$add_points()}}
+\item \href{#method-Visualizer-add_contours}{\code{Visualizer$add_contours()}}
 \item \href{#method-Visualizer-add_annotation}{\code{Visualizer$add_annotation()}}
 \item \href{#method-Visualizer-clone}{\code{Visualizer$clone()}}
 }
@@ -69,7 +70,8 @@ This method should be called by all child classes via \code{super$plot(...)}.
   z_lab = NULL,
   x_limits = NULL,
   y_limits = NULL,
-  z_limits = NULL
+  z_limits = NULL,
+  latex = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -111,6 +113,12 @@ Y-axis limits as c(min, max). If NULL, uses automatic limits. Default is NULL.}
 
 \item{\code{z_limits}}{(\code{numeric(2)})\cr
 Z-axis limits as c(min, max) (for surface plots). If NULL, uses automatic limits. Default is NULL.}
+
+\item{\code{latex}}{(\code{NULL}|\code{logical(1)}|\code{list})
+Controls LaTeX parsing for plot text. Supply \code{NULL} to auto-detect LaTeX markers,
+a logical scalar to toggle parsing globally, or a named list (keys such as
+\code{title}, \code{subtitle}, \code{legend}, \code{x}, \code{y}, \code{z}) to override individual
+components.}
 }
 \if{html}{\out{</div>}}
 }
@@ -174,7 +182,8 @@ Add points to the plot. This method can be called multiple times to add differen
   annotation_size = NULL,
   ordered = FALSE,
   arrow_color = NULL,
-  arrow_size = 0.3
+  arrow_size = 0.3,
+  annotations_latex = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -214,8 +223,72 @@ Color of arrows when ordered = TRUE. If NULL, uses point color.}
 
 \item{\code{arrow_size}}{(\code{numeric(1)})\cr
 Length/size of arrows when \code{ordered = TRUE}. Default is 0.3 units in the coordinate system.}
+
+\item{\code{annotations_latex}}{(\code{NULL}|\code{logical()})\cr
+Optional LaTeX flags for point annotations. Supply a single logical value to
+apply to all annotations or a vector matching \code{annotations}.}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Visualizer-add_contours"></a>}}
+\if{latex}{\out{\hypertarget{method-Visualizer-add_contours}{}}}
+\subsection{Method \code{add_contours()}}{
+Add contour lines for grid-based visualizers (2D ggplot backends).
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Visualizer$add_contours(
+  breaks = NULL,
+  bins = NULL,
+  binwidth = NULL,
+  color = "auto",
+  linewidth = NULL,
+  linetype = "solid",
+  alpha = NULL,
+  mode = c("scale", "single"),
+  palette = NULL,
+  ...
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{breaks}}{(\code{numeric()})
+Numeric vector of contour levels. Passed to \code{ggplot2::geom_contour()}. Default \code{NULL}.}
+
+\item{\code{bins}}{(\code{integer(1)})
+Number of contour bins when \code{breaks} is not supplied. Default \code{NULL} (ggplot default).}
+
+\item{\code{binwidth}}{(\code{numeric(1)})
+Spacing between contour levels. Ignored when \code{breaks} supplied. Default \code{NULL}.}
+
+\item{\code{color}}{(\code{character(1)})
+Line color used when \code{mode = "single"}. Set to "auto" to draw from the active palette or
+provide an explicit hex/name. Ignored when \code{mode = "scale"}.}
+
+\item{\code{linewidth}}{(\code{numeric(1)})
+Line width. Falls back to the active theme when \code{NULL}.}
+
+\item{\code{linetype}}{(\code{character(1)})
+Line type for contour strokes. Default "solid".}
+
+\item{\code{alpha}}{(\code{numeric(1)})
+Opacity in \verb{[0, 1]}. Uses the active theme when \code{NULL}.}
+
+\item{\code{mode}}{(\code{character(1)})
+Either "scale" (default) to colour individual contour levels using a continuous palette or
+"single" to draw all contours in the same colour.}
+
+\item{\code{palette}}{(\code{character(1)})
+Optional palette override ("viridis", "plasma", "grayscale") when \code{mode = "scale"}.}
+
+\item{\code{...}}{Additional arguments forwarded to \code{ggplot2::geom_contour()}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Invisible self.
 }
 }
 \if{html}{\out{<hr>}}

@@ -45,7 +45,7 @@ vis$add_optimization_trace(opt, name = "GD")
 vis$plot()
 ```
 
-<img src="man/figures/README-quick-start-1.png" width="100%" height="700px" />
+<img src="man/figures/README-quick-start-1.png" width="100%" />
 
 ## Installation
 
@@ -60,22 +60,13 @@ pak::pak("slds-lmu/vistool")
 Prefer base R tooling? `remotes::install_github("slds-lmu/vistool")`
 works as well.
 
-### Plotly backend and static export
+## Exporting interactive surface plots
 
-Interactive surfaces rely on `plotly`, which accesses Python
-functionality through `reticulate`. `vistool` (via `reticulate >= 1.41`)
-calls `reticulate::py_require("kaleido")` on demand, provisioning a
-cached Python environment automatically when you first save a surface
-plot.
-
-If you manage Python yourself, point `reticulate` to your interpreter
-and ensure `kaleido` is installed:
-
-``` r
-install.packages("reticulate")
-# Sys.setenv(RETICULATE_PYTHON = "/path/to/python")
-reticulate::py_install("kaleido")
-```
+When you call `save()` with an image extension, `vistool` writes a
+self-contained HTML snapshot, captures it through `webshot2` (ensure
+Chrome/Chromium is available), and trims the result with `magick`. You
+can also call `save()` with `.html` to persist the interactive widget
+directly.
 
 ## Documentation roadmap
 

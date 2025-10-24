@@ -168,7 +168,7 @@ p %>% add_trace(
 
 ## Animations
 
-You can animate surface views and optimization traces. The code below creates frames and saves them as images; combine them into GIFs with ImageMagick. This may require `kaleido` for saving static images from plotly (see Getting Started). Heavy chunks are kept non-evaluated here.
+You can animate surface views and optimization traces. The code below creates frames and saves them as images; combine them into GIFs with ImageMagick.
 
 ```{r, eval=FALSE}
 obj = obj("TF_GoldsteinPriceLog")

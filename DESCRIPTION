@@ -1,18 +1,18 @@
 Type: Package
 Package: vistool
 Title: Visualize optimization methods
-Version: 0.4.1
+Version: 0.5.1
 Authors@R: c(
     person("Marc", "Becker", , "marcbecker@posteo.de", role = "aut",
            comment = c(ORCID = "0000-0002-8115-0400")),
-    person("Daniel", "Schalk", , "daniel.schalk@stat.uni-muenchen.de", role = c("aut", "cre"),
+    person("Manuel", "Helmerichs", , "manuel.helmerichs@campus.lmu.de", role = c("aut", "cre")),
+    person("Daniel", "Schalk", , "daniel.schalk@stat.uni-muenchen.de", role = "aut",
            comment = c(ORCID = "0000-0003-0950-1947")),
     person("Lukas", "Burk", , "github@quantenbrot.de", role = "aut",
-           comment = c(ORCID = "0000-0001-7528-3795")),
-    person("Manuel", "Helmerichs", , "manuel.helmerichs@campus.lmu.de", role = "aut")
+           comment = c(ORCID = "0000-0001-7528-3795"))
   )
-Author: Marc Becker [aut], Daniel Schalk [aut, cre], Lukas Burk [aut], Manuel Helmerichs [aut]
-Maintainer: Daniel Schalk <daniel.schalk@stat.uni-muenchen.de>
+Author: Marc Becker [aut], Manuel Helmerichs [aut, cre], Daniel Schalk [aut], Lukas Burk [aut]
+Maintainer: Manuel Helmerichs <manuel.helmerichs@campus.lmu.de>
 Description: Visualize the optimization path of several methods.
 License: GPL (>= 3)
 URL: https://slds-lmu.github.io/vistool/
@@ -24,12 +24,14 @@ Imports:
     data.table,
     ggplot2,
     ggsci,
+    htmlwidgets,
+    magick,
     magrittr,
     mlr3,
     mlr3misc,
     paradox,
     plotly,
-    reticulate,
+    webshot2,
     R6,
     rootSolve,
     stringr,
@@ -43,10 +45,12 @@ Suggests:
     patchwork,
     purrr,
     rmarkdown,
-    testthat (>= 3.0.0)
+    rpart,
+    testthat (>= 3.0.0),
+    styler
 VignetteBuilder:
     knitr
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Config/testthat/edition: 3

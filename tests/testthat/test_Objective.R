@@ -1,5 +1,4 @@
 test_that("Objective creation works", {
-  # Simple 1D objective
   obj_1d = Objective$new(
     id = "test_1d",
     fun = function(x) x^2,
@@ -15,7 +14,6 @@ test_that("Objective creation works", {
   expect_equal(obj_1d$upper, 5)
   expect_false(obj_1d$minimize)
 
-  # Simple 2D objective
   obj_2d = Objective$new(
     id = "test_2d",
     fun = function(x) sum(x^2),
@@ -40,22 +38,17 @@ test_that("Objective evaluation works", {
     lower = c(-1, -1),
     upper = c(1, 1)
   )
-
-  # Test eval
   result = obj$eval(c(1, 1))
   expect_equal(result, 2)
 
-  # Test eval_store
   stored = obj$eval_store(c(0.5, 0.5))
   expect_equal(stored$fval, 0.5)
   expect_length(stored$x[[1]], 2)
 
-  # Check archive
   expect_true(nrow(obj$archive) >= 1)
 })
 
 test_that("Objective gradient and hessian work", {
-  # Objective with gradient and hessian
   obj = Objective$new(
     id = "quadratic",
     fun = function(x) sum(x^2),
@@ -64,14 +57,11 @@ test_that("Objective gradient and hessian work", {
     upper = c(1, 1)
   )
 
-  # Test gradient (should be 2*x for quadratic)
   grad = obj$grad(c(1, 2))
   expect_equal(grad, c(2, 4))
 
-  # Test hessian (hessian fallback uses numerical approximation)
   hess = obj$hess(c(1, 1))
   expect_equal(dim(hess), c(2, 2))
-  # For numerical hessian approximation, we can't expect exact values
   expect_true(all(is.finite(hess)))
 })
 
@@ -84,11 +74,9 @@ test_that("Objective input validation works", {
     upper = c(1, 1)
   )
 
-  # Test dimension mismatch
   expect_error(obj$eval(c(1)), "Assertion on 'x' failed")
   expect_error(obj$eval(c(1, 2, 3)), "Assertion on 'x' failed")
 
-  # Test boundary checking with assert_x
   valid_x = obj$assert_x(c(0.5, 0.5))
   expect_equal(valid_x, c(0.5, 0.5))
 })
@@ -102,10 +90,8 @@ test_that("Objective archive works", {
     upper = c(1, 1)
   )
 
-  # Initially empty
   expect_equal(nrow(obj$archive), 0)
 
-  # Add some evaluations
   obj$eval_store(c(0, 0))
   obj$eval_store(c(1, 1))
 
@@ -113,41 +99,34 @@ test_that("Objective archive works", {
   expect_true("fval" %in% colnames(obj$archive))
   expect_true("x" %in% colnames(obj$archive))
 
-  # Clear archive
   obj$clear_archive()
   expect_equal(nrow(obj$archive), 0)
 })
 
 test_that("Built-in objectives work", {
-  # Test TF_branin objective
   obj_branin = obj("TF_branin")
   expect_s3_class(obj_branin, "Objective")
   expect_equal(obj_branin$xdim, 2)
 
-  # Test evaluation
   result = obj_branin$eval(c(0.5, 0.5))
   expect_true(is.numeric(result))
   expect_length(result, 1)
 
-  # Test TF_banana objective
   obj_banana = obj("TF_banana")
   expect_s3_class(obj_banana, "Objective")
   expect_equal(obj_banana$xdim, 2)
 })
 
 test_that("Dictionary operations work", {
-  # Test dictionary access
   dict = dict_objective
   expect_true(length(dict) > 0)
 
-  # Test getting available objectives
   keys = dict$keys()
   expect_true("TF_branin" %in% keys)
   expect_true("TF_banana" %in% keys)
 })
 
 test_that("Objective with custom arguments works", {
-  # Objective with additional arguments
   obj = Objective$new(
     id = "custom",
     fun = function(x, scale = 1) scale * sum(x^2),

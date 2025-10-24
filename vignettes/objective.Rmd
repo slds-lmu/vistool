@@ -97,7 +97,7 @@ Visualize the custom objective:
 
 ```{r, out.width='100%', out.height='700px'}
 vis_lm = as_visualizer(obj_lm, x1_limits = c(-0.5, 5), x2_limits = c(-3.2, 2.8))
-vis_lm$plot()
+vis_lm$add_contours()$plot()
 ```
 
 You can also add custom points directly to the visualizer using `$add_points()`, which supports many customization options (see below).
@@ -119,10 +119,10 @@ From the [`TestFunctions`](https://CRAN.R-project.org/web/packages/TestFunctions
 
 ```{r, out.width='100%', out.height='4000px', echo=FALSE}
 library(plotly)
-library(ggsci)
 
 tab = as.data.table(dict_objective)
 keys = tab[list(2), key, on = "xdim"]
+keys = keys[startsWith(keys, "TF_")]
 
 visualizers = map(keys, function(key) {
   objective = obj(key)
@@ -141,7 +141,15 @@ visualizers = map(keys, function(key) {
     )
 })
 
-subplot(visualizers, nrows = 8)
+n_cols = 2L
+subplot(
+  visualizers,
+  nrows = ceiling(length(visualizers) / n_cols),
+  shareX = FALSE,
+  shareY = FALSE,
+  margin = 0.03
+) %>%
+  layout(showlegend = FALSE)
 ```
 
 ## See also

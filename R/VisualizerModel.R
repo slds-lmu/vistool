@@ -21,7 +21,6 @@
 VisualizerModel = R6::R6Class("VisualizerModel",
   inherit = Visualizer,
   public = list(
-
     #' @field task (`mlr3::Task`)\cr
     #' Task used to train the model.
     task = NULL,
@@ -348,6 +347,8 @@ VisualizerModel = R6::R6Class("VisualizerModel",
             private$render_training_data_layer(layer$spec)
           } else if (layer$type == "boundary") {
             private$render_boundary_layer(layer$spec)
+          } else if (layer$type == "contour") {
+            private$render_contour_layer(layer$spec)
           } else if (layer$type == "points") {
             # Handle points layer using the base class method
             private$.plot = private$add_points_to_ggplot(private$.plot, private$.dimensionality)
@@ -363,6 +364,162 @@ VisualizerModel = R6::R6Class("VisualizerModel",
         z = if (private$.dimensionality == "2d") private$.data_structure$coordinates$y else NULL
       )
       private$.plot = private$add_annotations_to_ggplot(private$.plot, private$.dimensionality, ranges)
+    },
+
+    render_contour_layer = function(layer_spec) {
+      if (private$.dimensionality != "2d") {
+        warning("Contour layers require 2D data; ignoring request.", call. = FALSE)
+        return(invisible(NULL))
+      }
+
+      eff = private$.effective_theme
+      coords = private$.data_structure$coordinates
+
+      linewidth = if (!is.null(layer_spec$linewidth)) layer_spec$linewidth else eff$line_width
+      linetype = if (!is.null(layer_spec$linetype)) layer_spec$linetype else "solid"
+      alpha = if (!is.null(layer_spec$alpha)) layer_spec$alpha else eff$alpha
+      extra_args = layer_spec$extra_args
+      if (length(extra_args)) {
+        keep = !vapply(extra_args, is.null, logical(1))
+        extra_args = extra_args[keep]
+      }
+
+      if (!identical(layer_spec$mode, "scale")) {
+        data = data.frame(
+          x = coords$x1,
+          y = coords$x2,
+          z = coords$y,
+          stringsAsFactors = FALSE
+        )
+
+        args = list(
+          data = data,
+          mapping = ggplot2::aes(x = x, y = y, z = z),
+          inherit.aes = FALSE
+        )
+
+        if (!is.null(layer_spec$breaks)) args$breaks = layer_spec$breaks
+        if (!is.null(layer_spec$bins)) args$bins = layer_spec$bins
+        if (!is.null(layer_spec$binwidth)) args$binwidth = layer_spec$binwidth
+
+        if (!is.null(layer_spec$color)) args$colour = layer_spec$color
+        if (!is.null(linewidth)) args$linewidth = linewidth
+        if (!is.null(linetype)) args$linetype = linetype
+        if (!is.null(alpha)) args$alpha = alpha
+        if (length(extra_args)) args = c(args, extra_args)
+
+        private$.plot = private$.plot + do.call(ggplot2::geom_contour, args)
+        return(invisible(NULL))
+      }
+
+      x_vals = sort(unique(coords$x1))
+      y_vals = sort(unique(coords$x2))
+
+      if (!length(x_vals) || !length(y_vals)) {
+        warning("Unable to compute contours because the prediction grid is empty.", call. = FALSE)
+        return(invisible(NULL))
+      }
+
+      z_vals = coords$y
+      if (any(!is.finite(z_vals))) {
+        warning("Cannot compute contours because the grid contains non-finite predictions.", call. = FALSE)
+        return(invisible(NULL))
+      }
+
+      z_range = range(z_vals)
+      if (!all(is.finite(z_range)) || diff(z_range) <= .Machine$double.eps) {
+        return(invisible(NULL))
+      }
+
+      z_matrix = matrix(z_vals, nrow = length(x_vals), ncol = length(y_vals), byrow = TRUE)
+
+      levels = layer_spec$breaks
+      if (!is.null(levels)) {
+        levels = sort(unique(levels))
+      } else if (!is.null(layer_spec$binwidth) && layer_spec$binwidth > 0) {
+        start = z_range[1]
+        end = z_range[2]
+        levels = seq(start, end, by = layer_spec$binwidth)
+      } else {
+        bins = if (is.null(layer_spec$bins)) 10L else layer_spec$bins
+        levels = pretty(z_range, n = bins)
+      }
+
+      levels = levels[levels > z_range[1] & levels < z_range[2]]
+      levels = sort(unique(levels))
+      if (!length(levels)) {
+        return(invisible(NULL))
+      }
+
+      contour_list = grDevices::contourLines(x = x_vals, y = y_vals, z = z_matrix, levels = levels)
+      if (!length(contour_list)) {
+        return(invisible(NULL))
+      }
+
+      palette_name = if (!is.null(layer_spec$palette)) layer_spec$palette else eff$palette
+      if (is.null(palette_name)) palette_name = "viridis"
+      scale_def = get_continuous_colorscale(palette_name)
+      palette_colors = vapply(scale_def, function(entry) entry[[2]], character(1))
+      palette_fun = grDevices::colorRampPalette(palette_colors)
+      color_values = palette_fun(max(2L, length(levels)))
+      color_map = stats::setNames(color_values[seq_along(levels)], as.character(levels))
+
+      contour_dfs = lapply(seq_along(contour_list), function(idx) {
+        line = contour_list[[idx]]
+        if (length(line$x) < 2L) {
+          return(NULL)
+        }
+        data.frame(
+          x = line$x,
+          y = line$y,
+          level = line$level,
+          group = sprintf("contour_%d", idx),
+          stringsAsFactors = FALSE
+        )
+      })
+      contour_dfs = Filter(Negate(is.null), contour_dfs)
+      if (!length(contour_dfs)) {
+        return(invisible(NULL))
+      }
+
+      contours_combined = do.call(rbind, contour_dfs)
+      split_levels = split(contours_combined, contours_combined$level)
+
+      for (lvl in names(split_levels)) {
+        df_lvl = split_levels[[lvl]]
+        if (nrow(df_lvl) < 2L) {
+          next
+        }
+
+        lvl_key = as.character(df_lvl$level[1])
+        colour_value = color_map[[lvl_key]]
+        if (is.null(colour_value)) {
+          numeric_keys = suppressWarnings(as.numeric(names(color_map)))
+          if (all(is.na(numeric_keys))) {
+            colour_value = color_map[[1L]]
+          } else {
+            closest_idx = which.min(abs(numeric_keys - df_lvl$level[1]))
+            colour_value = color_map[[closest_idx]]
+          }
+        }
+
+        path_args = list(
+          data = df_lvl,
+          mapping = ggplot2::aes(x = x, y = y, group = group),
+          inherit.aes = FALSE,
+          show.legend = FALSE,
+          colour = colour_value
+        )
+
+        if (!is.null(linewidth)) path_args$linewidth = linewidth
+        if (!is.null(linetype)) path_args$linetype = linetype
+        if (!is.null(alpha)) path_args$alpha = alpha
+        if (length(extra_args)) path_args = c(path_args, extra_args)
+
+        private$.plot = private$.plot + do.call(ggplot2::geom_path, path_args)
+      }
+
+      invisible(NULL)
     },
 
     # Initialize 1D plot with function line
@@ -433,13 +590,15 @@ VisualizerModel = R6::R6Class("VisualizerModel",
 
           # Add manual scales if needed
           if (length(style$color) > 1) {
-            private$.plot = private$.plot + ggplot2::scale_color_manual(values = style$color, name = self$task$target_names)
+            legend_name_res = private$format_label(self$task$target_names, "legend", "ggplot")
+            private$.plot = private$.plot + ggplot2::scale_color_manual(values = style$color, name = legend_name_res$values)
           } else if (style$color[1] == "auto") {
             # Apply themed discrete color scale for automatic colors
             private$.plot = private$apply_ggplot_color_scale(private$.plot, eff$palette, "color", discrete = TRUE)
           }
           if (length(style$shape) > 1) {
-            private$.plot = private$.plot + ggplot2::scale_shape_manual(values = style$shape, name = self$task$target_names)
+            legend_name_res = private$format_label(self$task$target_names, "legend", "ggplot")
+            private$.plot = private$.plot + ggplot2::scale_shape_manual(values = style$shape, name = legend_name_res$values)
           }
         } else {
           # Single styling - color should already be resolved by base class
@@ -489,13 +648,15 @@ VisualizerModel = R6::R6Class("VisualizerModel",
 
           # Add manual scales if needed
           if (length(style$color) > 1) {
-            private$.plot = private$.plot + ggplot2::scale_color_manual(values = style$color, name = self$task$target_names)
+            legend_name_res = private$format_label(self$task$target_names, "legend", "ggplot")
+            private$.plot = private$.plot + ggplot2::scale_color_manual(values = style$color, name = legend_name_res$values)
           } else if (style$color[1] == "auto") {
             # Apply themed discrete color scale for automatic colors
             private$.plot = private$apply_ggplot_color_scale(private$.plot, eff$palette, "color", discrete = TRUE)
           }
           if (length(style$shape) > 1) {
-            private$.plot = private$.plot + ggplot2::scale_shape_manual(values = style$shape, name = self$task$target_names)
+            legend_name_res = private$format_label(self$task$target_names, "legend", "ggplot")
+            private$.plot = private$.plot + ggplot2::scale_shape_manual(values = style$shape, name = legend_name_res$values)
           }
         } else {
           # Single styling - color should already be resolved by base class
@@ -513,18 +674,46 @@ VisualizerModel = R6::R6Class("VisualizerModel",
       if (style$show_labels) {
         label_size = if (!is.null(style$label_size)) style$label_size else 3
         if (private$.dimensionality == "1d") {
+          label_res = private$format_label(
+            text = rownames(points_data),
+            context = "annotations",
+            backend = "ggplot"
+          )
+          label_data = points_data
+          if (label_res$as_list_column) {
+            label_data$label = I(label_res$values)
+          } else if (label_res$any_latex) {
+            label_data$label = I(list(label_res$values))
+          } else {
+            label_data$label = label_res$values
+          }
           private$.plot = private$.plot + ggplot2::geom_text(
-            data = points_data,
-            ggplot2::aes(x = x, y = y, label = rownames(points_data)),
+            data = label_data,
+            ggplot2::aes(x = x, y = y, label = label),
             size = label_size, nudge_y = 0.02 * diff(range(points_data$y)),
-            inherit.aes = FALSE
+            inherit.aes = FALSE,
+            parse = FALSE
           )
         } else {
+          label_res = private$format_label(
+            text = rownames(points_data),
+            context = "annotations",
+            backend = "ggplot"
+          )
+          label_data = points_data
+          if (label_res$as_list_column) {
+            label_data$label = I(label_res$values)
+          } else if (label_res$any_latex) {
+            label_data$label = I(list(label_res$values))
+          } else {
+            label_data$label = label_res$values
+          }
           private$.plot = private$.plot + ggplot2::geom_text(
-            data = points_data,
-            ggplot2::aes(x = x1, y = x2, label = rownames(points_data)),
+            data = label_data,
+            ggplot2::aes(x = x1, y = x2, label = label),
             size = label_size, nudge_y = 0.02 * diff(range(points_data$x2)),
-            inherit.aes = FALSE
+            inherit.aes = FALSE,
+            parse = FALSE
           )
         }
       }

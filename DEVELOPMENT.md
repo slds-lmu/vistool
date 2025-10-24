@@ -256,6 +256,10 @@ private = list(
 )
 ```
 
+### LaTeX handling
+
+Run plot-bound strings through `private$format_label()` rather than manual TeX glue. The helper honours `plot(latex = ...)` preferences, layer-level overrides such as `annotations_latex`, and manages both `latex2exp` (ggplot2 expressions) and MathJax configuration for plotly traces. When you add labels to data frames, wrap expression vectors with `I(list(...))` so ggplot2 keeps them list-valued.
+
 
 ## Development workflow
 
@@ -333,6 +337,7 @@ pkgdown::build_site()
   - Files: snake_case where feasible (e.g., `as_visualizer.R`); class files should retain CamelCase to match class names (e.g., `VisualizerModel.R`).
 
 Tooling:
+
 - lintr: `.lintr` config allows both `snake_case` and `CamelCase`. It cannot distinguish classes from other objects, so we enforce “CamelCase only for classes” via code review and PRs. If you must use a non-conforming name due to external APIs, add a short comment and, if necessary, a targeted `# nolint: object_name_linter.` on that line.
 - styler: formatting only; it does not rename identifiers. See `.styler` for formatting configuration.
 
@@ -346,7 +351,7 @@ Documentation titles should use __Sentence case__.
 - Use appropriate `expect_*()` functions
 
 ```r
-# Skip tests requiring Python dependencies on CI
+# Skip tests on CI
 skip_on_ci()
 
 # Skip if optional package not available  
