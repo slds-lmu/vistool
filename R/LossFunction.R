@@ -189,7 +189,7 @@ lss = function(.key, ...) {
   "regr.mae" = "l1_ae",
   "regr.huber" = "huber",
   "classif.logloss" = "cross-entropy",
-  "classif.ce" = "cross-entropy",
+  "classif.ce" = "zero-one",
   "classif.brier" = "brier"
 )
 
@@ -244,6 +244,18 @@ dict_loss$add(
     fun = list(
       score = function(r) log(1 + exp(-r)),
       probability = function(pi) -log(pi)
+    ),
+    input_default = "score",
+    input_supported = c("score", "probability")
+  )
+)
+
+dict_loss$add(
+  "zero-one",
+  LossFunction$new("zero-one", "0-1 Loss", "classif",
+    fun = list(
+      score = function(r) as.numeric(r <= 0),
+      probability = function(pi) as.numeric(pi <= 0.5)
     ),
     input_default = "score",
     input_supported = c("score", "probability")

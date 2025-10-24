@@ -5,7 +5,7 @@ test_that("mlr3 loss key aliases resolve", {
   expect_identical(lss("regr.mae")$id, lss("l1_ae")$id)
   expect_identical(lss("regr.huber")$id, lss("huber")$id)
   expect_identical(lss("classif.logloss")$id, lss("cross-entropy")$id)
-  expect_identical(lss("classif.ce")$id, lss("cross-entropy")$id)
+  expect_identical(lss("classif.ce")$id, lss("zero-one")$id)
   expect_identical(lss("classif.brier")$id, lss("brier")$id)
   expect_error(lss("regr.unknown123"), "not found")
 })

@@ -122,6 +122,7 @@ library(plotly)
 
 tab = as.data.table(dict_objective)
 keys = tab[list(2), key, on = "xdim"]
+keys = keys[startsWith(keys, "TF_")]
 
 visualizers = map(keys, function(key) {
   objective = obj(key)

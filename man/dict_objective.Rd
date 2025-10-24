@@ -3,17 +3,25 @@
 \docType{data}
 \name{dict_objective}
 \alias{dict_objective}
-\title{Dictionary for test functions}
+\title{Objective dictionary}
 \format{
-An object of class \code{DictionaryObjective} (inherits from \code{Dictionary}, \code{R6}) of length 12.
+A \link[mlr3misc:Dictionary]{mlr3misc::Dictionary} where each entry is an \link{Objective} instance.
 }
 \usage{
 dict_objective
 }
 \description{
-Dictionary for test functions
+Lookup table for reusable \link{Objective} definitions. The dictionary ships with
+vistool and comes pre-populated with regularized regression objectives as
+well as a selection of benchmark test functions when the optional
+\code{TestFunctions} package is available. New objectives can be registered at
+runtime via \link[mlr3misc:Dictionary]{mlr3misc::Dictionary} methods such as \verb{$add()}.
 }
 \examples{
 dict_objective$get("TF_branin")
+
+}
+\seealso{
+\code{\link[=obj]{obj()}} for convenient retrieval.
 }
 \keyword{datasets}

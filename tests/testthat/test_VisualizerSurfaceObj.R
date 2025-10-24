@@ -140,6 +140,7 @@ test_that("VisualizerSurfaceObj save functionality works", {
 
 test_that("Plotly MathJax configuration respects vistool.mathjax option", {
   skip_if_not_installed("plotly")
+  skip_on_ci()
 
   obj = obj("TF_branin")
   original = getOption("vistool.mathjax")

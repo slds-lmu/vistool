@@ -60,7 +60,7 @@ pak::pak("slds-lmu/vistool")
 Prefer base R tooling? `remotes::install_github("slds-lmu/vistool")`
 works as well.
 
-### Exporting interactive surface plots
+## Exporting interactive surface plots
 
 When you call `save()` with an image extension, `vistool` writes a
 self-contained HTML snapshot, captures it through `webshot2` (ensure
