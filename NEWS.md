@@ -1,9 +1,3 @@
-# vistool (development version)
-
-* Added `objective_transform()` helpers (including `objective_transform_log()`)
-  and a `transform` argument on `objective_logistic()` / `objective_linear()`.
-  `Objective$set_transform()` now composes value, gradient, and Hessian outputs
-  with the selected transform while keeping objective labels in sync.
 
 # vistool 0.5.1
 
@@ -15,6 +9,7 @@
 * Added a centralized LaTeX formatter: `plot(latex = ...)` toggles math parsing, `add_points(..., annotations_latex = ...)` handles per-point flags.
 * Replaced the `kaleido`/Python export path with an `htmlwidgets` + `webshot2` + `magick` pipeline, completely removing any Python dependency.
 * Includes definitions of the `0-1` loss and objectives (including penalization terms) for the logistic and linear regression.
+* Added `objective_transform()` helpers (including `objective_transform_log()`) and a `transform` argument on `objective_logistic()` / `objective_linear()`. `Objective$set_transform()` now composes value, gradient, and Hessian outputs with the selected transform while keeping objective labels in sync.
 
 # vistool 0.4.1
 
