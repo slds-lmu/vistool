@@ -680,19 +680,14 @@ VisualizerModel = R6::R6Class("VisualizerModel",
             backend = "ggplot"
           )
           label_data = points_data
-          if (label_res$as_list_column) {
-            label_data$label = I(label_res$values)
-          } else if (label_res$any_latex) {
-            label_data$label = I(list(label_res$values))
-          } else {
-            label_data$label = label_res$values
-          }
+          use_parse = isTRUE(label_res$any_latex)
+          label_data$label = private$coerce_labels_for_ggplot(label_res$values, label_res$as_list_column, use_parse)
           private$.plot = private$.plot + ggplot2::geom_text(
             data = label_data,
             ggplot2::aes(x = x, y = y, label = label),
             size = label_size, nudge_y = 0.02 * diff(range(points_data$y)),
             inherit.aes = FALSE,
-            parse = FALSE
+            parse = use_parse
           )
         } else {
           label_res = private$format_label(
@@ -701,19 +696,14 @@ VisualizerModel = R6::R6Class("VisualizerModel",
             backend = "ggplot"
           )
           label_data = points_data
-          if (label_res$as_list_column) {
-            label_data$label = I(label_res$values)
-          } else if (label_res$any_latex) {
-            label_data$label = I(list(label_res$values))
-          } else {
-            label_data$label = label_res$values
-          }
+          use_parse = isTRUE(label_res$any_latex)
+          label_data$label = private$coerce_labels_for_ggplot(label_res$values, label_res$as_list_column, use_parse)
           private$.plot = private$.plot + ggplot2::geom_text(
             data = label_data,
             ggplot2::aes(x = x1, y = x2, label = label),
             size = label_size, nudge_y = 0.02 * diff(range(points_data$x2)),
             inherit.aes = FALSE,
-            parse = FALSE
+            parse = use_parse
           )
         }
       }

@@ -450,13 +450,8 @@ Visualizer = R6::R6Class("Visualizer",
             explicit_latex = point_spec$annotations_latex
           )
           annotation_df = points_data
-          if (label_res$as_list_column) {
-            annotation_df$label = I(label_res$values)
-          } else if (label_res$any_latex) {
-            annotation_df$label = I(list(label_res$values))
-          } else {
-            annotation_df$label = label_res$values
-          }
+          use_parse = isTRUE(label_res$any_latex)
+          annotation_df$label = private$coerce_labels_for_ggplot(label_res$values, label_res$as_list_column, use_parse)
 
           plot_obj = plot_obj + ggplot2::geom_text(
             data = annotation_df,
@@ -465,7 +460,7 @@ Visualizer = R6::R6Class("Visualizer",
             size = ann_size,
             vjust = -0.5,
             inherit.aes = FALSE,
-            parse = FALSE
+            parse = use_parse
           )
         }
 
@@ -962,13 +957,11 @@ Visualizer = R6::R6Class("Visualizer",
           backend = "ggplot",
           explicit_latex = spec$latex
         )
-        label_value = label_res$values
-        if (isTRUE(label_res$as_list_column)) {
-          label_value = I(label_value)
-        } else if (isTRUE(label_res$any_latex)) {
-          label_value = I(list(label_value))
-        }
-        size_mm = spec$size / ggplot2::.pt
+        use_parse = isTRUE(label_res$any_latex)
+        label_value = private$coerce_labels_for_ggplot(label_res$values, label_res$as_list_column, use_parse)
+        eff_theme = if (is.null(private$.effective_theme)) get_pkg_theme_default() else private$.effective_theme
+        resolved_size = if (is.null(spec$size)) eff_theme$text_size else spec$size
+        size_mm = resolved_size / ggplot2::.pt
         plot_obj = plot_obj + ggplot2::annotate(
           geom = "text",
           x = coords$x,
@@ -979,7 +972,7 @@ Visualizer = R6::R6Class("Visualizer",
           alpha = spec$opacity,
           hjust = spec$hjust,
           vjust = spec$vjust,
-          parse = FALSE
+          parse = use_parse
         )
       }
 
@@ -1352,6 +1345,91 @@ Visualizer = R6::R6Class("Visualizer",
         any_latex = any_latex,
         as_list_column = as_list_column
       )
+    },
+
+    convert_single_label_value_to_character = function(value) {
+      if (is.null(value)) {
+        return(NA_character_)
+      }
+
+      if (length(value) == 1L && is.atomic(value) && !inherits(value, "expression") && !inherits(value, "language") && isTRUE(is.na(value))) {
+        return(NA_character_)
+      }
+
+      if (inherits(value, "expression") || inherits(value, "latexexpression")) {
+        expr_vals = vapply(seq_along(value), function(i) {
+          expr_item = value[[i]]
+          if (is.null(expr_item)) {
+            return(NA_character_)
+          }
+          paste(deparse(expr_item), collapse = "")
+        }, character(1))
+        return(paste(expr_vals, collapse = ""))
+      }
+
+      if (is.language(value)) {
+        return(paste(deparse(value), collapse = ""))
+      }
+
+      if (is.list(value)) {
+        if (!length(value)) {
+          return("")
+        }
+        return(paste(vapply(value, private$convert_single_label_value_to_character, character(1)), collapse = " "))
+      }
+
+      if (is.character(value)) {
+        if (length(value) == 1L) {
+          return(value)
+        }
+        return(paste(value, collapse = ""))
+      }
+
+      if (length(value) > 1L) {
+        return(paste(as.character(value), collapse = " "))
+      }
+
+      as.character(value)
+    },
+
+    convert_label_values_to_character = function(values) {
+      if (is.null(values)) {
+        return(values)
+      }
+
+      if (is.character(values)) {
+        return(values)
+      }
+
+      if (is.numeric(values) || is.logical(values)) {
+        return(as.character(values))
+      }
+
+      if (inherits(values, "expression") || inherits(values, "latexexpression")) {
+        return(vapply(seq_along(values), function(i) private$convert_single_label_value_to_character(values[i]), character(1)))
+      }
+
+      if (is.list(values)) {
+        return(vapply(values, private$convert_single_label_value_to_character, character(1)))
+      }
+
+      if (length(values) > 1L) {
+        return(vapply(as.list(values), private$convert_single_label_value_to_character, character(1)))
+      }
+
+      private$convert_single_label_value_to_character(values)
+    },
+
+    coerce_labels_for_ggplot = function(values, as_list_column, use_parse) {
+      if (isTRUE(use_parse)) {
+        return(private$convert_label_values_to_character(values))
+      }
+
+      if (isTRUE(as_list_column)) {
+        return(I(values))
+      }
+
+      values
     },
 
     ensure_mathjax_dependency = function(plot_obj) {
