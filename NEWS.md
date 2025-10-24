@@ -1,3 +1,10 @@
+# vistool (development version)
+
+* Added `objective_transform()` helpers (including `objective_transform_log()`)
+  and a `transform` argument on `objective_logistic()` / `objective_linear()`.
+  `Objective$set_transform()` now composes value, gradient, and Hessian outputs
+  with the selected transform while keeping objective labels in sync.
+
 # vistool 0.5.1
 
 * Added `options(vistool.mathjax = c("cdn", "local", "<url>"))` to control how MathJax is sourced for `plotly` widgets.

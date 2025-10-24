@@ -50,6 +50,33 @@ obj_branin$grad(x)
 obj_branin$hess(x)
 ```
 
+## Objective transformations
+
+Objective instances can apply scalar transformations to their values while keeping gradients and Hessians consistent.
+This is useful when you want to inspect a log-scaled risk surface without re-implementing the underlying model objective.
+
+```{r}
+log_design = matrix(c(-1, 0, 1, 2), ncol = 1)
+log_response = c(0, 1, 0, 1)
+
+obj_logistic = objective_logistic(log_design, log_response)
+obj_logistic_log = objective_logistic(
+  log_design,
+  log_response,
+  transform = objective_transform_log()
+)
+
+theta = c(0.2, -0.4)
+c(
+  identity = obj_logistic$eval(theta),
+  log = obj_logistic_log$eval(theta)
+)
+obj_logistic_log$transform_id
+
+obj_logistic$set_transform(objective_transform_log())
+obj_logistic$label
+```
+
 ## Visualizing objectives
 
 Use `as_visualizer()` to create a visualizer for an objective. For 1D and 2D objectives, the appropriate visualizer is selected automatically.
