@@ -119,7 +119,6 @@ From the [`TestFunctions`](https://CRAN.R-project.org/web/packages/TestFunctions
 
 ```{r, out.width='100%', out.height='4000px', echo=FALSE}
 library(plotly)
-library(ggsci)
 
 tab = as.data.table(dict_objective)
 keys = tab[list(2), key, on = "xdim"]
@@ -141,7 +140,15 @@ visualizers = map(keys, function(key) {
     )
 })
 
-subplot(visualizers, nrows = 8)
+n_cols = 2L
+subplot(
+  visualizers,
+  nrows = ceiling(length(visualizers) / n_cols),
+  shareX = FALSE,
+  shareY = FALSE,
+  margin = 0.03
+) %>%
+  layout(showlegend = FALSE)
 ```
 
 ## See also

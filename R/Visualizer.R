@@ -43,8 +43,8 @@ Visualizer = R6::R6Class("Visualizer",
     #' @param latex (`NULL`|`logical(1)`|`list`)
     #'   Controls LaTeX parsing for plot text. Supply `NULL` to auto-detect LaTeX markers,
     #'   a logical scalar to toggle parsing globally, or a named list (keys such as
-    #'   `title`, `subtitle`, `legend`, `x`, `y`, `z`, `annotations`) to override
-    #'   individual components.
+    #'   `title`, `subtitle`, `legend`, `x`, `y`, `z`) to override individual
+    #'   components.
     #' @return Invisible self for method chaining (child classes handle actual plot creation).
     plot = function(theme = NULL,
                     show_title = TRUE,
@@ -484,16 +484,12 @@ Visualizer = R6::R6Class("Visualizer",
             dist = sqrt(dx^2 + dy^2)
 
             if (dist > 0) {
-              # Normalize direction vector
               dx_norm = dx / dist
               dy_norm = dy / dist
 
-              # Calculate arrow endpoints based on arrow_size
               arrow_size = point_spec$arrow_size
               arrow_x2 = x1 + dx_norm * arrow_size
               arrow_y2 = y1 + dy_norm * arrow_size
-
-              # Create arrow data frame
               arrow_data = data.frame(
                 x = x1,
                 y = y1,
@@ -501,10 +497,7 @@ Visualizer = R6::R6Class("Visualizer",
                 yend = arrow_y2
               )
 
-              # Add arrow segment
-              # Use the same color as points if arrow_color is not specified
               arrow_color = if (is.null(point_spec$arrow_color)) point_spec$color else point_spec$arrow_color
-
               plot_obj = plot_obj + ggplot2::geom_segment(
                 data = arrow_data,
                 ggplot2::aes(x = x, y = y, xend = xend, yend = yend),
@@ -521,7 +514,6 @@ Visualizer = R6::R6Class("Visualizer",
       return(plot_obj)
     },
 
-    # Helper method to add points to plotly objects
     add_points_to_plotly = function(plot_obj, visualizer_type = "surface") {
       points_layers = private$get_layers_by_type("points")
       if (length(points_layers) == 0) {
@@ -544,13 +536,9 @@ Visualizer = R6::R6Class("Visualizer",
         }
 
         if (visualizer_type == "surface") {
-          # For 3D surface plots, need z values
           if (!"z" %in% names(points_data)) {
-            # Try to infer z values if the visualizer has a way to evaluate the function
             points_data$z = private$infer_z_values(points_data)
           }
-
-          # Add 3D scatter trace
           plot_obj = plot_obj %>% add_trace(
             x = if (length(points_data$x) == 1) list(points_data$x) else points_data$x,
             y = if (length(points_data$y) == 1) list(points_data$y) else points_data$y,
@@ -566,7 +554,6 @@ Visualizer = R6::R6Class("Visualizer",
             showlegend = FALSE
           )
 
-          # Add annotations if provided (3D text)
           if (!is.null(point_spec$annotations)) {
             text_vals = label_res$values
             ann_size = if (!is.null(point_spec$annotation_size)) point_spec$annotation_size else (eff$text_size + 1)
@@ -585,9 +572,7 @@ Visualizer = R6::R6Class("Visualizer",
             )
           }
 
-          # Add ordered path if requested
           if (point_spec$ordered && nrow(points_data) > 1) {
-            # For 3D plots, we'll use lines but with shorter segments
             for (i in 1:(nrow(points_data) - 1)) {
               x1 = points_data$x[i]
               y1 = points_data$y[i]
@@ -596,25 +581,21 @@ Visualizer = R6::R6Class("Visualizer",
               y2 = points_data$y[i + 1]
               z2 = points_data$z[i + 1]
 
-              # Calculate direction vector and normalize it
               dx = x2 - x1
               dy = y2 - y1
               dz = z2 - z1
               dist = sqrt(dx^2 + dy^2 + dz^2)
 
               if (dist > 0) {
-                # Normalize direction vector
                 dx_norm = dx / dist
                 dy_norm = dy / dist
                 dz_norm = dz / dist
 
-                # Calculate arrow endpoints based on arrow_size
                 arrow_size = point_spec$arrow_size
                 arrow_x2 = x1 + dx_norm * arrow_size
                 arrow_y2 = y1 + dy_norm * arrow_size
                 arrow_z2 = z1 + dz_norm * arrow_size
 
-                # Add arrow segment
                 plot_obj = plot_obj %>% add_trace(
                   x = c(x1, arrow_x2),
                   y = c(y1, arrow_y2),
@@ -632,7 +613,6 @@ Visualizer = R6::R6Class("Visualizer",
             }
           }
         } else {
-          # For 2D contour plots
           plot_obj = plot_obj %>% add_trace(
             x = points_data$x,
             y = points_data$y,
@@ -647,7 +627,6 @@ Visualizer = R6::R6Class("Visualizer",
             showlegend = FALSE
           )
 
-          # Add annotations if provided (2D text)
           if (!is.null(point_spec$annotations)) {
             plot_obj = plot_obj %>% plotly::add_annotations(
               x = points_data$x,
@@ -661,31 +640,25 @@ Visualizer = R6::R6Class("Visualizer",
             )
           }
 
-          # Add ordered path if requested
           if (point_spec$ordered && nrow(points_data) > 1) {
-            # For 2D plots, use shorter line segments
             for (i in 1:(nrow(points_data) - 1)) {
               x1 = points_data$x[i]
               y1 = points_data$y[i]
               x2 = points_data$x[i + 1]
               y2 = points_data$y[i + 1]
 
-              # Calculate direction vector and normalize it
               dx = x2 - x1
               dy = y2 - y1
               dist = sqrt(dx^2 + dy^2)
 
               if (dist > 0) {
-                # Normalize direction vector
                 dx_norm = dx / dist
                 dy_norm = dy / dist
 
-                # Calculate arrow endpoints based on arrow_size
                 arrow_size = point_spec$arrow_size
                 arrow_x2 = x1 + dx_norm * arrow_size
                 arrow_y2 = y1 + dy_norm * arrow_size
 
-                # Add arrow segment
                 plot_obj = plot_obj %>% add_trace(
                   x = c(x1, arrow_x2),
                   y = c(y1, arrow_y2),
@@ -708,19 +681,15 @@ Visualizer = R6::R6Class("Visualizer",
       return(plot_obj)
     },
 
-    # Helper method to prepare points data into consistent format
     prepare_points_data = function(points, visualizer_type) {
       if (is.null(points)) {
         stop("Points cannot be NULL")
       }
 
-      # Convert different input formats to data.frame
       if (is.numeric(points) && visualizer_type == "1D") {
-        # For 1D: numeric vector of x values
         points_data = data.frame(x = points, y = NA_real_)
       } else if (is.matrix(points) || is.data.frame(points)) {
         points_data = as.data.frame(points)
-        # Ensure consistent column names
         if (ncol(points_data) == 1 && visualizer_type == "1D") {
           names(points_data) = "x"
           points_data$y = NA_real_
@@ -731,7 +700,6 @@ Visualizer = R6::R6Class("Visualizer",
           }
         }
       } else if (is.list(points) && !is.data.frame(points)) {
-        # List of vectors - convert to data.frame
         if (all(sapply(points, length) == 2)) {
           points_data = data.frame(
             x = sapply(points, function(p) p[1]),
@@ -743,8 +711,6 @@ Visualizer = R6::R6Class("Visualizer",
       } else {
         stop("Unsupported points format")
       }
-
-      # Validate dimensions
       if (visualizer_type == "1D" && !"x" %in% names(points_data)) {
         stop("1D visualizers require x coordinates")
       } else if (visualizer_type %in% c("2D", "surface") && (!("x" %in% names(points_data)) || !("y" %in% names(points_data)))) {
@@ -762,9 +728,7 @@ Visualizer = R6::R6Class("Visualizer",
       return(rep(0, nrow(points_data)))
     },
 
-    # Resolve colors in all stored layers
     resolve_all_layer_colors = function() {
-      # Initialize layers_to_add if it doesn't exist
       if (is.null(private$.layers_to_add)) {
         private$.layers_to_add = list()
       }
@@ -1203,7 +1167,7 @@ Visualizer = R6::R6Class("Visualizer",
         stop("Named list entries required for `latex` control.", call. = FALSE)
       }
 
-      allowed = c("default", "title", "subtitle", "legend", "legend_title", "x", "y", "z", "axes", "annotations")
+      allowed = c("default", "title", "subtitle", "legend", "legend_title", "x", "y", "z", "axes")
       unknown = setdiff(names(latex_value), allowed)
       if (length(unknown)) {
         stop(sprintf("Unsupported latex control key(s): %s", paste(unknown, collapse = ", ")), call. = FALSE)
@@ -1424,7 +1388,7 @@ Visualizer = R6::R6Class("Visualizer",
       if (is.null(plot_obj$x$config)) {
         plot_obj$x$config = list()
       }
-      plot_obj$x$config$typesetMath <- TRUE
+      plot_obj$x$config$typesetMath = TRUE
 
       private$.mathjax_applied = TRUE
       plot_obj
@@ -1616,19 +1580,13 @@ Visualizer = R6::R6Class("Visualizer",
       eff = private$.effective_theme
       rp = private$.render_params
 
-      # Create base data for the function line
       plot_data = data.frame(
         x = data_structure$coordinates$x1,
         y = data_structure$coordinates$y
       )
 
-      # Create base ggplot
       private$.plot = private$init_ggplot(plot_data, "x", "y")
-
-      # Add the visualization layer (line for functions, points for objectives)
       private$.plot = geom_layer_func(private$.plot, plot_data, eff)
-
-      # Apply common styling
       private$gg_apply_labels_limits_theme(data_structure)
     },
 
@@ -1637,20 +1595,13 @@ Visualizer = R6::R6Class("Visualizer",
       eff = private$.effective_theme
       rp = private$.render_params
 
-      # Create base data for the filled contour
       plot_data = data.frame(
         x1 = data_structure$coordinates$x1,
         x2 = data_structure$coordinates$x2,
         y = data_structure$coordinates$y
       )
-
-      # Create base ggplot
       private$.plot = private$init_ggplot(plot_data, "x1", "x2")
-
-      # Add the visualization layer (raster for both models and objectives)
       private$.plot = geom_layer_func(private$.plot, plot_data, eff)
-
-      # Apply common styling
       private$gg_apply_labels_limits_theme(data_structure, is_2d = TRUE)
     },
 
@@ -1658,11 +1609,7 @@ Visualizer = R6::R6Class("Visualizer",
     gg_apply_labels_limits_theme = function(data_structure, is_2d = FALSE) {
       eff = private$.effective_theme
       rp = private$.render_params
-
-      # Apply theme and styling
       private$.plot = private$apply_ggplot_theme(private$.plot, eff$text_size, eff$title_size, eff$theme, eff$background, eff$show_grid, eff$grid_color)
-
-      # Determine labels
       title_text = if (!is.null(rp$plot_title)) rp$plot_title else data_structure$labels$title
       x_text = if (!is.null(rp$x_lab)) rp$x_lab else data_structure$labels$x1
       y_text = if (!is.null(rp$y_lab)) rp$y_lab else if (is_2d) data_structure$labels$x2 else data_structure$labels$y
@@ -1693,7 +1640,6 @@ Visualizer = R6::R6Class("Visualizer",
 
       private$.plot = private$.plot + do.call(ggplot2::labs, labels_list)
 
-      # Apply axis limits
       if (!is.null(rp$x_limits)) {
         private$.plot = private$.plot + ggplot2::xlim(rp$x_limits)
       }
@@ -1701,7 +1647,6 @@ Visualizer = R6::R6Class("Visualizer",
         private$.plot = private$.plot + ggplot2::ylim(rp$y_limits)
       }
 
-      # Apply legend settings: theme drives position; "none" disables legend
       legend_pos = if (is.null(eff$legend_position)) "right" else eff$legend_position
       if (!rp$show_legend || identical(legend_pos, "none")) {
         private$.plot = private$.plot + ggplot2::theme(legend.position = "none")

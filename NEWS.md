@@ -1,13 +1,12 @@
-# vistool (development)
+# vistool 0.5.1
 
 * Added `options(vistool.mathjax = c("cdn", "local", "<url>"))` to control how MathJax is sourced for plotly widgets.
-* Plotly exports now depend on `htmlwidgets`, `webshot2`, and `magick` directly; `webshot2` (headless Chrome/Chromium) is required for static surface captures.
-* Replaced the Kaleido/Python export path with an `htmlwidgets` + `webshot2` + `magick` pipeline and updated documentation.
+* Replaced the `kaleido`/Python export path with an `htmlwidgets` + `webshot2` + `magick` pipeline, completely removing any Python dependency.
 
 # vistool 0.5.0
 
 * Implemented `add_contours()` for `ggplot2` backends.
-* Added a centralized LaTeX formatter: `plot(latex = ...)` toggles math parsing, `add_points(..., annotations_latex = ...)` handles per-point flags, MathJax is wired automatically for plotly layers, and default axis labels now ship as TeX-ready `$x_1$`, `$x_2$`, `$y$`.
+* Added a centralized LaTeX formatter: `plot(latex = ...)` toggles math parsing, `add_points(..., annotations_latex = ...)` handles per-point flags.
 * Includes definitions of the `0-1` loss and objectives (including penalization terms) for the logistic and linear regression.
 
 # vistool 0.4.1

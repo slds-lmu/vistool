@@ -45,7 +45,7 @@ vis$add_optimization_trace(opt, name = "GD")
 vis$plot()
 ```
 
-<img src="man/figures/README-quick-start-1.png" width="100%" height="700px" />
+<img src="man/figures/README-quick-start-1.png" width="100%" />
 
 ## Installation
 
@@ -60,26 +60,13 @@ pak::pak("slds-lmu/vistool")
 Prefer base R tooling? `remotes::install_github("slds-lmu/vistool")`
 works as well.
 
-### Plotly backend, MathJax, and static export
+### Exporting interactive surface plots
 
-Plotly surfaces receive MathJax automatically whenever a label contains
-LaTeX markers. Control the MathJax source globally via
-`options(vistool.mathjax = "cdn")` (default), `"local"` to reuse a system
-installation, or a fully qualified URL when you host MathJax yourself.
-
-Static exports no longer rely on Python or Kaleido. When you call
-`save()` with an image extension, `vistool` writes a self-contained HTML
-snapshot, captures it through `webshot2` (headless Chrome/Chromium), and
-trims the result with `magick`. These dependencies (`htmlwidgets`,
-`webshot2`, `magick`) are now imported automatically; ensure a recent
-Chrome/Chromium is available on your system and `vis$save("plot.png")`
-just works.
-
-You can still call `save()` with `.html` to persist the interactive
-widget directly.
-
-Pkgdown builds automatically inherit this MathJax wiring, so no extra
-`<script>` tags are required.
+When you call `save()` with an image extension, `vistool` writes a
+self-contained HTML snapshot, captures it through `webshot2` (ensure
+Chrome/Chromium is available), and trims the result with `magick`. You
+can also call `save()` with `.html` to persist the interactive widget
+directly.
 
 ## Documentation roadmap
 

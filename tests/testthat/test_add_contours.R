@@ -7,8 +7,10 @@ test_that("VisualizerObj add_contours works for 2D objectives", {
   expect_no_error(vis$add_contours(bins = 7))
   expect_no_error(vis$add_contours(binwidth = 1))
 
-  p = NULL
-  expect_no_error(p <- vis$plot())
+  p = vis$plot()
+  expect_no_error({
+    p
+  })
   if (requireNamespace("ggplot2", quietly = TRUE)) {
     expect_s3_class(p, "ggplot")
     geom_names = vapply(p$layers, function(l) class(l$geom)[1], character(1))
@@ -22,14 +24,20 @@ test_that("VisualizerModel add_contours works for 2D tasks", {
 
   task = mlr3::tsk("iris")$select(c("Sepal.Length", "Sepal.Width"))
   learner = mlr3::lrn("classif.rpart")
+  learner_pkgs = unique(learner$packages)
+  for (pkg in learner_pkgs) {
+    skip_if_not_installed(pkg)
+  }
 
   vis = as_visualizer(task, learner = learner, type = "2d", n_points = 40)
 
   expect_no_error(vis$add_contours(bins = 8))
   expect_no_error(vis$add_contours(breaks = seq(4, 8, by = 0.5)))
 
-  p = NULL
-  expect_no_error(p <- vis$plot())
+  p = vis$plot()
+  expect_no_error({
+    p
+  })
   if (requireNamespace("ggplot2", quietly = TRUE)) {
     expect_s3_class(p, "ggplot")
     # There should be at least one contour geom or raster/filled geom in layers

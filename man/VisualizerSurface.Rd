@@ -68,9 +68,9 @@ Creates a new instance of this \link[R6:R6Class]{R6} class.
   grid,
   zmat,
   plot_lab = NULL,
-  x1_lab = "$x_1$",
-  x2_lab = "$x_2$",
-  z_lab = "$y$"
+  x1_lab = "x1",
+  x2_lab = "x2",
+  z_lab = "y"
 )}\if{html}{\out{</div>}}
 }
 

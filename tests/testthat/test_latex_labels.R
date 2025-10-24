@@ -46,13 +46,23 @@ test_that("plotly surfaces format LaTeX titles and axes", {
     latex = list(title = TRUE, x = TRUE, y = TRUE, z = TRUE)
   )
   layout_attrs = plt$x$layoutAttrs[[length(plt$x$layoutAttrs)]]
-  expect_equal(layout_attrs$title$text, "$\\gamma$")
-  expect_equal(layout_attrs$scene$xaxis$title$text, "$x_1$")
-  expect_equal(layout_attrs$scene$yaxis$title$text, "$x_2$")
-  expect_equal(layout_attrs$scene$zaxis$title$text, "$y$")
+  title_text = layout_attrs$title$text
+  expect_true(inherits(title_text, "TeX"))
+  expect_identical(as.character(title_text), "$\\gamma$")
+  x_text = layout_attrs$scene$xaxis$title$text
+  expect_true(inherits(x_text, "TeX"))
+  expect_identical(as.character(x_text), "$x1$")
+  y_text = layout_attrs$scene$yaxis$title$text
+  expect_true(inherits(y_text, "TeX"))
+  expect_identical(as.character(y_text), "$x2$")
+  z_text = layout_attrs$scene$zaxis$title$text
+  expect_true(inherits(z_text, "TeX"))
+  expect_identical(as.character(z_text), "$y$")
 
   vis$add_points(points = matrix(c(0, 0), ncol = 2), annotations = "$\\beta$", annotations_latex = TRUE)
   flat = vis$plot(flatten = TRUE)
   flat_layout = flat$x$layoutAttrs[[length(flat$x$layoutAttrs)]]
-  expect_equal(flat_layout$annotations$text, "$\\beta$")
+  ann_text = flat_layout$annotations$text
+  expect_true(inherits(ann_text, "TeX"))
+  expect_identical(as.character(ann_text), "$\\beta$")
 })

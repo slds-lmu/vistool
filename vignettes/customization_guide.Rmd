@@ -35,6 +35,12 @@ set.seed(1)
 
 This keeps customization consistent across every visualization while respecting the theme precedence.
 
+## LaTeX support
+
+`plotly` surfaces automatically render MathJax when labels contain LaTeX syntax.
+You can control the MathJax source globally via options(vistool.mathjax = "cdn") (default), "local" to use a system installation, or a full URL for a self-hosted source.
+For `ggplot2` figures, the `latex2exp` package must be installed.
+
 ## Theme system overview
 
 ### Theme precedence (highest to lowest)

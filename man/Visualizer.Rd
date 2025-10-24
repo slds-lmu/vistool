@@ -117,8 +117,8 @@ Z-axis limits as c(min, max) (for surface plots). If NULL, uses automatic limits
 \item{\code{latex}}{(\code{NULL}|\code{logical(1)}|\code{list})
 Controls LaTeX parsing for plot text. Supply \code{NULL} to auto-detect LaTeX markers,
 a logical scalar to toggle parsing globally, or a named list (keys such as
-\code{title}, \code{subtitle}, \code{legend}, \code{x}, \code{y}, \code{z}, \code{annotations}) to override
-individual components.}
+\code{title}, \code{subtitle}, \code{legend}, \code{x}, \code{y}, \code{z}) to override individual
+components.}
 }
 \if{html}{\out{</div>}}
 }

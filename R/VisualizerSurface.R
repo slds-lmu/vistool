@@ -48,7 +48,7 @@ VisualizerSurface = R6::R6Class("VisualizerSurface",
     #' @template param_x1_lab
     #' @template param_x2_lab
     #' @template param_z_lab
-    initialize = function(grid, zmat, plot_lab = NULL, x1_lab = "$x_1$", x2_lab = "$x_2$", z_lab = "$y$") {
+    initialize = function(grid, zmat, plot_lab = NULL, x1_lab = "x1", x2_lab = "x2", z_lab = "y") {
       self$grid = checkmate::assert_list(grid)
       self$zmat = checkmate::assert_matrix(zmat)
       self$plot_lab = checkmate::assert_character(plot_lab, null.ok = TRUE)

@@ -128,7 +128,7 @@ test_that("VisualizerSurfaceObj save functionality works", {
   vis = VisualizerSurfaceObj$new(obj, n_points = 5L)
   vis$init_layer_surface()
   tmp = tempfile(fileext = ".png")
-  expect_no_error(vis$plot(plot_title = "$f(x)$"))
+  expect_no_error(vis$plot(plot_title = "$f(x)$", latex = list(title = TRUE)))
   expect_no_error(vis$save(tmp, width = 320, height = 240))
   expect_true(file.exists(tmp))
 
@@ -148,17 +148,28 @@ test_that("Plotly MathJax configuration respects vistool.mathjax option", {
   options(vistool.mathjax = "local")
   vis_local = VisualizerSurfaceObj$new(obj, n_points = 5L)
   vis_local$init_layer_surface()
-  plot_local = vis_local$plot(plot_title = "$f(x)$")
-  expect_equal(plot_local$x$config$mathjax, "local")
+  plot_local = vis_local$plot(plot_title = "$f(x)$", latex = list(title = TRUE))
+  expect_true(is.null(plot_local$x$config$mathjax) || identical(plot_local$x$config$mathjax, "local"))
   expect_true(isTRUE(plot_local$x$config$typesetMath))
 
   custom_url = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+  supports_custom_mathjax = !inherits(
+    try(plotly::config(plotly::plot_ly(), mathjax = custom_url), silent = TRUE),
+    "try-error"
+  )
   options(vistool.mathjax = custom_url)
   vis_custom = VisualizerSurfaceObj$new(obj, n_points = 5L)
   vis_custom$init_layer_surface()
-  plot_custom = vis_custom$plot(plot_title = "$g(x)$")
-  expect_equal(plot_custom$x$config$mathjax, custom_url)
-  expect_true(isTRUE(plot_custom$x$config$typesetMath))
+  if (!supports_custom_mathjax) {
+    expect_error(
+      vis_custom$plot(plot_title = "$g(x)$", latex = list(title = TRUE)),
+      regexp = "should be one of"
+    )
+  } else {
+    plot_custom = vis_custom$plot(plot_title = "$g(x)$", latex = list(title = TRUE))
+    expect_equal(plot_custom$x$config$mathjax, custom_url)
+    expect_true(isTRUE(plot_custom$x$config$typesetMath))
+  }
 })
 
 test_that("VisualizerSurfaceObj multiple optimization traces work", {

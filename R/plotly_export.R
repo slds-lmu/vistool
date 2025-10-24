@@ -42,11 +42,13 @@ NULL
 
   tmp_dir = tempfile("vistool_plotly")
   dir.create(tmp_dir, showWarnings = FALSE, recursive = TRUE)
-  on.exit({
-    if (dir.exists(tmp_dir)) {
-      unlink(tmp_dir, recursive = TRUE, force = TRUE)
-    }
-  }, add = TRUE)
+  on.exit(
+    {
+      if (dir.exists(tmp_dir)) {
+        unlink(tmp_dir, recursive = TRUE, force = TRUE)
+      }
+    },
+    add = TRUE)
 
   tmp_html = file.path(tmp_dir, "plot.html")
   tmp_png = file.path(tmp_dir, "plot.png")
