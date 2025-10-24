@@ -155,7 +155,7 @@ You can add arbitrary points to a model visualization using `add_points()`. When
 Below we create a 1D regression task (single feature) and add three custom points with L2 squared-error geometry.
 
 ```{r, out.width='100%', out.height='700px'}
-# create target y = 2x + 1 with small noise
+# Create target y = 2x + 1 with small noise
 dt = data.table::data.table(x = seq(-1, 1, length.out = 11))
 dt[, `:=`(y = 2 * x + 1)]
 task = mlr3::TaskRegr$new(id = "lin", backend = dt, target = "y")
