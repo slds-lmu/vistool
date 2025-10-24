@@ -16,7 +16,8 @@ objective_logistic(
   penalize_intercept = FALSE,
   loss_scale = NULL,
   id = NULL,
-  label = NULL
+  label = NULL,
+  transform = objective_transform_identity()
 )
 }
 \arguments{
@@ -55,6 +56,10 @@ Identifier forwarded to \link{Objective}. Defaults to \code{"logreg"}.}
 
 \item{label}{(\code{character(1)})
 Label used for the resulting objective. Defaults to \code{"logistic risk"}.}
+
+\item{transform}{(\code{objective_transform()})
+Optional scalar transformation applied to the empirical risk before it is
+returned. Defaults to \code{\link[=objective_transform_identity]{objective_transform_identity()}}.}
 }
 \value{
 An \link{Objective} instance capturing the logistic regression risk.

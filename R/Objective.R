@@ -3,6 +3,7 @@
 #' @description
 #' This class defines the objective that is used for optimization.
 #'
+#' @include objective_transform.R
 #' @export
 Objective = R6::R6Class("Objective",
   public = list(
@@ -35,12 +36,19 @@ Objective = R6::R6Class("Objective",
     #' @param xtest (`numeric()`) Test value for `fun` during initialization. If not defined,
     #' `xtest = rep(0, ifelse(is.na(xdim), 2, xdim))` is used.
     #' @param minimize (`logical(1)`) Is the problem a minimization problem? Default is no (`FALSE`).
+    #' @param transform (`objective_transform()`) Optional scalar transformation applied
+    #'   to the objective value. Defaults to [objective_transform_identity()].
+    #' @param label_base (`character(1)`) Optional base label used when appending
+    #'   transform identifiers. Defaults to `label`.
     #' @template param_dots_fun
     #' @template return_self_invisible
     initialize = function(id, fun, label = "f", xdim, lower = NA,
-                          upper = NA, xtest = NULL, minimize = FALSE, ...) {
+                          upper = NA, xtest = NULL, minimize = FALSE,
+                          transform = objective_transform_identity(),
+                          label_base = NULL, ...) {
       self$id = assertString(id)
       self$label = assertString(label)
+      private$p_label_base = if (is.null(label_base)) self$label else assertString(label_base)
       self$minimize = assertLogical(minimize, len = 1L)
       private$p_fun = assertFunction(fun)
       private$p_xdim = assertCount(xdim, na.ok = TRUE, positive = TRUE, coerce = TRUE)
@@ -56,6 +64,7 @@ Objective = R6::R6Class("Objective",
         xtest = rep(0, ifelse(is.na(xdim), 2, xdim))
       }
       private$p_xtest = self$assert_x(xtest)
+      self$set_transform(transform)
       assertNumber(self$eval(xtest)) # check that fun works as expected
 
       self$add_log_fun(function(x, fval, grad) l2norm(grad), "gnorm")
@@ -69,10 +78,10 @@ Objective = R6::R6Class("Objective",
     #' @param x (`numeric`) The numerical input of `fun`.
     #' @return The result of `fun(x)`.
     eval = function(x) {
-      if (!is.na(private$p_xdim)) {
-        assertNumeric(x, len = private$p_xdim)
-      }
-      return(do.call(private$p_fun, c(list(x = x), private$p_fargs)))
+      x = self$assert_x(x)
+      base_value = private$eval_base_value(x)
+      transform = private$check_transform_domain(base_value)
+      transform$value(base_value)
     },
 
     #' @description Evaluate the objective function and log into the archive. Each call logs
@@ -108,28 +117,77 @@ Objective = R6::R6Class("Objective",
       }
     },
 
+    #' @description Update the active transformation for the objective.
+    #' @param transform (`objective_transform()`) Transformation descriptor created
+    #'   via [objective_transform()].
+    #' @param test (`logical(1)`) If `TRUE`, validates the transform by evaluating
+    #'   the objective at the stored test point.
+    #' @return The [Objective] invisibly.
+    set_transform = function(transform, test = TRUE) {
+      transform = private$validate_transform(transform)
+      test = assertFlag(test)
+
+      old = private$p_transform
+      private$p_transform = transform
+
+      if (isTRUE(test)) {
+        result = try(self$eval(private$p_xtest), silent = TRUE)
+        if (inherits(result, "try-error")) {
+          private$p_transform = old
+          msg = attr(result, "condition")$message
+          stop(sprintf("Failed to apply transform '%s': %s", transform$id, msg), call. = FALSE)
+        }
+      }
+
+      base_label = private$p_label_base
+      if (!is.null(base_label)) {
+        old_id = if (is.null(old)) "identity" else old$id
+        expected_label = if (identical(old_id, "identity")) {
+          base_label
+        } else {
+          sprintf("%s (%s)", base_label, old_id)
+        }
+        if (identical(self$label, expected_label)) {
+          self$label = if (identical(transform$id, "identity")) {
+            base_label
+          } else {
+            sprintf("%s (%s)", base_label, transform$id)
+          }
+        }
+      }
+
+      invisible(self)
+    },
+
+    #' @description Retrieve the active transformation descriptor.
+    #' @return An object created by [objective_transform()].
+    get_transform = function() {
+      private$ensure_transform_initialized()
+    },
+
     #' @description Evaluate the gradient of the objective function at x.
     #' @param x (`numeric`) The numerical input of `fun`.
     grad = function(x) {
-      if (is.null(private$p_gradient)) {
-        return(do.call(private$p_gradient_fallback, c(list(x = x), private$p_fargs)))
-        # return(private$p_gradient_fallback(x))
-      } else {
-        return(do.call(private$p_gradient, c(list(x = x), private$p_fargs)))
-        # return(private$p_gradient(x))
-      }
+      x = self$assert_x(x)
+      base_value = private$eval_base_value(x)
+      transform = private$check_transform_domain(base_value)
+      base_grad = private$grad_base_value(x)
+      transform$d1(base_value) * base_grad
     },
 
     #' @description Evaluate the hessian of the objective function at x.
     #' @param x (`numeric`) The numerical input of `fun`.
     hess = function(x) {
-      if (is.null(private$p_hessian)) {
-        # return(private$p_hessian_fallback(x))
-        return(do.call(private$p_hessian_fallback, c(list(x = x), private$p_fargs)))
-      } else {
-        # return(private$p_hessian(x))
-        return(do.call(private$p_hessian, c(list(x = x), private$p_fargs)))
-      }
+      x = self$assert_x(x)
+      base_value = private$eval_base_value(x)
+      transform = private$check_transform_domain(base_value)
+      base_grad = private$grad_base_value(x)
+      base_hess = private$hess_base_value(x)
+
+      d1 = transform$d1(base_value)
+      d2 = transform$d2(base_value)
+
+      d2 * tcrossprod(base_grad) + d1 * base_hess
     },
 
     #' @description Method to add custom logger to the objective.
@@ -184,11 +242,23 @@ Objective = R6::R6Class("Objective",
     xdim = function(x) {
       if (!missing(x)) stop("`xdim` is read only")
       return(private$p_xdim)
+    },
+
+    #' @field transform_id (`character(1)`) Identifier of the active transform.
+    transform_id = function(x) {
+      if (!missing(x)) stop("`transform_id` is read only")
+      private$get_transform_id()
     }
   ),
   private = list(
     # @field fun (`function`) The objective function. The first argument must be a numerical input of length `xdim`.
     p_fun = NULL,
+
+    # @field p_label_base (`character(1)`) Base label used for transform suffixing.
+    p_label_base = NULL,
+
+    # @field p_transform (`objective_transform()`) Active scalar transformation.
+    p_transform = NULL,
 
     # @field xdim (`integer(1)`) The input dimension of `fun`.
     p_xdim = NULL,
@@ -212,7 +282,71 @@ Objective = R6::R6Class("Objective",
     p_log_funs = list(),
     p_fargs = list(),
     p_gradient_fallback = function(x, ...) rootSolve::gradient(f = private$p_fun, x = x, ...)[1, ],
-    p_hessian_fallback = function(x, ...) rootSolve::hessian(f = private$p_fun, x = x, ...)
+    p_hessian_fallback = function(x, ...) rootSolve::hessian(f = private$p_fun, x = x, ...),
+
+    validate_transform = function(transform) {
+      if (!inherits(transform, "objective_transform")) {
+        stop("`transform` must be created with `objective_transform()`.", call. = FALSE)
+      }
+
+      required = c("value", "d1", "d2", "id", "domain")
+      missing = setdiff(required, names(transform))
+      if (length(missing) > 0) {
+        stop(sprintf(
+          "Transform is missing required component(s): %s.",
+          paste(missing, collapse = ", ")
+        ), call. = FALSE)
+      }
+
+      assertFunction(transform$value, args = "v")
+      assertFunction(transform$d1, args = "v")
+      assertFunction(transform$d2, args = "v")
+      transform$id = assertString(transform$id)
+      if (!is.null(transform$domain)) {
+        assertFunction(transform$domain, args = "v")
+      }
+
+      transform
+    },
+
+    ensure_transform_initialized = function() {
+      if (is.null(private$p_transform)) {
+        private$p_transform = objective_transform_identity()
+      }
+      private$p_transform
+    },
+
+    get_transform_id = function() {
+      private$ensure_transform_initialized()$id
+    },
+
+    check_transform_domain = function(value) {
+      transform = private$ensure_transform_initialized()
+      if (!is.null(transform$domain)) {
+        transform$domain(value)
+      }
+      transform
+    },
+
+    eval_base_value = function(x) {
+      do.call(private$p_fun, c(list(x = x), private$p_fargs))
+    },
+
+    grad_base_value = function(x) {
+      if (is.null(private$p_gradient)) {
+        do.call(private$p_gradient_fallback, c(list(x = x), private$p_fargs))
+      } else {
+        do.call(private$p_gradient, c(list(x = x), private$p_fargs))
+      }
+    },
+
+    hess_base_value = function(x) {
+      if (is.null(private$p_hessian)) {
+        do.call(private$p_hessian_fallback, c(list(x = x), private$p_fargs))
+      } else {
+        do.call(private$p_hessian, c(list(x = x), private$p_fargs))
+      }
+    }
   )
 )
 
@@ -299,6 +433,9 @@ build_penalty_components = function(lambda_l1, lambda_l2, mask) {
 #'   Identifier forwarded to [Objective]. Defaults to `"logreg"`.
 #' @param label (`character(1)`)
 #'   Label used for the resulting objective. Defaults to `"logistic risk"`.
+#' @param transform (`objective_transform()`)
+#'   Optional scalar transformation applied to the empirical risk before it is
+#'   returned. Defaults to [objective_transform_identity()].
 #'
 #' @return An [Objective] instance capturing the logistic regression risk.
 #' @importFrom stats plogis
@@ -306,7 +443,8 @@ build_penalty_components = function(lambda_l1, lambda_l2, mask) {
 objective_logistic = function(x, y, weights = NULL, lambda = 0, alpha = 0,
                               lambda_l1 = NULL, lambda_l2 = NULL,
                               include_intercept = TRUE, penalize_intercept = FALSE,
-                              loss_scale = NULL, id = NULL, label = NULL) {
+                              loss_scale = NULL, id = NULL, label = NULL,
+                              transform = objective_transform_identity()) {
   x = as.matrix(x)
   assertMatrix(x, mode = "numeric", any.missing = FALSE)
   n = nrow(x)
@@ -370,6 +508,9 @@ objective_logistic = function(x, y, weights = NULL, lambda = 0, alpha = 0,
 
   penalty = build_penalty_components(lambda_l1, lambda_l2, mask)
 
+  transform = assertClass(transform, "objective_transform")
+  base_label = if (is.null(label)) "logistic risk" else assertString(label)
+
   logistic_value = function(x, design, y, weights, loss_scale, penalty) {
     theta = x
     eta = drop(design %*% theta)
@@ -403,10 +544,12 @@ objective_logistic = function(x, y, weights = NULL, lambda = 0, alpha = 0,
 
   objective = Objective$new(
     id = if (is.null(id)) "logreg" else assertString(id),
-    label = if (is.null(label)) "logistic risk" else assertString(label),
+    label = base_label,
     fun = logistic_value,
     xdim = ncol(x),
     minimize = TRUE,
+    transform = transform,
+    label_base = base_label,
     design = x,
     y = y,
     weights = weights,
@@ -430,12 +573,16 @@ objective_logistic = function(x, y, weights = NULL, lambda = 0, alpha = 0,
 #'   Numeric responses for the regression task.
 #' @param loss_scale (`numeric(1)`)
 #'   Scaling factor applied to the summed squared errors. Defaults to `1 / (2 * sum(weights))`.
+#' @param transform (`objective_transform()`)
+#'   Optional scalar transformation applied to the empirical risk before it is
+#'   returned. Defaults to [objective_transform_identity()].
 #' @return An [Objective] instance capturing the squared-error regression risk.
 #' @export
 objective_linear = function(x, y, weights = NULL, lambda = 0, alpha = 0,
                             lambda_l1 = NULL, lambda_l2 = NULL,
                             include_intercept = TRUE, penalize_intercept = FALSE,
-                            loss_scale = NULL, id = NULL, label = NULL) {
+                            loss_scale = NULL, id = NULL, label = NULL,
+                            transform = objective_transform_identity()) {
   x = as.matrix(x)
   assertMatrix(x, mode = "numeric", any.missing = FALSE)
   n = nrow(x)
@@ -496,6 +643,9 @@ objective_linear = function(x, y, weights = NULL, lambda = 0, alpha = 0,
 
   penalty = build_penalty_components(lambda_l1, lambda_l2, mask)
 
+  transform = assertClass(transform, "objective_transform")
+  base_label = if (is.null(label)) "squared error risk" else assertString(label)
+
   linear_value = function(x, design, y, weights, loss_scale, penalty) {
     theta = x
     residual = y - drop(design %*% theta)
@@ -524,10 +674,12 @@ objective_linear = function(x, y, weights = NULL, lambda = 0, alpha = 0,
 
   objective = Objective$new(
     id = if (is.null(id)) "linreg" else assertString(id),
-    label = if (is.null(label)) "squared error risk" else assertString(label),
+    label = base_label,
     fun = linear_value,
     xdim = ncol(x),
     minimize = TRUE,
+    transform = transform,
+    label_base = base_label,
     design = x,
     y = y,
     weights = weights,

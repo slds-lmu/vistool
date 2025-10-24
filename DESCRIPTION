@@ -48,6 +48,28 @@ Suggests:
     rpart,
     testthat (>= 3.0.0),
     styler
+Collate:
+    'Hypothesis.R'
+    'LearnerRegrLMFormula.R'
+    'LossFunction.R'
+    'objective_transform.R'
+    'Objective.R'
+    'Optimizer.R'
+    'Visualizer.R'
+    'VisualizerLossFuns.R'
+    'VisualizerModel.R'
+    'VisualizerObj.R'
+    'VisualizerSurface.R'
+    'VisualizerSurfaceModel.R'
+    'VisualizerSurfaceObj.R'
+    'as_visualizer.R'
+    'color_management.R'
+    'internal_mlr3.R'
+    'plotly_export.R'
+    'reexports.R'
+    'step_size_control.R'
+    'theme.R'
+    'zzz.R'
 VignetteBuilder:
     knitr
 Encoding: UTF-8

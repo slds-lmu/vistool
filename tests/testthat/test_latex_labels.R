@@ -26,9 +26,12 @@ test_that("point annotations respect annotations_latex flag", {
   p = vis$plot()
   built = ggplot2::ggplot_build(p)
   label_layer = built$data[[length(built$data)]]
-  expect_true(inherits(label_layer$label[[1]], "expression"))
-  expect_equal(attr(label_layer$label[[1]], "latex"), "$\\alpha$")
+  expect_true(is.character(label_layer$label))
+  expect_equal(label_layer$label[[1]], "alpha")
   expect_identical(label_layer$label[[2]], "beta")
+
+  parsed_label = parse(text = label_layer$label[[1]], keep.source = FALSE)[[1]]
+  expect_equal(deparse(parsed_label), "alpha")
 })
 
 test_that("plotly surfaces format LaTeX titles and axes", {

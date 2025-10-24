@@ -33,6 +33,8 @@ The id of the object.}
 \item{\code{log_funs}}{(\code{list()}) A list containing logging functions. Each function must have argument.}
 
 \item{\code{xdim}}{(\code{integer(1)}) Input dimension of \code{f}.}
+
+\item{\code{transform_id}}{(\code{character(1)}) Identifier of the active transform.}
 }
 \if{html}{\out{</div>}}
 }
@@ -43,6 +45,8 @@ The id of the object.}
 \item \href{#method-Objective-eval}{\code{Objective$eval()}}
 \item \href{#method-Objective-eval_store}{\code{Objective$eval_store()}}
 \item \href{#method-Objective-assert_x}{\code{Objective$assert_x()}}
+\item \href{#method-Objective-set_transform}{\code{Objective$set_transform()}}
+\item \href{#method-Objective-get_transform}{\code{Objective$get_transform()}}
 \item \href{#method-Objective-grad}{\code{Objective$grad()}}
 \item \href{#method-Objective-hess}{\code{Objective$hess()}}
 \item \href{#method-Objective-add_log_fun}{\code{Objective$add_log_fun()}}
@@ -65,6 +69,8 @@ Creates a new instance of this \link[R6:R6Class]{R6} class.
   upper = NA,
   xtest = NULL,
   minimize = FALSE,
+  transform = objective_transform_identity(),
+  label_base = NULL,
   ...
 )}\if{html}{\out{</div>}}
 }
@@ -90,6 +96,12 @@ be of length \code{xdim}.}
 \code{xtest = rep(0, ifelse(is.na(xdim), 2, xdim))} is used.}
 
 \item{\code{minimize}}{(\code{logical(1)}) Is the problem a minimization problem? Default is no (\code{FALSE}).}
+
+\item{\code{transform}}{(\code{objective_transform()}) Optional scalar transformation applied
+to the objective value. Defaults to \code{\link[=objective_transform_identity]{objective_transform_identity()}}.}
+
+\item{\code{label_base}}{(\code{character(1)}) Optional base label used when appending
+transform identifiers. Defaults to \code{label}.}
 
 \item{\code{...}}{\cr
 Additional arguments passed to \code{fun}.}
@@ -156,6 +168,43 @@ Assert a numeric input if it is suitable or not.
 \item{\code{...}}{Additional arguments passed to \code{assertNumeric(...)}.}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Objective-set_transform"></a>}}
+\if{latex}{\out{\hypertarget{method-Objective-set_transform}{}}}
+\subsection{Method \code{set_transform()}}{
+Update the active transformation for the objective.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Objective$set_transform(transform, test = TRUE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{transform}}{(\code{objective_transform()}) Transformation descriptor created
+via \code{\link[=objective_transform]{objective_transform()}}.}
+
+\item{\code{test}}{(\code{logical(1)}) If \code{TRUE}, validates the transform by evaluating
+the objective at the stored test point.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+The \link{Objective} invisibly.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Objective-get_transform"></a>}}
+\if{latex}{\out{\hypertarget{method-Objective-get_transform}{}}}
+\subsection{Method \code{get_transform()}}{
+Retrieve the active transformation descriptor.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Objective$get_transform()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+An object created by \code{\link[=objective_transform]{objective_transform()}}.
 }
 }
 \if{html}{\out{<hr>}}
