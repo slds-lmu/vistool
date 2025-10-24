@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">vistool</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,8 +44,19 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.5.1" id="vistool-051">vistool 0.5.1<a class="anchor" aria-label="anchor" href="#vistool-051"></a></h2>
+<ul><li>Added <code>options(vistool.mathjax = c("cdn", "local", "&lt;url&gt;"))</code> to control how MathJax is sourced for <code>plotly</code> widgets.</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.5.0" id="vistool-050">vistool 0.5.0<a class="anchor" aria-label="anchor" href="#vistool-050"></a></h2>
+<ul><li>Implemented <code>add_contours()</code> for <code>ggplot2</code> backends.</li>
+<li>Added a centralized LaTeX formatter: <code>plot(latex = ...)</code> toggles math parsing, <code>add_points(..., annotations_latex = ...)</code> handles per-point flags.</li>
+<li>Replaced the <code>kaleido</code>/Python export path with an <code>htmlwidgets</code> + <code>webshot2</code> + <code>magick</code> pipeline, completely removing any Python dependency.</li>
+<li>Includes definitions of the <code>0-1</code> loss and objectives (including penalization terms) for the logistic and linear regression.</li>
+</ul></div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.4.1" id="vistool-041">vistool 0.4.1<a class="anchor" aria-label="anchor" href="#vistool-041"></a></h2>
-<ul><li>Implemented <code>add_annotation()</code> for all visualizers, enabling styled text and LaTeX annotations across ggplot2 and plotly backends.</li>
+<ul><li>Implemented <code>add_annotation()</code> for all visualizers, enabling styled text and LaTeX annotations across <code>ggplot2</code> and <code>plotly</code> backends.</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.4.0" id="vistool-040">vistool 0.4.0<a class="anchor" aria-label="anchor" href="#vistool-040"></a></h2>
@@ -59,7 +70,7 @@
 <code><a href="../reference/lss.html">lss()</a></code> now accepts <code>mlr3</code> measure keys (e.g., <code>regr.huber</code>).</li>
 <li>For 1D regression tasks, <code>add_points()</code> allows specifying a loss geometry for L1 (residuals) and L2 (squares) losses.</li>
 <li>Objective plotting: Plot limits now default to the objective’s canonical bounds if present. If no bounds are available, explicit <code>x1_limits</code>/<code>x2_limits</code> are required. If user-specified limits exceed the canonical bounds, the plot is still drawn and a warning is issued.</li>
-<li>Automatic declaration of Python <code>kaleido</code> dependency via <code><a href="https://rstudio.github.io/reticulate/reference/py_require.html" class="external-link">reticulate::py_require()</a></code> (reticulate &gt;= 1.41) to support saving surface plots without manual Miniconda setup.</li>
+<li>Automatic declaration of Python <code>kaleido</code> dependency via <code>reticulate::py_require()</code> (reticulate &gt;= 1.41) to support saving surface plots without manual Miniconda setup.</li>
 <li>New theme system.</li>
 </ul></div>
     <div class="section level2">
@@ -106,7 +117,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Marc Becker, Daniel Schalk, Lukas Burk, Manuel Helmerichs.</p>
+  <p>Developed by Marc Becker, Manuel Helmerichs, Daniel Schalk, Lukas Burk.</p>
 </div>
 
 <div class="pkgdown-footer-right">

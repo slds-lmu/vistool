@@ -9,7 +9,7 @@ and saving plots across different plotting backends (ggplot2 for 1D/2D, plotly f
 
     <a class="navbar-brand me-2" href="../index.html">vistool</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,6 +64,7 @@ and saving plots across different plotting backends (ggplot2 for 1D/2D, plotly f
 <li><p><a href="#method-Visualizer-resolve_layer_colors"><code>Visualizer$resolve_layer_colors()</code></a></p></li>
 <li><p><a href="#method-Visualizer-save"><code>Visualizer$save()</code></a></p></li>
 <li><p><a href="#method-Visualizer-add_points"><code>Visualizer$add_points()</code></a></p></li>
+<li><p><a href="#method-Visualizer-add_contours"><code>Visualizer$add_contours()</code></a></p></li>
 <li><p><a href="#method-Visualizer-add_annotation"><code>Visualizer$add_annotation()</code></a></p></li>
 <li><p><a href="#method-Visualizer-clone"><code>Visualizer$clone()</code></a></p></li>
 </ul></div><p></p><hr><a id="method-Visualizer-set_theme"></a><div class="section">
@@ -111,7 +112,8 @@ This method should be called by all child classes via <code>super$plot(...)</cod
 <span>  z_lab <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  x_limits <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  y_limits <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  z_limits <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  z_limits <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  latex <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -175,6 +177,14 @@ Y-axis limits as c(min, max). If NULL, uses automatic limits. Default is NULL.</
 <dt><code>z_limits</code></dt>
 <dd><p>(<code>numeric(2)</code>)<br>
 Z-axis limits as c(min, max) (for surface plots). If NULL, uses automatic limits. Default is NULL.</p></dd>
+
+
+<dt><code>latex</code></dt>
+<dd><p>(<code>NULL</code>|<code>logical(1)</code>|<code>list</code>)
+Controls LaTeX parsing for plot text. Supply <code>NULL</code> to auto-detect LaTeX markers,
+a logical scalar to toggle parsing globally, or a named list (keys such as
+<code>title</code>, <code>subtitle</code>, <code>legend</code>, <code>x</code>, <code>y</code>, <code>z</code>) to override individual
+components.</p></dd>
 
 
 </dl><p></p></div>
@@ -243,7 +253,8 @@ Resolution for ggplot2 plots (ignored for plotly plots).</p></dd>
 <span>  annotation_size <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  ordered <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  arrow_color <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  arrow_size <span class="op">=</span> <span class="fl">0.3</span></span>
+<span>  arrow_size <span class="op">=</span> <span class="fl">0.3</span>,</span>
+<span>  annotations_latex <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -301,13 +312,97 @@ Color of arrows when ordered = TRUE. If NULL, uses point color.</p></dd>
 Length/size of arrows when <code>ordered = TRUE</code>. Default is 0.3 units in the coordinate system.</p></dd>
 
 
+<dt><code>annotations_latex</code></dt>
+<dd><p>(<code>NULL</code>|<code><a href="https://rdrr.io/r/base/logical.html" class="external-link">logical()</a></code>)<br>
+Optional LaTeX flags for point annotations. Supply a single logical value to
+apply to all annotations or a vector matching <code>annotations</code>.</p></dd>
+
+
 </dl><p></p></div>
+</div>
+
+</div><p></p><hr><a id="method-Visualizer-add_contours"></a><div class="section">
+<h3 id="method-add-contours-">Method <code>add_contours()</code><a class="anchor" aria-label="anchor" href="#method-add-contours-"></a></h3>
+<p>Add contour lines for grid-based visualizers (2D ggplot backends).</p><div class="section">
+<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Visualizer</span><span class="op">$</span><span class="fu">add_contours</span><span class="op">(</span></span>
+<span>  breaks <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  bins <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  binwidth <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  color <span class="op">=</span> <span class="st">"auto"</span>,</span>
+<span>  linewidth <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  linetype <span class="op">=</span> <span class="st">"solid"</span>,</span>
+<span>  alpha <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  mode <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"scale"</span>, <span class="st">"single"</span><span class="op">)</span>,</span>
+<span>  palette <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>breaks</code></dt>
+<dd><p>(<code><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric()</a></code>)
+Numeric vector of contour levels. Passed to <code><a href="https://ggplot2.tidyverse.org/reference/geom_contour.html" class="external-link">ggplot2::geom_contour()</a></code>. Default <code>NULL</code>.</p></dd>
+
+
+<dt><code>bins</code></dt>
+<dd><p>(<code>integer(1)</code>)
+Number of contour bins when <code>breaks</code> is not supplied. Default <code>NULL</code> (ggplot default).</p></dd>
+
+
+<dt><code>binwidth</code></dt>
+<dd><p>(<code>numeric(1)</code>)
+Spacing between contour levels. Ignored when <code>breaks</code> supplied. Default <code>NULL</code>.</p></dd>
+
+
+<dt><code>color</code></dt>
+<dd><p>(<code>character(1)</code>)
+Line color used when <code>mode = "single"</code>. Set to "auto" to draw from the active palette or
+provide an explicit hex/name. Ignored when <code>mode = "scale"</code>.</p></dd>
+
+
+<dt><code>linewidth</code></dt>
+<dd><p>(<code>numeric(1)</code>)
+Line width. Falls back to the active theme when <code>NULL</code>.</p></dd>
+
+
+<dt><code>linetype</code></dt>
+<dd><p>(<code>character(1)</code>)
+Line type for contour strokes. Default "solid".</p></dd>
+
+
+<dt><code>alpha</code></dt>
+<dd><p>(<code>numeric(1)</code>)
+Opacity in <code>[0, 1]</code>. Uses the active theme when <code>NULL</code>.</p></dd>
+
+
+<dt><code>mode</code></dt>
+<dd><p>(<code>character(1)</code>)
+Either "scale" (default) to colour individual contour levels using a continuous palette or
+"single" to draw all contours in the same colour.</p></dd>
+
+
+<dt><code>palette</code></dt>
+<dd><p>(<code>character(1)</code>)
+Optional palette override ("viridis", "plasma", "grayscale") when <code>mode = "scale"</code>.</p></dd>
+
+
+<dt><code>...</code></dt>
+<dd><p>Additional arguments forwarded to <code><a href="https://ggplot2.tidyverse.org/reference/geom_contour.html" class="external-link">ggplot2::geom_contour()</a></code>.</p></dd>
+
+
+</dl><p></p></div>
+</div>
+<div class="section">
+<h4 id="returns-2">Returns<a class="anchor" aria-label="anchor" href="#returns-2"></a></h4>
+<p>Invisible self.</p>
 </div>
 
 </div><p></p><hr><a id="method-Visualizer-add_annotation"></a><div class="section">
 <h3 id="method-add-annotation-">Method <code>add_annotation()</code><a class="anchor" aria-label="anchor" href="#method-add-annotation-"></a></h3>
 <p>Add a textual annotation that is resolved during plotting.</p><div class="section">
-<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
+<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Visualizer</span><span class="op">$</span><span class="fu">add_annotation</span><span class="op">(</span></span>
 <span>  <span class="va">text</span>,</span>
 <span>  latex <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -324,7 +419,7 @@ Length/size of arrows when <code>ordered = TRUE</code>. Default is 0.3 units in 
 </div>
 
 <div class="section">
-<h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
+<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>text</code></dt>
 <dd><p>(<code>character(1)</code>)
 The annotation text. Must be non-empty.</p></dd>
@@ -387,19 +482,19 @@ Vertical justification, following ggplot2 semantics.</p></dd>
 </dl><p></p></div>
 </div>
 <div class="section">
-<h4 id="returns-2">Returns<a class="anchor" aria-label="anchor" href="#returns-2"></a></h4>
+<h4 id="returns-3">Returns<a class="anchor" aria-label="anchor" href="#returns-3"></a></h4>
 <p>Invisible self.</p>
 </div>
 
 </div><p></p><hr><a id="method-Visualizer-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
+<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Visualizer</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
+<h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 
@@ -416,7 +511,7 @@ Vertical justification, following ggplot2 semantics.</p></dd>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Marc Becker, Daniel Schalk, Lukas Burk, Manuel Helmerichs.</p>
+  <p>Developed by Marc Becker, Manuel Helmerichs, Daniel Schalk, Lukas Burk.</p>
 </div>
 
 <div class="pkgdown-footer-right">

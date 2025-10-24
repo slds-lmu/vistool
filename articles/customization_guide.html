@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">vistool</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -98,6 +98,16 @@ can skip extra styling and still land on a polished plot.</p>
 </blockquote>
 <p>This keeps customization consistent across every visualization while
 respecting the theme precedence.</p>
+<div class="section level2">
+<h2 id="latex-support">LaTeX support<a class="anchor" aria-label="anchor" href="#latex-support"></a>
+</h2>
+<p><code>plotly</code> surfaces automatically render MathJax when labels
+contain LaTeX syntax. You can control the MathJax source globally via
+options(vistool.mathjax = “cdn”) (default), “local” to use a system
+installation, or a full URL for a self-hosted source. For
+<code>ggplot2</code> figures, the <code>latex2exp</code> package must be
+installed.</p>
+</div>
 <div class="section level2">
 <h2 id="theme-system-overview">Theme system overview<a class="anchor" aria-label="anchor" href="#theme-system-overview"></a>
 </h2>
@@ -352,7 +362,7 @@ visualization</a></li>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Marc Becker, Daniel Schalk, Lukas Burk, Manuel Helmerichs.</p>
+  <p>Developed by Marc Becker, Manuel Helmerichs, Daniel Schalk, Lukas Burk.</p>
 </div>
 
 <div class="pkgdown-footer-right">

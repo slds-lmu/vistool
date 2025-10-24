@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="index.html">vistool</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -72,11 +72,11 @@
 <h2 id="developer-workflow">Developer workflow<a class="anchor" aria-label="anchor" href="#developer-workflow"></a></h2>
 <ul><li>Standard loop: <code>devtools::load_all()</code>, edit, <code>devtools::test()</code>; run <code>devtools::check()</code> before release/PRs.</li>
 <li>Refresh docs with <code>devtools::document()</code> and <code>devtools::build_readme()</code>; vignettes in <code>vignettes/</code> compile via <code>devtools::build_vignettes()</code>.</li>
-<li>Tests live in <code>tests/testthat/</code>; plotly/Python-dependent cases skip on CI using <code>skip_on_ci()</code> or <code>skip_if_not_installed("plotly")</code>.</li>
+<li>Tests live in <code>tests/testthat/</code>.</li>
 </ul></div>
 <div class="section level2">
 <h2 id="integration-notes">Integration notes<a class="anchor" aria-label="anchor" href="#integration-notes"></a></h2>
-<ul><li>Surface visualizations depend on <code>plotly</code> + <code>reticulate</code>; <code>$save()</code> calls <code><a href="https://rdrr.io/pkg/plotly/man/save_image.html" class="external-link">plotly::save_image()</a></code> and expects Python <code>kaleido</code> (auto via <code>py_require("kaleido")</code>, but document manual setup if interacting with reticulate envs).</li>
+<ul><li>Surface visualizations depend on <code>plotly</code>; MathJax sourcing is controlled through <code>options(vistool.mathjax)</code> (<code>"cdn"</code>, <code>"local"</code>, or a custom URL). Static exports render via <code>htmlwidgets</code> + <code>webshot2</code> (headless Chrome/Chromium) + <code>magick</code>.</li>
 <li>mlr3 tasks/learners supply model data; objectives and losses are defined under <code>R/Objective*.R</code> and <code>R/LossFunction*.R</code>.</li>
 </ul></div>
 <div class="section level2">
@@ -99,7 +99,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Marc Becker, Daniel Schalk, Lukas Burk, Manuel Helmerichs.</p>
+  <p>Developed by Marc Becker, Manuel Helmerichs, Daniel Schalk, Lukas Burk.</p>
 </div>
 
 <div class="pkgdown-footer-right">

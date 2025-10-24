@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="index.html">vistool</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -299,6 +299,10 @@
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
+<div class="section level3">
+<h3 id="latex-handling">LaTeX handling<a class="anchor" aria-label="anchor" href="#latex-handling"></a></h3>
+<p>Run plot-bound strings through <code>private$format_label()</code> rather than manual TeX glue. The helper honours <code>plot(latex = ...)</code> preferences, layer-level overrides such as <code>annotations_latex</code>, and manages both <code>latex2exp</code> (ggplot2 expressions) and MathJax configuration for plotly traces. When you add labels to data frames, wrap expression vectors with <code>I(list(...))</code> so ggplot2 keeps them list-valued.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="development-workflow">Development workflow<a class="anchor" aria-label="anchor" href="#development-workflow"></a></h2>
@@ -366,8 +370,10 @@
 </li>
 <li>Files: snake_case where feasible (e.g., <code>as_visualizer.R</code>); class files should retain CamelCase to match class names (e.g., <code>VisualizerModel.R</code>).</li>
 </ul></li>
-</ul><p>Tooling: - lintr: <code>.lintr</code> config allows both <code>snake_case</code> and <code>CamelCase</code>. It cannot distinguish classes from other objects, so we enforce “CamelCase only for classes” via code review and PRs. If you must use a non-conforming name due to external APIs, add a short comment and, if necessary, a targeted <code># nolint: object_name_linter.</code> on that line. - styler: formatting only; it does not rename identifiers. See <code>.styler</code> for formatting configuration.</p>
-<p>Documentation titles should use <strong>Sentence case</strong>.</p>
+</ul><p>Tooling:</p>
+<ul><li>lintr: <code>.lintr</code> config allows both <code>snake_case</code> and <code>CamelCase</code>. It cannot distinguish classes from other objects, so we enforce “CamelCase only for classes” via code review and PRs. If you must use a non-conforming name due to external APIs, add a short comment and, if necessary, a targeted <code># nolint: object_name_linter.</code> on that line.</li>
+<li>styler: formatting only; it does not rename identifiers. See <code>.styler</code> for formatting configuration.</li>
+</ul><p>Documentation titles should use <strong>Sentence case</strong>.</p>
 </div>
 <div class="section level3">
 <h3 id="testing">Testing<a class="anchor" aria-label="anchor" href="#testing"></a></h3>
@@ -377,7 +383,7 @@
 <li>Test both success and failure cases</li>
 <li>Use appropriate <code>expect_*()</code> functions</li>
 </ul><div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Skip tests requiring Python dependencies on CI</span></span>
+<code class="sourceCode R"><span><span class="co"># Skip tests on CI</span></span>
 <span><span class="fu">skip_on_ci</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Skip if optional package not available  </span></span>
@@ -400,7 +406,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Marc Becker, Daniel Schalk, Lukas Burk, Manuel Helmerichs.</p>
+  <p>Developed by Marc Becker, Manuel Helmerichs, Daniel Schalk, Lukas Burk.</p>
 </div>
 
 <div class="pkgdown-footer-right">

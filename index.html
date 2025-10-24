@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">vistool</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -94,7 +94,7 @@
 <span><span class="co">#&gt; TF_GoldsteinPriceLog: Batch 1 step 10: f(x) = -2.1225, x = c(0.3729, 0.3911)</span></span>
 <span><span class="va">vis</span><span class="op">$</span><span class="fu">add_optimization_trace</span><span class="op">(</span><span class="va">opt</span>, name <span class="op">=</span> <span class="st">"GD"</span><span class="op">)</span></span>
 <span><span class="va">vis</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-quick-start-1.png" width="100%" height="700px"></p>
+<p><img src="reference/figures/README-quick-start-1.png" width="100%"></p>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -104,16 +104,11 @@
 <code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
 <span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"slds-lmu/vistool"</span><span class="op">)</span></span></code></pre></div>
 <p>Prefer base R tooling? <code>remotes::install_github("slds-lmu/vistool")</code> works as well.</p>
-<div class="section level3">
-<h3 id="plotly-backend-and-static-export">Plotly backend and static export<a class="anchor" aria-label="anchor" href="#plotly-backend-and-static-export"></a>
-</h3>
-<p>Interactive surfaces rely on <code>plotly</code>, which accesses Python functionality through <code>reticulate</code>. <code>vistool</code> (via <code>reticulate &gt;= 1.41</code>) calls <code>reticulate::py_require("kaleido")</code> on demand, provisioning a cached Python environment automatically when you first save a surface plot.</p>
-<p>If you manage Python yourself, point <code>reticulate</code> to your interpreter and ensure <code>kaleido</code> is installed:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"reticulate"</span><span class="op">)</span></span>
-<span><span class="co"># Sys.setenv(RETICULATE_PYTHON = "/path/to/python")</span></span>
-<span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/py_install.html" class="external-link">py_install</a></span><span class="op">(</span><span class="st">"kaleido"</span><span class="op">)</span></span></code></pre></div>
 </div>
+<div class="section level2">
+<h2 id="exporting-interactive-surface-plots">Exporting interactive surface plots<a class="anchor" aria-label="anchor" href="#exporting-interactive-surface-plots"></a>
+</h2>
+<p>When you call <code><a href="https://rdrr.io/r/base/save.html" class="external-link">save()</a></code> with an image extension, <code>vistool</code> writes a self-contained HTML snapshot, captures it through <code>webshot2</code> (ensure Chrome/Chromium is available), and trims the result with <code>magick</code>. You can also call <code><a href="https://rdrr.io/r/base/save.html" class="external-link">save()</a></code> with <code>.html</code> to persist the interactive widget directly.</p>
 </div>
 <div class="section level2">
 <h2 id="documentation-roadmap">Documentation roadmap<a class="anchor" aria-label="anchor" href="#documentation-roadmap"></a>
@@ -159,9 +154,9 @@
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
 <li>Marc Becker <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-8115-0400" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
-<li>Daniel Schalk <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0003-0950-1947" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
+<li>Manuel Helmerichs <br><small class="roles"> Author, maintainer </small>   </li>
+<li>Daniel Schalk <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0003-0950-1947" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 <li>Lukas Burk <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0001-7528-3795" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
-<li>Manuel Helmerichs <br><small class="roles"> Author </small>   </li>
 </ul>
 </div>
 
@@ -177,7 +172,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Marc Becker, Daniel Schalk, Lukas Burk, Manuel Helmerichs.</p>
+  <p>Developed by Marc Becker, Manuel Helmerichs, Daniel Schalk, Lukas Burk.</p>
 </div>
 
 <div class="pkgdown-footer-right">
