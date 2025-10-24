@@ -62,7 +62,8 @@
 <span>  penalize_intercept <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  loss_scale <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  id <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  label <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  label <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  transform <span class="op">=</span> <span class="fu"><a href="objective_transform.html">objective_transform_identity</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -128,6 +129,12 @@ Identifier forwarded to <a href="Objective.html">Objective</a>. Defaults to <cod
 <dt id="arg-label">label<a class="anchor" aria-label="anchor" href="#arg-label"></a></dt>
 <dd><p>(<code>character(1)</code>)
 Label used for the resulting objective. Defaults to <code>"logistic risk"</code>.</p></dd>
+
+
+<dt id="arg-transform">transform<a class="anchor" aria-label="anchor" href="#arg-transform"></a></dt>
+<dd><p>(<code><a href="objective_transform.html">objective_transform()</a></code>)
+Optional scalar transformation applied to the empirical risk before it is
+returned. Defaults to <code><a href="objective_transform.html">objective_transform_identity()</a></code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

@@ -92,6 +92,10 @@ The id of the object.</p></dd>
 <dd><p>(<code>integer(1)</code>) Input dimension of <code>f</code>.</p></dd>
 
 
+<dt><code>transform_id</code></dt>
+<dd><p>(<code>character(1)</code>) Identifier of the active transform.</p></dd>
+
+
 </dl><p></p></div>
     </div>
     <div class="section level2">
@@ -104,6 +108,8 @@ The id of the object.</p></dd>
 <li><p><a href="#method-Objective-eval"><code>Objective$eval()</code></a></p></li>
 <li><p><a href="#method-Objective-eval_store"><code>Objective$eval_store()</code></a></p></li>
 <li><p><a href="#method-Objective-assert_x"><code>Objective$assert_x()</code></a></p></li>
+<li><p><a href="#method-Objective-set_transform"><code>Objective$set_transform()</code></a></p></li>
+<li><p><a href="#method-Objective-get_transform"><code>Objective$get_transform()</code></a></p></li>
 <li><p><a href="#method-Objective-grad"><code>Objective$grad()</code></a></p></li>
 <li><p><a href="#method-Objective-hess"><code>Objective$hess()</code></a></p></li>
 <li><p><a href="#method-Objective-add_log_fun"><code>Objective$add_log_fun()</code></a></p></li>
@@ -122,6 +128,8 @@ The id of the object.</p></dd>
 <span>  upper <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  xtest <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  minimize <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  transform <span class="op">=</span> <span class="fu"><a href="../reference/objective_transform.html">objective_transform_identity</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  label_base <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
@@ -161,6 +169,16 @@ be of length <code>xdim</code>.</p></dd>
 
 <dt><code>minimize</code></dt>
 <dd><p>(<code>logical(1)</code>) Is the problem a minimization problem? Default is no (<code>FALSE</code>).</p></dd>
+
+
+<dt><code>transform</code></dt>
+<dd><p>(<code><a href="objective_transform.html">objective_transform()</a></code>) Optional scalar transformation applied
+to the objective value. Defaults to <code><a href="objective_transform.html">objective_transform_identity()</a></code>.</p></dd>
+
+
+<dt><code>label_base</code></dt>
+<dd><p>(<code>character(1)</code>) Optional base label used when appending
+transform identifiers. Defaults to <code>label</code>.</p></dd>
 
 
 <dt><code>...</code></dt>
@@ -233,27 +251,49 @@ the input vector <code>x</code>, result of fun <code>fval</code>, the gradient <
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-Objective-grad"></a><div class="section">
-<h3 id="method-grad-">Method <code>grad()</code><a class="anchor" aria-label="anchor" href="#method-grad-"></a></h3>
-<p>Evaluate the gradient of the objective function at x.</p><div class="section">
+</div><p></p><hr><a id="method-Objective-set_transform"></a><div class="section">
+<h3 id="method-set-transform-">Method <code>set_transform()</code><a class="anchor" aria-label="anchor" href="#method-set-transform-"></a></h3>
+<p>Update the active transformation for the objective.</p><div class="section">
 <h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Objective</span><span class="op">$</span><span class="fu">grad</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Objective</span><span class="op">$</span><span class="fu">set_transform</span><span class="op">(</span><span class="va">transform</span>, test <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
 <h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>x</code></dt>
-<dd><p>(<code>numeric</code>) The numerical input of <code>fun</code>.</p></dd>
+<p></p><div class="arguments"><dl><dt><code>transform</code></dt>
+<dd><p>(<code><a href="objective_transform.html">objective_transform()</a></code>) Transformation descriptor created
+via <code><a href="objective_transform.html">objective_transform()</a></code>.</p></dd>
+
+
+<dt><code>test</code></dt>
+<dd><p>(<code>logical(1)</code>) If <code>TRUE</code>, validates the transform by evaluating
+the objective at the stored test point.</p></dd>
 
 
 </dl><p></p></div>
 </div>
+<div class="section">
+<h4 id="returns-2">Returns<a class="anchor" aria-label="anchor" href="#returns-2"></a></h4>
+<p>The Objective invisibly.</p>
+</div>
 
-</div><p></p><hr><a id="method-Objective-hess"></a><div class="section">
-<h3 id="method-hess-">Method <code>hess()</code><a class="anchor" aria-label="anchor" href="#method-hess-"></a></h3>
-<p>Evaluate the hessian of the objective function at x.</p><div class="section">
+</div><p></p><hr><a id="method-Objective-get_transform"></a><div class="section">
+<h3 id="method-get-transform-">Method <code>get_transform()</code><a class="anchor" aria-label="anchor" href="#method-get-transform-"></a></h3>
+<p>Retrieve the active transformation descriptor.</p><div class="section">
 <h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Objective</span><span class="op">$</span><span class="fu">hess</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Objective</span><span class="op">$</span><span class="fu">get_transform</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="returns-3">Returns<a class="anchor" aria-label="anchor" href="#returns-3"></a></h4>
+<p>An object created by <code><a href="objective_transform.html">objective_transform()</a></code>.</p>
+</div>
+
+</div><p></p><hr><a id="method-Objective-grad"></a><div class="section">
+<h3 id="method-grad-">Method <code>grad()</code><a class="anchor" aria-label="anchor" href="#method-grad-"></a></h3>
+<p>Evaluate the gradient of the objective function at x.</p><div class="section">
+<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Objective</span><span class="op">$</span><span class="fu">grad</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -265,15 +305,31 @@ the input vector <code>x</code>, result of fun <code>fval</code>, the gradient <
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-Objective-add_log_fun"></a><div class="section">
-<h3 id="method-add-log-fun-">Method <code>add_log_fun()</code><a class="anchor" aria-label="anchor" href="#method-add-log-fun-"></a></h3>
-<p>Method to add custom logger to the objective.</p><div class="section">
-<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Objective</span><span class="op">$</span><span class="fu">add_log_fun</span><span class="op">(</span><span class="va">l</span>, <span class="va">label</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><hr><a id="method-Objective-hess"></a><div class="section">
+<h3 id="method-hess-">Method <code>hess()</code><a class="anchor" aria-label="anchor" href="#method-hess-"></a></h3>
+<p>Evaluate the hessian of the objective function at x.</p><div class="section">
+<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Objective</span><span class="op">$</span><span class="fu">hess</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
 <h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>x</code></dt>
+<dd><p>(<code>numeric</code>) The numerical input of <code>fun</code>.</p></dd>
+
+
+</dl><p></p></div>
+</div>
+
+</div><p></p><hr><a id="method-Objective-add_log_fun"></a><div class="section">
+<h3 id="method-add-log-fun-">Method <code>add_log_fun()</code><a class="anchor" aria-label="anchor" href="#method-add-log-fun-"></a></h3>
+<p>Method to add custom logger to the objective.</p><div class="section">
+<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Objective</span><span class="op">$</span><span class="fu">add_log_fun</span><span class="op">(</span><span class="va">l</span>, <span class="va">label</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-7">Arguments<a class="anchor" aria-label="anchor" href="#arguments-7"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>l</code></dt>
 <dd><p>(<code>function</code>) Function that returns a single numerical value or a string.
 The arguments of <code>l</code> must be <code>x</code>, <code>fval</code> and <code>grad</code>.</p></dd>
@@ -289,7 +345,7 @@ The arguments of <code>l</code> must be <code>x</code>, <code>fval</code> and <c
 </div><p></p><hr><a id="method-Objective-clear_archive"></a><div class="section">
 <h3 id="method-clear-archive-">Method <code>clear_archive()</code><a class="anchor" aria-label="anchor" href="#method-clear-archive-"></a></h3>
 <p>Delete the archive.</p><div class="section">
-<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
+<h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Objective</span><span class="op">$</span><span class="fu">clear_archive</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -297,12 +353,12 @@ The arguments of <code>l</code> must be <code>x</code>, <code>fval</code> and <c
 </div><p></p><hr><a id="method-Objective-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
+<h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Objective</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-7">Arguments<a class="anchor" aria-label="anchor" href="#arguments-7"></a></h4>
+<h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 

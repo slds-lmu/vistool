@@ -86,6 +86,7 @@ runtime via <a href="https://mlr3misc.mlr-org.com/reference/Dictionary.html" cla
 <span class="r-out co"><span class="r-pr">#&gt;</span>     clone: function (deep = FALSE) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     eval: function (x) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     eval_store: function (x) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     get_transform: function () </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     grad: function (x) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     hess: function (x) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     id: TF_branin</span>
@@ -94,9 +95,17 @@ runtime via <a href="https://mlr3misc.mlr-org.com/reference/Dictionary.html" cla
 <span class="r-out co"><span class="r-pr">#&gt;</span>     log_funs: active binding</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     lower: -5 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     minimize: TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     set_transform: function (transform, test = TRUE) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     transform_id: active binding</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     upper: 10 15</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     xdim: active binding</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Private:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     check_transform_domain: function (value) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     ensure_transform_initialized: function () </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     eval_base_value: function (x) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     get_transform_id: function () </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     grad_base_value: function (x) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     hess_base_value: function (x) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     p_archive: data.table, data.frame</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     p_fargs: list</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     p_fun: function (x, a = 1, b = 5.1/(4 * pi^2), cc = 5/pi, r = 6, s = 10, </span>
@@ -104,9 +113,12 @@ runtime via <a href="https://mlr3misc.mlr-org.com/reference/Dictionary.html" cla
 <span class="r-out co"><span class="r-pr">#&gt;</span>     p_gradient_fallback: function (x, ...) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     p_hessian: NULL</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     p_hessian_fallback: function (x, ...) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     p_label_base: branin</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     p_log_funs: list</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     p_transform: objective_transform</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     p_xdim: 2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     p_xtest: 0 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     validate_transform: function (transform) </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

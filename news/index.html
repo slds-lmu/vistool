@@ -53,6 +53,7 @@
 <li>Added a centralized LaTeX formatter: <code>plot(latex = ...)</code> toggles math parsing, <code>add_points(..., annotations_latex = ...)</code> handles per-point flags.</li>
 <li>Replaced the <code>kaleido</code>/Python export path with an <code>htmlwidgets</code> + <code>webshot2</code> + <code>magick</code> pipeline, completely removing any Python dependency.</li>
 <li>Includes definitions of the <code>0-1</code> loss and objectives (including penalization terms) for the logistic and linear regression.</li>
+<li>Added <code><a href="../reference/objective_transform.html">objective_transform()</a></code> helpers (including <code><a href="../reference/objective_transform.html">objective_transform_log()</a></code>) and a <code>transform</code> argument on <code><a href="../reference/objective_logistic.html">objective_logistic()</a></code> / <code><a href="../reference/objective_linear.html">objective_linear()</a></code>. <code>Objective$set_transform()</code> now composes value, gradient, and Hessian outputs with the selected transform while keeping objective labels in sync.</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.4.1" id="vistool-041">vistool 0.4.1<a class="anchor" aria-label="anchor" href="#vistool-041"></a></h2>
