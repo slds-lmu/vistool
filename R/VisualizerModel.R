@@ -341,14 +341,25 @@ VisualizerModel = R6::R6Class("VisualizerModel",
 
     # Render all stored layers in the order they were added
     render_all_layers = function() {
-      if (!is.null(private$.layers_to_add)) {
-        for (layer in private$.layers_to_add) {
-          if (layer$type == "training_data") {
+      layers = private$.layers_to_add
+
+      # Draw contour layers first so later overlays remain visible
+      if (!is.null(layers) && length(layers)) {
+        for (layer in layers) {
+          if (layer$type == "contour") {
+            private$render_contour_layer(layer$spec)
+          }
+        }
+      }
+
+      if (!is.null(layers) && length(layers)) {
+        for (layer in layers) {
+          if (layer$type == "contour") {
+            next
+          } else if (layer$type == "training_data") {
             private$render_training_data_layer(layer$spec)
           } else if (layer$type == "boundary") {
             private$render_boundary_layer(layer$spec)
-          } else if (layer$type == "contour") {
-            private$render_contour_layer(layer$spec)
           } else if (layer$type == "points") {
             # Handle points layer using the base class method
             private$.plot = private$add_points_to_ggplot(private$.plot, private$.dimensionality)
@@ -375,7 +386,8 @@ VisualizerModel = R6::R6Class("VisualizerModel",
       eff = private$.effective_theme
       coords = private$.data_structure$coordinates
 
-      linewidth = if (!is.null(layer_spec$linewidth)) layer_spec$linewidth else eff$line_width
+      default_linewidth = if (!is.null(eff$line_width)) eff$line_width * 0.75 else NULL
+      linewidth = if (!is.null(layer_spec$linewidth)) layer_spec$linewidth else default_linewidth
       linetype = if (!is.null(layer_spec$linetype)) layer_spec$linetype else "solid"
       alpha = if (!is.null(layer_spec$alpha)) layer_spec$alpha else eff$alpha
       extra_args = layer_spec$extra_args

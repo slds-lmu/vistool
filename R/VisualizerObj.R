@@ -187,17 +187,28 @@ VisualizerObj = R6::R6Class("VisualizerObj",
 
     # Render all stored layers in the order they were added
     render_all_layers = function() {
-      if (!is.null(private$.layers_to_add)) {
-        # 1) Render optimization traces together so they share a combined legend
-        private$render_optimization_trace_layers()
+      layers = private$.layers_to_add
 
-        # 2) Render other generic layers
-        for (layer in private$.layers_to_add) {
-          if (layer$type == "points") {
+      # Always render contour layers first so they stay behind subsequent overlays
+      if (!is.null(layers) && length(layers)) {
+        for (layer in layers) {
+          if (layer$type == "contour") {
+            private$render_contour_layer(layer$spec)
+          }
+        }
+      }
+
+      # Render optimization traces after contours so traces stay visible
+      private$render_optimization_trace_layers()
+
+      # Render remaining layers in their original order, skipping contours already drawn
+      if (!is.null(layers) && length(layers)) {
+        for (layer in layers) {
+          if (layer$type == "contour") {
+            next
+          } else if (layer$type == "points") {
             # Handle points layer using the base class method
             private$.plot = private$add_points_to_ggplot(private$.plot, private$.dimensionality)
-          } else if (layer$type == "contour") {
-            private$render_contour_layer(layer$spec)
           }
         }
       }
@@ -219,7 +230,8 @@ VisualizerObj = R6::R6Class("VisualizerObj",
       eff = private$.effective_theme
       coords = private$.data_structure$coordinates
 
-      linewidth = if (!is.null(layer_spec$linewidth)) layer_spec$linewidth else eff$line_width
+      default_linewidth = if (!is.null(eff$line_width)) eff$line_width * 0.75 else NULL
+      linewidth = if (!is.null(layer_spec$linewidth)) layer_spec$linewidth else default_linewidth
       linetype = if (!is.null(layer_spec$linetype)) layer_spec$linetype else "solid"
       alpha = if (!is.null(layer_spec$alpha)) layer_spec$alpha else eff$alpha
       extra_args = layer_spec$extra_args
