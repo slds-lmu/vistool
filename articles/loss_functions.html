@@ -129,7 +129,7 @@ points for smooth curves.</p>
 <p>Use the <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method to plot the loss function.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">vis</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="loss_functions_files/figure-html/unnamed-chunk-6-1.png" width="100%"></p>
+<p><img src="loss_functions_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" width="100%"></p>
 </div>
 <div class="section level2">
 <h2 id="regression-loss-functions">Regression loss functions<a class="anchor" aria-label="anchor" href="#regression-loss-functions"></a>
@@ -148,7 +148,7 @@ points for smooth curves.</p>
 <span>  n_points <span class="op">=</span> <span class="fl">5000L</span> <span class="co"># higher resolution for smooth curves</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">vis_combined</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="loss_functions_files/figure-html/unnamed-chunk-7-1.png" width="100%"></p>
+<p><img src="loss_functions_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" width="100%"></p>
 </div>
 <div class="section level2">
 <h2 id="classification-loss-functions">Classification loss functions<a class="anchor" aria-label="anchor" href="#classification-loss-functions"></a>
@@ -175,7 +175,7 @@ is the prediction score:</p>
 <span>  input_type <span class="op">=</span> <span class="st">"score"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">vis_scores</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="loss_functions_files/figure-html/unnamed-chunk-8-1.png" width="100%"></p>
+<p><img src="loss_functions_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="probability-based-classification-losses">Probability-based classification losses<a class="anchor" aria-label="anchor" href="#probability-based-classification-losses"></a>
@@ -192,7 +192,7 @@ forms, while the Brier score is naturally probability-based:</p>
 <span>  input_type <span class="op">=</span> <span class="st">"probability"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">vis_probs</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="loss_functions_files/figure-html/unnamed-chunk-9-1.png" width="100%"></p>
+<p><img src="loss_functions_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="controlling-which-class-curves-to-display">Controlling which class curves to display<a class="anchor" aria-label="anchor" href="#controlling-which-class-curves-to-display"></a>
@@ -207,7 +207,7 @@ parameter:</p>
 <span>  input_type <span class="op">=</span> <span class="st">"probability"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">vis_y1</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span>y_curves <span class="op">=</span> <span class="st">"y1"</span><span class="op">)</span> <span class="co"># Only show y = 1 curve</span></span></code></pre></div>
-<p><img src="loss_functions_files/figure-html/unnamed-chunk-10-1.png" width="100%"></p>
+<p><img src="loss_functions_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" width="100%"></p>
 </div>
 </div>
 <div class="section level2">
@@ -245,7 +245,7 @@ x-coordinates.</p>
 <span>  plot_title <span class="op">=</span> <span class="st">"Loss Functions with Points"</span>,</span>
 <span>  show_legend <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="loss_functions_files/figure-html/unnamed-chunk-11-1.png" width="100%"></p>
+<p><img src="loss_functions_files/figure-html/unnamed-chunk-11-1.png" class="r-plt" width="100%"></p>
 </div>
 <div class="section level2">
 <h2 id="custom-loss-functions">Custom loss functions<a class="anchor" aria-label="anchor" href="#custom-loss-functions"></a>
@@ -261,7 +261,7 @@ x-coordinates.</p>
 <span></span>
 <span><span class="va">vis</span> <span class="op">=</span> <span class="fu"><a href="../reference/as_visualizer.html">as_visualizer</a></span><span class="op">(</span><span class="va">custom_loss</span>, y_pred <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, y_true <span class="op">=</span> <span class="fl">0</span>, n_points <span class="op">=</span> <span class="fl">5000L</span><span class="op">)</span></span>
 <span><span class="va">vis</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="loss_functions_files/figure-html/unnamed-chunk-12-1.png" width="100%"></p>
+<p><img src="loss_functions_files/figure-html/unnamed-chunk-12-1.png" class="r-plt" width="100%"></p>
 </div>
 <div class="section level2">
 <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a>
@@ -287,7 +287,7 @@ visualization</a></li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

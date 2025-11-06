@@ -1,5 +1,5 @@
 pandoc: 3.1.11
-pkgdown: 2.1.3
+pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
   advanced_visualization: advanced_visualization.html
@@ -8,7 +8,7 @@ articles:
   model: model.html
   objective: objective.html
   optimization_traces: optimization_traces.html
-last_built: 2025-10-24T22:21Z
+last_built: 2025-11-06T15:46Z
 urls:
   reference: https://slds-lmu.github.io/vistool/reference
   article: https://slds-lmu.github.io/vistool/articles
