@@ -252,6 +252,220 @@ OptimizerGD = R6::R6Class("OptimizerGD",
   )
 )
 
+#' @title Newton-Raphson optimizer
+#'
+#' @description
+#' Implements Newton-Raphson updates by combining gradients and Hessians of the
+#' objective with optional Armijo backtracking. Falls back to the gradient
+#' direction when the Hessian is singular or indefinite.
+#'
+#' @template param_objective
+#' @template param_x_start
+#' @template param_id
+#' @template param_print_trace
+#'
+#' @export
+OptimizerNR = R6::R6Class("OptimizerNR",
+  inherit = Optimizer,
+  public = list(
+    #' @description Creates a new Newton-Raphson optimizer.
+    #' @template param_objective
+    #' @template param_x_start
+    #' @param step_size (`numeric(1)`)
+    #'   Initial step size used as the starting value for line search. Default `1`.
+    #' @param gamma (`numeric(1)`)
+    #'   Armijo slope parameter in `(0, 1)`.
+    #' @param tau (`numeric(1)`)
+    #'   Multiplicative backtracking factor in `(0, 1)`.
+    #' @param max_backtracks (`integer(1)`)
+    #'   Maximum number of Armijo backtracking attempts.
+    #' @param fallback (`character(1)`)
+    #'   Strategy when the Hessian cannot be inverted. One of "gradient" or "stop".
+    #' @template param_id
+    #' @template param_print_trace
+    initialize = function(objective, x_start, step_size = 1, gamma = 0.99,
+                          tau = 0.5, max_backtracks = 20L,
+                          fallback = c("gradient", "stop"),
+                          id = "Newton-Raphson", print_trace = TRUE) {
+      super$initialize(objective$clone(deep = TRUE), x_start, id, print_trace)
+
+      private$p_step_size = checkmate::assertNumber(step_size, lower = .Machine$double.eps)
+      private$p_gamma = checkmate::assertNumber(gamma, lower = 0, upper = 1)
+      private$p_tau = checkmate::assertNumber(tau, lower = 0, upper = 1)
+      private$p_max_backtracks = checkmate::assertCount(max_backtracks, positive = TRUE)
+      private$p_fallback = match.arg(fallback)
+      private$p_lr = 1
+    },
+
+    #' @description Optimize the associated objective for a number of steps.
+    #' @template param_steps
+    #' @param step_size_control (`function()`)
+    #'   Optional callback with signature `(x, u, obj, opt)` returning a scalar
+    #'   step size. Defaults to Armijo backtracking that uses the configured
+    #'   `gamma`, `tau`, and `max_backtracks` parameters.
+    #' @param minimize (`logical(1)`)
+    #'   Whether to minimize the objective. Defaults to
+    #'   `self$objective$minimize`. Maximization is not supported and triggers an error.
+    optimize = function(steps = 1L, step_size_control = NULL, minimize = NULL) {
+      checkmate::assertCount(steps, positive = TRUE)
+      if (is.null(minimize)) {
+        minimize = self$objective$minimize
+      }
+      checkmate::assertFlag(minimize)
+      if (!minimize) {
+        stop("OptimizerNR currently supports minimization problems only.")
+      }
+
+      if (is.null(step_size_control)) {
+        step_size_control = private$armijo_control
+      } else {
+        checkmate::assertFunction(step_size_control, args = c("x", "u", "obj", "opt"))
+      }
+
+      updates = list()
+      for (step in seq_len(steps)) {
+        state = super$objective$eval_store(super$x)
+        grad = state$grad[[1]]
+        hess = super$objective$hess(super$x)
+        direction = private$compute_direction(grad, hess, minimize)
+        if (all(!is.finite(direction)) || all(abs(direction) < .Machine$double.eps)) {
+          break
+        }
+        private$p_last_grad = grad
+
+        step_size = step_size_control(super$x, direction, super$objective, self)
+        step_size = checkmate::assertNumber(step_size, lower = .Machine$double.eps)
+
+        x_new = super$x + step_size * direction
+        fval_out = super$objective$eval(x_new)
+        updates[[length(updates) + 1L]] = super$prepare_update_for_archive(
+          x_out = x_new,
+          x_in = super$x,
+          update = direction,
+          fval_out = fval_out,
+          fval_in = state$fval,
+          lr = private$p_lr,
+          step_size = step_size,
+          objective = super$objective,
+          step = step,
+          newton_step_norm = sqrt(sum(direction^2))
+        )
+        super$set_x(x_new)
+      }
+
+      if (length(updates)) {
+        super$update_archive(data.table::rbindlist(updates))
+      }
+
+      return(invisible(self))
+    },
+
+    #' @description Access or update the base step size.
+    #' @param x (`numeric(1)`)
+    #'   Replacement value. Omit to retrieve the current setting.
+    step_size = function(x) {
+      if (missing(x)) {
+        return(private$p_step_size)
+      }
+      private$p_step_size = checkmate::assertNumber(x, lower = .Machine$double.eps)
+    },
+
+    #' @description Access or update the Armijo slope parameter.
+    #' @param x (`numeric(1)`)
+    gamma = function(x) {
+      if (missing(x)) {
+        return(private$p_gamma)
+      }
+      private$p_gamma = checkmate::assertNumber(x, lower = 0, upper = 1)
+    },
+
+    #' @description Access or update the Armijo shrink factor.
+    #' @param x (`numeric(1)`)
+    tau = function(x) {
+      if (missing(x)) {
+        return(private$p_tau)
+      }
+      private$p_tau = checkmate::assertNumber(x, lower = 0, upper = 1)
+    }
+  ),
+  private = list(
+    p_step_size = 1,
+    p_gamma = 0.99,
+    p_tau = 0.5,
+    p_max_backtracks = 20L,
+    p_fallback = "gradient",
+    p_last_grad = NULL,
+
+    compute_direction = function(grad, hess, minimize) {
+      checkmate::assertNumeric(grad, any.missing = FALSE)
+      if (!is.matrix(hess)) {
+        hess = as.matrix(hess)
+      }
+      if (!all(is.finite(hess))) {
+        hess[] = NA_real_
+      }
+      hess = 0.5 * (hess + t(hess))
+      solve_res = tryCatch(solve(hess, grad), error = function(e) e)
+      if (inherits(solve_res, "error") || any(!is.finite(solve_res))) {
+        if (identical(private$p_fallback, "gradient")) {
+          direction = grad
+        } else {
+          stop(sprintf("Failed to invert Hessian: %s", conditionMessage(solve_res)), call. = FALSE)
+        }
+      } else {
+        direction = as.numeric(solve_res)
+      }
+
+      if (minimize) {
+        direction = -direction
+        grad_dir = sum(grad * direction)
+        if (!is.finite(grad_dir) || grad_dir >= 0) {
+          if (identical(private$p_fallback, "gradient")) {
+            direction = -grad
+          } else {
+            stop("Newton direction is not a descent direction and fallback is disabled.", call. = FALSE)
+          }
+        }
+      } else {
+        grad_dir = sum(grad * direction)
+        if (!is.finite(grad_dir) || grad_dir <= 0) {
+          if (identical(private$p_fallback, "gradient")) {
+            direction = grad
+          } else {
+            stop("Newton direction is not an ascent direction and fallback is disabled.", call. = FALSE)
+          }
+        }
+      }
+
+      return(direction)
+    },
+
+    armijo_control = function(x, u, obj, opt) {
+      step = private$p_step_size
+      grad = private$p_last_grad
+      if (is.null(grad)) {
+        grad = obj$grad(x)
+      }
+      directional = sum(grad * u)
+      if (!is.finite(directional)) {
+        directional = -1
+      }
+      f_curr = obj$eval(x)
+
+      for (bt in seq_len(private$p_max_backtracks)) {
+        candidate = x + step * u
+        f_next = obj$eval(candidate)
+        if (f_next <= f_curr + private$p_gamma * step * directional) {
+          return(step)
+        }
+        step = step * private$p_tau
+      }
+
+      step
+    }
+  )
+)
+
 #' @title Nesterovs momentum optimizer
 #'
 #' @description
@@ -380,7 +594,10 @@ merge_optim_archives = function(...) {
         })))
         names(ax) = common_opt
         ax$optim_id = o$id
-        ax$gnorm = o$objective$archive$gnorm
+        ax$gnorm = vapply(ax$x_out, function(x) {
+          grad = o$objective$grad(x)
+          sqrt(sum(grad^2))
+        }, numeric(1))
         ax$iteration = seq_len(nrow(ax))
         ax
       },

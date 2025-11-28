@@ -580,10 +580,13 @@ VisualizerObj = R6::R6Class("VisualizerObj",
         # Apply manual color scale (legend title optional)
         legend_title = if (!is.null(rp$legend_title)) rp$legend_title else "Trace"
         legend_name_res = private$format_label(legend_title, "legend", "ggplot")
-        legend_labels_res = private$format_label(names(color_map), "legend", "ggplot")
+        legend_label_candidates = names(color_map)
+        legend_labels_res = private$format_label(legend_label_candidates, "legend", "ggplot")
         private$.plot = private$.plot + ggplot2::scale_color_manual(
           values = color_map,
           name = legend_name_res$values,
+          breaks = legend_label_candidates,
+          limits = legend_label_candidates,
           labels = legend_labels_res$values
         )
         # linewidth/linetype not applied for points; ignore in 1D
@@ -616,9 +619,25 @@ VisualizerObj = R6::R6Class("VisualizerObj",
         legend_label_candidates = names(color_map)
         legend_labels_res = private$format_label(legend_label_candidates, "legend", "ggplot")
         private$.plot = private$.plot +
-          ggplot2::scale_color_manual(values = color_map, name = legend_name_res$values, labels = legend_labels_res$values) +
-          ggplot2::scale_linetype_manual(values = ltype_map, name = legend_name_res$values, labels = legend_labels_res$values) +
-          ggplot2::scale_linewidth_manual(values = lw_map, guide = "none")
+          ggplot2::scale_color_manual(
+            values = color_map,
+            name = legend_name_res$values,
+            breaks = legend_label_candidates,
+            limits = legend_label_candidates,
+            labels = legend_labels_res$values
+          ) +
+          ggplot2::scale_linetype_manual(
+            values = ltype_map,
+            name = legend_name_res$values,
+            breaks = legend_label_candidates,
+            limits = legend_label_candidates,
+            labels = legend_labels_res$values
+          ) +
+          ggplot2::scale_linewidth_manual(
+            values = lw_map,
+            limits = legend_label_candidates,
+            guide = "none"
+          )
 
         # Add markers and start/end indicators (no legend)
         for (tl in trace_layers) {
