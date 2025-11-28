@@ -145,8 +145,8 @@ step_size_control_decay_time()
 #>     epoch = nrow(obj$archive)
 #>     return(1/(1 + decay * epoch))
 #> }
-#> <bytecode: 0x56538a7862a8>
-#> <environment: 0x56538a7858d0>
+#> <bytecode: 0x5571f9a5c8e0>
+#> <environment: 0x5571f9a57780>
 ```
 
 Let’s define multiple gradient descent optimizers and optimize 10 steps

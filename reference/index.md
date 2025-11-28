@@ -23,6 +23,9 @@
 - [`OptimizerNAG`](https://slds-lmu.github.io/vistool/reference/OptimizerNAG.md)
   : Nesterovs momentum optimizer
 
+- [`OptimizerNR`](https://slds-lmu.github.io/vistool/reference/OptimizerNR.md)
+  : Newton-Raphson optimizer
+
 - [`Visualizer`](https://slds-lmu.github.io/vistool/reference/Visualizer.md)
   : Base visualizer class
 
