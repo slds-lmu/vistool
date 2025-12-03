@@ -105,11 +105,10 @@ set_pkg_theme_default = function(theme) {
 #' @return A [`ggplot2::theme`] object that can be composed via `+` or passed to
 #'   `ggplot2::theme_set()`.
 #' @examples
-#' theme_set(theme_vistool())
+#' ggplot2::theme_set(theme_vistool())
 #'
-#' library(ggplot2)
-#' ggplot(mtcars, aes(wt, mpg)) +
-#'   geom_point() +
+#' ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) +
+#'   ggplot2::geom_point() +
 #'   theme_vistool()
 #' @export
 theme_vistool = function(theme = NULL) {

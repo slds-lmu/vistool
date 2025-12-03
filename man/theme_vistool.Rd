@@ -18,10 +18,9 @@ A \code{\link[ggplot2:theme]{ggplot2::theme}} object that can be composed via \c
 ggplot2 theme matching vistool defaults
 }
 \examples{
-theme_set(theme_vistool())
+ggplot2::theme_set(theme_vistool())
 
-library(ggplot2)
-ggplot(mtcars, aes(wt, mpg)) +
-  geom_point() +
+ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) +
+  ggplot2::geom_point() +
   theme_vistool()
 }
