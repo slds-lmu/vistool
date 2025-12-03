@@ -98,15 +98,27 @@ set_pkg_theme_default = function(theme) {
   invisible(TRUE)
 }
 
-#' Add vistool theme to ggplot2
+#' ggplot2 theme matching vistool defaults
 #'
-#' @param object A vistool_theme object.
-#' @param plot A ggplot object.
-#' @param ... Additional arguments (unused).
-#' @keywords internal
-#' @exportS3Method ggplot2::ggplot_add
-ggplot_add.vistool_theme = function(object, plot, ...) {
-  theme_func = switch(object$theme,
+#' @param theme Optional vistool theme object. Falls back to the active
+#'   `vistool_theme()` (global default) when `NULL`.
+#' @return A [`ggplot2::theme`] object that can be composed via `+` or passed to
+#'   `ggplot2::theme_set()`.
+#' @examples
+#' theme_set(theme_vistool())
+#'
+#' library(ggplot2)
+#' ggplot(mtcars, aes(wt, mpg)) +
+#'   geom_point() +
+#'   theme_vistool()
+#' @export
+theme_vistool = function(theme = NULL) {
+  if (is.null(theme)) {
+    theme = get_pkg_theme_default()
+  }
+  assert_vistool_theme(theme)
+
+  theme_func = switch(theme$theme,
     "minimal" = ggplot2::theme_minimal,
     "bw" = ggplot2::theme_bw,
     "classic" = ggplot2::theme_classic,
@@ -118,27 +130,38 @@ ggplot_add.vistool_theme = function(object, plot, ...) {
     ggplot2::theme_minimal
   )
 
-  plot = plot + theme_func(base_size = object$text_size)
+  base_theme = theme_func(base_size = theme$text_size)
 
-  title_size = object$text_size + 2
-  theme_additions = ggplot2::theme(
+  title_size = theme$text_size + 2
+  additions = ggplot2::theme(
     plot.title = ggplot2::element_text(size = title_size, hjust = 0.5),
-    plot.background = ggplot2::element_rect(fill = object$background, color = NA),
-    panel.background = ggplot2::element_rect(fill = object$background, color = NA),
-    legend.position = object$legend_position
+    plot.background = ggplot2::element_rect(fill = theme$background, color = NA),
+    panel.background = ggplot2::element_rect(fill = theme$background, color = NA),
+    legend.position = theme$legend_position
   )
 
-  if (!object$show_grid) {
-    theme_additions = theme_additions + ggplot2::theme(
+  if (!theme$show_grid) {
+    additions = additions + ggplot2::theme(
       panel.grid.major = ggplot2::element_blank(),
       panel.grid.minor = ggplot2::element_blank()
     )
-  } else if (!is.null(object$grid_color)) {
-    theme_additions = theme_additions + ggplot2::theme(
-      panel.grid.major = ggplot2::element_line(color = object$grid_color),
-      panel.grid.minor = ggplot2::element_line(color = object$grid_color, linewidth = 0.5)
+  } else if (!is.null(theme$grid_color)) {
+    additions = additions + ggplot2::theme(
+      panel.grid.major = ggplot2::element_line(color = theme$grid_color),
+      panel.grid.minor = ggplot2::element_line(color = theme$grid_color, linewidth = 0.5)
     )
   }
 
-  plot + theme_additions
+  base_theme + additions
+}
+
+#' Add vistool theme to ggplot2
+#'
+#' @param object A vistool_theme object.
+#' @param plot A ggplot object.
+#' @param ... Additional arguments (unused).
+#' @keywords internal
+#' @exportS3Method ggplot2::ggplot_add
+ggplot_add.vistool_theme = function(object, plot, ...) {
+  plot + theme_vistool(object)
 }

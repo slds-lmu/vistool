@@ -91,3 +91,14 @@ test_that("merge_theme works correctly", {
   merged_null = merge_theme(base, NULL)
   expect_equal(merged_null, base)
 })
+
+test_that("theme_vistool returns ggplot theme object", {
+  th = theme_vistool()
+  expect_s3_class(th, "theme")
+
+  p = ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) +
+    ggplot2::geom_point() +
+    theme_vistool()
+
+  expect_s3_class(p, "ggplot")
+})
