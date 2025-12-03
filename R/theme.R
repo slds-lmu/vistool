@@ -2,6 +2,8 @@
 #'
 #' @description
 #' Lightweight theme model and helpers to manage plotting style in a single place.
+#' Can be used with vistool visualizers via `set_theme()` or added directly to
+#' ggplot2 plots using the `+` operator.
 #'
 #' @param palette Character. Color palette to use. One of "viridis", "plasma", or "grayscale".
 #' @param text_size Numeric. Base text size for plots.
@@ -16,6 +18,12 @@
 #'
 #' @examples
 #' th = vistool_theme(palette = "plasma", text_size = 12)
+#'
+#' # Use with ggplot2
+#' library(ggplot2)
+#' ggplot(mtcars, aes(x = wt, y = mpg)) +
+#'   geom_point() +
+#'   vistool_theme()
 #' @export
 vistool_theme = function(
   palette = "viridis",
@@ -41,6 +49,7 @@ vistool_theme = function(
     background = background
   )
   assert_vistool_theme(th)
+  class(th) = c("vistool_theme", "list")
   th
 }
 
@@ -87,4 +96,49 @@ set_pkg_theme_default = function(theme) {
   assert_vistool_theme(theme)
   options(vistool.theme = merge_theme(vistool_theme(), theme))
   invisible(TRUE)
+}
+
+#' Add vistool theme to ggplot2
+#'
+#' @param object A vistool_theme object.
+#' @param plot A ggplot object.
+#' @param ... Additional arguments (unused).
+#' @keywords internal
+#' @exportS3Method ggplot2::ggplot_add
+ggplot_add.vistool_theme = function(object, plot, ...) {
+  theme_func = switch(object$theme,
+    "minimal" = ggplot2::theme_minimal,
+    "bw" = ggplot2::theme_bw,
+    "classic" = ggplot2::theme_classic,
+    "gray" = ggplot2::theme_gray,
+    "grey" = ggplot2::theme_grey,
+    "light" = ggplot2::theme_light,
+    "dark" = ggplot2::theme_dark,
+    "void" = ggplot2::theme_void,
+    ggplot2::theme_minimal
+  )
+
+  plot = plot + theme_func(base_size = object$text_size)
+
+  title_size = object$text_size + 2
+  theme_additions = ggplot2::theme(
+    plot.title = ggplot2::element_text(size = title_size, hjust = 0.5),
+    plot.background = ggplot2::element_rect(fill = object$background, color = NA),
+    panel.background = ggplot2::element_rect(fill = object$background, color = NA),
+    legend.position = object$legend_position
+  )
+
+  if (!object$show_grid) {
+    theme_additions = theme_additions + ggplot2::theme(
+      panel.grid.major = ggplot2::element_blank(),
+      panel.grid.minor = ggplot2::element_blank()
+    )
+  } else if (!is.null(object$grid_color)) {
+    theme_additions = theme_additions + ggplot2::theme(
+      panel.grid.major = ggplot2::element_line(color = object$grid_color),
+      panel.grid.minor = ggplot2::element_line(color = object$grid_color, linewidth = 0.5)
+    )
+  }
+
+  plot + theme_additions
 }
