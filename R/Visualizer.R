@@ -1568,7 +1568,8 @@ Visualizer = R6::R6Class("Visualizer",
 
     # Apply theme and styling to ggplot2 object
     apply_ggplot_theme = function(plot_obj, text_size = 11, title_size = NULL, theme = "minimal",
-                                  background = "white", show_grid = TRUE, grid_color = "gray90") {
+                                  background = "white", show_grid = TRUE, grid_color = "gray90",
+                                  palette = NULL) {
       # derive sizes
       if (is.null(title_size)) title_size = text_size + 2
 
@@ -1607,47 +1608,17 @@ Visualizer = R6::R6Class("Visualizer",
         )
       }
 
+      plot_obj = plot_obj + vistool_palette_theme(palette)
+
       return(plot_obj)
     },
 
     # Apply color scales to ggplot2 object
     apply_ggplot_color_scale = function(plot_obj, color_palette = "viridis", scale_type = "fill", discrete = FALSE) {
       if (scale_type == "fill") {
-        if (discrete) {
-          if (color_palette == "viridis") {
-            plot_obj = plot_obj + ggplot2::scale_fill_viridis_d()
-          } else if (color_palette == "plasma") {
-            plot_obj = plot_obj + ggplot2::scale_fill_viridis_d(option = "plasma")
-          } else if (color_palette == "grayscale") {
-            plot_obj = plot_obj + ggplot2::scale_fill_grey()
-          }
-        } else {
-          if (color_palette == "viridis") {
-            plot_obj = plot_obj + ggplot2::scale_fill_viridis_c()
-          } else if (color_palette == "plasma") {
-            plot_obj = plot_obj + ggplot2::scale_fill_viridis_c(option = "plasma")
-          } else if (color_palette == "grayscale") {
-            plot_obj = plot_obj + ggplot2::scale_fill_gradient(low = "black", high = "white")
-          }
-        }
+        plot_obj = plot_obj + if (discrete) ggplot2::scale_fill_discrete() else ggplot2::scale_fill_continuous()
       } else if (scale_type == "color") {
-        if (discrete) {
-          if (color_palette == "viridis") {
-            plot_obj = plot_obj + ggplot2::scale_color_viridis_d()
-          } else if (color_palette == "plasma") {
-            plot_obj = plot_obj + ggplot2::scale_color_viridis_d(option = "plasma")
-          } else if (color_palette == "grayscale") {
-            plot_obj = plot_obj + ggplot2::scale_color_grey()
-          }
-        } else {
-          if (color_palette == "viridis") {
-            plot_obj = plot_obj + ggplot2::scale_color_viridis_c()
-          } else if (color_palette == "plasma") {
-            plot_obj = plot_obj + ggplot2::scale_color_viridis_c(option = "plasma")
-          } else if (color_palette == "grayscale") {
-            plot_obj = plot_obj + ggplot2::scale_color_gradient(low = "black", high = "white")
-          }
-        }
+        plot_obj = plot_obj + if (discrete) ggplot2::scale_color_discrete() else ggplot2::scale_color_continuous()
       }
 
       return(plot_obj)
@@ -1687,7 +1658,10 @@ Visualizer = R6::R6Class("Visualizer",
     gg_apply_labels_limits_theme = function(data_structure, is_2d = FALSE) {
       eff = private$.effective_theme
       rp = private$.render_params
-      private$.plot = private$apply_ggplot_theme(private$.plot, eff$text_size, eff$title_size, eff$theme, eff$background, eff$show_grid, eff$grid_color)
+      private$.plot = private$apply_ggplot_theme(
+        private$.plot, eff$text_size, eff$title_size, eff$theme, eff$background,
+        eff$show_grid, eff$grid_color, eff$palette
+      )
       title_text = if (!is.null(rp$plot_title)) rp$plot_title else data_structure$labels$title
       x_text = if (!is.null(rp$x_lab)) rp$x_lab else data_structure$labels$x1
       y_text = if (!is.null(rp$y_lab)) rp$y_lab else if (is_2d) data_structure$labels$x2 else data_structure$labels$y

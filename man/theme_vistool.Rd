@@ -4,11 +4,14 @@
 \alias{theme_vistool}
 \title{ggplot2 theme matching vistool defaults}
 \usage{
-theme_vistool(theme = NULL)
+theme_vistool(theme = NULL, ...)
 }
 \arguments{
 \item{theme}{Optional vistool theme object. Falls back to the active
 \code{vistool_theme()} (global default) when \code{NULL}.}
+
+\item{...}{Additional arguments passed to \code{ggplot2::theme()} to override
+defaults for a specific plot.}
 }
 \value{
 A \code{\link[ggplot2:theme]{ggplot2::theme}} object that can be composed via \code{+} or passed to
@@ -22,5 +25,5 @@ ggplot2::theme_set(theme_vistool())
 
 ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) +
   ggplot2::geom_point() +
-  theme_vistool()
+  theme_vistool(legend.position = "bottom")
 }

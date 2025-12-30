@@ -98,10 +98,35 @@ set_pkg_theme_default = function(theme) {
   invisible(TRUE)
 }
 
+#' Build ggplot2 palette theme elements
+#' @keywords internal
+vistool_palette_theme = function(palette) {
+  palette = if (is.null(palette)) "viridis" else palette
+  checkmate::assert_choice(palette, choices = c("viridis", "plasma", "grayscale"))
+
+  discrete_key = paste0("discrete_", palette)
+  discrete_colors = .vistool_colors[[discrete_key]]
+  if (is.null(discrete_colors)) {
+    discrete_colors = .vistool_colors[["discrete"]]
+  }
+
+  scale_def = get_continuous_colorscale(palette)
+  continuous_colors = vapply(scale_def, function(entry) entry[[2]], character(1))
+
+  ggplot2::theme(
+    palette.colour.discrete = discrete_colors,
+    palette.fill.discrete = discrete_colors,
+    palette.colour.continuous = continuous_colors,
+    palette.fill.continuous = continuous_colors
+  )
+}
+
 #' ggplot2 theme matching vistool defaults
 #'
 #' @param theme Optional vistool theme object. Falls back to the active
 #'   `vistool_theme()` (global default) when `NULL`.
+#' @param ... Additional arguments passed to `ggplot2::theme()` to override
+#'   defaults for a specific plot.
 #' @return A [`ggplot2::theme`] object that can be composed via `+` or passed to
 #'   `ggplot2::theme_set()`.
 #' @examples
@@ -109,9 +134,9 @@ set_pkg_theme_default = function(theme) {
 #'
 #' ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) +
 #'   ggplot2::geom_point() +
-#'   theme_vistool()
+#'   theme_vistool(legend.position = "bottom")
 #' @export
-theme_vistool = function(theme = NULL) {
+theme_vistool = function(theme = NULL, ...) {
   if (is.null(theme)) {
     theme = get_pkg_theme_default()
   }
@@ -138,6 +163,8 @@ theme_vistool = function(theme = NULL) {
     panel.background = ggplot2::element_rect(fill = theme$background, color = NA),
     legend.position = theme$legend_position
   )
+  palette_theme = vistool_palette_theme(theme$palette)
+  extra = ggplot2::theme(...)
 
   if (!theme$show_grid) {
     additions = additions + ggplot2::theme(
@@ -151,7 +178,7 @@ theme_vistool = function(theme = NULL) {
     )
   }
 
-  base_theme + additions
+  base_theme + additions + palette_theme + extra
 }
 
 #' Add vistool theme to ggplot2
