@@ -211,6 +211,9 @@ reference](https://slds-lmu.github.io/vistool/DEVELOPMENT.md).
 - [`step_size_control_line_search()`](https://slds-lmu.github.io/vistool/reference/step_size_control_line_search.md)
   : Conduct line search in each iteration to adjust the update.
 
+- [`theme_vistool()`](https://slds-lmu.github.io/vistool/reference/theme_vistool.md)
+  : ggplot2 theme matching vistool defaults
+
 - [`vistool_theme()`](https://slds-lmu.github.io/vistool/reference/vistool_theme.md)
   : vistool theming utilities
 

@@ -21,7 +21,7 @@ This class defines the optimization technique.
 
 - `archive`:
 
-  ([`data.table()`](https://rdatatable.gitlab.io/data.table/reference/data.table.html))
+  ([`data.table()`](https://rdrr.io/pkg/data.table/man/data.table.html))
   Archive of all calls to `$eval_store`.
 
 - `objective`:
@@ -150,8 +150,8 @@ Prepare updates for adding them to the archive.
 
 #### Returns
 
-[`data.table()`](https://rdatatable.gitlab.io/data.table/reference/data.table.html)
-of the input arguments.
+[`data.table()`](https://rdrr.io/pkg/data.table/man/data.table.html) of
+the input arguments.
 
 ------------------------------------------------------------------------
 
@@ -167,7 +167,7 @@ Add points to the archive.
 
 - `ain`:
 
-  [`data.table()`](https://rdatatable.gitlab.io/data.table/reference/data.table.html)
+  [`data.table()`](https://rdrr.io/pkg/data.table/man/data.table.html)
   with names "x_out", "x_in", "update", "fval_out", "fval_in", "lr",
   "objective", and "step".
 

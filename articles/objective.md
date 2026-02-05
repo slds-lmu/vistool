@@ -54,6 +54,7 @@ as.data.table(dict_objective)
 #> 32:                 linreg  squared error risk     2        NA      NA
 #> 33:                 logreg       logistic risk     2        NA      NA
 #>                        key               label  xdim     lower   upper
+#>                     <char>              <char> <int>    <list>  <list>
 ```
 
 To retrieve an objective function:

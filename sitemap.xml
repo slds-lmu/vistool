@@ -38,6 +38,7 @@
 <url><loc>https://slds-lmu.github.io/vistool/reference/get_continuous_colorscale.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/get_pkg_theme_default.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/get_vistool_color.html</loc></url>
+<url><loc>https://slds-lmu.github.io/vistool/reference/ggplot_add.vistool_theme.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/hex_to_rgba.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/index.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/lss.html</loc></url>
@@ -55,7 +56,9 @@
 <url><loc>https://slds-lmu.github.io/vistool/reference/step_size_control_decay_steps.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/step_size_control_decay_time.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/step_size_control_line_search.html</loc></url>
+<url><loc>https://slds-lmu.github.io/vistool/reference/theme_vistool.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/validate_color.html</loc></url>
+<url><loc>https://slds-lmu.github.io/vistool/reference/vistool_palette_theme.html</loc></url>
 <url><loc>https://slds-lmu.github.io/vistool/reference/vistool_theme.html</loc></url>
 </urlset>
 

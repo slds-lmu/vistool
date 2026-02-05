@@ -1,7 +1,8 @@
 # vistool theming utilities
 
 Lightweight theme model and helpers to manage plotting style in a single
-place.
+place. Can be used with vistool visualizers via `set_theme()` or added
+directly to ggplot2 plots using the `+` operator.
 
 ## Usage
 
@@ -69,4 +70,10 @@ vistool_theme(
 
 ``` r
 th = vistool_theme(palette = "plasma", text_size = 12)
+
+# Use with ggplot2
+library(ggplot2)
+ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point() +
+  vistool_theme()
 ```

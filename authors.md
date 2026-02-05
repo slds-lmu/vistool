@@ -12,14 +12,14 @@
 
 ## Citation
 
-Becker M, Helmerichs M, Schalk D, Burk L (2025). *vistool: Visualize
+Becker M, Helmerichs M, Schalk D, Burk L (2026). *vistool: Visualize
 optimization methods*. R package version 0.5.1,
 <https://slds-lmu.github.io/vistool/>.
 
     @Manual{,
       title = {vistool: Visualize optimization methods},
       author = {Marc Becker and Manuel Helmerichs and Daniel Schalk and Lukas Burk},
-      year = {2025},
+      year = {2026},
       note = {R package version 0.5.1},
       url = {https://slds-lmu.github.io/vistool/},
     }
