@@ -2,6 +2,7 @@
 # vistool 0.5.1
 
 * Added `options(vistool.mathjax = c("cdn", "local", "<url>"))` to control how MathJax is sourced for `plotly` widgets.
+* Added `theme_vistool()` as a bridge from `vistool_theme()` to `ggplot2` themes.
 
 # vistool 0.5.0
 

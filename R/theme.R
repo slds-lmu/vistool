@@ -2,6 +2,8 @@
 #'
 #' @description
 #' Lightweight theme model and helpers to manage plotting style in a single place.
+#' Can be used with vistool visualizers via `set_theme()` or added directly to
+#' ggplot2 plots using the `+` operator.
 #'
 #' @param palette Character. Color palette to use. One of "viridis", "plasma", or "grayscale".
 #' @param text_size Numeric. Base text size for plots.
@@ -16,6 +18,12 @@
 #'
 #' @examples
 #' th = vistool_theme(palette = "plasma", text_size = 12)
+#'
+#' # Use with ggplot2
+#' library(ggplot2)
+#' ggplot(mtcars, aes(x = wt, y = mpg)) +
+#'   geom_point() +
+#'   vistool_theme()
 #' @export
 vistool_theme = function(
   palette = "viridis",
@@ -41,6 +49,7 @@ vistool_theme = function(
     background = background
   )
   assert_vistool_theme(th)
+  class(th) = c("vistool_theme", "list")
   th
 }
 
@@ -87,4 +96,98 @@ set_pkg_theme_default = function(theme) {
   assert_vistool_theme(theme)
   options(vistool.theme = merge_theme(vistool_theme(), theme))
   invisible(TRUE)
+}
+
+#' Build ggplot2 palette theme elements
+#' @keywords internal
+vistool_palette_theme = function(palette) {
+  palette = if (is.null(palette)) "viridis" else palette
+  checkmate::assert_choice(palette, choices = c("viridis", "plasma", "grayscale"))
+
+  discrete_key = paste0("discrete_", palette)
+  discrete_colors = .vistool_colors[[discrete_key]]
+  if (is.null(discrete_colors)) {
+    discrete_colors = .vistool_colors[["discrete"]]
+  }
+
+  scale_def = get_continuous_colorscale(palette)
+  continuous_colors = vapply(scale_def, function(entry) entry[[2]], character(1))
+
+  ggplot2::theme(
+    palette.colour.discrete = discrete_colors,
+    palette.fill.discrete = discrete_colors,
+    palette.colour.continuous = continuous_colors,
+    palette.fill.continuous = continuous_colors
+  )
+}
+
+#' ggplot2 theme matching vistool defaults
+#'
+#' @param theme Optional vistool theme object. Falls back to the active
+#'   `vistool_theme()` (global default) when `NULL`.
+#' @param ... Additional arguments passed to `ggplot2::theme()` to override
+#'   defaults for a specific plot.
+#' @return A [`ggplot2::theme`] object that can be composed via `+` or passed to
+#'   `ggplot2::theme_set()`.
+#' @examples
+#' ggplot2::theme_set(theme_vistool())
+#'
+#' ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) +
+#'   ggplot2::geom_point() +
+#'   theme_vistool(legend.position = "bottom")
+#' @export
+theme_vistool = function(theme = NULL, ...) {
+  if (is.null(theme)) {
+    theme = get_pkg_theme_default()
+  }
+  assert_vistool_theme(theme)
+
+  theme_func = switch(theme$theme,
+    "minimal" = ggplot2::theme_minimal,
+    "bw" = ggplot2::theme_bw,
+    "classic" = ggplot2::theme_classic,
+    "gray" = ggplot2::theme_gray,
+    "grey" = ggplot2::theme_grey,
+    "light" = ggplot2::theme_light,
+    "dark" = ggplot2::theme_dark,
+    "void" = ggplot2::theme_void,
+    ggplot2::theme_minimal
+  )
+
+  base_theme = theme_func(base_size = theme$text_size)
+
+  title_size = theme$text_size + 2
+  additions = ggplot2::theme(
+    plot.title = ggplot2::element_text(size = title_size, hjust = 0.5),
+    plot.background = ggplot2::element_rect(fill = theme$background, color = NA),
+    panel.background = ggplot2::element_rect(fill = theme$background, color = NA),
+    legend.position = theme$legend_position
+  )
+  palette_theme = vistool_palette_theme(theme$palette)
+  extra = ggplot2::theme(...)
+
+  if (!theme$show_grid) {
+    additions = additions + ggplot2::theme(
+      panel.grid.major = ggplot2::element_blank(),
+      panel.grid.minor = ggplot2::element_blank()
+    )
+  } else if (!is.null(theme$grid_color)) {
+    additions = additions + ggplot2::theme(
+      panel.grid.major = ggplot2::element_line(color = theme$grid_color),
+      panel.grid.minor = ggplot2::element_line(color = theme$grid_color, linewidth = 0.5)
+    )
+  }
+
+  base_theme + additions + palette_theme + extra
+}
+
+#' Add vistool theme to ggplot2
+#'
+#' @param object A vistool_theme object.
+#' @param plot A ggplot object.
+#' @param ... Additional arguments (unused).
+#' @keywords internal
+#' @exportS3Method ggplot2::ggplot_add
+ggplot_add.vistool_theme = function(object, plot, ...) {
+  plot + theme_vistool(object)
 }

@@ -91,3 +91,32 @@ test_that("merge_theme works correctly", {
   merged_null = merge_theme(base, NULL)
   expect_equal(merged_null, base)
 })
+
+test_that("theme_vistool returns ggplot theme object", {
+  th = theme_vistool()
+  expect_s3_class(th, "theme")
+
+  p = ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) +
+    ggplot2::geom_point() +
+    theme_vistool()
+
+  expect_s3_class(p, "ggplot")
+})
+
+test_that("theme_vistool supports ggplot2 overrides via dots", {
+  th = theme_vistool(legend.position = "bottom")
+  expect_equal(th$legend.position, "bottom")
+})
+
+test_that("theme_vistool sets palette theme elements", {
+  th = theme_vistool(vistool_theme(palette = "plasma"))
+  expect_true(is.character(th$palette.colour.discrete))
+  expect_true(is.character(th$palette.colour.continuous))
+  expect_equal(th$palette.colour.discrete[1], get_vistool_color(1, "discrete", base_palette = "plasma"))
+
+  scale_def = get_continuous_colorscale("plasma")
+  cont_colors = vapply(scale_def, function(entry) entry[[2]], character(1))
+  expect_equal(th$palette.colour.continuous, cont_colors)
+  expect_equal(th$palette.fill.discrete, th$palette.colour.discrete)
+  expect_equal(th$palette.fill.continuous, th$palette.colour.continuous)
+})

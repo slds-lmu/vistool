@@ -22,7 +22,7 @@ Imports:
     checkmate,
     colorspace,
     data.table,
-    ggplot2,
+    ggplot2 (>= 4.0.0),
     ggsci,
     htmlwidgets,
     magick,
